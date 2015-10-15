@@ -34,4 +34,27 @@ public class SourceCodeFileChange {
 		this.repairedCode = repairedCode;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+
+		if(o instanceof SourceCodeFileChange) {
+
+			SourceCodeFileChange a = (SourceCodeFileChange) o;
+
+			if(this.buggyFile.equals(a.buggyFile)
+				&& this.repairedFile.equals(a.repairedFile)) {
+
+				return true;
+
+			}
+
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return (this.buggyFile + this.repairedCode).hashCode();
+	}
+
 }

@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.pangor.classify.alert;
 
 import ca.ubc.ece.salt.pangor.batch.Commit;
+import ca.ubc.ece.salt.pangor.batch.SourceCodeFileChange;
 
 
 /**
@@ -20,9 +21,10 @@ public class DeserializedClassifierAlert extends ClassifierAlert {
 	 */
 	private String explanation;
 
-	public DeserializedClassifierAlert(Commit ami, String functionName,
-			String type, String subtype, String description, String explanation, int id) {
-		super(ami, functionName, type, subtype, id);
+	public DeserializedClassifierAlert(Commit commit, SourceCodeFileChange sourceCodeFileChange,
+			String functionName, String type, String subtype, String description,
+			String explanation, int id) {
+		super(commit, sourceCodeFileChange, functionName, type, subtype, id);
 		this.description = description;
 		this.explanation = explanation;
 	}
@@ -39,13 +41,14 @@ public class DeserializedClassifierAlert extends ClassifierAlert {
 
 		if(features.length < 12) throw new Exception("De-serialization exception. Serial format not recognized.");
 
-		Commit ami = new Commit(-1, -1,
-				features[1], features[2], features[3], features[4], features[5],
-				features[6], null, null);
+		Commit commit = new Commit(-1, -1,
+				features[1], features[2], features[3], features[4]);
+
+		SourceCodeFileChange sourceCodeFileChange = new SourceCodeFileChange(features[5], features[6], null, null);
 
 		DeserializedClassifierAlert classifierAlert = new DeserializedClassifierAlert(
-				ami, features[7], features[8], features[9], features[10], features[11],
-				Integer.parseInt(features[0]));
+				commit, sourceCodeFileChange, features[7], features[8], features[9],
+				features[10], features[11], Integer.parseInt(features[0]));
 
 		return classifierAlert;
 
@@ -65,14 +68,16 @@ public class DeserializedClassifierAlert extends ClassifierAlert {
 	public boolean equals(Object o) {
 		if(o instanceof DeserializedClassifierAlert) {
 			DeserializedClassifierAlert a = (DeserializedClassifierAlert) o;
-			return this.ami.equals(a.ami) && this.getLongDescription().equals(a.getLongDescription());
+			return this.commit.equals(a.commit)
+					&& this.sourceCodeFileChange.equals(a.sourceCodeFileChange)
+					&& this.getLongDescription().equals(a.getLongDescription());
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return this.ami.hashCode();
+		return this.commit.hashCode();
 	}
 
 }

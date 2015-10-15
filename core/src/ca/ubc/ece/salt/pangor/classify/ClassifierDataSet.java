@@ -136,7 +136,7 @@ public class ClassifierDataSet implements DataSet<ClassifierAlert> {
 		/* Finished writing the alert. */
 		stream.close();
 
-		/* Write the source code to a folder so we can examine it later. */
+		/* Write the source code to a folder so we can excommitne it later. */
 		this.printSupplementaryFiles(alert);
 
 	}
@@ -280,8 +280,8 @@ public class ClassifierDataSet implements DataSet<ClassifierAlert> {
 		try (PrintStream srcStream = new PrintStream(new FileOutputStream(src));
 			 PrintStream dstStream = new PrintStream(new FileOutputStream(dst));) {
 
-			srcStream.print(alert.ami.buggyCode);
-			dstStream.print(alert.ami.repairedCode);
+			srcStream.print(alert.sourceCodeFileChange.buggyCode);
+			dstStream.print(alert.sourceCodeFileChange.repairedCode);
 
 			srcStream.close();
 			dstStream.close();

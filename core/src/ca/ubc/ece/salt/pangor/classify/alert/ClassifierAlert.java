@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.pangor.classify.alert;
 
 import ca.ubc.ece.salt.pangor.analysis.Alert;
 import ca.ubc.ece.salt.pangor.batch.Commit;
+import ca.ubc.ece.salt.pangor.batch.SourceCodeFileChange;
 
 
 /**
@@ -24,8 +25,9 @@ public abstract class ClassifierAlert extends Alert {
 	 * @param checker The checker which generated the alert.
 	 * @param subtype A checker may detect more than one repair subtype.
 	 */
-	public ClassifierAlert(Commit ami, String functionName, String type, String subtype) {
-		super(ami, functionName);
+	public ClassifierAlert(Commit commit, SourceCodeFileChange sourceCodeFileChange,
+			String functionName, String type, String subtype) {
+		super(commit, sourceCodeFileChange, functionName);
 		this.type = type;
 		this.subtype = subtype;
 	}
@@ -39,8 +41,9 @@ public abstract class ClassifierAlert extends Alert {
 	 * @param subtype A checker may detect more than one repair subtype.
 	 * @param id The unique id for the alert.
 	 */
-	public ClassifierAlert(Commit ami, String functionName, String type, String subtype, int id) {
-		super(ami, functionName, id);
+	public ClassifierAlert(Commit commit, SourceCodeFileChange sourceCodeFileChange,
+			String functionName, String type, String subtype, int id) {
+		super(commit, sourceCodeFileChange, functionName, id);
 		this.type = type;
 		this.subtype = subtype;
 	}
@@ -52,11 +55,23 @@ public abstract class ClassifierAlert extends Alert {
 	 */
 	public String serialize() {
 
-		String serialized = id + "," + this.ami.projectID + "," + this.ami.projectHomepage
-				+ "," + this.ami.buggyFile + "," + this.ami.repairedFile
-				+ "," + this.ami.buggyCommitID + "," + this.ami.repairedCommitID
-				+ "," + this.functionName + "," + this.type + "," + this.subtype
-				+ "," + this.getLongDescription() + "," + this.getAlertExplanation();
+		/* Serialize the commit info. */
+		String serialized = id + "," + this.commit.projectID + "," + this.commit.projectHomepage
+				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
+				+ "," + this.functionName + "," + this.type + "," + this.subtype;
+
+		/* Serialize the source code file info (if any) */
+		if(this.sourceCodeFileChange != null) {
+			serialized += "," + this.sourceCodeFileChange.buggyFile
+					    + "," + this.sourceCodeFileChange.repairedFile;
+		}
+		else {
+			serialized += ",null"
+					    + ",null";
+		}
+
+		/* Serialize the alert. */
+		serialized += "," + this.getLongDescription() + "," + this.getAlertExplanation();
 
 		return serialized;
 
