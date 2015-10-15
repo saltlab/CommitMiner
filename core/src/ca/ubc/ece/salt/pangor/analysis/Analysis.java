@@ -3,7 +3,7 @@ package ca.ubc.ece.salt.pangor.analysis;
 import java.util.List;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.batch.Commit;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
@@ -25,13 +25,13 @@ public abstract class Analysis<U extends Alert, T extends DataSet<U>> {
 	/**
 	 * The meta info for the analysis (i.e., project id, file paths, commit IDs, etc.).
 	 */
-	protected AnalysisMetaInformation ami;
+	protected Commit ami;
 
 	/**
 	 * @param dataSet The data set that will keep track of the alerts.
 	 * @param ami The meta information from the bulk analysis.
 	 */
-	public Analysis(DataSet<U> dataSet, AnalysisMetaInformation ami) {
+	public Analysis(DataSet<U> dataSet, Commit ami) {
 		this.dataSet = dataSet;
 		this.ami = ami;
 	}

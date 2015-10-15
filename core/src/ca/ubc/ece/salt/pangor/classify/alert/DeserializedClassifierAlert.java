@@ -1,6 +1,6 @@
 package ca.ubc.ece.salt.pangor.classify.alert;
 
-import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.batch.Commit;
 
 
 /**
@@ -20,7 +20,7 @@ public class DeserializedClassifierAlert extends ClassifierAlert {
 	 */
 	private String explanation;
 
-	public DeserializedClassifierAlert(AnalysisMetaInformation ami, String functionName,
+	public DeserializedClassifierAlert(Commit ami, String functionName,
 			String type, String subtype, String description, String explanation, int id) {
 		super(ami, functionName, type, subtype, id);
 		this.description = description;
@@ -39,7 +39,7 @@ public class DeserializedClassifierAlert extends ClassifierAlert {
 
 		if(features.length < 12) throw new Exception("De-serialization exception. Serial format not recognized.");
 
-		AnalysisMetaInformation ami = new AnalysisMetaInformation(-1, -1,
+		Commit ami = new Commit(-1, -1,
 				features[1], features[2], features[3], features[4], features[5],
 				features[6], null, null);
 

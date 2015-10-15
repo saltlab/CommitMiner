@@ -3,7 +3,7 @@ package ca.ubc.ece.salt.pangor.analysis;
 import java.util.List;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.batch.Commit;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
@@ -27,7 +27,7 @@ public abstract class MetaAnalysis<U extends Alert, T extends DataSet<U>,
 	 * @param srcAnalysis The analysis to run on the source (or buggy) file.
 	 * @param dstAnalysis The analysis to run on the destination (or repaired) file.
 	 */
-	public MetaAnalysis(T dataSet, AnalysisMetaInformation ami, S srcAnalysis, D dstAnalysis) {
+	public MetaAnalysis(T dataSet, Commit ami, S srcAnalysis, D dstAnalysis) {
 		super(dataSet, ami);
 		this.srcAnalysis = srcAnalysis;
 		this.dstAnalysis = dstAnalysis;

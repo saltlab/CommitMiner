@@ -1,7 +1,7 @@
 package ca.ubc.ece.salt.pangor.classify.alert;
 
 import ca.ubc.ece.salt.pangor.analysis.Alert;
-import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.batch.Commit;
 
 
 /**
@@ -24,7 +24,7 @@ public abstract class ClassifierAlert extends Alert {
 	 * @param checker The checker which generated the alert.
 	 * @param subtype A checker may detect more than one repair subtype.
 	 */
-	public ClassifierAlert(AnalysisMetaInformation ami, String functionName, String type, String subtype) {
+	public ClassifierAlert(Commit ami, String functionName, String type, String subtype) {
 		super(ami, functionName);
 		this.type = type;
 		this.subtype = subtype;
@@ -39,7 +39,7 @@ public abstract class ClassifierAlert extends Alert {
 	 * @param subtype A checker may detect more than one repair subtype.
 	 * @param id The unique id for the alert.
 	 */
-	public ClassifierAlert(AnalysisMetaInformation ami, String functionName, String type, String subtype, int id) {
+	public ClassifierAlert(Commit ami, String functionName, String type, String subtype, int id) {
 		super(ami, functionName, id);
 		this.type = type;
 		this.subtype = subtype;

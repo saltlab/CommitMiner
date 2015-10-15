@@ -19,6 +19,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
+import ca.ubc.ece.salt.pangor.analysis2.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.git.GitProject;
 
 /**
@@ -27,14 +28,14 @@ import ca.ubc.ece.salt.pangor.git.GitProject;
 public class GitProjectAnalysis extends GitProject {
 
 	/** Runs an analysis on a source file. **/
-	private AnalysisRunner runner;
+	private CommitAnalysis<?,?,?,?> commitAnalysis;
 
 	/**
 	 * Constructor that is used by our static factory methods.
 	 */
-	protected GitProjectAnalysis(GitProject gitProject, AnalysisRunner runner) {
+	protected GitProjectAnalysis(GitProject gitProject, CommitAnalysis<?,?,?,?> commitAnalysis) {
 		super(gitProject);
-		this.runner = runner;
+		this.commitAnalysis = commitAnalysis;
 	}
 
 	/**
@@ -88,8 +89,16 @@ public class GitProjectAnalysis extends GitProject {
 
 		List<DiffEntry> diffs = diffCommand.call();
 
-		for(DiffEntry diff : diffs) {
+		/* The {@code Commit} is meta data and a set of source code changes. */
+		Commit commit = new Commit(
+				this.totalCommits, this.bugFixingCommits,
+				this.projectID,
+				this.projectHomepage,
+				buggyRevision, bugFixingRevision);
 
+		/* Iterate through the modified files and add them as
+		 * {@code SourceCodeFileChange}s in the commit. */
+		for(DiffEntry diff : diffs) {
 
 			if(diff.getOldPath().matches("^.*\\.js$") && diff.getNewPath().matches("^.*\\.js$")){
 
@@ -108,32 +117,30 @@ public class GitProjectAnalysis extends GitProject {
 				logger.debug("Exploring diff \n {} \n {} - {} \n {} - {}", getURI(), buggyRevision, diff.getOldPath(),
 						bugFixingRevision, diff.getNewPath());
 
+				/* Add this source code file change to the commit. */
+
                 String oldFile = this.fetchBlob(buggyRevision, diff.getOldPath());
                 String newFile = this.fetchBlob(bugFixingRevision, diff.getNewPath());
 
-                try {
-                	AnalysisMetaInformation ami = new AnalysisMetaInformation(
-                			this.totalCommits, this.bugFixingCommits,
-                			this.projectID,
-                			this.projectHomepage,
-                			diff.getOldPath(), diff.getNewPath(),
-                			buggyRevision, bugFixingRevision,
-                			oldFile, newFile);
-                	runner.analyzeFile(ami);
-                }
-                catch(Exception ignore) {
-                	System.err.println("Ignoring exception in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nOld File: " + diff.getOldPath() + "\nBug Fixing Revision: " + bugFixingRevision + "\nNew File:" + diff.getNewPath());
-                	System.out.println(oldFile);
-                	System.out.println(newFile);
-                	throw ignore;
-                }
-                catch(Error e) {
-                	System.err.println("Ignoring error in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nOld File: " + diff.getOldPath() + "\nBug Fixing Revision: " + bugFixingRevision + "\nNew File:" + diff.getNewPath());
-                	System.out.println(oldFile);
-                	System.out.println(newFile);
-                	throw e;
-                }
+                commit.addSourceCodeFileChange(new SourceCodeFileChange(
+                		diff.getOldPath(), diff.getNewPath(),
+                		oldFile, newFile));
+
 			}
+		}
+
+		/* Run the {@code CommitAnalysis} through the AnalysisRunner. */
+
+		try {
+			commitAnalysis.analyze(commit);
+		}
+		catch(Exception ignore) {
+			System.err.println("Ignoring exception in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nBug Fixing Revision: " + bugFixingRevision);
+			throw ignore;
+		}
+		catch(Error e) {
+			System.err.println("Ignoring error in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nBug Fixing Revision: " + bugFixingRevision);
+			throw e;
 		}
 
 	}
@@ -191,11 +198,11 @@ public class GitProjectAnalysis extends GitProject {
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitProjectAnalysisException
 	 */
-	public static GitProjectAnalysis fromDirectory(String directory, String name, AnalysisRunner runner)
+	public static GitProjectAnalysis fromDirectory(String directory, String name, CommitAnalysis<?,?,?,?> commitAnalysis)
 			throws GitProjectAnalysisException {
 		GitProject gitProject = GitProject.fromDirectory(directory, name);
 
-		return new GitProjectAnalysis(gitProject, runner);
+		return new GitProjectAnalysis(gitProject, commitAnalysis);
 	}
 
 	/**
@@ -208,11 +215,11 @@ public class GitProjectAnalysis extends GitProject {
 	 * @throws TransportException
 	 * @throws InvalidRemoteException
 	 */
-	public static GitProjectAnalysis fromURI(String uri, String directory, AnalysisRunner runner)
+	public static GitProjectAnalysis fromURI(String uri, String directory, CommitAnalysis<?,?,?,?> commitAnalysis)
 			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
 		GitProject gitProject = GitProject.fromURI(uri, directory);
 
-		return new GitProjectAnalysis(gitProject, runner);
+		return new GitProjectAnalysis(gitProject, commitAnalysis);
 	}
 
 }

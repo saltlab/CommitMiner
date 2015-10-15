@@ -67,6 +67,13 @@ public class ControlFlowDifferencing {
 	}
 
 	/**
+	 * @return The context needed to perform a {@code SourceCodeFileAnalysis}
+	 */
+	public CFDContext getContext() {
+		return this.context;
+	}
+
+	/**
 	 * Perform a control flow differencing analysis.
 	 * @param analysis The analysis to run.
 	 * @return The list of alerts from the analysis.

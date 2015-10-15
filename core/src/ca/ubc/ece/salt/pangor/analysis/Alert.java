@@ -1,6 +1,6 @@
 package ca.ubc.ece.salt.pangor.analysis;
 
-import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.batch.Commit;
 
 /**
  * Stores some information that has been inferred by static analysis.
@@ -17,13 +17,13 @@ public abstract class Alert {
 	public String functionName;
 
 	/** The meta info for the analysis (project, buggy/repaired files, etc.). */
-	public AnalysisMetaInformation ami;
+	public Commit ami;
 
 	/**
 	 * @param ami The meta information from a bulk analysis.
 	 * @param functionName The name of the function that was analyzed.
 	 **/
-	public Alert(AnalysisMetaInformation ami, String functionName) {
+	public Alert(Commit ami, String functionName) {
 		this.ami = ami;
 		this.functionName = functionName;
 		this.id = getNextID();
@@ -34,7 +34,7 @@ public abstract class Alert {
 	 * @param ami The meta information from a bulk analysis.
 	 * @param functionName The name of the function that was analyzed.
 	 **/
-	public Alert(AnalysisMetaInformation ami, String functionName, int id) {
+	public Alert(Commit ami, String functionName, int id) {
 		this.ami = ami;
 		this.functionName = functionName;
 		this.id = id;

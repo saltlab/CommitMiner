@@ -3,7 +3,7 @@ package ca.ubc.ece.salt.pangor.analysis2;
 import java.util.List;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.batch.Commit;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
@@ -12,7 +12,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFG;
 public class FileAnalysisInformation {
 
 	/** Meta information about the file we are analyzing. **/
-	public AnalysisMetaInformation ami;
+	public Commit ami;
 
 	/** The root of the source AST for this file. **/
 	public ClassifiedASTNode srcRoot;
