@@ -19,4 +19,11 @@ public interface CFGFactory {
 	 */
 	List<CFG> createCFGs(ClassifiedASTNode root);
 
+	/**
+	 * @param extension The source code file extension.
+	 * @return true if the CFGFactory accepts the type of source code file
+	 * specified by the extension.
+	 */
+	boolean acceptsExtension(String extension);
+
 }

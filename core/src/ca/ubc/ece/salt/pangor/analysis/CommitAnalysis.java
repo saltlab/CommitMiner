@@ -1,13 +1,12 @@
-package ca.ubc.ece.salt.pangor.analysis2;
+package ca.ubc.ece.salt.pangor.analysis;
 
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.mozilla.javascript.EvaluatorException;
 
-import ca.ubc.ece.salt.pangor.analysis.Alert;
-import ca.ubc.ece.salt.pangor.analysis.DataSet;
 import ca.ubc.ece.salt.pangor.batch.Commit;
 import ca.ubc.ece.salt.pangor.batch.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
@@ -17,22 +16,19 @@ import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 /**
  * Gathers facts about one commit and synthesizes alerts based on those facts.
  *
- * @param <U> The type of alert the data set stores.
- * @param <T> The type of data set that stores the analysis results.
+ * @param <A> The type of alert the data set stores.
+ * @param <DS> The type of data set that stores the analysis results.
  * @param <S> The type of the source file analysis.
  * @param <D> Type type of the destination file analysis.
- *
- * TODO: Here is where we should create pre and post conditions. When both conditions are met, we register
- * some alert... which also needs to be defined by the subclass.
  */
-public abstract class CommitAnalysis<U extends Alert, T extends DataSet<U>,
-	S extends SourceCodeFileAnalysis, D extends SourceCodeFileAnalysis> {
+public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends DataSet<A>,
+	S extends SourceCodeFileAnalysis<A>, D extends SourceCodeFileAnalysis<A>> {
 
 	/**
 	 * The data set manages the alerts by storing and loading alerts to and
 	 * from the disk, performing pre-processing tasks and calculating metrics.
 	 */
-	private T dataSet;
+	private DataSet<Alert> dataSet;
 
 	/** The source file analysis to use. **/
 	private S srcAnalysis;
@@ -43,7 +39,7 @@ public abstract class CommitAnalysis<U extends Alert, T extends DataSet<U>,
 	/**
 	 * A map of file extensions to CFGFactories (used for control flow differencing).
 	 */
-	private Map<String, CFGFactory> cfgFactories;
+	private CFGFactory cfgFactory;
 
 	/** Set to true to enable AST pre-processing. **/
 	private boolean preProcess;
@@ -52,11 +48,12 @@ public abstract class CommitAnalysis<U extends Alert, T extends DataSet<U>,
 	 * @param srcAnalysis The analysis to run on the source (or buggy) file.
 	 * @param dstAnalysis The analysis to run on the destination (or repaired) file.
 	 */
-	public CommitAnalysis(T dataSet, Commit ami, S srcAnalysis, D dstAnalysis,
-			Map<String, CFGFactory> cfgFactories, boolean preProcess) {
+	public CommitAnalysis(DataSet<Alert> dataSet, Commit ami, S srcAnalysis, D dstAnalysis,
+			CFGFactory cfgFactory, boolean preProcess) {
+		this.dataSet = dataSet;
 		this.srcAnalysis = srcAnalysis;
 		this.dstAnalysis = dstAnalysis;
-		this.cfgFactories = cfgFactories;
+		this.cfgFactory = cfgFactory;
 		this.preProcess = preProcess;
 	}
 
@@ -76,7 +73,7 @@ public abstract class CommitAnalysis<U extends Alert, T extends DataSet<U>,
 		}
 
 		/* Synthesize the alerts from the analysis facts. */
-		this.synthesizeAlerts();
+		this.synthesizeAlerts(commit);
 
 	}
 
@@ -88,9 +85,35 @@ public abstract class CommitAnalysis<U extends Alert, T extends DataSet<U>,
 	 *
 	 * @throws Exception
 	 */
-	protected void synthesizeAlerts() throws Exception {
+	protected void synthesizeAlerts(Commit commit) throws Exception {
 
-		/* TODO: Compute the set of (P - A) n C ... that is patters minus antipatterns intersecting preconditions. */
+		/* Get the facts (patterns, anti-patterns and pre-conditions) from the
+		 * source and destination analysis. */
+
+		List<Pattern<A>> patterns = this.srcAnalysis.getPatterns();
+		patterns.addAll(this.dstAnalysis.getPatterns());
+
+		Set<AntiPattern> antiPatterns = this.srcAnalysis.getAntiPatterns();
+		antiPatterns.addAll(this.dstAnalysis.getAntiPatterns());
+
+		Set<PreCondition> preConditions = this.srcAnalysis.getPreConditions();
+		preConditions.addAll(this.dstAnalysis.getPreConditions());
+
+		/* Compute the set of (P - A) n C ... that is patters minus
+		 * anti-patterns intersecting pre-conditions. */
+
+		List<A> alerts = new LinkedList<A>();
+		for(Pattern<A> pattern : patterns) {
+			if(pattern.accept(antiPatterns, preConditions)) {
+				alerts.add(pattern.getAlert());
+			}
+		}
+
+		/* Register the alerts. */
+
+		for(Alert alert : alerts) {
+			this.dataSet.registerAlert(alert);
+		}
 
 	}
 
@@ -107,12 +130,8 @@ public abstract class CommitAnalysis<U extends Alert, T extends DataSet<U>,
 		/* Get the file extension. */
 		String fileExtension = getSourceCodeFileExtension(sourceCodeFileChange.buggyFile, sourceCodeFileChange.repairedFile);
 
-		/* Look up the CFGFactory. */
-		CFGFactory cfgFactory = null;
-		if(fileExtension != null) cfgFactory = this.cfgFactories.get(fileExtension);
-
 		/* Difference the files and analyze if they are an extension we handle. */
-		if(cfgFactory != null) {
+		if(fileExtension != null && cfgFactory.acceptsExtension(fileExtension)) {
 
 			/* Control flow difference the files. */
 			ControlFlowDifferencing cfd = null;
@@ -152,7 +171,7 @@ public abstract class CommitAnalysis<U extends Alert, T extends DataSet<U>,
 	 * 	or the extensions of the pre and post paths do not match.
 	 */
 	private static String getSourceCodeFileExtension(String preCommitPath, String postCommitPath) {
-		Pattern pattern = Pattern.compile("\\.[a-z]+$");
+		java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\.[a-z]+$");
 		Matcher preMatcher = pattern.matcher(preCommitPath);
 		Matcher postMatcher = pattern.matcher(postCommitPath);
 

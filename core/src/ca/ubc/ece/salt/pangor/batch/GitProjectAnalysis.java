@@ -19,7 +19,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
-import ca.ubc.ece.salt.pangor.analysis2.CommitAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.git.GitProject;
 
 /**
@@ -28,12 +28,12 @@ import ca.ubc.ece.salt.pangor.git.GitProject;
 public class GitProjectAnalysis extends GitProject {
 
 	/** Runs an analysis on a source file. **/
-	private CommitAnalysis<?,?,?,?> commitAnalysis;
+	private CommitAnalysis<?,?,?,?,?> commitAnalysis;
 
 	/**
 	 * Constructor that is used by our static factory methods.
 	 */
-	protected GitProjectAnalysis(GitProject gitProject, CommitAnalysis<?,?,?,?> commitAnalysis) {
+	protected GitProjectAnalysis(GitProject gitProject, CommitAnalysis<?,?,?,?,?> commitAnalysis) {
 		super(gitProject);
 		this.commitAnalysis = commitAnalysis;
 	}
@@ -198,7 +198,7 @@ public class GitProjectAnalysis extends GitProject {
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitProjectAnalysisException
 	 */
-	public static GitProjectAnalysis fromDirectory(String directory, String name, CommitAnalysis<?,?,?,?> commitAnalysis)
+	public static GitProjectAnalysis fromDirectory(String directory, String name, CommitAnalysis<?,?,?,?,?> commitAnalysis)
 			throws GitProjectAnalysisException {
 		GitProject gitProject = GitProject.fromDirectory(directory, name);
 
@@ -215,7 +215,7 @@ public class GitProjectAnalysis extends GitProject {
 	 * @throws TransportException
 	 * @throws InvalidRemoteException
 	 */
-	public static GitProjectAnalysis fromURI(String uri, String directory, CommitAnalysis<?,?,?,?> commitAnalysis)
+	public static GitProjectAnalysis fromURI(String uri, String directory, CommitAnalysis<?,?,?,?,?> commitAnalysis)
 			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
 		GitProject gitProject = GitProject.fromURI(uri, directory);
 

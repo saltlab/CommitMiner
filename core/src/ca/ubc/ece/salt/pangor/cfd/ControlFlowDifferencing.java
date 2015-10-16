@@ -12,7 +12,6 @@ import org.kohsuke.args4j.CmdLineParser;
 
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.pangor.analysis.Analysis;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.cfg.diff.CFGDifferencing;
@@ -71,19 +70,6 @@ public class ControlFlowDifferencing {
 	 */
 	public CFDContext getContext() {
 		return this.context;
-	}
-
-	/**
-	 * Perform a control flow differencing analysis.
-	 * @param analysis The analysis to run.
-	 * @return The list of alerts from the analysis.
-	 * @throws Exception
-	 */
-	public void analyze(Analysis<?, ?> analysis) throws Exception {
-
-		/* Perform the analysis. */
-        analysis.analyze(this.context.srcScript, this.context.srcCFGs, this.context.dstScript, this.context.dstCFGs);
-
 	}
 
 	/**

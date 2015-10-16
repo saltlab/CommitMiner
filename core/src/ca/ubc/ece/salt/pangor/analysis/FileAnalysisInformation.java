@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.analysis2;
+package ca.ubc.ece.salt.pangor.analysis;
 
 import java.util.List;
 
