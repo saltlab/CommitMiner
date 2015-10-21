@@ -8,19 +8,14 @@ import ca.ubc.ece.salt.pangor.batch.Commit;
  * Describes a pattern found by an analysis.
  * @param <A> The type of alert that is produced by this analysis.
  */
-public abstract class Pattern<A extends Alert> {
+public abstract class Pattern {
 
-	/** The commit that this pattern was found in. */
-	protected Commit commit;
-
-	public Pattern(Commit commit) {
-		this.commit = commit;
-	}
+	public Pattern() { }
 
 	/**
 	 * @return An {@code Alert} representation of this pattern.
 	 */
-	public abstract A getAlert();
+	public abstract Alert getAlert(Commit commit);
 
 	/**
 	 * @param antiPatterns The list of anti-patterns produced during the analysis.

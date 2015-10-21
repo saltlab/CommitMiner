@@ -12,8 +12,13 @@ public class TestSimpleAnalysis {
 
 	@Test
 	public void test() {
-		/* TODO */
+
+		/* These represent a method-rename refactoring. */
+		String source = "/Users/qhanam/Documents/workspace_pangor/pangor/core/test/input/java-source/User.java";
+		String destination = "/Users/qhanam/Documents/workspace_pangor/pangor/core/test/input/java-destination/User.java";
+
 		fail("Not yet implemented");
+
 	}
 
 }

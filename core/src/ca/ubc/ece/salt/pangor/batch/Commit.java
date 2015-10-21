@@ -1,7 +1,13 @@
 package ca.ubc.ece.salt.pangor.batch;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
+import ca.ubc.ece.salt.pangor.analysis.AntiPattern;
+import ca.ubc.ece.salt.pangor.analysis.Pattern;
+import ca.ubc.ece.salt.pangor.analysis.PreCondition;
 
 /**
  * Stores the meta information for a commit. This information includes meta
@@ -35,6 +41,15 @@ public class Commit {
 	/** The list of source code file changes that occur in this commit. */
 	public List<SourceCodeFileChange> sourceCodeFileChanges;
 
+	/** Pre-conditions found by the analysis. **/
+	private Set<PreCondition> preConditions;
+
+	/** Anti-patterns found by the analysis. **/
+	private Set<AntiPattern> antiPatterns;
+
+	/** Patterns found by the analysis. **/
+	private List<Pattern> patterns;
+
 	/**
 	 * @param totalCommits The number of commits inspected.
 	 * @param bugFixingCommits The number of bug fixing commits analyzed.
@@ -57,6 +72,11 @@ public class Commit {
 
 		this.sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
 
+		/* Initialize the pattern sets. */
+		this.preConditions = new HashSet<PreCondition>();
+		this.antiPatterns = new HashSet<AntiPattern>();
+		this.patterns = new LinkedList<Pattern>();
+
 	}
 
 	/**
@@ -65,6 +85,51 @@ public class Commit {
 	 */
 	public void addSourceCodeFileChange(SourceCodeFileChange scfc) {
 		this.sourceCodeFileChanges.add(scfc);
+	}
+
+	/**
+	 * Adds a pre-condition fact.
+	 * @param preCondition The pre-condition.
+	 */
+	protected void addPreCondition(PreCondition preCondition) {
+		this.preConditions.add(preCondition);
+	}
+
+	/**
+	 * @return The set of pre-condition facts generated during the analysis.
+	 */
+	public Set<PreCondition> getPreConditions() {
+		return this.preConditions;
+	}
+
+	/**
+	 * Adds an anti-pattern fact.
+	 * @param antiPattern The anti-pattern.
+	 */
+	protected void addAntiPattern(AntiPattern antiPattern) {
+		this.antiPatterns.add(antiPattern);
+	}
+
+	/**
+	 * @return The set of anti-pattern facts generated during the analysis.
+	 */
+	public Set<AntiPattern> getAntiPatterns() {
+		return this.antiPatterns;
+	}
+
+	/**
+	 * Adds a pattern fact.
+	 * @param pattern The pattern.
+	 */
+	protected void addPattern(Pattern pattern) {
+		this.patterns.add(pattern);
+	}
+
+	/**
+	 * @return The set of pattern facts generated during the analysis.
+	 */
+	public List<Pattern> getPatterns() {
+		return this.patterns;
 	}
 
 	@Override

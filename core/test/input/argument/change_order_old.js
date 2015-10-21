@@ -1,1 +1,0 @@
-foo.bar(lol, "some string", 1);

@@ -22,7 +22,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
  * @param <D> Type type of the destination file analysis.
  */
 public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends DataSet<A>,
-	S extends SourceCodeFileAnalysis<A>, D extends SourceCodeFileAnalysis<A>> {
+	S extends SourceCodeFileAnalysis, D extends SourceCodeFileAnalysis> {
 
 	/**
 	 * The data set manages the alerts by storing and loading alerts to and
@@ -90,22 +90,18 @@ public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends Da
 		/* Get the facts (patterns, anti-patterns and pre-conditions) from the
 		 * source and destination analysis. */
 
-		List<Pattern<A>> patterns = this.srcAnalysis.getPatterns();
-		patterns.addAll(this.dstAnalysis.getPatterns());
-
-		Set<AntiPattern> antiPatterns = this.srcAnalysis.getAntiPatterns();
-		antiPatterns.addAll(this.dstAnalysis.getAntiPatterns());
-
-		Set<PreCondition> preConditions = this.srcAnalysis.getPreConditions();
-		preConditions.addAll(this.dstAnalysis.getPreConditions());
+		// Problem: The analysis is persistent and will continue adding patterns for each commit...
+		List<Pattern> patterns = commit.getPatterns();
+		Set<AntiPattern> antiPatterns = commit.getAntiPatterns();
+		Set<PreCondition> preConditions = commit.getPreConditions();
 
 		/* Compute the set of (P - A) n C ... that is patters minus
 		 * anti-patterns intersecting pre-conditions. */
 
-		List<A> alerts = new LinkedList<A>();
-		for(Pattern<A> pattern : patterns) {
+		List<Alert> alerts = new LinkedList<Alert>();
+		for(Pattern pattern : patterns) {
 			if(pattern.accept(antiPatterns, preConditions)) {
-				alerts.add(pattern.getAlert());
+				alerts.add(pattern.getAlert(commit));
 			}
 		}
 
