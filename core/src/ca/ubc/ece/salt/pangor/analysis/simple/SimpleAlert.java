@@ -1,7 +1,7 @@
 package ca.ubc.ece.salt.pangor.analysis.simple;
 
 import ca.ubc.ece.salt.pangor.analysis.Alert;
-import ca.ubc.ece.salt.pangor.batch.Commit;
+import ca.ubc.ece.salt.pangor.analysis.Commit;
 
 public class SimpleAlert extends Alert {
 

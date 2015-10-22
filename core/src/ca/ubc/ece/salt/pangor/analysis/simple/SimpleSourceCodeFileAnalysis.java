@@ -3,26 +3,21 @@ package ca.ubc.ece.salt.pangor.analysis.simple;
 import java.util.List;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
+import ca.ubc.ece.salt.pangor.analysis.Facts;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileAnalysis;
-import ca.ubc.ece.salt.pangor.batch.Commit;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
- * Performs a simple analysis of a source code file. The analysis lists all
- * member variables and methods in the source code file.
- *
- * NOTE: this analysis only works with Java.
+ * Performs a simple analysis of a source code file. The analysis registers
+ * a pattern for each file, which is the type name of the root node.
  */
-public class SimpleSourceCodeFileAnalysis extends SourceCodeFileAnalysis {
+public class SimpleSourceCodeFileAnalysis extends SourceCodeFileAnalysis<SimpleAlert> {
 
-	public SimpleSourceCodeFileAnalysis(Commit commit) {
-		super(commit);
-	}
+	public SimpleSourceCodeFileAnalysis() { }
 
 	@Override
-	public void analyze(ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
-		root.getTypeName();
-		this.addPattern(new SimplePattern(root.getTypeName()));
+	public void analyze(Facts<SimpleAlert> facts, ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
+		facts.addPattern(new SimplePattern(root.getTypeName()));
 	}
 
 }

@@ -1,10 +1,12 @@
 package ca.ubc.ece.salt.pangor.analysis.simple;
 
-import ca.ubc.ece.salt.pangor.analysis.Alert;
+import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.Pattern;
-import ca.ubc.ece.salt.pangor.batch.Commit;
 
-public class SimplePattern extends Pattern {
+/**
+ * Describes a change pattern.
+ */
+public class SimplePattern extends Pattern<SimpleAlert> {
 
 	/** The pattern description. **/
 	private String pattern;
@@ -18,7 +20,7 @@ public class SimplePattern extends Pattern {
 	}
 
 	@Override
-	public Alert getAlert(Commit commit) {
+	public SimpleAlert getAlert(Commit commit) {
 		return new SimpleAlert(commit, this.pattern);
 	}
 

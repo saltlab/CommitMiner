@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 
 import org.mozilla.javascript.EvaluatorException;
 
-import ca.ubc.ece.salt.pangor.batch.Commit;
 import ca.ubc.ece.salt.pangor.batch.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
@@ -21,14 +20,14 @@ import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
  * @param <S> The type of the source file analysis.
  * @param <D> Type type of the destination file analysis.
  */
-public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends DataSet<A>,
-	S extends SourceCodeFileAnalysis, D extends SourceCodeFileAnalysis> {
+public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
+	S extends SourceCodeFileAnalysis<A>, D extends SourceCodeFileAnalysis<A>> {
 
 	/**
 	 * The data set manages the alerts by storing and loading alerts to and
 	 * from the disk, performing pre-processing tasks and calculating metrics.
 	 */
-	private DataSet<Alert> dataSet;
+	private DS dataSet;
 
 	/** The source file analysis to use. **/
 	private S srcAnalysis;
@@ -48,7 +47,7 @@ public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends Da
 	 * @param srcAnalysis The analysis to run on the source (or buggy) file.
 	 * @param dstAnalysis The analysis to run on the destination (or repaired) file.
 	 */
-	public CommitAnalysis(DataSet<Alert> dataSet, Commit ami, S srcAnalysis, D dstAnalysis,
+	public CommitAnalysis(DS dataSet, Commit commit, S srcAnalysis, D dstAnalysis,
 			CFGFactory cfgFactory, boolean preProcess) {
 		this.dataSet = dataSet;
 		this.srcAnalysis = srcAnalysis;
@@ -67,13 +66,16 @@ public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends Da
 	 */
 	public void analyze(Commit commit) throws Exception {
 
+		/* Store the facts from the analysis in this object. */
+		Facts<A> facts = new Facts<A>();
+
 		/* Iterate through the files in the commit and call the SourceCodeFileAnalysis on them. */
 		for(SourceCodeFileChange sourceCodeFileChange : commit.sourceCodeFileChanges) {
-			this.analyzeFile(sourceCodeFileChange);
+			this.analyzeFile(facts, sourceCodeFileChange);
 		}
 
 		/* Synthesize the alerts from the analysis facts. */
-		this.synthesizeAlerts(commit);
+		this.synthesizeAlerts(commit, facts);
 
 	}
 
@@ -85,21 +87,20 @@ public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends Da
 	 *
 	 * @throws Exception
 	 */
-	protected void synthesizeAlerts(Commit commit) throws Exception {
+	protected void synthesizeAlerts(Commit commit, Facts<A> facts) throws Exception {
 
 		/* Get the facts (patterns, anti-patterns and pre-conditions) from the
 		 * source and destination analysis. */
 
-		// Problem: The analysis is persistent and will continue adding patterns for each commit...
-		List<Pattern> patterns = commit.getPatterns();
-		Set<AntiPattern> antiPatterns = commit.getAntiPatterns();
-		Set<PreCondition> preConditions = commit.getPreConditions();
+		List<Pattern<A>> patterns = facts.getPatterns();
+		Set<AntiPattern> antiPatterns = facts.getAntiPatterns();
+		Set<PreCondition> preConditions = facts.getPreConditions();
 
 		/* Compute the set of (P - A) n C ... that is patters minus
 		 * anti-patterns intersecting pre-conditions. */
 
-		List<Alert> alerts = new LinkedList<Alert>();
-		for(Pattern pattern : patterns) {
+		List<A> alerts = new LinkedList<A>();
+		for(Pattern<A> pattern : patterns) {
 			if(pattern.accept(antiPatterns, preConditions)) {
 				alerts.add(pattern.getAlert(commit));
 			}
@@ -107,7 +108,7 @@ public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends Da
 
 		/* Register the alerts. */
 
-		for(Alert alert : alerts) {
+		for(A alert : alerts) {
 			this.dataSet.registerAlert(alert);
 		}
 
@@ -117,11 +118,10 @@ public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends Da
 	 * Performs AST-differencing and launches the analysis of the pre-commit/post-commit
 	 * source code file pair.
 	 *
-	 * @param commit The meta info for the analysis (i.e., project id, file paths,
-	 * 			  commit IDs, etc.)
+	 * @param facts Stores the facts from this analysis.
 	 * @param preProcess Set to true to enable AST pre-processing.
 	 */
-	private void analyzeFile(SourceCodeFileChange sourceCodeFileChange) throws Exception {
+	private void analyzeFile(Facts<A> facts, SourceCodeFileChange sourceCodeFileChange) throws Exception {
 
 		/* Get the file extension. */
 		String fileExtension = getSourceCodeFileExtension(sourceCodeFileChange.buggyFile, sourceCodeFileChange.repairedFile);
@@ -153,8 +153,8 @@ public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends Da
 			CFDContext cfdContext = cfd.getContext();
 
 			/* Run the analysis. */
-			this.srcAnalysis.analyze(cfdContext.srcScript, cfdContext.srcCFGs);
-			this.dstAnalysis.analyze(cfdContext.dstScript, cfdContext.dstCFGs);
+			this.srcAnalysis.analyze(facts, cfdContext.srcScript, cfdContext.srcCFGs);
+			this.dstAnalysis.analyze(facts, cfdContext.dstScript, cfdContext.dstCFGs);
 
 		}
 
@@ -174,7 +174,7 @@ public class CommitAnalysis<F extends CFGFactory, A extends Alert, DS extends Da
 		String preExtension = null;
 		String postExtension = null;
 
-		if(preMatcher.matches() && postMatcher.matches()) {
+		if(preMatcher.find() && postMatcher.find()) {
 			preExtension = preMatcher.group();
 			postExtension = postMatcher.group();
 			if(preExtension.equals(postExtension)) return preExtension.substring(1);

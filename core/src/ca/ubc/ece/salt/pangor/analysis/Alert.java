@@ -1,6 +1,5 @@
 package ca.ubc.ece.salt.pangor.analysis;
 
-import ca.ubc.ece.salt.pangor.batch.Commit;
 
 /**
  * Stores some information that has been inferred by static analysis.
