@@ -23,6 +23,13 @@ public class SimpleDataSet<A> implements DataSet<A> {
 	}
 
 	/**
+	 * @return true if {@code alert} is in this dataset.
+	 */
+	public boolean contains(A alert) {
+		return alerts.contains(alert);
+	}
+
+	/**
 	 * @return A string containing the serialized alerts.
 	 */
 	public String printAlerts() {

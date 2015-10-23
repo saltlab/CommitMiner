@@ -1,11 +1,10 @@
 package ca.ubc.ece.salt.pangor.analysis;
 
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleAlert;
@@ -21,7 +20,7 @@ import ca.ubc.ece.salt.pangor.batch.SourceCodeFileChange;
 public class TestSimpleAnalysis {
 
 	@Test
-	public void test() throws IOException {
+	public void test() throws Exception {
 
 		/* Set up a dummy commit. */
 		Commit commit = new Commit(1, 1, "test", "http://github.com/saltlab/Pangor", "c0", "c1");
@@ -53,14 +52,11 @@ public class TestSimpleAnalysis {
 					   SimpleSourceCodeFileAnalysis, SimpleSourceCodeFileAnalysis>(
 							   dataSet, commit, srcAnalysis, dstAnalysis, cfgFactory, false);
 
-		try {
-			commitAnalysis.analyze(commit);
-		} catch (Exception e) {
-			fail("An exception was thrown: " + e.getMessage());
-		}
+		commitAnalysis.analyze(commit);
 
-		/* We should have alerts in the data set now. */
-		System.out.println(dataSet.printAlerts());
+		/* We should have one alert in the data set now. */
+		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "CompilationUnit")));
+
 	}
 
 	/**

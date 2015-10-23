@@ -18,6 +18,7 @@ public class SimpleSourceCodeFileAnalysis extends SourceCodeFileAnalysis<SimpleA
 	@Override
 	public void analyze(Facts<SimpleAlert> facts, ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
 		facts.addPattern(new SimplePattern(root.getASTNodeType()));
+		facts.addPreCondition(new SimplePattern(root.getASTNodeType()));
 	}
 
 }
