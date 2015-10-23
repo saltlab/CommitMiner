@@ -35,7 +35,7 @@ public class SimpleDataSet<A> implements DataSet<A> {
 	public String printAlerts() {
 		String file = "";
 		for(A alert : this.alerts) {
-			file += alert.toString();
+			file += alert.toString() + "\n";
 		}
 		return file;
 	}

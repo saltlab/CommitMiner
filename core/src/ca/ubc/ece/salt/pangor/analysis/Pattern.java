@@ -27,4 +27,10 @@ public abstract class Pattern<A extends Alert> {
 		return false;
 	}
 
+	@Override
+	public abstract boolean equals(Object o);
+
+	@Override
+	public abstract int hashCode();
+
 }

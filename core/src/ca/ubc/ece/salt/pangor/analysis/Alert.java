@@ -45,4 +45,7 @@ public abstract class Alert {
 		return idCounter;
 	}
 
+	@Override
+	public abstract boolean equals(Object o);
+
 }

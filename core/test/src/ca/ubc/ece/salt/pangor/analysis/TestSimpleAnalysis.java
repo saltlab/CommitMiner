@@ -10,7 +10,8 @@ import org.junit.Test;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleAlert;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleCFGFactory;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleSourceCodeFileAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDstFileAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.simple.SimpleSrcFileAnalysis;
 import ca.ubc.ece.salt.pangor.batch.SourceCodeFileChange;
 
 /**
@@ -39,23 +40,25 @@ public class TestSimpleAnalysis {
 		SimpleDataSet<SimpleAlert> dataSet = new SimpleDataSet<SimpleAlert>();
 
 		/* We will use a simple file analysis for this test. */
-		SimpleSourceCodeFileAnalysis srcAnalysis = new SimpleSourceCodeFileAnalysis();
-		SimpleSourceCodeFileAnalysis dstAnalysis = new SimpleSourceCodeFileAnalysis();
+		SimpleSrcFileAnalysis srcAnalysis = new SimpleSrcFileAnalysis();
+		SimpleDstFileAnalysis dstAnalysis = new SimpleDstFileAnalysis();
 
 		/* The SimpleCFGFactory doesn't do anything, so it is generic to any file type. */
 		SimpleCFGFactory cfgFactory = new SimpleCFGFactory();
 
 		/* Set up the commit analysis. */
 		CommitAnalysis<SimpleAlert, SimpleDataSet<SimpleAlert>,
-					   SimpleSourceCodeFileAnalysis, SimpleSourceCodeFileAnalysis> commitAnalysis;
+					   SimpleSrcFileAnalysis, SimpleDstFileAnalysis> commitAnalysis;
 		commitAnalysis = new CommitAnalysis<SimpleAlert, SimpleDataSet<SimpleAlert>,
-					   SimpleSourceCodeFileAnalysis, SimpleSourceCodeFileAnalysis>(
+					   SimpleSrcFileAnalysis, SimpleDstFileAnalysis>(
 							   dataSet, commit, srcAnalysis, dstAnalysis, cfgFactory, false);
 
 		commitAnalysis.analyze(commit);
 
 		/* We should have one alert in the data set now. */
-		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "CompilationUnit")));
+		System.out.println(dataSet.printAlerts());
+		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "Source Root: org.eclipse.jdt.core.dom.CompilationUnit")));
+		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "Destination Root: org.eclipse.jdt.core.dom.CompilationUnit")));
 
 	}
 
