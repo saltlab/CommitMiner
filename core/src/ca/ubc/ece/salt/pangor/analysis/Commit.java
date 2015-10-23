@@ -3,8 +3,6 @@ package ca.ubc.ece.salt.pangor.analysis;
 import java.util.LinkedList;
 import java.util.List;
 
-import ca.ubc.ece.salt.pangor.batch.SourceCodeFileChange;
-
 /**
  * Stores the meta information for a commit. This information includes meta
  * information like the commit IDs as well as a list of individual files that

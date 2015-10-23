@@ -21,6 +21,7 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.git.GitProject;
 
 /**
@@ -101,33 +102,30 @@ public class GitProjectAnalysis extends GitProject {
 		 * {@code SourceCodeFileChange}s in the commit. */
 		for(DiffEntry diff : diffs) {
 
-			if(diff.getOldPath().matches("^.*\\.js$") && diff.getNewPath().matches("^.*\\.js$")){
-
-				/* Skip jquery files. */
-				if (diff.getOldPath().matches("^.*jquery.*$") || diff.getNewPath().matches("^.*jquery.*$")) {
-					logger.info("[SKIP_FILE] jquery file: " + diff.getOldPath());
-					continue;
-				}
-
-				/* Skip minified files. */
-				if (diff.getOldPath().endsWith(".min.js") || diff.getNewPath().endsWith(".min.js")) {
-					logger.info("[SKIP_FILE] Skipping minifed file: " + diff.getOldPath());
-					return;
-				}
-
-				logger.debug("Exploring diff \n {} \n {} - {} \n {} - {}", getURI(), buggyRevision, diff.getOldPath(),
-						bugFixingRevision, diff.getNewPath());
-
-				/* Add this source code file change to the commit. */
-
-                String oldFile = this.fetchBlob(buggyRevision, diff.getOldPath());
-                String newFile = this.fetchBlob(bugFixingRevision, diff.getNewPath());
-
-                commit.addSourceCodeFileChange(new SourceCodeFileChange(
-                		diff.getOldPath(), diff.getNewPath(),
-                		oldFile, newFile));
-
+			/* Skip jquery files. */
+			if (diff.getOldPath().matches("^.*jquery.*$") || diff.getNewPath().matches("^.*jquery.*$")) {
+				logger.info("[SKIP_FILE] jquery file: " + diff.getOldPath());
+				continue;
 			}
+
+			/* Skip minified files. */
+			if (diff.getOldPath().endsWith(".min.js") || diff.getNewPath().endsWith(".min.js")) {
+				logger.info("[SKIP_FILE] Skipping minifed file: " + diff.getOldPath());
+				return;
+			}
+
+			logger.debug("Exploring diff \n {} \n {} - {} \n {} - {}", getURI(), buggyRevision, diff.getOldPath(),
+					bugFixingRevision, diff.getNewPath());
+
+			/* Add this source code file change to the commit. */
+
+			String oldFile = this.fetchBlob(buggyRevision, diff.getOldPath());
+			String newFile = this.fetchBlob(bugFixingRevision, diff.getNewPath());
+
+			commit.addSourceCodeFileChange(new SourceCodeFileChange(
+					diff.getOldPath(), diff.getNewPath(),
+					oldFile, newFile));
+
 		}
 
 		/* Run the {@code CommitAnalysis} through the AnalysisRunner. */
@@ -196,12 +194,15 @@ public class GitProjectAnalysis extends GitProject {
 	 * Creates a new GitProjectAnalysis instance from a git project directory.
 	 *
 	 * @param directory The base directory for the project.
+	 * @param commitMessageRegex The regular expression that a commit message
+	 * 		  needs to match in order to be analyzed.
+	 * @param commitAnalysis The analysis to run on each commit.
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitProjectAnalysisException
 	 */
-	public static GitProjectAnalysis fromDirectory(String directory, String name, CommitAnalysis<?,?,?,?> commitAnalysis)
+	public static GitProjectAnalysis fromDirectory(String directory, String commitMessageRegex, CommitAnalysis<?,?,?,?> commitAnalysis)
 			throws GitProjectAnalysisException {
-		GitProject gitProject = GitProject.fromDirectory(directory, name);
+		GitProject gitProject = GitProject.fromDirectory(directory, commitMessageRegex);
 
 		return new GitProjectAnalysis(gitProject, commitAnalysis);
 	}
@@ -211,14 +212,17 @@ public class GitProjectAnalysis extends GitProject {
 	 *
 	 * @param uri The remote .git address.
 	 * @param directory The directory that stores the cloned repositories.
-	 * @return An instance of GitProjectAnalysis.
+	 * @param commitMessageRegex The regular expression that a commit message
+	 * 		  needs to match in order to be analyzed.
+	 * @param commitAnalysis The analysis to run on each commit.
+ 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitAPIException
 	 * @throws TransportException
 	 * @throws InvalidRemoteException
 	 */
-	public static GitProjectAnalysis fromURI(String uri, String directory, CommitAnalysis<?,?,?,?> commitAnalysis)
+	public static GitProjectAnalysis fromURI(String uri, String directory, String commitMessageRegex, CommitAnalysis<?,?,?,?> commitAnalysis)
 			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
-		GitProject gitProject = GitProject.fromURI(uri, directory);
+		GitProject gitProject = GitProject.fromURI(uri, directory, commitMessageRegex);
 
 		return new GitProjectAnalysis(gitProject, commitAnalysis);
 	}

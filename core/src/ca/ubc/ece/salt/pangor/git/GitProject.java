@@ -365,10 +365,12 @@ public class GitProject {
 	 * Creates a new GitProject instance from a git project directory.
 	 *
 	 * @param directory The base directory for the project.
+	 * @param commitMessageRegex The regular expression that a commit message
+	 * 		  needs to match in order to be analyzed.
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitProjectAnalysisException
 	 */
-	public static GitProject fromDirectory(String directory, String name) throws GitProjectAnalysisException {
+	public static GitProject fromDirectory(String directory, String commitMessageRegex) throws GitProjectAnalysisException {
 		Git git;
 		Repository repository;
 
@@ -387,12 +389,14 @@ public class GitProject {
 	 *
 	 * @param uri The remote .git address.
 	 * @param directory The directory that stores the cloned repositories.
+	 * @param commitMessageRegex The regular expression that a commit message
+	 * 		  needs to match in order to be analyzed.
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitAPIException
 	 * @throws TransportException
 	 * @throws InvalidRemoteException
 	 */
-	public static GitProject fromURI(String uri, String directory)
+	public static GitProject fromURI(String uri, String directory, String commitMessageRegex)
 			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
 		Git git;
 		Repository repository;

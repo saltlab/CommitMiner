@@ -17,8 +17,8 @@ import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysisException;
  * Executable class for calculating metrics of a list of repositories Input
  * Usage: -i <file with 1 repository per line> -o <output CSV file with metrics>
  * Check GitMetricsExtratorOptions for default values
- * 
- * Input can either be: 
+ *
+ * Input can either be:
  *  (1) file with one repository uri per line (for applications) or
  *  (2) file with repository,number_of_downloads (for modules)
  */
@@ -63,10 +63,10 @@ public class GitMetricsExtractorMain {
 				String uri = line.split(",")[0];
 				Integer downloadsLastMonth = Integer.parseInt(line.split(",")[1]);
 
-				project = GitProject.fromURI(uri, CHECKOUT_DIR);
+				project = GitProject.fromURI(uri, CHECKOUT_DIR, options.getCommitMessageRegex());
 				project.setDownloadsLastMonth(downloadsLastMonth);
 			} else {
-				project = GitProject.fromURI(line, CHECKOUT_DIR);
+				project = GitProject.fromURI(line, CHECKOUT_DIR, options.getCommitMessageRegex());
 			}
 
 			System.out.println("* Accessing repository: " + project.getURI());

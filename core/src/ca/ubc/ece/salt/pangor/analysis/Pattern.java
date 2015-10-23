@@ -8,12 +8,25 @@ import java.util.Set;
  */
 public abstract class Pattern<A extends Alert> {
 
-	public Pattern() { }
+	/** The commit information. */
+	public Commit commit;
+
+	/** The source code file change information. */
+	public SourceCodeFileChange sourceCodeFileChange;
+
+	/**
+	 * @param commit The commit information.
+	 * @param sourceCodeFileChange The source code file change information.
+	 */
+	public Pattern(Commit commit, SourceCodeFileChange sourceCodeFileChange) {
+		this.commit = commit;
+		this.sourceCodeFileChange = sourceCodeFileChange;
+	}
 
 	/**
 	 * @return An {@code Alert} representation of this pattern.
 	 */
-	public abstract A getAlert(Commit commit);
+	public abstract A getAlert();
 
 	/**
 	 * @param antiPatterns The list of anti-patterns produced during the analysis.

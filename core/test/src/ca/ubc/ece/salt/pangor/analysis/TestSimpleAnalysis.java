@@ -12,7 +12,6 @@ import ca.ubc.ece.salt.pangor.analysis.simple.SimpleCFGFactory;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDstFileAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleSrcFileAnalysis;
-import ca.ubc.ece.salt.pangor.batch.SourceCodeFileChange;
 
 /**
  * Tests {@code CommitAnalysis} and {@code SourceCodeFileAnalysis} with
@@ -51,14 +50,14 @@ public class TestSimpleAnalysis {
 					   SimpleSrcFileAnalysis, SimpleDstFileAnalysis> commitAnalysis;
 		commitAnalysis = new CommitAnalysis<SimpleAlert, SimpleDataSet<SimpleAlert>,
 					   SimpleSrcFileAnalysis, SimpleDstFileAnalysis>(
-							   dataSet, commit, srcAnalysis, dstAnalysis, cfgFactory, false);
+							   dataSet, srcAnalysis, dstAnalysis, cfgFactory, false);
 
 		commitAnalysis.analyze(commit);
 
 		/* We should have one alert in the data set now. */
 		System.out.println(dataSet.printAlerts());
-		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "Source Root: org.eclipse.jdt.core.dom.CompilationUnit")));
-		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "Destination Root: org.eclipse.jdt.core.dom.CompilationUnit")));
+		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, sourceFileChange, "Source Root: org.eclipse.jdt.core.dom.CompilationUnit")));
+		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, sourceFileChange, "Destination Root: org.eclipse.jdt.core.dom.CompilationUnit")));
 
 	}
 

@@ -15,11 +15,13 @@ public abstract class SourceCodeFileAnalysis<A extends Alert> {
 
 	/**
 	 * Perform a single-file analysis.
+	 * @param commit The commit information.
+	 * @param sourceCodeFileChange The source code file change information.
 	 * @param facts Stores the facts from this analysis.
 	 * @param root The script.
 	 * @param cfgs The list of CFGs in the script (one for each function plus
 	 * 			   one for the script).
 	 */
-	public abstract void analyze(Facts<A> facts, ClassifiedASTNode root, List<CFG> cfgs) throws Exception;
+	public abstract void analyze(Commit commit, SourceCodeFileChange sourceCodeFileChange, Facts<A> facts, ClassifiedASTNode root, List<CFG> cfgs) throws Exception;
 
 }

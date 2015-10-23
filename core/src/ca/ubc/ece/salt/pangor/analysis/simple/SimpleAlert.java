@@ -2,20 +2,25 @@ package ca.ubc.ece.salt.pangor.analysis.simple;
 
 import ca.ubc.ece.salt.pangor.analysis.Alert;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
+import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 
 public class SimpleAlert extends Alert {
 
 	/** The pattern found by the analysis. **/
 	public String pattern;
 
-	public SimpleAlert(Commit commit, String pattern) {
-		super(commit);
+	public SimpleAlert(Commit commit, SourceCodeFileChange sourceCodeFileChange, String pattern) {
+		super(commit, sourceCodeFileChange);
 		this.pattern = pattern;
 	}
 
 	@Override
 	public String toString() {
-		return this.commit.sourceCodeFileChanges.get(0).buggyFile + ", " + this.pattern;
+		return this.commit.buggyCommitID
+				+ ", " + this.commit.repairedCommitID
+				+ ", " + this.sourceCodeFileChange.buggyFile
+				+ ", " + this.sourceCodeFileChange.repairedFile
+				+ ", " + this.pattern;
 	}
 
 	@Override

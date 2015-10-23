@@ -4,6 +4,7 @@ import ca.ubc.ece.salt.pangor.analysis.AntiPattern;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.Pattern;
 import ca.ubc.ece.salt.pangor.analysis.PreCondition;
+import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 
 /**
  * Describes a change pattern.
@@ -17,13 +18,14 @@ public class SimplePattern extends Pattern<SimpleAlert> implements PreCondition,
 	 * @param commit The commit that contained this pattern.
 	 * @param pattern The pattern description.
 	 */
-	public SimplePattern(String pattern) {
+	public SimplePattern(Commit commit, SourceCodeFileChange sourceCodeFileChange, String pattern) {
+		super(commit, sourceCodeFileChange);
 		this.pattern = pattern;
 	}
 
 	@Override
-	public SimpleAlert getAlert(Commit commit) {
-		return new SimpleAlert(commit, this.pattern);
+	public SimpleAlert getAlert() {
+		return new SimpleAlert(this.commit, this.sourceCodeFileChange, this.pattern);
 	}
 
 	@Override

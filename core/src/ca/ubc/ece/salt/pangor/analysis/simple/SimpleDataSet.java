@@ -23,6 +23,13 @@ public class SimpleDataSet<A> implements DataSet<A> {
 	}
 
 	/**
+	 * @return The alerts this data set contains.
+	 */
+	public List<A> getAlerts() {
+		return this.alerts;
+	}
+
+	/**
 	 * @return true if {@code alert} is in this dataset.
 	 */
 	public boolean contains(A alert) {
@@ -34,8 +41,10 @@ public class SimpleDataSet<A> implements DataSet<A> {
 	 */
 	public String printAlerts() {
 		String file = "";
+		int i = 1;
 		for(A alert : this.alerts) {
-			file += alert.toString() + "\n";
+			file += i + ", " + alert.toString() + "\n";
+			i++;
 		}
 		return file;
 	}

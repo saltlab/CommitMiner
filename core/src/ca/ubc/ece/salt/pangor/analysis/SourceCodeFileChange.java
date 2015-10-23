@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.batch;
+package ca.ubc.ece.salt.pangor.analysis;
 
 /**
  * Stores the information that represents a change to a source code file.

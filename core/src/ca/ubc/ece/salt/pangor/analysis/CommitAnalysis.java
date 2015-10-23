@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 
 import org.mozilla.javascript.EvaluatorException;
 
-import ca.ubc.ece.salt.pangor.batch.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
@@ -47,7 +46,7 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 	 * @param srcAnalysis The analysis to run on the source (or buggy) file.
 	 * @param dstAnalysis The analysis to run on the destination (or repaired) file.
 	 */
-	public CommitAnalysis(DS dataSet, Commit commit, S srcAnalysis, D dstAnalysis,
+	public CommitAnalysis(DS dataSet, S srcAnalysis, D dstAnalysis,
 			CFGFactory cfgFactory, boolean preProcess) {
 		this.dataSet = dataSet;
 		this.srcAnalysis = srcAnalysis;
@@ -71,7 +70,7 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 
 		/* Iterate through the files in the commit and call the SourceCodeFileAnalysis on them. */
 		for(SourceCodeFileChange sourceCodeFileChange : commit.sourceCodeFileChanges) {
-			this.analyzeFile(facts, sourceCodeFileChange);
+			this.analyzeFile(commit, sourceCodeFileChange, facts);
 		}
 
 		/* Synthesize the alerts from the analysis facts. */
@@ -102,7 +101,7 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 		List<A> alerts = new LinkedList<A>();
 		for(Pattern<A> pattern : patterns) {
 			if(pattern.accept(antiPatterns, preConditions)) {
-				alerts.add(pattern.getAlert(commit));
+				alerts.add(pattern.getAlert());
 			}
 		}
 
@@ -118,10 +117,12 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 	 * Performs AST-differencing and launches the analysis of the pre-commit/post-commit
 	 * source code file pair.
 	 *
+	 * @param commit The commit information.
+	 * @param sourceCodeFileChange The source code file change information.
 	 * @param facts Stores the facts from this analysis.
 	 * @param preProcess Set to true to enable AST pre-processing.
 	 */
-	private void analyzeFile(Facts<A> facts, SourceCodeFileChange sourceCodeFileChange) throws Exception {
+	private void analyzeFile(Commit commit, SourceCodeFileChange sourceCodeFileChange, Facts<A> facts) throws Exception {
 
 		/* Get the file extension. */
 		String fileExtension = getSourceCodeFileExtension(sourceCodeFileChange.buggyFile, sourceCodeFileChange.repairedFile);
@@ -154,8 +155,8 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 			CFDContext cfdContext = cfd.getContext();
 
 			/* Run the analysis. */
-			this.srcAnalysis.analyze(facts, cfdContext.srcScript, cfdContext.srcCFGs);
-			this.dstAnalysis.analyze(facts, cfdContext.dstScript, cfdContext.dstCFGs);
+			this.srcAnalysis.analyze(commit, sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
+			this.dstAnalysis.analyze(commit, sourceCodeFileChange, facts, cfdContext.dstScript, cfdContext.dstCFGs);
 
 		}
 
