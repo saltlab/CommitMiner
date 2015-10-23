@@ -132,7 +132,8 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 			/* Control flow difference the files. */
 			ControlFlowDifferencing cfd = null;
 			try {
-				String[] args = preProcess ? new String[] {"", "", "-pp"} : new String[] {"", ""};
+				String[] args = preProcess ? new String[] {sourceCodeFileChange.buggyFile, sourceCodeFileChange.repairedFile, "-pp"}
+									: new String[] {sourceCodeFileChange.buggyFile, sourceCodeFileChange.repairedFile};
 				cfd = new ControlFlowDifferencing(cfgFactory, args, sourceCodeFileChange.buggyCode, sourceCodeFileChange.repairedCode);
 			}
 			catch(ArrayIndexOutOfBoundsException e) {
@@ -167,7 +168,8 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 	 * 	or the extensions of the pre and post paths do not match.
 	 */
 	private static String getSourceCodeFileExtension(String preCommitPath, String postCommitPath) {
-		java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\.[a-z]+$");
+
+		java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\.([a-z]+)$");
 		Matcher preMatcher = pattern.matcher(preCommitPath);
 		Matcher postMatcher = pattern.matcher(postCommitPath);
 
@@ -175,9 +177,9 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 		String postExtension = null;
 
 		if(preMatcher.find() && postMatcher.find()) {
-			preExtension = preMatcher.group();
-			postExtension = postMatcher.group();
-			if(preExtension.equals(postExtension)) return preExtension.substring(1);
+			preExtension = preMatcher.group(1);
+			postExtension = postMatcher.group(1);
+			if(preExtension.equals(postExtension)) return preExtension;
 		}
 
 		return null;

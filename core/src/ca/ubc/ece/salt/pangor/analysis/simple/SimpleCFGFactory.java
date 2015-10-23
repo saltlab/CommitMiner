@@ -6,9 +6,13 @@ import java.util.List;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
+import fr.labri.gumtree.gen.jdt.JdtTreeGenerator;
+import fr.labri.gumtree.gen.js.RhinoTreeGenerator;
+import fr.labri.gumtree.io.TreeGenerator;
 
 /**
- * NOTE: This class is for testing only.
+ * A CFG factory for Java.
+ * NOTE: This class is for testing only and does not build ASTs.
  */
 public class SimpleCFGFactory implements CFGFactory {
 
@@ -21,10 +25,27 @@ public class SimpleCFGFactory implements CFGFactory {
 		return cfgs;
 	}
 
+	/**
+	 * @return The GumTree Tree generator (AST parser) for the file extension.
+	 */
+	@Override
+	public TreeGenerator getTreeGenerator(String extension) {
+
+		switch(extension) {
+		case "java":
+			return new JdtTreeGenerator();
+		case "js":
+			return new RhinoTreeGenerator();
+		default:
+			return null;
+		}
+
+	}
+
 	@Override
 	public boolean acceptsExtension(String extension) {
 
-		/* GumTree should be able to parse ASTs for .java and .js files. */
+		/* This factory only handles .java files. */
 		return (extension.equals("java") || extension.equals("js"));
 
 	}

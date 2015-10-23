@@ -1,6 +1,5 @@
 package ca.ubc.ece.salt.pangor.cfd;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.util.HashMap;
@@ -18,7 +17,7 @@ import ca.ubc.ece.salt.pangor.cfg.diff.CFGDifferencing;
 import fr.labri.gumtree.actions.RootAndLeavesClassifier;
 import fr.labri.gumtree.actions.TreeClassifier;
 import fr.labri.gumtree.client.DiffOptions;
-import fr.labri.gumtree.gen.js.RhinoTreeGenerator;
+import fr.labri.gumtree.io.TreeGenerator;
 import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.matchers.Matcher;
 import fr.labri.gumtree.matchers.MatcherFactories;
@@ -109,10 +108,10 @@ public class ControlFlowDifferencing {
         /* Create the abstract GumTree representations of the ASTs. */
         Tree src = null;
         Tree dst = null;
-        if(srcSourceCode == null) src = ControlFlowDifferencing.createGumTree(options.getSrc(), options.getPreProcess());
-        else src = ControlFlowDifferencing.createGumTree(srcSourceCode, options.getSrc(), options.getPreProcess());
-        if(dstSourceCode == null) dst = ControlFlowDifferencing.createGumTree(options.getDst(), options.getPreProcess());
-        else dst = ControlFlowDifferencing.createGumTree(dstSourceCode, options.getDst(), options.getPreProcess());
+        if(srcSourceCode == null) src = ControlFlowDifferencing.createGumTree(cfgFactory, options.getSrc(), options.getPreProcess());
+        else src = ControlFlowDifferencing.createGumTree(cfgFactory, srcSourceCode, options.getSrc(), options.getPreProcess());
+        if(dstSourceCode == null) dst = ControlFlowDifferencing.createGumTree(cfgFactory, options.getDst(), options.getPreProcess());
+        else dst = ControlFlowDifferencing.createGumTree(cfgFactory, dstSourceCode, options.getDst(), options.getPreProcess());
 
 		/* Match the source tree nodes to the destination tree nodes. */
         Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src, dst);
@@ -165,15 +164,25 @@ public class ControlFlowDifferencing {
      * from the Rhino parser, so we need some language specific info from
      * RhinoTreeGenerator.
 	 *
+	 * @param cfgFactory The factory class that builds the CFGs.
 	 * @param file The file containing the source code.
 	 * @param preProcess Set to true to perform pre-processing on the AST.
 	 * @return The GumTree (AST) representation of the source file.
 	 * @throws IOException When something goes wrong reading the source file.
 	 */
-	public static Tree createGumTree(String path, boolean preProcess) throws IOException {
+	public static Tree createGumTree(CFGFactory cfgFactory, String path, boolean preProcess) throws IOException {
 
-        RhinoTreeGenerator rhinoTreeGenerator = new RhinoTreeGenerator();
-        Tree tree = rhinoTreeGenerator.fromFile(new File(path).getAbsolutePath(), preProcess);
+		Tree tree = null;
+
+		/* Guess the language from the file extension. */
+		String extension = getSourceCodeFileExtension(path);
+
+		/* Use the TreeGenerator from the CFGFactory. */
+		if(extension != null) {
+			TreeGenerator treeGenerator = cfgFactory.getTreeGenerator(extension);
+			tree = treeGenerator.fromFile(path, preProcess);
+		}
+
         return tree;
 
 	}
@@ -186,15 +195,25 @@ public class ControlFlowDifferencing {
      * from the Rhino parser, so we need some language specific info from
      * RhinoTreeGenerator.
 	 *
+	 * @param cfgFactory The factory class that builds the CFGs.
 	 * @param file The file containing the source code.
 	 * @param preProcess Set to true to perform pre-processing on the AST.
 	 * @return The GumTree (AST) representation of the source file.
 	 * @throws IOException When something goes wrong reading the source file.
 	 */
-	public static Tree createGumTree(String source, String path, boolean preProcess) throws IOException {
+	public static Tree createGumTree(CFGFactory cfgFactory, String source, String path, boolean preProcess) throws IOException {
 
-        RhinoTreeGenerator rhinoTreeGenerator = new RhinoTreeGenerator();
-        Tree tree = rhinoTreeGenerator.fromSource(source, path, preProcess);
+		Tree tree = null;
+
+		/* Guess the language from the file extension. */
+		String extension = getSourceCodeFileExtension(path);
+
+		/* Use the TreeGenerator from the CFGFactory. */
+		if(extension != null) {
+			TreeGenerator treeGenerator = cfgFactory.getTreeGenerator(extension);
+			tree = treeGenerator.fromSource(source, path, preProcess);
+		}
+
         return tree;
 
 	}
@@ -271,6 +290,27 @@ public class ControlFlowDifferencing {
 			}
 
 		}
+
+	}
+
+	/**
+	 * @param path The path of the file before the commit.
+	 * @return The extension of the source code file or null if none is found
+	 * 	or the extensions of the pre and post paths do not match.
+	 */
+	private static String getSourceCodeFileExtension(String path) {
+
+		java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\.[a-z]+$");
+		java.util.regex.Matcher preMatcher = pattern.matcher(path);
+
+		String preExtension = null;
+
+		if(preMatcher.find()) {
+			preExtension = preMatcher.group();
+			return preExtension.substring(1);
+		}
+
+		return null;
 
 	}
 
