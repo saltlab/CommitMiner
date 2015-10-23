@@ -1,6 +1,5 @@
 package ca.ubc.ece.salt.pangor.analysis;
 
-import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 
 /**
  * Stores some information that has been inferred by static analysis.
@@ -13,30 +12,30 @@ public abstract class Alert {
 	/** The unique ID for the alert. **/
 	public int id;
 
-	/** The name of the function that was analyzed. **/
-	public String functionName;
+	/** The commit information. */
+	public Commit commit;
 
-	/** The meta info for the analysis (project, buggy/repaired files, etc.). */
-	public AnalysisMetaInformation ami;
+	/** The source code file change information. */
+	public SourceCodeFileChange sourceCodeFileChange;
 
 	/**
-	 * @param ami The meta information from a bulk analysis.
+	 * @param commit The meta and change information from the commit.
 	 * @param functionName The name of the function that was analyzed.
 	 **/
-	public Alert(AnalysisMetaInformation ami, String functionName) {
-		this.ami = ami;
-		this.functionName = functionName;
+	public Alert(Commit commit, SourceCodeFileChange sourceCodeFileChange) {
+		this.commit = commit;
+		this.sourceCodeFileChange = sourceCodeFileChange;
 		this.id = getNextID();
 	}
 
 	/**
-	 * Used for de-serializing alerts.
-	 * @param ami The meta information from a bulk analysis.
+	 * Used for de-serializing alerts
+	 * @param commit The meta information from a bulk analysis.
 	 * @param functionName The name of the function that was analyzed.
 	 **/
-	public Alert(AnalysisMetaInformation ami, String functionName, int id) {
-		this.ami = ami;
-		this.functionName = functionName;
+	public Alert(Commit commit, SourceCodeFileChange sourceCodeFileChange, int id) {
+		this.commit = commit;
+		this.sourceCodeFileChange = sourceCodeFileChange;
 		this.id = id;
 	}
 
@@ -50,5 +49,8 @@ public abstract class Alert {
 		idCounter++;
 		return idCounter;
 	}
+
+	@Override
+	public abstract boolean equals(Object o);
 
 }

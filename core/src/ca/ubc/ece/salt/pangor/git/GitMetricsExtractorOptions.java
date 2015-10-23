@@ -13,6 +13,9 @@ public class GitMetricsExtractorOptions {
 	@Option(name = "-o", aliases = { "--output" }, usage = "The output CSV file with the repository and the metrics.")
 	private String outputPath = "./input/repositories_metrics.csv";
 
+	@Option(name = "-mrx", aliases = { "--message_regex" }, usage = "The regular expression that a commit message must match in order to be analyzed")
+	private String commitMessageRegex = "^.*$";
+
 	public boolean getHelp() {
 		return this.help;
 	}
@@ -23,5 +26,9 @@ public class GitMetricsExtractorOptions {
 
 	public String getOutputPath() {
 		return this.outputPath;
+	}
+
+	public String getCommitMessageRegex() {
+		return this.commitMessageRegex;
 	}
 }

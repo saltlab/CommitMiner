@@ -9,33 +9,33 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
  * A control flow graph node. Thread safe.
  */
 public class CFGNode {
-	
+
 	/** Unique IDs for nodes. **/
 	private static long idGen = 0;
-	
+
 	/** The unique id for this node. **/
 	private long id;
-	
+
 	/** Optional name for this node. **/
 	private String name;
-	
+
 	/** The AST Statement which contains the actions this node performs. From
 	 * org.mozilla.javascript.Token. **/
 	private ClassifiedASTNode statement;
-	
+
 	/** The edges leaving this node. **/
 	private List<CFGEdge> edges;
-	
+
 	/** The corresponding source or destination CFGNode. */
 	private CFGNode mappedNode;
-	
+
 	/** A semaphore for counting the edges in and visits. */
 	private int edgesIn;
-	
-	/** 
-	
+
 	/**
-	 * @param statement The statement that is executed when this node is 
+
+	/**
+	 * @param statement The statement that is executed when this node is
 	 * 		  			reached.
 	 */
 	public CFGNode(ClassifiedASTNode statement) {
@@ -46,9 +46,9 @@ public class CFGNode {
 		this.setMappedNode(null);
 		this.edgesIn = 0;
 	}
-	
+
 	/**
-	 * @param statement The statement that is executed when this node is 
+	 * @param statement The statement that is executed when this node is
 	 * 		  			reached.
 	 * @param name The name for this node (nice for printing and debugging).
 	 */
@@ -59,14 +59,14 @@ public class CFGNode {
 		this.name = name;
 		this.edgesIn = 0;
 	}
-	
+
 	/**
 	 * Add one to the number of edges going into the node.
 	 */
 	public void incrementEdges() {
 		this.edgesIn++;
 	}
-	
+
 	/**
 	 * Subtract one from the number of edges going into the node.
 	 * @return true if the decrement reaches 0.
@@ -75,10 +75,10 @@ public class CFGNode {
 		this.edgesIn--;
 		return this.edgesIn == 0;
 	}
-	
+
 	/**
 	 * Add an edge to this node. If an edge with the same condition already
-	 * exists, that edge will be overwritten. 
+	 * exists, that edge will be overwritten.
 	 * @param condition The condition for which we traverse the edge.
 	 * @param node The node at the other end of this edge.
 	 */
@@ -95,7 +95,7 @@ public class CFGNode {
 
 	/**
 	 * Add an edge to this node. If an edge with the same condition already
-	 * exists, that edge will be overwritten. 
+	 * exists, that edge will be overwritten.
 	 * @param condition The condition for which we traverse the edge.
 	 * @param node The node at the other end of this edge.
 	 */
@@ -109,10 +109,10 @@ public class CFGNode {
             this.edges.add(new CFGEdge(condition, this, node, loopEdge));
 		}
 	}
-	
+
 	/**
 	 * Add an edge to this node. If an edge with the same condition already
-	 * exists, that edge will be overwritten. 
+	 * exists, that edge will be overwritten.
 	 * @param edge The edge to add.
 	 */
 	public void addEdge(CFGEdge edge) {
@@ -124,28 +124,28 @@ public class CFGNode {
             this.edges.add(edge);
 		}
 	}
-	
+
 	/**
 	 * @return The edges leaving this node.
 	 */
 	public List<CFGEdge> getEdges() {
 		return this.edges;
 	}
-	
+
 	/**
 	 * @param edges The new edges for the node.
 	 */
 	public void setEdges(List<CFGEdge> edges) {
 		this.edges = edges;
 	}
-	
+
 	/**
 	 * @return The AST Statement which contains the actions this node performs.
 	 */
 	public ClassifiedASTNode getStatement() {
 		return statement;
 	}
-	
+
 	/**
 	 * @param statement The AST Statement which contains the actions this node
 	 * 					performs.
@@ -169,18 +169,18 @@ public class CFGNode {
 	}
 
 	/**
-	 * @param mappedNode the corresponding node in the source or destination CFG.	 
+	 * @param mappedNode the corresponding node in the source or destination CFG.
 	 */
 	public void setMappedNode(CFGNode mappedNode) {
 		this.mappedNode = mappedNode;
 	}
-	
+
 	public String getName() {
-		
+
 		if(this.name != null) return this.name;
-		
-		return this.statement.getTypeName();
-		
+
+		return this.statement.getASTNodeType();
+
 	}
 
 	/**
@@ -203,14 +203,14 @@ public class CFGNode {
 		CFGNode.idGen++;
 		return id;
 	}
-	
+
 	/**
 	 * Reset the ID generator value. Needed in between test cases.
 	 */
 	public static synchronized void resetIdGen() {
 		CFGNode.idGen = 0;
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.id + "_" + this.getName();
