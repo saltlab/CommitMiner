@@ -5,7 +5,11 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
+import ca.ubc.ece.salt.pangor.analysis.Alert;
+import ca.ubc.ece.salt.pangor.analysis.Commit;
+import ca.ubc.ece.salt.pangor.analysis.Facts;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
@@ -17,14 +21,16 @@ import ca.ubc.ece.salt.pangor.cfg.CFG;
  *
  * NOTE: This class only works with the Eclipse JDT AST.
  */
-public class ClassAnalysis extends SourceCodeFileAnalysis {
+public class ClassAnalysis<A extends Alert> extends SourceCodeFileAnalysis<A> {
 
 	protected List<CFG> cfgs;
 
 	public ClassAnalysis() { }
 
 	@Override
-	public void analyze(ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
+	public void analyze(Commit commit,
+			SourceCodeFileChange sourceCodeFileChange, Facts facts,
+			ClassifiedASTNode root, List cfgs) throws Exception {
 
 		/* Check we are working with the correct AST type. */
 		if(!(root instanceof CompilationUnit)) throw new IllegalArgumentException("The AST must be parsed from Eclipse JDT.");
