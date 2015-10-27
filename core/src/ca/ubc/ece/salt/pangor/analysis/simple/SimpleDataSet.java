@@ -8,31 +8,31 @@ import ca.ubc.ece.salt.pangor.analysis.DataSet;
 /**
  * A simple data set used for quick analysis prototypes and testing.
  */
-public class SimpleDataSet<A> implements DataSet<A> {
+public class SimpleDataSet implements DataSet<SimpleAlert> {
 
 	/** The alerts in this data set. **/
-	private List<A> alerts;
+	private List<SimpleAlert> alerts;
 
 	public SimpleDataSet() {
-		this.alerts = new LinkedList<A>();
+		this.alerts = new LinkedList<SimpleAlert>();
 	}
 
 	@Override
-	public void registerAlert(A alert) throws Exception {
+	public void registerAlert(SimpleAlert alert) throws Exception {
 		this.alerts.add(alert);
 	}
 
 	/**
 	 * @return The alerts this data set contains.
 	 */
-	public List<A> getAlerts() {
+	public List<SimpleAlert> getAlerts() {
 		return this.alerts;
 	}
 
 	/**
 	 * @return true if {@code alert} is in this dataset.
 	 */
-	public boolean contains(A alert) {
+	public boolean contains(SimpleAlert alert) {
 		return alerts.contains(alert);
 	}
 
@@ -42,7 +42,7 @@ public class SimpleDataSet<A> implements DataSet<A> {
 	public String printAlerts() {
 		String file = "";
 		int i = 1;
-		for(A alert : this.alerts) {
+		for(SimpleAlert alert : this.alerts) {
 			file += i + ", " + alert.toString() + "\n";
 			i++;
 		}

@@ -18,7 +18,7 @@ public class TestBatchAnalysis {
 	public void test() throws IOException, Exception {
 
 		/* Set up the data set (stores alerts aka feature vectors). */
-		SimpleDataSet<SimpleAlert> dataSet = new SimpleDataSet<SimpleAlert>();
+		SimpleDataSet dataSet = new SimpleDataSet();
 
 		/* We will use a simple file analysis for this test. */
 		SimpleSrcFileAnalysis srcAnalysis = new SimpleSrcFileAnalysis();
@@ -28,9 +28,9 @@ public class TestBatchAnalysis {
 		SimpleCFGFactory cfgFactory = new SimpleCFGFactory();
 
 		/* Set up the commit analysis (analyzes one commit). */
-		CommitAnalysis<SimpleAlert, SimpleDataSet<SimpleAlert>,
+		CommitAnalysis<SimpleAlert, SimpleDataSet,
 					   SimpleSrcFileAnalysis, SimpleDstFileAnalysis> commitAnalysis;
-		commitAnalysis = new CommitAnalysis<SimpleAlert, SimpleDataSet<SimpleAlert>,
+		commitAnalysis = new CommitAnalysis<SimpleAlert, SimpleDataSet,
 					   SimpleSrcFileAnalysis, SimpleDstFileAnalysis>(
 							   dataSet, srcAnalysis, dstAnalysis, cfgFactory, false);
 
