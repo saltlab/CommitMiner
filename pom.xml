@@ -52,9 +52,8 @@
 
 	<modules>
 		<module>core</module>
-		<module>js</module>
-		<module>js-learning</module>
-		<module>js-classify</module>
+		<module>java</module>
+		<module>java-classify</module>
 	</modules>
 			
 	<repositories>
