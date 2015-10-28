@@ -29,7 +29,8 @@ public abstract class ClassifierAlert extends Alert {
 	 * @param type The checker which generated the alert.
 	 * @param subtype A checker may detect more than one repair subtype.
 	 */
-	public ClassifierAlert(Commit commit, SourceCodeFileChange sourceCodeFileChange, String functionName, String type, String subtype) {
+	public ClassifierAlert(Commit commit, SourceCodeFileChange sourceCodeFileChange,
+			String functionName, String type, String subtype) {
 		super(commit, sourceCodeFileChange);
 		this.functionName = functionName;
 		this.type = type;

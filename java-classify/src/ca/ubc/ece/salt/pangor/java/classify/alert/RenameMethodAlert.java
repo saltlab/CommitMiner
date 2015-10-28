@@ -9,14 +9,23 @@ import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierAlert;
  */
 public class RenameMethodAlert extends ClassifierAlert {
 
+	/** The original method name. **/
+	private String oldName;
+
+	/** The new method name. **/
+	private String newName;
+
 	public RenameMethodAlert(Commit commit, SourceCodeFileChange sourceCodeFileChange,
-			String functionName, String type, String subtype) {
+			String functionName, String type, String subtype, String oldName,
+			String newName) {
 		super(commit, sourceCodeFileChange, functionName, type, subtype);
+		this.oldName = oldName;
+		this.newName = newName;
 	}
 
 	@Override
 	protected String getAlertDescription() {
-		return "A rename method refactoring was performed.";
+		return "A method was renamed from " + this.oldName + " to " + this.newName + ".";
 	}
 
 	@Override

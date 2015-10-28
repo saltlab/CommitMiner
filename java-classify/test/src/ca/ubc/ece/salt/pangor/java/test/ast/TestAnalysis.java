@@ -13,8 +13,8 @@ import org.junit.Ignore;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleAlert;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
+import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierAlert;
+import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.java.analysis.ClassAnalysis;
 
 @Ignore
@@ -31,12 +31,12 @@ public class TestAnalysis extends TestCase {
 	 * @throws Exception
 	 */
 	protected void runTest(Commit commit, SourceCodeFileChange sourceFileChange,
-			List<SimpleAlert> expectedAlerts,
+			List<ClassifierAlert> expectedAlerts,
 			boolean printAlerts,
-			CommitAnalysis<SimpleAlert, SimpleDataSet,
-						   ClassAnalysis<SimpleAlert>,
-						   ClassAnalysis<SimpleAlert>> commitAnalysis,
-			SimpleDataSet dataSet) throws Exception {
+			CommitAnalysis<ClassifierAlert, ClassifierDataSet,
+						   ClassAnalysis<ClassifierAlert>,
+						   ClassAnalysis<ClassifierAlert>> commitAnalysis,
+			ClassifierDataSet dataSet) throws Exception {
 
 		/* Add the source code file change to the commit. */
 		commit.addSourceCodeFileChange(sourceFileChange);
@@ -46,11 +46,11 @@ public class TestAnalysis extends TestCase {
 
 		/* Check the results. */
 
-        List<SimpleAlert> actualAlerts = dataSet.getAlerts();
+        List<ClassifierAlert> actualAlerts = dataSet.getAlerts();
 
         /* Output if needed. */
         if(printAlerts) {
-        	for(SimpleAlert alert : actualAlerts) {
+        	for(ClassifierAlert alert : actualAlerts) {
         		System.out.println(alert.toString());
         	}
         }
@@ -60,14 +60,14 @@ public class TestAnalysis extends TestCase {
 
 	}
 
-	protected void check(List<SimpleAlert> actualAlerts, List<SimpleAlert> expectedAlerts) {
+	protected void check(List<ClassifierAlert> actualAlerts, List<ClassifierAlert> expectedAlerts) {
 		/* Check that all the expected alerts are produced by SDJSB. */
-		for(SimpleAlert expected : expectedAlerts) {
+		for(ClassifierAlert expected : expectedAlerts) {
 			assertTrue("SDJSB did not produce the alert \"" + expected.toString() + "\"", actualAlerts.contains(expected));
 		}
 
 		/* Check that only the expected alerts are produced by SDJSB. */
-		for(SimpleAlert actual : actualAlerts) {
+		for(ClassifierAlert actual : actualAlerts) {
 			assertTrue("SDJSB produced the unexpected alert \"" + actual.toString() + "\"", expectedAlerts.contains(actual));
 		}
 	}

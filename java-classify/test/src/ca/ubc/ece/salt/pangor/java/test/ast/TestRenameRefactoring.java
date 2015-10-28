@@ -8,43 +8,44 @@ import org.junit.Test;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleAlert;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
+import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierAlert;
+import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.java.analysis.ClassAnalysis;
 import ca.ubc.ece.salt.pangor.java.analysis.methodrename.RenameMethodDstAnalysis;
 import ca.ubc.ece.salt.pangor.java.analysis.methodrename.RenameMethodSrcAnalysis;
 import ca.ubc.ece.salt.pangor.java.cfg.JavaCFGFactory;
+import ca.ubc.ece.salt.pangor.java.classify.alert.RenameMethodAlert;
 
 public class TestRenameRefactoring extends TestAnalysis{
 
 
 	private void runTest(Commit commit, SourceCodeFileChange sourceFileChange,
-			List<SimpleAlert> expectedAlerts,
+			List<ClassifierAlert> expectedAlerts,
 			boolean printAlerts) throws Exception {
 
 		/* Build the CFG with the JDT Java CFG factory. */
 		CFGFactory cfgFactory = new JavaCFGFactory();
 
-		SimpleDataSet dataSet = new SimpleDataSet();
+		ClassifierDataSet dataSet = new ClassifierDataSet(null, null);
 
-		/* Registers a pre-condition for each method. */
-		ClassAnalysis<SimpleAlert> srcAnalysis
-			= new ClassAnalysis<SimpleAlert>(new RenameMethodSrcAnalysis());
+		/* The source analysis for rename refactoring. */
+		ClassAnalysis<ClassifierAlert> srcAnalysis
+			= new ClassAnalysis<ClassifierAlert>(new RenameMethodSrcAnalysis());
 
-		/* Registers a pattern for each method. */
-		ClassAnalysis<SimpleAlert> dstAnalysis
-			= new ClassAnalysis<SimpleAlert>(new RenameMethodDstAnalysis());
+		/* The destination analysis for rename refactoring. */
+		ClassAnalysis<ClassifierAlert> dstAnalysis
+			= new ClassAnalysis<ClassifierAlert>(new RenameMethodDstAnalysis());
 
 		/* Produces an alert for each method that was not inserted or removed. */
-		CommitAnalysis<SimpleAlert,
-					   SimpleDataSet,
-					   ClassAnalysis<SimpleAlert>,
-					   ClassAnalysis<SimpleAlert>> commitAnalysis
-			= new CommitAnalysis<SimpleAlert,
-								 SimpleDataSet,
-								 ClassAnalysis<SimpleAlert>,
-								 ClassAnalysis<SimpleAlert>>(dataSet,
+		CommitAnalysis<ClassifierAlert,
+					   ClassifierDataSet,
+					   ClassAnalysis<ClassifierAlert>,
+					   ClassAnalysis<ClassifierAlert>> commitAnalysis
+			= new CommitAnalysis<ClassifierAlert,
+								 ClassifierDataSet,
+								 ClassAnalysis<ClassifierAlert>,
+								 ClassAnalysis<ClassifierAlert>>(dataSet,
 										 					 srcAnalysis,
 										 					 dstAnalysis,
 										 					 cfgFactory,
@@ -67,8 +68,11 @@ public class TestRenameRefactoring extends TestAnalysis{
 		SourceCodeFileChange sourceFileChange = TestAnalysis.getSourceCodeFileChange(srcFile, dstFile);
 
 		/* Define the expected results. */
-		List<SimpleAlert> expectedAlerts = new LinkedList<SimpleAlert>();
-		expectedAlerts.add(new SimpleAlert(commit, sourceFileChange, "getName -> getUserName"));
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new RenameMethodAlert(commit, sourceFileChange,
+				"~NA~", "REFACTOR", "METHOD_RENAME", "getName", "getUserName"));
+		expectedAlerts.add(new RenameMethodAlert(commit, sourceFileChange,
+				"~NA~", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE", "getName", "getUserName"));
 
 		this.runTest(commit, sourceFileChange, expectedAlerts, true);
 

@@ -3,42 +3,68 @@ package ca.ubc.ece.salt.pangor.java.analysis.methodrename;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleAlert;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimplePattern;
+import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.java.analysis.MethodAnalysis;
+import ca.ubc.ece.salt.pangor.java.analysis.methodrename.RenameMethodVisitor.UpdatedCallsite;
 
 /**
- * Performs a simple analysis of a Java method. The analysis registers
- * a pattern for the method, which is the name of the method, if the name is
- * different than the name of the source method.
+ * Looks for the following facts:
+ * 	1. Pattern = A method name was changed in a method declaration.
+ *  2. PreCondition = A method name was changed in a method declaration.
+ *  3. Pattern = A method name was changed in a call site.
+ *  4. Anti-pattern = A method name was unchanged in a method declaration.
+ *  5. Anti-pattern = A method name was unchanged in a call site.
  */
-public class RenameMethodDstAnalysis extends MethodAnalysis<SimpleAlert> {
+public class RenameMethodDstAnalysis extends MethodAnalysis<ClassifierAlert> {
 
 	public RenameMethodDstAnalysis() { }
 
 	@Override
 	public void concreteAnalysis(MethodDeclaration method, CFG cfg) {
-		if(method.getChangeType() != ChangeType.INSERTED &&
-				method.getChangeType() != ChangeType.REMOVED) {
+
+		/* Add a method rename pattern and pre-condition if this method was renamed. */
+		if(method.getChangeType() == ChangeType.UPDATED) {
 
 			MethodDeclaration srcMethod = (MethodDeclaration)method.getMapping();
 
 			String srcName = srcMethod.getName().getIdentifier();
 			String dstName = method.getName().getIdentifier();
 
-			if(!srcName.equals(dstName)) {
+			RenameMethodPattern pattern = new RenameMethodPattern(
+												this.commit,
+												this.sourceCodeFileChange,
+												srcName, dstName);
 
-				this.facts.addPattern(
-					new SimplePattern(
-						this.commit,
-						this.sourceCodeFileChange,
-						srcMethod.toString(),
-						srcMethod.getName().getIdentifier() + " -> " + method.getName().getIdentifier()));
-
-			}
+			this.facts.addPattern(pattern);
+			this.facts.addPreCondition(pattern);
 
 		}
+		/* Add a method rename anti-pattern if this method was not renamed. */
+		else if(method.getChangeType() == ChangeType.UNCHANGED) {
+			this.facts.addAntiPattern(
+					new RenameMethodAntiPattern(
+							method.getName().getIdentifier()));
+		}
+
+		/* Get patterns from call sites. */
+		RenameMethodVisitor visitor = new RenameMethodVisitor();
+		method.accept(visitor);
+
+		/* Add the facts generated in the visitor. */
+		for(UpdatedCallsite updated : visitor.getUpdatedCallsites()) {
+			this.facts.addPattern(
+					new UpdateCallsitePattern(
+							this.commit,
+							this.sourceCodeFileChange,
+							updated.oldName, updated.newName));
+		}
+		for(String unchanged : visitor.getUnchangedCallsites()) {
+			this.facts.addAntiPattern(
+					new RenameMethodAntiPattern(
+							unchanged));
+		}
+
 	}
 
 }
