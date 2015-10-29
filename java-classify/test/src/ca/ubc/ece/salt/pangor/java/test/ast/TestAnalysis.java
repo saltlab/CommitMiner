@@ -30,7 +30,7 @@ public class TestAnalysis extends TestCase {
 	 * 				  tests pass/fail.
 	 * @throws Exception
 	 */
-	protected void runTest(Commit commit, SourceCodeFileChange sourceFileChange,
+	protected void runTest(Commit commit, List<SourceCodeFileChange> sourceFileChanges,
 			List<ClassifierAlert> expectedAlerts,
 			boolean printAlerts,
 			CommitAnalysis<ClassifierAlert, ClassifierDataSet,
@@ -38,8 +38,10 @@ public class TestAnalysis extends TestCase {
 						   ClassAnalysis<ClassifierAlert>> commitAnalysis,
 			ClassifierDataSet dataSet) throws Exception {
 
-		/* Add the source code file change to the commit. */
-		commit.addSourceCodeFileChange(sourceFileChange);
+		/* Add the source code file changes to the commit. */
+		for(SourceCodeFileChange sourceFileChange : sourceFileChanges) {
+			commit.addSourceCodeFileChange(sourceFileChange);
+		}
 
 		/* Run the analysis. */
 		commitAnalysis.analyze(commit);

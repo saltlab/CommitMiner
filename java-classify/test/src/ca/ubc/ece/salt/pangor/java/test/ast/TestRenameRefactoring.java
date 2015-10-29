@@ -21,7 +21,7 @@ import ca.ubc.ece.salt.pangor.java.cfg.JavaCFGFactory;
 public class TestRenameRefactoring extends TestAnalysis{
 
 
-	private void runTest(Commit commit, SourceCodeFileChange sourceFileChange,
+	private void runTest(Commit commit, List<SourceCodeFileChange> sourceFileChanges,
 			List<ClassifierAlert> expectedAlerts,
 			boolean printAlerts) throws Exception {
 
@@ -53,7 +53,7 @@ public class TestRenameRefactoring extends TestAnalysis{
 										 					 printAlerts);
 
 		/* Run the analysis. */
-		this.runTest(commit, sourceFileChange, expectedAlerts, printAlerts, commitAnalysis, dataSet);
+		this.runTest(commit, sourceFileChanges, expectedAlerts, printAlerts, commitAnalysis, dataSet);
 
 	}
 
@@ -66,24 +66,106 @@ public class TestRenameRefactoring extends TestAnalysis{
 
 		/* Set up the dummy data. */
 		Commit commit = TestAnalysis.getCommit();
-		SourceCodeFileChange sourceFileChange = TestAnalysis.getSourceCodeFileChange(srcFile, dstFile);
+		List<SourceCodeFileChange> sourceFileChanges = new LinkedList<SourceCodeFileChange>();
+		SourceCodeFileChange user = TestAnalysis.getSourceCodeFileChange(srcFile, dstFile);
+		sourceFileChanges.add(user);
 
 		/* Define the expected results. */
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		expectedAlerts.add(new RenameMethodAlert(commit, sourceFileChange,
+		expectedAlerts.add(new RenameMethodAlert(commit, user,
 				"~NA~", "REFACTOR", "METHOD_RENAME", "getName", "getUserName"));
 
-		expectedAlerts.add(new UpdatedCallsiteAlert(commit, sourceFileChange,
+		expectedAlerts.add(new UpdatedCallsiteAlert(commit, user,
 				"getGreetingMessage", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE",
 				"getGreetingMessage", 20, 20,
 				"getName", "getUserName"));
 
-		expectedAlerts.add(new UpdatedCallsiteAlert(commit, sourceFileChange,
+		expectedAlerts.add(new UpdatedCallsiteAlert(commit, user,
 				"getRelativeAgeMessage", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE",
 				"getRelativeAgeMessage", 27, 27,
 				"getName", "getUserName"));
 
-		this.runTest(commit, sourceFileChange, expectedAlerts, true);
+		this.runTest(commit, sourceFileChanges, expectedAlerts, true);
+
+	}
+
+	@Test
+	public void testMultiFileRename() throws Exception {
+
+		/* The test files. */
+		String srcFileUser = "/Users/qhanam/Documents/workspace_pangor/pangor/java-classify/test/input/java-source/User.java";
+		String srcFileHRSystem = "/Users/qhanam/Documents/workspace_pangor/pangor/java-classify/test/input/java-source/HRSystem.java";
+		String dstFileUser = "/Users/qhanam/Documents/workspace_pangor/pangor/java-classify/test/input/java-destination/User.java";
+		String dstFileHRSystem = "/Users/qhanam/Documents/workspace_pangor/pangor/java-classify/test/input/java-destination/HRSystem.java";
+
+		/* Set up the dummy data. */
+		Commit commit = TestAnalysis.getCommit();
+		List<SourceCodeFileChange> sourceFileChanges = new LinkedList<SourceCodeFileChange>();
+		SourceCodeFileChange user = TestAnalysis.getSourceCodeFileChange(srcFileUser, dstFileUser);
+		sourceFileChanges.add(user);
+		SourceCodeFileChange hrsystem = TestAnalysis.getSourceCodeFileChange(srcFileHRSystem, dstFileHRSystem);
+		sourceFileChanges.add(hrsystem);
+
+		/* Define the expected results. */
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new RenameMethodAlert(commit, user,
+				"~NA~", "REFACTOR", "METHOD_RENAME", "getName", "getUserName"));
+
+		expectedAlerts.add(new UpdatedCallsiteAlert(commit, user,
+				"getGreetingMessage", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE",
+				"getGreetingMessage", 20, 20,
+				"getName", "getUserName"));
+
+		expectedAlerts.add(new UpdatedCallsiteAlert(commit, user,
+				"getRelativeAgeMessage", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE",
+				"getRelativeAgeMessage", 27, 27,
+				"getName", "getUserName"));
+
+		expectedAlerts.add(new RenameMethodAlert(commit, user,
+				"~NA~", "REFACTOR", "METHOD_RENAME", "birthday", "getBirthday"));
+
+		expectedAlerts.add(new UpdatedCallsiteAlert(commit, hrsystem,
+				"main", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE",
+				"main", 28, 28,
+				"birthday", "getBirthday"));
+
+		this.runTest(commit, sourceFileChanges, expectedAlerts, true);
+
+	}
+
+	@Test
+	public void testMultiFileFalsePositive() throws Exception {
+
+		/* The test files. */
+		String srcFileUser = "/Users/qhanam/Documents/workspace_pangor/pangor/java-classify/test/input/java-source/User.java";
+		String srcFileHRSystem = "/Users/qhanam/Documents/workspace_pangor/pangor/java-classify/test/input/java-source/HRSystem.java";
+		String dstFileUser = "/Users/qhanam/Documents/workspace_pangor/pangor/java-classify/test/input/java-destination/UserFP.java";
+		String dstFileHRSystem = "/Users/qhanam/Documents/workspace_pangor/pangor/java-classify/test/input/java-destination/HRSystemFP.java";
+
+		/* Set up the dummy data. */
+		Commit commit = TestAnalysis.getCommit();
+		List<SourceCodeFileChange> sourceFileChanges = new LinkedList<SourceCodeFileChange>();
+		SourceCodeFileChange user = TestAnalysis.getSourceCodeFileChange(srcFileUser, dstFileUser);
+		sourceFileChanges.add(user);
+		SourceCodeFileChange hrsystem = TestAnalysis.getSourceCodeFileChange(srcFileHRSystem, dstFileHRSystem);
+		sourceFileChanges.add(hrsystem);
+
+		/* Define the expected results. */
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new RenameMethodAlert(commit, user,
+				"~NA~", "REFACTOR", "METHOD_RENAME", "getName", "getUserName"));
+
+		expectedAlerts.add(new UpdatedCallsiteAlert(commit, user,
+				"getGreetingMessage", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE",
+				"getGreetingMessage", 20, 20,
+				"getName", "getUserName"));
+
+		expectedAlerts.add(new UpdatedCallsiteAlert(commit, user,
+				"getRelativeAgeMessage", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE",
+				"getRelativeAgeMessage", 27, 27,
+				"getName", "getUserName"));
+
+		this.runTest(commit, sourceFileChanges, expectedAlerts, true);
 
 	}
 
