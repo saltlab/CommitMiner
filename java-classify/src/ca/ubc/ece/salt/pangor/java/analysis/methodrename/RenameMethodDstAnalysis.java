@@ -31,13 +31,17 @@ public class RenameMethodDstAnalysis extends MethodAnalysis<ClassifierAlert> {
 			String srcName = srcMethod.getName().getIdentifier();
 			String dstName = method.getName().getIdentifier();
 
-			RenameMethodPattern pattern = new RenameMethodPattern(
-												this.commit,
-												this.sourceCodeFileChange,
-												srcName, dstName);
+			if(!srcName.equals(dstName)) {
 
-			this.facts.addPattern(pattern);
-			this.facts.addPreCondition(pattern);
+				RenameMethodPattern pattern = new RenameMethodPattern(
+													this.commit,
+													this.sourceCodeFileChange,
+													srcName, dstName);
+
+				this.facts.addPattern(pattern);
+				this.facts.addPreCondition(pattern);
+
+			}
 
 		}
 		/* Add a method rename anti-pattern if this method was not renamed. */

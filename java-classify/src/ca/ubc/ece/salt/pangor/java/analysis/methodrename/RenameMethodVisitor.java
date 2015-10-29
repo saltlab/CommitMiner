@@ -48,10 +48,15 @@ public class RenameMethodVisitor extends ASTVisitor {
 		if(target.getChangeType() == ChangeType.UPDATED) {
 
 			SimpleName oldTarget = (SimpleName)target.getMapping();
-			this.updatedCallsites.add(new UpdatedCallsite(
-					oldTarget, target,
-					oldTarget.getIdentifier(),
-					target.getIdentifier()));
+
+			if(!oldTarget.equals(target)) {
+
+				this.updatedCallsites.add(new UpdatedCallsite(
+						oldTarget, target,
+						oldTarget.getIdentifier(),
+						target.getIdentifier()));
+
+			}
 
 		}
 		/* If the target name is not updated, store an anti-pattern. */
