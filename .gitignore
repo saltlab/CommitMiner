@@ -6,6 +6,7 @@ test/output/
 .DS_Store
 *.swp
 *.log
+*.class
 .classpath
 .project
 output/
