@@ -4,7 +4,6 @@ import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.Pattern;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierAlert;
-import ca.ubc.ece.salt.pangor.java.classify.alert.UpdatedCallsiteAlert;
 
 /**
  * A pattern where a call site was updated to reflect a renamed method.

@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.java.classify.alert;
+package ca.ubc.ece.salt.pangor.java.analysis.methodrename;
 
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;

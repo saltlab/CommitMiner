@@ -5,7 +5,6 @@ import ca.ubc.ece.salt.pangor.analysis.Pattern;
 import ca.ubc.ece.salt.pangor.analysis.PreCondition;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierAlert;
-import ca.ubc.ece.salt.pangor.java.classify.alert.RenameMethodAlert;
 
 /**
  * A pattern where a method was renamed (i.e., a method name was updated).

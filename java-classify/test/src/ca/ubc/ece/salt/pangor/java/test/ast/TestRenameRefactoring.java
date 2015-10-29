@@ -12,11 +12,11 @@ import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.java.analysis.ClassAnalysis;
+import ca.ubc.ece.salt.pangor.java.analysis.methodrename.RenameMethodAlert;
 import ca.ubc.ece.salt.pangor.java.analysis.methodrename.RenameMethodDstAnalysis;
 import ca.ubc.ece.salt.pangor.java.analysis.methodrename.RenameMethodSrcAnalysis;
+import ca.ubc.ece.salt.pangor.java.analysis.methodrename.UpdatedCallsiteAlert;
 import ca.ubc.ece.salt.pangor.java.cfg.JavaCFGFactory;
-import ca.ubc.ece.salt.pangor.java.classify.alert.RenameMethodAlert;
-import ca.ubc.ece.salt.pangor.java.classify.alert.UpdatedCallsiteAlert;
 
 public class TestRenameRefactoring extends TestAnalysis{
 
