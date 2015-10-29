@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.java.test.ast;
+package ca.ubc.ece.salt.pangor.java.test.analysis;
 
 import java.util.LinkedList;
 import java.util.List;
