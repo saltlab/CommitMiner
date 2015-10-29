@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.pangor.java.analysis;
 
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
@@ -23,6 +24,12 @@ public abstract class MethodAnalysis<A extends Alert> {
 	/** The source code file that this class was parsed from. **/
 	protected SourceCodeFileChange sourceCodeFileChange;
 
+	/**
+	 * The {@code CompilationUnit}. Needed for getting line numbers and
+	 * the class name.
+	 */
+	protected CompilationUnit compilationUnit;
+
 	/** The analysis facts. Register patterns with this structure. **/
 	protected Facts<A> facts;
 
@@ -35,6 +42,7 @@ public abstract class MethodAnalysis<A extends Alert> {
 		this.commit = null;
 		this.sourceCodeFileChange = null;
 		this.facts = null;
+		this.compilationUnit = null;
 	}
 
 	/**
@@ -42,10 +50,12 @@ public abstract class MethodAnalysis<A extends Alert> {
 	 * triggered from here.
 	 */
 	public void analyze(Commit commit, SourceCodeFileChange sourceCodeFileChange,
+			CompilationUnit compilationUnit,
 			Facts<A> facts, ClassifiedASTNode root, CFG cfg) throws Exception {
 
 		this.commit = commit;
 		this.sourceCodeFileChange = sourceCodeFileChange;
+		this.compilationUnit = compilationUnit;
 		this.facts = facts;
 
 		/* Check we are working with the correct AST type. */

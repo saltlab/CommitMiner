@@ -16,6 +16,7 @@ import ca.ubc.ece.salt.pangor.java.analysis.methodrename.RenameMethodDstAnalysis
 import ca.ubc.ece.salt.pangor.java.analysis.methodrename.RenameMethodSrcAnalysis;
 import ca.ubc.ece.salt.pangor.java.cfg.JavaCFGFactory;
 import ca.ubc.ece.salt.pangor.java.classify.alert.RenameMethodAlert;
+import ca.ubc.ece.salt.pangor.java.classify.alert.UpdatedCallsiteAlert;
 
 public class TestRenameRefactoring extends TestAnalysis{
 
@@ -71,8 +72,16 @@ public class TestRenameRefactoring extends TestAnalysis{
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new RenameMethodAlert(commit, sourceFileChange,
 				"~NA~", "REFACTOR", "METHOD_RENAME", "getName", "getUserName"));
-		expectedAlerts.add(new RenameMethodAlert(commit, sourceFileChange,
-				"~NA~", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE", "getName", "getUserName"));
+
+		expectedAlerts.add(new UpdatedCallsiteAlert(commit, sourceFileChange,
+				"getGreetingMessage", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE",
+				"getGreetingMessage", 20, 20,
+				"getName", "getUserName"));
+
+		expectedAlerts.add(new UpdatedCallsiteAlert(commit, sourceFileChange,
+				"getRelativeAgeMessage", "REFACTOR", "METHOD_RENAME_UPDATE_CALLSITE",
+				"getRelativeAgeMessage", 27, 27,
+				"getName", "getUserName"));
 
 		this.runTest(commit, sourceFileChange, expectedAlerts, true);
 

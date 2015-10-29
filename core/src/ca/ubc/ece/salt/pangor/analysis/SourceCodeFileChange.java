@@ -1,5 +1,9 @@
 package ca.ubc.ece.salt.pangor.analysis;
 
+import java.util.regex.Matcher;
+
+
+
 /**
  * Stores the information that represents a change to a source code file.
  *
@@ -32,6 +36,20 @@ public class SourceCodeFileChange {
 		this.repairedFile = repairedFile;
 		this.buggyCode = buggyCode;
 		this.repairedCode = repairedCode;
+	}
+
+	/**
+	 * @return the file name (without the full path).
+	 */
+	public String getFileName() {
+		java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("/([A-za-z]+)\\.java");
+		Matcher m = pattern.matcher(this.repairedFile);
+
+		if(m.find()) {
+			return m.group(1);
+		}
+
+		return "[unknown]";
 	}
 
 	@Override

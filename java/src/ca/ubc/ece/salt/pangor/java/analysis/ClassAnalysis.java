@@ -63,8 +63,9 @@ public class ClassAnalysis<A extends Alert> extends SourceCodeFileAnalysis<A> {
 		List<MethodDeclaration> methodDeclarations = MethodVisitor.getMethodDeclarations(subjectClass);
 
 		for(MethodDeclaration methodDeclaration : methodDeclarations) {
-			this.methodAnalysis.analyze(commit, sourceCodeFileChange, facts,
-					methodDeclaration, getFunctionCFG(methodDeclaration));
+			this.methodAnalysis.analyze(commit, sourceCodeFileChange,
+					subjectClass, facts, methodDeclaration,
+					getFunctionCFG(methodDeclaration));
 		}
 
 	}

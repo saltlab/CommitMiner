@@ -49,6 +49,7 @@ public class RenameMethodVisitor extends ASTVisitor {
 
 			SimpleName oldTarget = (SimpleName)target.getMapping();
 			this.updatedCallsites.add(new UpdatedCallsite(
+					oldTarget, target,
 					oldTarget.getIdentifier(),
 					target.getIdentifier()));
 
@@ -70,10 +71,16 @@ public class RenameMethodVisitor extends ASTVisitor {
 	 */
 	public class UpdatedCallsite {
 
+		public SimpleName oldNode;
+		public SimpleName newNode;
+
 		public String oldName;
 		public String newName;
 
-		public UpdatedCallsite(String oldName, String newName) {
+		public UpdatedCallsite(SimpleName oldNode, SimpleName newNode,
+				String oldName, String newName) {
+			this.oldNode = oldNode;
+			this.newNode = newNode;
 			this.oldName = oldName;
 			this.newName = newName;
 		}

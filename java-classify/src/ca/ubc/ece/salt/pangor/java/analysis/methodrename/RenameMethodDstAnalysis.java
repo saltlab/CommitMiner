@@ -53,10 +53,16 @@ public class RenameMethodDstAnalysis extends MethodAnalysis<ClassifierAlert> {
 
 		/* Add the facts generated in the visitor. */
 		for(UpdatedCallsite updated : visitor.getUpdatedCallsites()) {
+
+			int oldLine = this.compilationUnit.getLineNumber(updated.oldNode.getStartPosition()-1);
+			int newLine = this.compilationUnit.getLineNumber(updated.newNode.getStartPosition()-1);
+
 			this.facts.addPattern(
 					new UpdateCallsitePattern(
 							this.commit,
 							this.sourceCodeFileChange,
+							method.getName().getIdentifier(),
+							oldLine, newLine,
 							updated.oldName, updated.newName));
 		}
 		for(String unchanged : visitor.getUnchangedCallsites()) {

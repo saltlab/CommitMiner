@@ -51,7 +51,7 @@ public class TestAnalysis extends TestCase {
         /* Output if needed. */
         if(printAlerts) {
         	for(ClassifierAlert alert : actualAlerts) {
-        		System.out.println(alert.toString());
+        		System.out.println(alert.getLongDescription());
         	}
         }
 
