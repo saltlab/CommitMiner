@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.pangor.test.cfg;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -13,6 +14,7 @@ public class MockCFGNode {
 	public MockCFGNode(int id, String statementType) {
 		this.id = id;
 		this.statementType = statementType;
+		this.edges = new LinkedList<MockCFGEdge>();
 	}
 
 	public void addEdge(MockCFGEdge edge) {
@@ -28,5 +30,9 @@ public class MockCFGNode {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return this.id + "_" + this.statementType;
+	}
 
 }

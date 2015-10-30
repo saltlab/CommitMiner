@@ -134,4 +134,9 @@ public class CFGEdge {
 		return 42; // any arbitrary constant will do
 	}
 
+	@Override
+	public String toString() {
+		return this.from.toString() + "-[" + this.condition + "]->" + this.to.toString();
+	}
+
 }

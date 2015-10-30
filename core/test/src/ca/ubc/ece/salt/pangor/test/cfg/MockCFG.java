@@ -19,9 +19,11 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 public class MockCFG {
 
 	private MockCFGNode entryNode;
+	private boolean print;
 
-	public MockCFG(MockCFGNode entryNode) {
+	public MockCFG(MockCFGNode entryNode, boolean print) {
 		this.entryNode = entryNode;
+		this.print = print;
 	}
 
 	public MockCFGNode getEntryNode() {
@@ -45,7 +47,7 @@ public class MockCFG {
 	 * @param expectedCFG The expected CFG defined by the test case.
 	 * @return {@code true} if the CFGs are equivalent.
 	 */
-	public static boolean isEquivalent(CFG actualCFG, MockCFG expectedCFG) {
+	public boolean isEquivalent(CFG actualCFG, MockCFG expectedCFG) {
 
 		/* Breadth-first search to check equivalence. */
 		Queue<Pair<CFGNode, MockCFGNode>> queue = new LinkedList<Pair<CFGNode, MockCFGNode>>();
@@ -53,6 +55,9 @@ public class MockCFG {
 
 		/* Make sure the starting nodes are equivalent. */
 		if(!expectedCFG.getEntryNode().equals(actualCFG.getEntryNode())) {
+			if(this.print)
+				System.out.println("actual=" + actualCFG.getEntryNode().toString()
+						+ ", expected=" + expectedCFG.getEntryNode().toString());
 			return false;
 		}
 
@@ -66,6 +71,9 @@ public class MockCFG {
 			CFGNode actual = pair.getLeft();
 			MockCFGNode expected = pair.getRight();
 
+			if(this.print)
+				System.out.println("actual=" + actual.toString() + ", expected=" + expected.toString());
+
 			/* Check that all the edges of actual and expected are the same. */
 			for(CFGEdge actualEdge : actual.getEdges()) {
 
@@ -73,7 +81,16 @@ public class MockCFG {
 				MockCFGEdge expectedEdge = getExpectedEdge(actualEdge, expected.edges);
 
 				/* If there is no matching edge, the graphs are not equivalent. */
-				if(expectedEdge == null) return false;
+				if(expectedEdge == null) {
+					if(this.print) {
+						System.out.println("actual=" + actualEdge.toString());
+						for(MockCFGEdge e : expected.edges) {
+							System.out.println("expected=" + e.toString());
+						}
+
+					}
+					return false;
+				}
 
 				if(!visited.contains(expectedEdge.to)) {
 					/* Add the next node to the queue to be explored. */

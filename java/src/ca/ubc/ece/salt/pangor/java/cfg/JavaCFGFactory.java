@@ -47,6 +47,7 @@ public class JavaCFGFactory implements CFGFactory {
 		}
 
 		return cfgs;
+
 	}
 
 	@Override
@@ -69,7 +70,7 @@ public class JavaCFGFactory implements CFGFactory {
 
 		/* Set the entry and exit points for the CFG. */
 		CFGNode methodEntry = new CFGNode(method, "METHOD_ENTRY");
-		CFGNode methodExit = new CFGNode(method, "METHOD_EXIT");
+		CFGNode methodExit = new CFGNode(new EmptyStatement(method.getAST()), "METHOD_EXIT");
 
 		/* Build the CFG for the method. */
 		CFG cfg = new CFG(methodEntry);
