@@ -1,10 +1,11 @@
-package ca.ubc.ece.salt.pangor.analysis;
+package ca.ubc.ece.salt.pangor.test.analysis;
 
 import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleAlert;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleCFGFactory;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;

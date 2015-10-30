@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.analysis;
+package ca.ubc.ece.salt.pangor.test.analysis;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import ca.ubc.ece.salt.pangor.analysis.Commit;
+import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleAlert;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleCFGFactory;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
