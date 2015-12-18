@@ -7,11 +7,11 @@ import org.junit.Test;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleCFGFactory;
 import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.pangor.java.analysis.ClassAnalysis;
 import ca.ubc.ece.salt.pangor.java.analysis.methodrename.RenameMethodDstAnalysis;
 import ca.ubc.ece.salt.pangor.java.analysis.methodrename.RenameMethodSrcAnalysis;
+import ca.ubc.ece.salt.pangor.java.cfg.JavaCFGFactory;
 
 public class TestRenameRefactoringBatchAnalysis {
 
@@ -30,7 +30,7 @@ public class TestRenameRefactoringBatchAnalysis {
 				new RenameMethodDstAnalysis());
 
 		/* The SimpleCFGFactory doesn't do anything, so it is generic to any file type. */
-		SimpleCFGFactory cfgFactory = new SimpleCFGFactory();
+		JavaCFGFactory cfgFactory = new JavaCFGFactory();
 
 		/* Set up the commit analysis (analyzes one commit). */
 		CommitAnalysis<ClassifierAlert, ClassifierDataSet,
@@ -43,7 +43,9 @@ public class TestRenameRefactoringBatchAnalysis {
 
 		/* Set up the project analysis (analyzes one project). */
 		GitProjectAnalysis projectAnalysis = GitProjectAnalysis.fromURI(
-				"https://github.com/naman14/Timber.git", "./repositories/",
+//				"https://github.com/naman14/Timber.git", "./repositories/",
+//				"https://github.com/apache/tez.git", "./repositories/",
+				"https://github.com/apache/commons-math.git", "./repositories/",
 				"^.*$", commitAnalysis);
 
 		/* Run the analysis. */

@@ -12,7 +12,8 @@ import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 
 /**
- * Gathers facts about one commit and synthesizes alerts based on those facts.
+ * Gathers facts about one commit and runs queries in prolog against those
+ * facts to synthesize alerts.
  *
  * @param <A> The type of alert the data set stores.
  * @param <DS> The type of data set that stores the analysis results.
