@@ -1,10 +1,14 @@
 package ca.ubc.ece.salt.pangor.analysis;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.regex.Matcher;
 
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.api.basics.IQuery;
+import org.deri.iris.api.basics.IRule;
+import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.EvaluatorException;
 
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
@@ -20,8 +24,8 @@ import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
  * @param <S> The type of the source file analysis.
  * @param <D> Type type of the destination file analysis.
  */
-public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
-	S extends SourceCodeFileAnalysis<A>, D extends SourceCodeFileAnalysis<A>> {
+public class CommitAnalysis<DS extends DataSet,
+	S extends SourceCodeFileAnalysis, D extends SourceCodeFileAnalysis> {
 
 	/**
 	 * The data set manages the alerts by storing and loading alerts to and
@@ -44,10 +48,14 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 	private boolean preProcess;
 
 	/**
+	 * @param rules The datalog rules that are part of the IRIS KnowledgeBase.
+	 * @param queries The datalog queries that will produce alerts.
 	 * @param srcAnalysis The analysis to run on the source (or buggy) file.
 	 * @param dstAnalysis The analysis to run on the destination (or repaired) file.
 	 */
-	public CommitAnalysis(DS dataSet, S srcAnalysis, D dstAnalysis,
+	public CommitAnalysis(List<IRule> rules, List<IQuery> queries,
+			DS dataSet,
+			S srcAnalysis, D dstAnalysis,
 			CFGFactory cfgFactory, boolean preProcess) {
 		this.dataSet = dataSet;
 		this.srcAnalysis = srcAnalysis;
@@ -66,10 +74,13 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 	 */
 	public void analyze(Commit commit) throws Exception {
 
-		/* Store the facts from the analysis in this object. */
-		Facts<A> facts = new Facts<A>();
+		/* Initialize the fact base that will be filled by:
+		 * 	a) This CommitAnalysis.
+		 * 	b) The SourceCodeFileAnalysis implementations. */
+		Map<IPredicate, IRelation> facts = new HashMap<IPredicate, IRelation>();
 
-		/* Iterate through the files in the commit and call the SourceCodeFileAnalysis on them. */
+		/* Iterate through the files in the commit and run the
+		 * SourceCodeFileAnalysis on each of them. */
 		for(SourceCodeFileChange sourceCodeFileChange : commit.sourceCodeFileChanges) {
 			this.analyzeFile(commit, sourceCodeFileChange, facts);
 		}
@@ -80,37 +91,20 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 	}
 
 	/**
-	 * Registers alerts based on the patterns found by the analysis.
+	 * Registers alerts by applying rules to the facts found during the analysis.
 	 *
-	 * For each pattern, checks that pre-conditions are met and that there
-	 * are no anti-patterns.
+	 * This method is effective for patterns that are contained within one
+	 * file. For analyses that need knowledge about multiple files, this method
+	 * should be overridden.
 	 *
+	 * @param commit The details for the commit.
+	 * @param facts The facts derived from the source code file analyses.
 	 * @throws Exception
 	 */
-	protected void synthesizeAlerts(Commit commit, Facts<A> facts) throws Exception {
+	protected void synthesizeAlerts(Commit commit, Map<IPredicate, IRelation> facts) throws Exception {
 
-		/* Get the facts (patterns, anti-patterns and pre-conditions) from the
-		 * source and destination analysis. */
-
-		List<Pattern<A>> patterns = facts.getPatterns();
-		Set<AntiPattern> antiPatterns = facts.getAntiPatterns();
-		Set<PreCondition> preConditions = facts.getPreConditions();
-
-		/* Compute the set of (P - A) n C ... that is patters minus
-		 * anti-patterns intersecting pre-conditions. */
-
-		List<A> alerts = new LinkedList<A>();
-		for(Pattern<A> pattern : patterns) {
-			if(pattern.accept(antiPatterns, preConditions)) {
-				alerts.add(pattern.getAlert());
-			}
-		}
-
-		/* Register the alerts. */
-
-		for(A alert : alerts) {
-			this.dataSet.registerAlert(alert);
-		}
+		/* Query the knowledge base and create alerts. */
+		this.dataSet.addCommitAnalysisResults(commit, facts);
 
 	}
 
@@ -123,7 +117,7 @@ public class CommitAnalysis<A extends Alert, DS extends DataSet<A>,
 	 * @param facts Stores the facts from this analysis.
 	 * @param preProcess Set to true to enable AST pre-processing.
 	 */
-	private void analyzeFile(Commit commit, SourceCodeFileChange sourceCodeFileChange, Facts<A> facts) throws Exception {
+	private void analyzeFile(Commit commit, SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts) throws Exception {
 
 		/* Get the file extension. */
 		String fileExtension = getSourceCodeFileExtension(sourceCodeFileChange.buggyFile, sourceCodeFileChange.repairedFile);

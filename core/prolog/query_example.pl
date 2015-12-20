@@ -5,13 +5,11 @@
 % destination_protected_dereference := protected a dereferenced variable by adding a branch condition
 % arg1 := the function identifier
 % arg2 := the name of the identifier (variable, field, or function return value) being dereferenced.
-%:- multifile(destination_protected_dereference/2).
 destination_protected_dereference(_,_) :- fail.
 
 % source_unprotected_dereference := unprotected a dereferenced variable by removing a branch condition
 % arg1 := the function identifier
 % arg2 := the name of the identifier (variable, field, or function return value) being dereferenced.
-%:- multifile(source_unprotected_dereference/2).
 source_unprotected_dereference(_,_) :- fail.
 
 %% %%%%%%%%%%%%%%%%%%%%
