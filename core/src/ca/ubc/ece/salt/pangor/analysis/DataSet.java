@@ -27,6 +27,10 @@ public abstract class DataSet {
 	 */
 	private List<IQuery> queries;
 
+	/**
+	 * @param rules The datalog rules that are part of the IRIS KnowledgeBase.
+	 * @param queries The datalog queries that will produce alerts.
+	 */
 	public DataSet(List<IRule> rules, List<IQuery> queries) {
 		this.rules = rules;
 		this.queries = queries;

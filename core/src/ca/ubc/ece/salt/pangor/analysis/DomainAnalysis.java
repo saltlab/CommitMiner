@@ -1,12 +1,9 @@
 package ca.ubc.ece.salt.pangor.analysis;
 
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
 import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.api.basics.IQuery;
-import org.deri.iris.api.basics.IRule;
 import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.EvaluatorException;
 
@@ -34,14 +31,12 @@ public class DomainAnalysis {
 	private boolean preProcess;
 
 	/**
-	 * @param rules The datalog rules that are part of the IRIS KnowledgeBase.
-	 * @param queries The datalog queries that will produce alerts.
 	 * @param srcAnalysis The analysis to run on the source (or buggy) file.
 	 * @param dstAnalysis The analysis to run on the destination (or repaired) file.
 	 */
-	public DomainAnalysis(List<IRule> rules, List<IQuery> queries,
-			SourceCodeFileAnalysis srcAnalysis, SourceCodeFileAnalysis dstAnalysis,
-			CFGFactory cfgFactory, boolean preProcess) {
+	public DomainAnalysis(SourceCodeFileAnalysis srcAnalysis,
+						  SourceCodeFileAnalysis dstAnalysis,
+						  CFGFactory cfgFactory, boolean preProcess) {
 		this.srcAnalysis = srcAnalysis;
 		this.dstAnalysis = dstAnalysis;
 		this.cfgFactory = cfgFactory;

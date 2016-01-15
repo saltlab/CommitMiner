@@ -5,11 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.api.basics.IQuery;
-import org.deri.iris.api.basics.IRule;
 import org.deri.iris.storage.IRelation;
-
-import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 
 /**
  * Gathers facts about one commit from various domains and runs queries in
@@ -30,14 +26,12 @@ public class CommitAnalysis {
 	private List<DomainAnalysis> domainAnalyses;
 
 	/**
-	 * @param rules The datalog rules that are part of the IRIS KnowledgeBase.
-	 * @param queries The datalog queries that will produce alerts.
+	 * @param dataSet The data set that will generate and store the alerts.
+	 * @param domainAnalyses The domains to extract facts from.
 	 */
-	public CommitAnalysis(List<IRule> rules, List<IQuery> queries,
-			DataSet dataSet,
-			List<DomainAnalysis> domainAnalyses,
-			CFGFactory cfgFactory, boolean preProcess) {
+	public CommitAnalysis(DataSet dataSet, List<DomainAnalysis> domainAnalyses) {
 		this.dataSet = dataSet;
+		this.domainAnalyses = domainAnalyses;
 	}
 
 	/**
