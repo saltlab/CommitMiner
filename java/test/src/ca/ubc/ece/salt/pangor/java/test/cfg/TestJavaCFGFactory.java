@@ -41,7 +41,7 @@ public class TestJavaCFGFactory {
 		MockCFG expected = new MockCFG(entry, true);
 
 		/* The test file. */
-		String file = "/Users/qhanam/Documents/workspace_pangor/pangor/java/test/input/SimpleCFG.java";
+		String file = "/Users/qhanam/Documents/workspace_commitminer/pangor/java/test/input/SimpleCFG.java";
 		String source = readFile(file);
 
 		/* Parse the file into a CompilationUnit. */

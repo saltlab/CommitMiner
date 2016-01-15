@@ -13,7 +13,6 @@ import org.deri.iris.storage.IRelationFactory;
 import org.deri.iris.storage.simple.SimpleRelationFactory;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
@@ -27,7 +26,7 @@ public class SimpleDstFileAnalysis extends SourceCodeFileAnalysis {
 	public SimpleDstFileAnalysis() { }
 
 	@Override
-	public void analyze(Commit commit, SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts, ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
+	public void analyze(SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts, ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
 
 		/* The factories we need to create the predicates. */
 		IBasicFactory basicFactory = Factory.BASIC;

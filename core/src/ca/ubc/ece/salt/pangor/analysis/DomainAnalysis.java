@@ -58,7 +58,7 @@ public class DomainAnalysis {
 		/* Iterate through the files in the commit and run the
 		 * SourceCodeFileAnalysis on each of them. */
 		for(SourceCodeFileChange sourceCodeFileChange : commit.sourceCodeFileChanges) {
-			this.analyzeFile(commit, sourceCodeFileChange, facts);
+			this.analyzeFile(sourceCodeFileChange, facts);
 		}
 
 	}
@@ -67,12 +67,11 @@ public class DomainAnalysis {
 	 * Performs AST-differencing and launches the analysis of the pre-commit/post-commit
 	 * source code file pair.
 	 *
-	 * @param commit The commit information.
 	 * @param sourceCodeFileChange The source code file change information.
 	 * @param facts Stores the facts from this analysis.
 	 * @param preProcess Set to true to enable AST pre-processing.
 	 */
-	private void analyzeFile(Commit commit, SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts) throws Exception {
+	private void analyzeFile(SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts) throws Exception {
 
 		/* Get the file extension. */
 		String fileExtension = getSourceCodeFileExtension(sourceCodeFileChange.buggyFile, sourceCodeFileChange.repairedFile);
@@ -105,8 +104,8 @@ public class DomainAnalysis {
 			CFDContext cfdContext = cfd.getContext();
 
 			/* Run the analysis. */
-			this.srcAnalysis.analyze(commit, sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
-			this.dstAnalysis.analyze(commit, sourceCodeFileChange, facts, cfdContext.dstScript, cfdContext.dstCFGs);
+			this.srcAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
+			this.dstAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.dstScript, cfdContext.dstCFGs);
 
 		}
 

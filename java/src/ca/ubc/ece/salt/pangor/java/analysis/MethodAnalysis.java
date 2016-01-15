@@ -1,78 +1,63 @@
 package ca.ubc.ece.salt.pangor.java.analysis;
 
+import java.util.Map;
+
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.storage.IRelation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.pangor.analysis.Alert;
-import ca.ubc.ece.salt.pangor.analysis.Commit;
-import ca.ubc.ece.salt.pangor.analysis.Facts;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
  * An analysis of a Java Method.
  *
- * NOTE: Not thread safe.
- * NOTE: This class only works with the Eclipse JDT AST.
+ * NOTES:
+ * 	1. This class only works with the Eclipse JDT AST.
+ * 	2. This class is thread-safe.
  */
-public abstract class MethodAnalysis<A extends Alert> {
-
-	/** The commit that this class was modified in. **/
-	protected Commit commit;
-
-	/** The source code file that this class was parsed from. **/
-	protected SourceCodeFileChange sourceCodeFileChange;
-
-	/**
-	 * The {@code CompilationUnit}. Needed for getting line numbers and
-	 * the class name.
-	 */
-	protected CompilationUnit compilationUnit;
-
-	/** The analysis facts. Register patterns with this structure. **/
-	protected Facts<A> facts;
-
-	/**
-	 * The current control flow graph for the method being analyzed.
-	 */
-	protected CFG cfg;
-
-	public MethodAnalysis() {
-		this.commit = null;
-		this.sourceCodeFileChange = null;
-		this.facts = null;
-		this.compilationUnit = null;
-	}
+public abstract class MethodAnalysis {
 
 	/**
 	 * An analysis of a Java method. The concrete analysis of the method is
 	 * triggered from here.
+	 * @param sourceCodeFileChange The source code file that this class was parsed from.
+	 * @param The {@code CompilationUnit}. Needed for getting line numbers and
+	 * 		  the class name.
+	 * @param facts The analysis facts. Register patterns with this structure.
+	 * @param The current control flow graph for the method being analyzed.
 	 */
-	public void analyze(Commit commit, SourceCodeFileChange sourceCodeFileChange,
-			CompilationUnit compilationUnit,
-			Facts<A> facts, ClassifiedASTNode root, CFG cfg) throws Exception {
-
-		this.commit = commit;
-		this.sourceCodeFileChange = sourceCodeFileChange;
-		this.compilationUnit = compilationUnit;
-		this.facts = facts;
+	public void analyze(SourceCodeFileChange sourceCodeFileChange,
+						CompilationUnit compilationUnit,
+						Map<IPredicate, IRelation> facts,
+						ClassifiedASTNode root, CFG cfg) throws Exception {
 
 		/* Check we are working with the correct AST type. */
 		if(!(root instanceof MethodDeclaration)) throw new IllegalArgumentException("The AST must be parsed from Eclipse JDT.");
 		MethodDeclaration method = (MethodDeclaration) root;
 
 		/* Analyze this method with a concrete analysis that recognizes patterns. */
-		this.concreteAnalysis(method, cfg);
+		this.concreteAnalysis(sourceCodeFileChange, compilationUnit, facts,
+							  root, cfg, method);
 
 	}
 
 	/**
 	 * Analyzes a method with a concrete analysis that recognizes and registers
 	 * patterns.
+	 * @param sourceCodeFileChange The source code file that this class was parsed from.
+	 * @param The {@code CompilationUnit}. Needed for getting line numbers and
+	 * 		  the class name.
+	 * @param facts The analysis facts. Register patterns with this structure.
+	 * @param The current control flow graph for the method being analyzed.
 	 * @param method The method declaration's AST node.
-	 * @param cfg The control flow graph for the method.
 	 */
-	public abstract void concreteAnalysis(MethodDeclaration method, CFG cfg);
+	protected abstract void concreteAnalysis(SourceCodeFileChange sourceCodeFileChange,
+											 CompilationUnit compilationUnit,
+											 Map<IPredicate, IRelation> facts,
+											 ClassifiedASTNode root, CFG cfg,
+											 MethodDeclaration method);
 
 }

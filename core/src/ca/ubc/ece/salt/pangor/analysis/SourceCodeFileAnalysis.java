@@ -17,7 +17,6 @@ public abstract class SourceCodeFileAnalysis {
 
 	/**
 	 * Perform a single-file analysis.
-	 * @param commit The commit information.
 	 * @param sourceCodeFileChange The source code file change information.
 	 * @param facts Stores the facts (predicates and their relations) from this
 	 * 				analysis.
@@ -25,8 +24,7 @@ public abstract class SourceCodeFileAnalysis {
 	 * @param cfgs The list of CFGs in the script (one for each function plus
 	 * 			   one for the script).
 	 */
-	public abstract void analyze(Commit commit,
-								 SourceCodeFileChange sourceCodeFileChange,
+	public abstract void analyze(SourceCodeFileChange sourceCodeFileChange,
 								 Map<IPredicate, IRelation> facts,
 								 ClassifiedASTNode root,
 								 List<CFG> cfgs) throws Exception;
