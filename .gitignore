@@ -9,6 +9,7 @@ test/output/
 *.class
 .classpath
 .project
+.settings
 output/
 target/
 dependencies/
