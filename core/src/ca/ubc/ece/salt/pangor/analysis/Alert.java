@@ -15,27 +15,20 @@ public abstract class Alert {
 	/** The commit information. */
 	public Commit commit;
 
-	/** The source code file change information. */
-	public SourceCodeFileChange sourceCodeFileChange;
-
 	/**
 	 * @param commit The meta and change information from the commit.
-	 * @param functionName The name of the function that was analyzed.
 	 **/
-	public Alert(Commit commit, SourceCodeFileChange sourceCodeFileChange) {
+	public Alert(Commit commit) {
 		this.commit = commit;
-		this.sourceCodeFileChange = sourceCodeFileChange;
 		this.id = getNextID();
 	}
 
 	/**
 	 * Used for de-serializing alerts
 	 * @param commit The meta information from a bulk analysis.
-	 * @param functionName The name of the function that was analyzed.
 	 **/
-	public Alert(Commit commit, SourceCodeFileChange sourceCodeFileChange, int id) {
+	public Alert(Commit commit, int id) {
 		this.commit = commit;
-		this.sourceCodeFileChange = sourceCodeFileChange;
 		this.id = id;
 	}
 
