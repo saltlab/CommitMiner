@@ -14,6 +14,7 @@ import org.deri.iris.storage.IRelation;
 
 /**
  * The {@code DataSet} manages the data that is generated during an analysis.
+ * @param T The type of alerts produced by the {@code DataSet}.
  */
 public abstract class DataSet {
 
@@ -47,16 +48,17 @@ public abstract class DataSet {
 
 		for(IQuery query : this.queries) {
 			IRelation result = knowledgeBase.execute(query);
-			registerAlert(query, result);
+			registerAlert(commit, query, result);
 		}
 
 	}
 
 	/**
 	 * A Datalog query has found a match. Register the result as an alert.
+	 * @param commit The commit that the alert was generated for.
 	 * @param query The query that matched.
 	 * @param result The set of results from the query.
 	 */
-	protected abstract void registerAlert(IQuery query, IRelation result);
+	protected abstract void registerAlert(Commit commit, IQuery query, IRelation result);
 
 }

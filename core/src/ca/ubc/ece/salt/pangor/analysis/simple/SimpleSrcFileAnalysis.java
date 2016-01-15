@@ -49,7 +49,9 @@ public class SimpleSrcFileAnalysis extends SourceCodeFileAnalysis {
 		}
 
 		/* Add the new tuple to the relation. */
-		ITuple tuple = basicFactory.createTuple(termFactory.createString(sourceCodeFileChange.getFileName()), termFactory.createString(root.getASTNodeType()));
+		ITuple tuple = basicFactory.createTuple(
+				termFactory.createString(sourceCodeFileChange.getFileName()),
+				termFactory.createString(root.getASTNodeType()));
 		relation.add(tuple);
 
 	}

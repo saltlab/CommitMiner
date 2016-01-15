@@ -3,23 +3,41 @@ package ca.ubc.ece.salt.pangor.analysis.simple;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.deri.iris.api.basics.IQuery;
+import org.deri.iris.api.basics.IRule;
+import org.deri.iris.api.basics.ITuple;
+import org.deri.iris.storage.IRelation;
+
+import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
 
 /**
  * A simple data set used for quick analysis prototypes and testing.
  */
-public class SimpleDataSet implements DataSet<SimpleAlert> {
+public class SimpleDataSet extends DataSet {
 
 	/** The alerts in this data set. **/
 	private List<SimpleAlert> alerts;
 
-	public SimpleDataSet() {
+	public SimpleDataSet(List<IRule> rules, List<IQuery> queries) {
+		super(rules, queries);
 		this.alerts = new LinkedList<SimpleAlert>();
 	}
 
 	@Override
-	public void registerAlert(SimpleAlert alert) throws Exception {
-		this.alerts.add(alert);
+	public void registerAlert(Commit commit, IQuery query, IRelation results) {
+
+		/* Iterate through the tuples that are members of the relation and
+		 * add them as alerts. */
+		for(int i = 0; i < results.size(); i++) {
+
+			ITuple tuple = results.get(i);
+
+			/* Create a SimpleAlert and store it in the data set. */
+			this.alerts.add(new SimpleAlert(commit, results + "(" + tuple.toString() + ")"));
+
+		}
+
 	}
 
 	/**
@@ -30,7 +48,7 @@ public class SimpleDataSet implements DataSet<SimpleAlert> {
 	}
 
 	/**
-	 * @return true if {@code alert} is in this dataset.
+	 * @return true if {@code alert} is in this data set.
 	 */
 	public boolean contains(SimpleAlert alert) {
 		return alerts.contains(alert);
