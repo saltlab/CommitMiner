@@ -30,12 +30,12 @@ import ca.ubc.ece.salt.pangor.git.GitProject;
 public class GitProjectAnalysis extends GitProject {
 
 	/** Runs an analysis on a source file. **/
-	private CommitAnalysis<?,?,?,?> commitAnalysis;
+	private CommitAnalysis commitAnalysis;
 
 	/**
 	 * Constructor that is used by our static factory methods.
 	 */
-	protected GitProjectAnalysis(GitProject gitProject, CommitAnalysis<?,?,?,?> commitAnalysis) {
+	protected GitProjectAnalysis(GitProject gitProject, CommitAnalysis commitAnalysis) {
 		super(gitProject);
 		this.commitAnalysis = commitAnalysis;
 	}
@@ -200,7 +200,7 @@ public class GitProjectAnalysis extends GitProject {
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitProjectAnalysisException
 	 */
-	public static GitProjectAnalysis fromDirectory(String directory, String commitMessageRegex, CommitAnalysis<?,?,?,?> commitAnalysis)
+	public static GitProjectAnalysis fromDirectory(String directory, String commitMessageRegex, CommitAnalysis commitAnalysis)
 			throws GitProjectAnalysisException {
 		GitProject gitProject = GitProject.fromDirectory(directory, commitMessageRegex);
 
@@ -220,7 +220,7 @@ public class GitProjectAnalysis extends GitProject {
 	 * @throws TransportException
 	 * @throws InvalidRemoteException
 	 */
-	public static GitProjectAnalysis fromURI(String uri, String directory, String commitMessageRegex, CommitAnalysis<?,?,?,?> commitAnalysis)
+	public static GitProjectAnalysis fromURI(String uri, String directory, String commitMessageRegex, CommitAnalysis commitAnalysis)
 			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
 		GitProject gitProject = GitProject.fromURI(uri, directory, commitMessageRegex);
 
