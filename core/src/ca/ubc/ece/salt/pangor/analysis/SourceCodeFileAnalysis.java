@@ -10,12 +10,10 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
- * Gathers facts (patterns, pre-conditions and anti-patterns) about changes to
- * a source code file.
+ * Gathers Datalog facts about changes to a source code file. This class should
+ * be extended to analyze a file in a particular language.
  */
 public abstract class SourceCodeFileAnalysis {
-
-	public SourceCodeFileAnalysis() { }
 
 	/**
 	 * Perform a single-file analysis.
@@ -27,6 +25,10 @@ public abstract class SourceCodeFileAnalysis {
 	 * @param cfgs The list of CFGs in the script (one for each function plus
 	 * 			   one for the script).
 	 */
-	public abstract void analyze(Commit commit, SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts, ClassifiedASTNode root, List<CFG> cfgs) throws Exception;
+	public abstract void analyze(Commit commit,
+								 SourceCodeFileChange sourceCodeFileChange,
+								 Map<IPredicate, IRelation> facts,
+								 ClassifiedASTNode root,
+								 List<CFG> cfgs) throws Exception;
 
 }

@@ -42,7 +42,7 @@ public abstract class DataSet {
 	public void addCommitAnalysisResults(Commit commit, Map<IPredicate, IRelation> facts) throws EvaluationException {
 
 		/* Since we are not doing any further analysis for the commit, we can
-		 * create the knowledge base. */
+		 * create the knowledge base, run the queries and create the alerts. */
 		IKnowledgeBase knowledgeBase = new KnowledgeBase(facts, this.rules, new Configuration());
 
 		for(IQuery query : this.queries) {
