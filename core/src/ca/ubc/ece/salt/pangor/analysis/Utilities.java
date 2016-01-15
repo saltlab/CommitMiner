@@ -28,7 +28,7 @@ public class Utilities {
 		IBasicFactory basicFactory = Factory.BASIC;
 
 		/* Create the predicate for this analysis. */
-		IPredicate predicate = basicFactory.createPredicate("DstMethodRename", terms.length);
+		IPredicate predicate = basicFactory.createPredicate(predicateName, terms.length);
 
 		/* Get the relation for this predicate from the fact base. */
 		IRelation relation = facts.get(predicate);

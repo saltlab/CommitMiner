@@ -20,7 +20,7 @@ import ca.ubc.ece.salt.pangor.analysis.DataSet;
  * The {@code DataSet} manages the alerts that were generated during the
  * analysis.
  */
-public class ClassifierDataSet implements DataSet<ClassifierAlert> {
+public class ClassifierDataSet implements DataSet {
 
 	/**
 	 * The path to the file where the data set will be cached. This allows us
