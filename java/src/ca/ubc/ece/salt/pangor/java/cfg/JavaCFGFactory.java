@@ -14,6 +14,7 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
+import ca.ubc.ece.salt.pangor.java.analysis.MethodVisitor;
 import fr.labri.gumtree.gen.jdt.JdtTreeGenerator;
 import fr.labri.gumtree.io.TreeGenerator;
 
@@ -38,12 +39,12 @@ public class JavaCFGFactory implements CFGFactory {
 		List<CFG> cfgs = new LinkedList<CFG>();
 
 		/* Get the list of methods in the class. */
-//		List<MethodDeclaration> methods = MethodVisitor.getMethodDeclarations(cu);
+		List<MethodDeclaration> methods = MethodVisitor.getMethodDeclarations(cu);
 
 		/* For each function, generate its CFG. */
-//		for(MethodDeclaration method : methods) {
-//			cfgs.add(JavaCFGFactory.buildMethodCFG(method));
-//		}
+		for(MethodDeclaration method : methods) {
+			cfgs.add(JavaCFGFactory.buildMethodCFG(method));
+		}
 
 		return cfgs;
 

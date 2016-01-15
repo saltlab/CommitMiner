@@ -15,7 +15,6 @@ import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleAlert;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
-import ca.ubc.ece.salt.pangor.java.analysis.ClassAnalysis;
 
 @Ignore
 public class TestAnalysis extends TestCase {
@@ -33,9 +32,7 @@ public class TestAnalysis extends TestCase {
 	protected void runTest(Commit commit, SourceCodeFileChange sourceFileChange,
 			List<SimpleAlert> expectedAlerts,
 			boolean printAlerts,
-			CommitAnalysis<SimpleAlert, SimpleDataSet,
-						   ClassAnalysis<SimpleAlert>,
-						   ClassAnalysis<SimpleAlert>> commitAnalysis,
+			CommitAnalysis commitAnalysis,
 			SimpleDataSet dataSet) throws Exception {
 
 		/* Add the source code file change to the commit. */
