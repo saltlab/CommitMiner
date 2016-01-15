@@ -33,8 +33,8 @@ public class TestBatchAnalysis {
 		IBasicFactory basicFactory = Factory.BASIC;
 		ITermFactory termFactory = Factory.TERM;
 
-		ITerm termX = termFactory.createString("X"); // X
-		ITerm termY = termFactory.createString("Y"); // Y
+		ITerm termX = termFactory.createVariable("X"); // X
+		ITerm termY = termFactory.createVariable("Y"); // Y
 		ITuple tuple = basicFactory.createTuple(termX, termY); // X,Y
 
 		IPredicate sourcePredicate = basicFactory.createPredicate("SourceRoot", 2); // SourceRoot(,)

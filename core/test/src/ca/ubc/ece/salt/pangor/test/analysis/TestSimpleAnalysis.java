@@ -54,8 +54,8 @@ public class TestSimpleAnalysis {
 		IBasicFactory basicFactory = Factory.BASIC;
 		ITermFactory termFactory = Factory.TERM;
 
-		ITerm termX = termFactory.createString("X"); // X
-		ITerm termY = termFactory.createString("Y"); // Y
+		ITerm termX = termFactory.createVariable("X"); // X
+		ITerm termY = termFactory.createVariable("Y"); // Y
 		ITuple tuple = basicFactory.createTuple(termX, termY); // X,Y
 
 		IPredicate sourcePredicate = basicFactory.createPredicate("SourceRoot", 2); // SourceRoot(,)
@@ -95,8 +95,8 @@ public class TestSimpleAnalysis {
 
 		/* We should have one alert in the data set now. */
 		System.out.println(dataSet.printAlerts());
-		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "Source Root: org.eclipse.jdt.core.dom.CompilationUnit")));
-		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "Destination Root: org.eclipse.jdt.core.dom.CompilationUnit")));
+		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "[?- SourceRoot(?X, ?Y).](('User', 'CompilationUnit'))")));
+		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "[?- DestinationRoot(?X, ?Y).](('User', 'CompilationUnit'))")));
 
 	}
 

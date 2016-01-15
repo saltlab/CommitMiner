@@ -34,7 +34,7 @@ public class SimpleDataSet extends DataSet {
 			ITuple tuple = results.get(i);
 
 			/* Create a SimpleAlert and store it in the data set. */
-			this.alerts.add(new SimpleAlert(commit, results + "(" + tuple.toString() + ")"));
+			this.alerts.add(new SimpleAlert(commit, "[" + query.toString() + "](" + tuple.toString() + ")"));
 
 		}
 
