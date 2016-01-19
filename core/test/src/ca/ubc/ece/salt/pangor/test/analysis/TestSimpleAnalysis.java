@@ -22,10 +22,10 @@ import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleFeatureVector;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleCFGFactory;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDstFileAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.simple.SimpleFeatureVector;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleSrcFileAnalysis;
 
 /**
@@ -38,7 +38,7 @@ public class TestSimpleAnalysis {
 	public void test() throws Exception {
 
 		/* Set up a dummy commit. */
-		Commit commit = new Commit(1, 1, "test", "http://github.com/saltlab/Pangor", "c0", "c1");
+		Commit commit = new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1");
 
 		/* Add a source code file change. */
 		String buggyFile = "/Users/qhanam/Documents/workspace_commitminer/pangor/core/test/input/java-source/User.java";

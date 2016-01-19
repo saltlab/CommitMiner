@@ -14,12 +14,6 @@ import java.util.List;
  */
 public class Commit {
 
-	/** The number of commits inspected. **/
-	public int totalCommits;
-
-	/** The number of bug fixing commits analyzed. **/
-	public int commitsAnalyzed;
-
 	/** The identifier for the project. **/
 	public String projectID;
 
@@ -43,13 +37,9 @@ public class Commit {
 	 * @param buggyCommitID The ID for the prior commit.
 	 * @param repairedCommitID The ID for the current commit.
 	 */
-	public Commit(int totalCommits, int bugFixingCommits,
-			String projectID,
-			String projectHomepage,
-			String buggyCommitID, String repairedCommitID) {
+	public Commit(String projectID, String projectHomepage,
+				  String buggyCommitID, String repairedCommitID) {
 
-		this.totalCommits = totalCommits;
-		this.commitsAnalyzed = bugFixingCommits;
 		this.projectID = projectID;
 		this.url = projectHomepage;
 		this.buggyCommitID = buggyCommitID;

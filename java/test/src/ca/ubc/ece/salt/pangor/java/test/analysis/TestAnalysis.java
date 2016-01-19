@@ -13,8 +13,8 @@ import org.junit.Ignore;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleFeatureVector;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
+import ca.ubc.ece.salt.pangor.analysis.simple.SimpleFeatureVector;
 
 @Ignore
 public class TestAnalysis extends TestCase {
@@ -73,7 +73,7 @@ public class TestAnalysis extends TestCase {
 	 * @return A dummy commit for testing.
 	 */
 	public static Commit getCommit() {
-		return new Commit(1, 1, "test", "http://github.com/saltlab/Pangor", "c0", "c1");
+		return new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1");
 	}
 
 	/**

@@ -93,7 +93,6 @@ public class GitProjectAnalysis extends GitProject {
 
 		/* The {@code Commit} is meta data and a set of source code changes. */
 		Commit commit = new Commit(
-				this.totalCommits, this.bugFixingCommits,
 				this.projectID,
 				this.projectHomepage,
 				buggyRevision, bugFixingRevision);

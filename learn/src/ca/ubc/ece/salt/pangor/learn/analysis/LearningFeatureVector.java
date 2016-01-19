@@ -1,11 +1,22 @@
 package ca.ubc.ece.salt.pangor.learn.analysis;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.FeatureVector;
+import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition;
+import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.learn.api.KeywordUse;
+import ca.ubc.ece.salt.pangor.learn.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.learn.api.StatementUse;
 
 /**
@@ -25,7 +36,7 @@ import ca.ubc.ece.salt.pangor.learn.api.StatementUse;
  * 	- StatementChange(class, method, change type, statement type)
  * 	- KeywordChange(class, method, type, context, change type, package, name)
  */
-public abstract class LearningFeatureVector extends FeatureVector {
+public class LearningFeatureVector extends FeatureVector {
 
 	/** The class that was analyzed (if at or below class granularity). **/
 	public String klass;
@@ -40,23 +51,16 @@ public abstract class LearningFeatureVector extends FeatureVector {
 	public Map<KeywordUse, Integer> keywordMap;
 
 	/**
-	 * An alert is always associated a concrete Checker.
-	 * @param commit
-	 * @param sourceCodeFileChange
-	 * @param type The checker which generated the alert.
-	 * @param subtype A checker may detect more than one repair subtype.
+	 * @param commit The commit that the features were extracted from.
+	 * @param klass The class that the features were extracted from.
+	 * @param method The method that the features were extracted from.
 	 */
-	public LearningFeatureVector(Commit commit, String project,
-								 String srcCommit, String dstCommit,
-								 String url,
-								 String klass, String method,
-								 Map<StatementUse, Integer> statementMap,
-								 Map<KeywordUse, Integer> keywordMap) {
+	public LearningFeatureVector(Commit commit, String klass, String method) {
 		super(commit);
 		this.klass = klass;
 		this.method = method;
-		this.statementMap = statementMap;
-		this.keywordMap = keywordMap;
+		this.statementMap = new HashMap<StatementUse, Integer>();
+		this.keywordMap = new HashMap<KeywordUse, Integer>();
 	}
 
 	/**
@@ -72,6 +76,8 @@ public abstract class LearningFeatureVector extends FeatureVector {
 	 */
 	public LearningFeatureVector(Commit commit, int id) {
 		super(commit, id);
+		this.statementMap = new HashMap<StatementUse, Integer>();
+		this.keywordMap = new HashMap<KeywordUse, Integer>();
 	}
 
 	/**
@@ -96,6 +102,136 @@ public abstract class LearningFeatureVector extends FeatureVector {
 		}
 
 		return serialized;
+
+	}
+
+	/**
+	 * If the given token is a statement, that statement's count is incremented by
+	 * one.
+	 * @param token The string to check against the statement list.
+	 */
+	public void addStatement(StatementUse statement) {
+
+		Integer count = this.statementMap.containsKey(statement) ? this.statementMap.get(statement) + 1 : 1;
+		this.statementMap.put(statement,  count);
+
+	}
+
+	/**
+	 * Add the statement to the feature vector and set its count.
+	 * @param token The string to check against the statement list.
+	 */
+	public void addStatement(StatementUse statement, Integer count) {
+
+		this.statementMap.put(statement,  count);
+
+	}
+
+	/**
+	 * If the given token is a keyword, that keyword's count is incremented by
+	 * one.
+	 * @param token The string to check against the keyword list.
+	 */
+	public void addKeyword(KeywordUse keyword) {
+
+		Integer count = this.keywordMap.containsKey(keyword) ? this.keywordMap.get(keyword) + 1 : 1;
+		this.keywordMap.put(keyword,  count);
+
+	}
+
+	/**
+	 * Add the keyword to the feature vector and set its count.
+	 * @param token The string to check against the keyword list.
+	 */
+	public void addKeyword(KeywordUse keyword, Integer count) {
+
+		this.keywordMap.put(keyword,  count);
+
+	}
+
+	/**
+	 * This method de-serializes a feature vector. This is useful when reading
+	 * a data set from the disk.
+	 * @param serialized The serialized version of a feature vector.
+	 * @return The feature vector represented by {@code serialized}.
+	 */
+	public static LearningFeatureVector deSerialize(String serialized) throws Exception {
+
+		String[] features = serialized.split(",");
+
+		if(features.length < 7) throw new Exception("De-serialization exception. Serial format not recognized.");
+
+		Commit commit = new Commit(features[1], features[2], features[3],
+								   features[4]);
+
+		LearningFeatureVector featureVector = new LearningFeatureVector(commit, Integer.parseInt(features[0]));
+
+		for(int i = 8; i < features.length; i++) {
+			String[] feature = features[i].split(":");
+			if(feature.length < 6) throw new Exception("De-serialization exception. Serial format not recognized.");
+			KeywordUse keyword = new KeywordUse(KeywordType.valueOf(feature[0]),
+												KeywordContext.valueOf(feature[1]),
+												feature[4],
+												ChangeType.valueOf(feature[2]), feature[3]);
+			featureVector.addKeyword(keyword, Integer.parseInt(feature[5]));
+		}
+
+		return featureVector;
+
+	}
+
+	/**
+	 * Converts this feature vector into a Weka Instance.
+	 * @return This feature vector as a Weka Instance
+	 */
+	public Instance getWekaInstance(Instances dataSet, ArrayList<Attribute> attributes, Set<KeywordDefinition> keywords) {
+
+		Instance instance = new DenseInstance(attributes.size());
+		instance.setDataset(dataSet);
+
+		/* Set the meta info for the instance. */
+		instance.setValue(0, this.id);
+		instance.setValue(1, this.commit.projectID);
+		instance.setValue(2, this.commit.url);
+		instance.setValue(3, this.commit.buggyCommitID);
+		instance.setValue(4, this.commit.repairedCommitID);
+		instance.setValue(5, this.klass);
+		instance.setValue(6, this.method);
+		instance.setValue(7, "?"); // assigned cluster
+
+		/* Set the keyword values. */
+		int i = 9;
+		for(KeywordDefinition keyword : keywords) {
+			if(this.keywordMap.containsKey(keyword)) {
+				instance.setValue(i, this.keywordMap.get(keyword));
+			}
+			else {
+				instance.setValue(i, 0);
+			}
+			i++;
+		}
+
+		return instance;
+
+	}
+
+	/**
+	 * Prints the meta features and the specified keyword values in the order they are provided.
+	 * @param keywords An ordered list of the keywords to print in the feature vector.
+	 * @return the CSV row (the feature vector) as a string.
+	 */
+	public String getFeatureVector(Set<KeywordDefinition> keywords) {
+
+		String vector = id + "," + this.commit.projectID + "," + this.commit.url + ","
+				+ this.commit.buggyCommitID + "," + this.commit.repairedCommitID
+				+ "," + this.klass + "," + this.method;
+
+		for(KeywordDefinition keyword : keywords) {
+			if(this.keywordMap.containsKey(keyword)) vector += "," + this.keywordMap.get(keyword).toString();
+			else vector += ",0";
+		}
+
+		return vector;
 
 	}
 

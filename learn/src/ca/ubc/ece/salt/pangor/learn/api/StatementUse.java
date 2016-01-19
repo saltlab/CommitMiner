@@ -16,6 +16,11 @@ public class StatementUse {
 	/** How this keyword was modified from the source to the destination file. **/
 	public ChangeType changeType;
 
+	public StatementUse(String type, ChangeType changeType) {
+		this.type = type;
+		this.changeType = changeType;
+	}
+
 	@Override
 	public String toString() {
 		return "STATEMENT:" + type + ":" + changeType.name();
