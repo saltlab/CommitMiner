@@ -1,14 +1,14 @@
 package ca.ubc.ece.salt.pangor.analysis.simple;
 
-import ca.ubc.ece.salt.pangor.analysis.Alert;
+import ca.ubc.ece.salt.pangor.analysis.FeatureVector;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 
-public class SimpleAlert extends Alert {
+public class SimpleFeatureVector extends FeatureVector {
 
 	/** The pattern found by the analysis. **/
 	public String pattern;
 
-	public SimpleAlert(Commit commit, String pattern) {
+	public SimpleFeatureVector(Commit commit, String pattern) {
 		super(commit);
 		this.pattern = pattern;
 	}
@@ -22,8 +22,8 @@ public class SimpleAlert extends Alert {
 
 	@Override
 	public boolean equals(Object o) {
-		if(o instanceof SimpleAlert) {
-			SimpleAlert sa = (SimpleAlert)o;
+		if(o instanceof SimpleFeatureVector) {
+			SimpleFeatureVector sa = (SimpleFeatureVector)o;
 			if(this.pattern.equals(sa.pattern)
 					&& this.commit.equals(sa.commit)) return true;
 		}

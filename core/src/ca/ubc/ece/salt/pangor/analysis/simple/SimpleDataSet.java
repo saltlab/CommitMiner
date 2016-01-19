@@ -17,11 +17,11 @@ import ca.ubc.ece.salt.pangor.analysis.DataSet;
 public class SimpleDataSet extends DataSet {
 
 	/** The alerts in this data set. **/
-	private List<SimpleAlert> alerts;
+	private List<SimpleFeatureVector> alerts;
 
 	public SimpleDataSet(List<IRule> rules, List<IQuery> queries) {
 		super(rules, queries);
-		this.alerts = new LinkedList<SimpleAlert>();
+		this.alerts = new LinkedList<SimpleFeatureVector>();
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class SimpleDataSet extends DataSet {
 			ITuple tuple = results.get(i);
 
 			/* Create a SimpleAlert and store it in the data set. */
-			this.alerts.add(new SimpleAlert(commit, "[" + query.toString() + "](" + tuple.toString() + ")"));
+			this.alerts.add(new SimpleFeatureVector(commit, "[" + query.toString() + "](" + tuple.toString() + ")"));
 
 		}
 
@@ -43,14 +43,14 @@ public class SimpleDataSet extends DataSet {
 	/**
 	 * @return The alerts this data set contains.
 	 */
-	public List<SimpleAlert> getAlerts() {
+	public List<SimpleFeatureVector> getAlerts() {
 		return this.alerts;
 	}
 
 	/**
 	 * @return true if {@code alert} is in this data set.
 	 */
-	public boolean contains(SimpleAlert alert) {
+	public boolean contains(SimpleFeatureVector alert) {
 		return alerts.contains(alert);
 	}
 
@@ -60,7 +60,7 @@ public class SimpleDataSet extends DataSet {
 	public String printAlerts() {
 		String file = "";
 		int i = 1;
-		for(SimpleAlert alert : this.alerts) {
+		for(SimpleFeatureVector alert : this.alerts) {
 			file += i + ", " + alert.toString() + "\n";
 			i++;
 		}

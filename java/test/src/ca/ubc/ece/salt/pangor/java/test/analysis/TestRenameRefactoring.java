@@ -17,7 +17,7 @@ import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleAlert;
+import ca.ubc.ece.salt.pangor.analysis.simple.SimpleFeatureVector;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.java.analysis.ClassAnalysis;
@@ -30,7 +30,7 @@ public class TestRenameRefactoring extends TestAnalysis{
 
 
 	private void runTest(Commit commit, SourceCodeFileChange sourceFileChange,
-			List<SimpleAlert> expectedAlerts,
+			List<SimpleFeatureVector> expectedAlerts,
 			boolean printAlerts) throws Exception {
 
 		/* Build the CFG with the JDT Java CFG factory. */
@@ -139,8 +139,8 @@ public class TestRenameRefactoring extends TestAnalysis{
 		SourceCodeFileChange sourceFileChange = TestAnalysis.getSourceCodeFileChange(srcFile, dstFile);
 
 		/* Define the expected results. */
-		List<SimpleAlert> expectedAlerts = new LinkedList<SimpleAlert>();
-		expectedAlerts.add(new SimpleAlert(commit, "getName -> getUserName"));
+		List<SimpleFeatureVector> expectedAlerts = new LinkedList<SimpleFeatureVector>();
+		expectedAlerts.add(new SimpleFeatureVector(commit, "getName -> getUserName"));
 
 		this.runTest(commit, sourceFileChange, expectedAlerts, true);
 

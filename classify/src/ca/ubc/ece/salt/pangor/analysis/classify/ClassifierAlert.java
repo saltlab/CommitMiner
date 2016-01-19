@@ -1,6 +1,6 @@
 package ca.ubc.ece.salt.pangor.analysis.classify;
 
-import ca.ubc.ece.salt.pangor.analysis.Alert;
+import ca.ubc.ece.salt.pangor.analysis.FeatureVector;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 
 /**
@@ -10,7 +10,7 @@ import ca.ubc.ece.salt.pangor.analysis.Commit;
  * The alert includes meta information. The meta information (e.g., project,
  * commit #, file names, etc.) is used to investigate classification.
  */
-public abstract class ClassifierAlert extends Alert {
+public abstract class ClassifierAlert extends FeatureVector {
 
 	/** A description of the pattern that was found. **/
 	protected String pattern;
@@ -50,7 +50,7 @@ public abstract class ClassifierAlert extends Alert {
 	public String serialize() {
 
 		String serialized = id + "," + this.commit.projectID
-				+ "," + this.commit.projectHomepage + "/commit/" + this.commit.repairedCommitID
+				+ "," + this.commit.url + "/commit/" + this.commit.repairedCommitID
 				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
 				+ "," + this.pattern;
 
@@ -59,17 +59,20 @@ public abstract class ClassifierAlert extends Alert {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if(o instanceof ClassifierAlert) {
-			ClassifierAlert a = (ClassifierAlert) o;
-			return this.pattern.equals(a.pattern);
-		}
-		return false;
+	public String toString() {
+		return this.commit.buggyCommitID
+				+ ", " + this.commit.repairedCommitID
+				+ ", " + this.pattern;
 	}
 
 	@Override
-	public String toString() {
-		return this.pattern;
+	public boolean equals(Object o) {
+		if(o instanceof ClassifierAlert) {
+			ClassifierAlert sa = (ClassifierAlert)o;
+			if(this.pattern.equals(sa.pattern)
+					&& this.commit.equals(sa.commit)) return true;
+		}
+		return false;
 	}
 
 	@Override

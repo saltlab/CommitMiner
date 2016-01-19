@@ -22,7 +22,7 @@ import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleAlert;
+import ca.ubc.ece.salt.pangor.analysis.simple.SimpleFeatureVector;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleCFGFactory;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDstFileAnalysis;
@@ -95,8 +95,8 @@ public class TestSimpleAnalysis {
 
 		/* We should have one alert in the data set now. */
 		System.out.println(dataSet.printAlerts());
-		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "[?- SourceRoot(?X, ?Y).](('User', 'CompilationUnit'))")));
-		Assert.assertTrue(dataSet.contains(new SimpleAlert(commit, "[?- DestinationRoot(?X, ?Y).](('User', 'CompilationUnit'))")));
+		Assert.assertTrue(dataSet.contains(new SimpleFeatureVector(commit, "[?- SourceRoot(?X, ?Y).](('User', 'CompilationUnit'))")));
+		Assert.assertTrue(dataSet.contains(new SimpleFeatureVector(commit, "[?- DestinationRoot(?X, ?Y).](('User', 'CompilationUnit'))")));
 
 	}
 

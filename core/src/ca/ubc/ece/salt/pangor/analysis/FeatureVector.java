@@ -2,9 +2,9 @@ package ca.ubc.ece.salt.pangor.analysis;
 
 
 /**
- * Stores some information that has been inferred by static analysis.
+ * Stores a row of information that has been inferred by static analysis.
  */
-public abstract class Alert {
+public abstract class FeatureVector {
 
 	/** A counter to produce unique IDs for each alert. **/
 	private static int idCounter;
@@ -18,7 +18,7 @@ public abstract class Alert {
 	/**
 	 * @param commit The meta and change information from the commit.
 	 **/
-	public Alert(Commit commit) {
+	public FeatureVector(Commit commit) {
 		this.commit = commit;
 		this.id = getNextID();
 	}
@@ -27,7 +27,7 @@ public abstract class Alert {
 	 * Used for de-serializing alerts
 	 * @param commit The meta information from a bulk analysis.
 	 **/
-	public Alert(Commit commit, int id) {
+	public FeatureVector(Commit commit, int id) {
 		this.commit = commit;
 		this.id = id;
 	}

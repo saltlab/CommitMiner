@@ -52,6 +52,7 @@
 
 	<modules>
 		<module>core</module>
+		<module>learn</module>
 		<module>classify</module>
 		<module>java</module>
 		<module>java-classify</module>

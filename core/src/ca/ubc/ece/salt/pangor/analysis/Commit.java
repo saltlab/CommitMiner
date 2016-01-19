@@ -23,8 +23,8 @@ public class Commit {
 	/** The identifier for the project. **/
 	public String projectID;
 
-	/** The homepage for the project. **/
-	public String projectHomepage;
+	/** The GitHub URL for the commit diff. **/
+	public String url;
 
 	/** The ID for the prior commit. **/
 	public String buggyCommitID;
@@ -51,7 +51,7 @@ public class Commit {
 		this.totalCommits = totalCommits;
 		this.commitsAnalyzed = bugFixingCommits;
 		this.projectID = projectID;
-		this.projectHomepage = projectHomepage;
+		this.url = projectHomepage;
 		this.buggyCommitID = buggyCommitID;
 		this.repairedCommitID = repairedCommitID;
 
