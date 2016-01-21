@@ -17,7 +17,9 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.deri.iris.api.basics.IQuery;
+import org.deri.iris.api.basics.IRule;
 import org.deri.iris.api.basics.ITuple;
+import org.deri.iris.factory.Factory;
 import org.deri.iris.storage.IRelation;
 
 import weka.clusterers.DBSCAN;
@@ -79,11 +81,12 @@ public class LearningDataSet extends DataSet {
 	 * Used to produce a Weka data set. Create a {@code LearningDataSet} from
 	 * a file on disk. This {@code LearningDataSet} can pre-process the data
 	 * set and create a data set file for Weka.
+	 * @param dataSetPath The file path to read the data set.
 	 * @param filters Filters out rows by requiring keywords to be present.
 	 * @throws Exception Throws an exception when the {@code dataSetPath}
 	 * 					 cannot be read.
 	 */
-	public LearningDataSet(String dataSetPath, List<KeywordFilter> filters) throws Exception {
+	private LearningDataSet(String dataSetPath, List<KeywordFilter> filters) throws Exception {
 		super(null, null);
 		this.filters = filters;
 		this.keywords = new HashSet<KeywordDefinition>();
@@ -98,10 +101,9 @@ public class LearningDataSet extends DataSet {
 	 * Used for keyword analysis. Create a {@code LearningDataSet} to write
 	 * the analysis results to disk.
 	 * @param dataSetPath The file path to store the data set.
-	 * @param supplementaryPath The folder path to store supplementary files.
 	 */
-	public LearningDataSet(String dataSetPath, String supplementaryPath) {
-		super(null, null); // TODO: Add the rules and queries.
+	private LearningDataSet(String dataSetPath, List<IRule> rules, List<IQuery> queries) {
+		super(rules, queries);
 		this.filters = null;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
@@ -113,12 +115,72 @@ public class LearningDataSet extends DataSet {
 	 * features directly to the data set (instead of writing them to a file).
 	 * @param filters Filters out rows by requiring keywords to be present.
 	 */
-	public LearningDataSet(List<KeywordFilter> filters) {
-		super(null, null); // TODO: Add the rules and queries.
+	private LearningDataSet(List<KeywordFilter> filters, List<IRule> rules, List<IQuery> queries) {
+		super(rules, queries);
 		this.filters = filters;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
 		this.dataSetPath = null;
+	}
+
+	/**
+	 * Used to produce a Weka data set. Create a {@code LearningDataSet} from
+	 * a file on disk. This {@code LearningDataSet} can pre-process the data
+	 * set and create a data set file for Weka.
+	 * @param dataSetPath The file path to read the data set.
+	 * @param filters Filters out rows by requiring keywords to be present.
+	 * @throws Exception Throws an exception when the {@code dataSetPath}
+	 * 					 cannot be read.
+	 */
+	public static LearningDataSet createLearningDataSet(String dataSetPath, List<KeywordFilter> filters) throws Exception {
+		return new LearningDataSet(dataSetPath, filters);
+	}
+
+	/**
+	 * Creates a {@code LearningDataSet} performing the static analysis.
+	 * @param dataSetPath The file path to store the data set.
+	 * @return A new data set to store the analysis results.
+	 */
+	public static LearningDataSet createLearningDataSet(String dataSetPath) {
+		return new LearningDataSet(dataSetPath, new LinkedList<IRule>(), getQueries());
+	}
+
+	/**
+	 * Used for testing. Creates a {@code LearningDataSet} that will add
+	 * features directly to the data set (instead of writing them to a file).
+	 * @param filters Filters out rows by requiring keywords to be present.
+	 */
+	public static LearningDataSet createLearningDataSet(List<KeywordFilter> filters) {
+		return new LearningDataSet(filters, new LinkedList<IRule>(), getQueries());
+	}
+
+	/**
+	 * @return The list of queries for the test.
+	 */
+	private static List<IQuery> getQueries() {
+
+		List<IQuery> queries = new LinkedList<IQuery>();
+		queries.add(
+			Factory.BASIC.createQuery(
+				Factory.BASIC.createLiteral(true,
+					Factory.BASIC.createPredicate("KeywordChange", 5),
+					Factory.BASIC.createTuple(
+						Factory.TERM.createVariable("KeywordType"),
+						Factory.TERM.createVariable("KeywordContext"),
+						Factory.TERM.createVariable("Package"),
+						Factory.TERM.createVariable("ChangeType"),
+						Factory.TERM.createVariable("Keyword")))));
+
+		queries.add(
+			Factory.BASIC.createQuery(
+				Factory.BASIC.createLiteral(true,
+					Factory.BASIC.createPredicate("StatementChange", 2),
+					Factory.BASIC.createTuple(
+						Factory.TERM.createVariable("StatementType"),
+						Factory.TERM.createVariable("ChangeType")))));
+
+		return queries;
+
 	}
 
 	/**
