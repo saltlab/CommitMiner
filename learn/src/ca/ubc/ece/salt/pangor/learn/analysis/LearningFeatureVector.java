@@ -68,14 +68,15 @@ public class LearningFeatureVector extends FeatureVector {
 	 * should only be used if making a LearningAlert from serial. Otherwise
 	 * the other constructor should be used so the ID is automatically
 	 * generated.
-	 * @param commit
-	 * @param sourceCodeFileChange
-	 * @param type The checker which generated the alert.
-	 * @param subtype A checker may detect more than one repair subtype.
+	 * @param commit The commit that the features were extracted from.
+	 * @param klass The class that the features were extracted from.
+	 * @param method The method that the features were extracted from.
 	 * @param id The unique id for the alert.
 	 */
-	public LearningFeatureVector(Commit commit, int id) {
+	public LearningFeatureVector(Commit commit, String klass, String method, int id) {
 		super(commit, id);
+		this.klass = klass;
+		this.method = method;
 		this.statementMap = new HashMap<StatementUse, Integer>();
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
 	}
@@ -84,12 +85,15 @@ public class LearningFeatureVector extends FeatureVector {
 	 * This method serializes the alert. This is useful when writing
 	 * a data set to the disk.
 	 * @return The serialized version of the alert.
+	 * 		   Has the format [ID, ProjectID, URL, BuggyCommit, RepairedCommit, [KeywordList]]
+	 * 		   where KeywordList = [Type:Context:ChangeType:Package:Keyword:COUNT].
 	 */
 	public String serialize() {
 
 		String serialized = id + "," + this.commit.projectID
 				+ "," + this.commit.url + "/commit/" + this.commit.repairedCommitID
-				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID;
+				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
+				+ "," + this.klass + "," + this.method;
 
 		/* Iterate through the keyword uses. */
 		for(Entry<KeywordUse, Integer> entry : this.keywordMap.entrySet()) {
@@ -164,15 +168,16 @@ public class LearningFeatureVector extends FeatureVector {
 		Commit commit = new Commit(features[1], features[2], features[3],
 								   features[4]);
 
-		LearningFeatureVector featureVector = new LearningFeatureVector(commit, Integer.parseInt(features[0]));
+		LearningFeatureVector featureVector = new LearningFeatureVector(commit, features[5], features[6], Integer.parseInt(features[0]));
 
-		for(int i = 8; i < features.length; i++) {
+		for(int i = 7; i < features.length; i++) {
 			String[] feature = features[i].split(":");
 			if(feature.length < 6) throw new Exception("De-serialization exception. Serial format not recognized.");
 			KeywordUse keyword = new KeywordUse(KeywordType.valueOf(feature[0]),
 												KeywordContext.valueOf(feature[1]),
 												feature[4],
-												ChangeType.valueOf(feature[2]), feature[3]);
+												ChangeType.valueOf(feature[2]),
+												feature[3]);
 			featureVector.addKeyword(keyword, Integer.parseInt(feature[5]));
 		}
 
@@ -200,7 +205,7 @@ public class LearningFeatureVector extends FeatureVector {
 		instance.setValue(7, "?"); // assigned cluster
 
 		/* Set the keyword values. */
-		int i = 9;
+		int i = 8;
 		for(KeywordDefinition keyword : keywords) {
 			if(this.keywordMap.containsKey(keyword)) {
 				instance.setValue(i, this.keywordMap.get(keyword));

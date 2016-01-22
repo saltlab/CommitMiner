@@ -30,8 +30,6 @@ public class Commit {
 	public List<SourceCodeFileChange> sourceCodeFileChanges;
 
 	/**
-	 * @param totalCommits The number of commits inspected.
-	 * @param bugFixingCommits The number of bug fixing commits analyzed.
 	 * @param projectID The identifier for the project.
 	 * @param projectHomepage The homepage for the project.
 	 * @param buggyCommitID The ID for the prior commit.

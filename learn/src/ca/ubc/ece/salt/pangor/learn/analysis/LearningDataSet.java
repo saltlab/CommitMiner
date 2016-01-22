@@ -193,10 +193,7 @@ public class LearningDataSet extends DataSet {
 	@Override
 	protected void registerAlert(Commit commit, IQuery query, IRelation results) {
 
-		/* TODO: Desearialize each result. Create a map of commit/class/method changes.
-		 * This could produce more than one feature vector. */
 		Map<String, LearningFeatureVector> featureVectors = new HashMap<String, LearningFeatureVector>();
-
 
 		/* Iterate through the tuples that are members of the relation and add
 		 * them as alerts. */
@@ -333,15 +330,14 @@ public class LearningDataSet extends DataSet {
 
 		attributes.add(new Attribute("ID", 0));
 		attributes.add(new Attribute("ProjectID", (ArrayList<String>)null, 1));
-		attributes.add(new Attribute("ProjectHomepage", (ArrayList<String>)null, 2));
-		attributes.add(new Attribute("BuggyFile", (ArrayList<String>)null, 3));
-		attributes.add(new Attribute("RepairedFile", (ArrayList<String>)null, 4));
-		attributes.add(new Attribute("BuggyCommitID", (ArrayList<String>)null, 5));
-		attributes.add(new Attribute("RepairedCommitID", (ArrayList<String>)null, 6));
-		attributes.add(new Attribute("FunctionName", (ArrayList<String>)null, 7));
-		attributes.add(new Attribute("Cluster", (ArrayList<String>) null, 8));
+		attributes.add(new Attribute("CommitURL", (ArrayList<String>)null, 2));
+		attributes.add(new Attribute("BuggyCommitID", (ArrayList<String>)null, 3));
+		attributes.add(new Attribute("RepairedCommitID", (ArrayList<String>)null, 4));
+		attributes.add(new Attribute("Class", (ArrayList<String>)null, 5));
+		attributes.add(new Attribute("Method", (ArrayList<String>)null, 6));
+		attributes.add(new Attribute("Cluster", (ArrayList<String>) null, 7));
 
-		int i = 9;
+		int i = 8;
 		for(KeywordDefinition keyword : this.keywords) {
 			attributes.add(new Attribute(keyword.toString(), i));
 			i++;
@@ -358,7 +354,7 @@ public class LearningDataSet extends DataSet {
 	 */
 	public String getLearningFeatureVectorHeader() {
 
-		String header = String.join(",", "ID", "ProjectID", "ProjectHomepage", "BuggyFile",
+		String header = String.join(",", "ID", "ProjectID", "CommitURL", "BuggyFile",
 				"RepairedFile", "BuggyCommitID", "RepairedCommitID",
 				"FunctionName");
 
@@ -518,7 +514,7 @@ public class LearningDataSet extends DataSet {
 		/* Filter out the columns we don't want. */
 		String[] removeOptions = new String[2];
 		removeOptions[0] = "-R";
-		removeOptions[1] = "1-9";
+		removeOptions[1] = "1-8";
 		Remove remove = new Remove();
 		remove.setOptions(removeOptions);
 		remove.setInputFormat(wekaData);
@@ -545,7 +541,8 @@ public class LearningDataSet extends DataSet {
 		/* Attribute filter for Context Group 3 (API Methods and Properties). */
 		removeKeywordOptions[1] = "(.*typeof.*)|(.*null.*)|(.*undefined.*)|(.*falsey.*)|(.*this.*)|(.*true.*)|(.*false.*)|(.*_STATEMENT.*)|(.*_global_test)";
 		RemoveByName removeKeyword = new RemoveByName();
-		removeKeyword.setOptions(removeKeywordOptions);
+		/* TODO: Uncomment for full data set. Get "NO ATTRIBUTE" error when small." */
+		//removeKeyword.setOptions(removeKeywordOptions);
 		removeKeyword.setInputFormat(filteredData);
 		filteredData = Filter.useFilter(filteredData, removeKeyword);
 

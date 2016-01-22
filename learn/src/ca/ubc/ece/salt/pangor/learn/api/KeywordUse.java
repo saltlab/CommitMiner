@@ -24,29 +24,30 @@ public class KeywordUse extends KeywordDefinition {
 	 * Stores the api as a string if the AbstractAPI object is not available
 	 * (i.e., after de-serialization).
 	 */
-	public String apiString;
+	public String apiPackage;
 
 	/**
 	 * To be used when investigating a single function.
 	 * @param type
 	 * @param context
-	 * @param keyword
+	 * @param keyword The keyword string.
 	 * @param changeType
+	 * @param api The name of the package where the keyword resides.
 	 */
 	public KeywordUse(KeywordType type, KeywordContext context, String keyword,
-			ChangeType changeType, String apiString) {
+			ChangeType changeType, String api) {
 		super(type, keyword);
 
 		this.context = context;
 		this.changeType = changeType;
-		this.apiString = apiString;
+		this.apiPackage = api;
 	}
 
 	/**
 	 * To be used when investigating a single function.
 	 * @param type
 	 * @param context
-	 * @param keyword
+	 * @param keyword The keyword string.
 	 * @param changeType
 	 */
 	public KeywordUse(KeywordType type, KeywordContext context, String keyword,
@@ -55,19 +56,27 @@ public class KeywordUse extends KeywordDefinition {
 
 		this.context = context;
 		this.changeType = changeType;
-		this.apiString = "_unknownapi_";
+		this.apiPackage = "_unknownapi_";
 	}
 
 	/**
 	 * To be used in the initial scan of the entire script for the purpose of
 	 * building the API model for the class.
 	 * @param type
-	 * @param keyword
+	 * @param keyword The keyword string.
 	 */
 	public KeywordUse(KeywordType type, String keyword) {
 		this(type, KeywordContext.UNKNOWN, keyword, ChangeType.UNKNOWN);
 	}
 
+	/**
+	 *
+	 * @param type
+	 * @param context
+	 * @param keyword The keyword string.
+	 * @param changeType
+	 * @param path The package as an AbstractAPI
+	 */
 	public KeywordUse(KeywordType type, KeywordContext context, String keyword, ChangeType changeType,
 			AbstractAPI path) {
 		this(type, context, keyword, changeType);
@@ -84,7 +93,7 @@ public class KeywordUse extends KeywordDefinition {
 		if (api != null)
 			return api.getPackageName();
 
-		return this.apiString;
+		return this.apiPackage;
 	}
 
 	@Override
@@ -126,7 +135,7 @@ public class KeywordUse extends KeywordDefinition {
 				   this.changeType.toString() + ":" + this.api.getName() + ":" + this.keyword;
 		}
 		return "KEYWORD:" + this.type.toString() + ":" + this.context.toString() + ":" +
-			   this.changeType.toString() + ":" + this.apiString + ":" + this.keyword;
+			   this.changeType.toString() + ":" + this.apiPackage + ":" + this.keyword;
 
 	}
 
