@@ -8,7 +8,6 @@ import org.deri.iris.storage.IRelation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.Utilities;
@@ -26,8 +25,7 @@ public class SimpleMethodDstAnalysis extends MethodAnalysis {
 	protected void concreteAnalysis(SourceCodeFileChange sourceCodeFileChange,
 									CompilationUnit compilationUnit,
 									Map<IPredicate, IRelation> facts,
-									ClassifiedASTNode root, CFG cfg,
-									MethodDeclaration method) {
+									CFG cfg, MethodDeclaration method) {
 
 		if(method.getChangeType() != ChangeType.INSERTED &&
 				method.getChangeType() != ChangeType.REMOVED) {

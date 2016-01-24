@@ -12,7 +12,7 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
- * An analysis of a Java Method.
+ * An analysis of a Java method.
  *
  * NOTES:
  * 	1. This class only works with the Eclipse JDT AST.
@@ -24,10 +24,10 @@ public abstract class MethodAnalysis {
 	 * An analysis of a Java method. The concrete analysis of the method is
 	 * triggered from here.
 	 * @param sourceCodeFileChange The source code file that this class was parsed from.
-	 * @param The {@code CompilationUnit}. Needed for getting line numbers and
+	 * @param compilationUnit The {@code CompilationUnit}. Needed for getting line numbers and
 	 * 		  the class name.
 	 * @param facts The analysis facts. Register patterns with this structure.
-	 * @param The current control flow graph for the method being analyzed.
+	 * @param cfg The current control flow graph for the method being analyzed.
 	 */
 	public void analyze(SourceCodeFileChange sourceCodeFileChange,
 						CompilationUnit compilationUnit,
@@ -40,7 +40,7 @@ public abstract class MethodAnalysis {
 
 		/* Analyze this method with a concrete analysis that recognizes patterns. */
 		this.concreteAnalysis(sourceCodeFileChange, compilationUnit, facts,
-							  root, cfg, method);
+							  cfg, method);
 
 	}
 
@@ -51,13 +51,12 @@ public abstract class MethodAnalysis {
 	 * @param The {@code CompilationUnit}. Needed for getting line numbers and
 	 * 		  the class name.
 	 * @param facts The analysis facts. Register patterns with this structure.
-	 * @param The current control flow graph for the method being analyzed.
+	 * @param cfg The current control flow graph for the method being analyzed.
 	 * @param method The method declaration's AST node.
 	 */
 	protected abstract void concreteAnalysis(SourceCodeFileChange sourceCodeFileChange,
 											 CompilationUnit compilationUnit,
 											 Map<IPredicate, IRelation> facts,
-											 ClassifiedASTNode root, CFG cfg,
-											 MethodDeclaration method);
+											 CFG cfg, MethodDeclaration method);
 
 }

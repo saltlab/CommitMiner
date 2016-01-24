@@ -20,7 +20,7 @@ import fr.labri.gumtree.io.TreeGenerator;
 
 /**
  * A CFG factory for Java.
- * NOTE: This class only works with the Mozilla Rhino AST.
+ * NOTE: This class only works with the Eclipse JDT AST.
  */
 public class JavaCFGFactory implements CFGFactory {
 
