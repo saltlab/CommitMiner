@@ -55,13 +55,38 @@ public class DomainAnalysis {
 	 */
 	public void analyze(Commit commit, Map<IPredicate, IRelation> facts) throws Exception {
 
+		/* Analyze the commit before the files are analyzed. */
+		if(!preAnalysis(commit, facts)) return;
+
 		/* Iterate through the files in the commit and run the
 		 * SourceCodeFileAnalysis on each of them. */
 		for(SourceCodeFileChange sourceCodeFileChange : commit.sourceCodeFileChanges) {
 			this.analyzeFile(sourceCodeFileChange, facts);
 		}
 
+		/* Analyze the commit after the files are analyzed. */
+		postAnalysis(commit, facts);
+
 	}
+
+	/**
+	 * Override to run a custom pre-file analysis.
+	 * @return {@code true} to continue the analysis, {@code false} to abort.
+	 * @param commit The commit being analyzed.
+	 * @param facts The database of facts the domain analysis will add to.
+	 * @throws Exception when an error occurs during domain analysis.
+	 */
+	protected boolean preAnalysis(Commit commit, Map<IPredicate, IRelation> facts) throws Exception {
+		return true;
+	}
+
+	/**
+	 * Override to run a custom post-file analysis.
+	 * @param commit The commit being analyzed.
+	 * @param facts The database of facts the domain analysis will add to.
+	 * @throws Exception when an error occurs during domain analysis.
+	 */
+	protected void postAnalysis(Commit commit, Map<IPredicate, IRelation> facts) throws Exception { }
 
 	/**
 	 * Performs AST-differencing and launches the analysis of the pre-commit/post-commit
@@ -70,8 +95,13 @@ public class DomainAnalysis {
 	 * @param sourceCodeFileChange The source code file change information.
 	 * @param facts Stores the facts from this analysis.
 	 * @param preProcess Set to true to enable AST pre-processing.
+	 * @param srcAnalysis The analysis to run on the buggy file.
+	 * @param dstAnalysis The analysis to run on the repaired file.
 	 */
-	private void analyzeFile(SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts) throws Exception {
+	protected void analyzeFile(SourceCodeFileChange sourceCodeFileChange,
+							   Map<IPredicate, IRelation> facts,
+							   SourceCodeFileAnalysis srcAnalysis,
+							   SourceCodeFileAnalysis dstAnalysis) throws Exception {
 
 		/* Get the file extension. */
 		String fileExtension = getSourceCodeFileExtension(sourceCodeFileChange.buggyFile, sourceCodeFileChange.repairedFile);
@@ -104,11 +134,37 @@ public class DomainAnalysis {
 			CFDContext cfdContext = cfd.getContext();
 
 			/* Run the analysis. */
-			this.srcAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
-			this.dstAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.dstScript, cfdContext.dstCFGs);
+			if(srcAnalysis != null) {
+				srcAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
+			}
+			else {
+				this.srcAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
+			}
+
+			if(dstAnalysis != null) {
+				dstAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.dstScript, cfdContext.dstCFGs);
+			}
+			else {
+				this.dstAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.dstScript, cfdContext.dstCFGs);
+			}
 
 		}
 
+	}
+
+	/**
+	 * Performs AST-differencing and launches the analysis of the pre-commit/post-commit
+	 * source code file pair.
+	 *
+	 * @param sourceCodeFileChange The source code file change information.
+	 * @param facts Stores the facts from this analysis.
+	 * @param preProcess Set to true to enable AST pre-processing.
+	 * @param srcAnalysis The analysis to run on the buggy file.
+	 * @param dstAnalysis The analysis to run on the repaired file.
+	 */
+	protected void analyzeFile(SourceCodeFileChange sourceCodeFileChange,
+							   Map<IPredicate, IRelation> facts) throws Exception {
+		this.analyzeFile(sourceCodeFileChange, facts, null, null);
 	}
 
 	/**

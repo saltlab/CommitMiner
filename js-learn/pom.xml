@@ -8,10 +8,10 @@
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>pangor-js</artifactId>
+	<artifactId>pangor-js-learn</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Pangor JavaScript</name>
+	<name>Pangor JavaScript Learning</name>
 
 	<inceptionYear>2015</inceptionYear>
 
