@@ -401,13 +401,12 @@ public class AnalysisUtilities {
 				if (argument instanceof FunctionCall || argument instanceof FunctionNode)
 					continue;
 
-				/* TODO: Pull the new Rhino AstNode from GitHub for getTypeName(). */
-//				if (!argument.getTypeName().equals(mappedCall.getArguments().get(argumentIndex).getTypeName())) {
-//					arguments.add(argument);
-//				}
-				if(!(argument.getType() == mappedCall.getArguments().get(argumentIndex).getType())) {
+				if (!argument.getASTNodeType().equals(mappedCall.getArguments().get(argumentIndex).getASTNodeType())) {
 					arguments.add(argument);
 				}
+//				if(!(argument.getType() == mappedCall.getArguments().get(argumentIndex).getType())) {
+//					arguments.add(argument);
+//				}
 			}
 
 		} else {
