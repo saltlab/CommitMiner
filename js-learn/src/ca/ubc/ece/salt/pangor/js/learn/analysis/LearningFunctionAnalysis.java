@@ -29,18 +29,6 @@ public class LearningFunctionAnalysis extends FunctionAnalysis {
 			PointsToPrediction model)
 			throws Exception {
 
-		/* Initialize the points-to analysis. It may take some time to build the package model.
-		 *
-		 *  NOTE: In the future, it might be useful to put this inside
-		 *  	  ScopeAnalysis so all analyses have access to detailed
-		 *   	  points-to info (for APIs at least). */
-
-		/* TODO: Create a JS function that visits a file and extracts a HashMap<KeywordUse, Integer> of the model. */
-//		PointsToPrediction packageModel = new PointsToPrediction(JSAPIFactory.buildTopLevelAPI(),
-//				/*TODO:*/new HashMap<KeywordUse, Integer>());
-		//APIModelVisitor.getScriptFeatureVector((ScriptNode)scope.getScope());
-		//PointsToPrediction packageModel = null;
-
 		/* If the function was inserted or deleted, there is nothing to do. We
 		 * only want functions that were repaired. Class-level repairs are left
 		 * for later. */
