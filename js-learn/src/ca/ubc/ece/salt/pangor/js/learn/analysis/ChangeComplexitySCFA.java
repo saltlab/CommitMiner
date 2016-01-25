@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.learn;
+package ca.ubc.ece.salt.pangor.js.learn.analysis;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,6 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
-import ca.ubc.ece.salt.pangor.js.learn.analysis.ChangeComplexityVisitor;
 import ca.ubc.ece.salt.pangor.js.learn.analysis.ChangeComplexityVisitor.ChangeComplexity;
 
 /**

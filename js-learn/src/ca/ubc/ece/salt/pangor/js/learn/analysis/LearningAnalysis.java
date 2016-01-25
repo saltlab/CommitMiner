@@ -14,8 +14,6 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.js.analysis.FunctionAnalysis;
 import ca.ubc.ece.salt.pangor.js.analysis.ScriptAnalysis;
 import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
-import ca.ubc.ece.salt.pangor.js.learn.ChangeComplexitySCFA;
-import ca.ubc.ece.salt.pangor.js.learn.LearningFunctionAnalysis;
 
 /**
  * An analysis for extracting facts in the learning domain.

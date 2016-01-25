@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.learn;
+package ca.ubc.ece.salt.pangor.js.learn.analysis;
 
 import java.util.Map;
 
@@ -12,7 +12,6 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.js.analysis.FunctionAnalysis;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
-import ca.ubc.ece.salt.pangor.js.learn.analysis.LearningAnalysisVisitor;
 import ca.ubc.ece.salt.pangor.js.learn.api.JSAPIFactory;
 import ca.ubc.ece.salt.pangor.learn.pointsto.PointsToPrediction;
 
