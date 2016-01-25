@@ -15,8 +15,12 @@ import org.apache.log4j.PropertyConfigurator;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysisTask;
+import ca.ubc.ece.salt.pangor.js.learn.analysis.LearningAnalysis;
+import ca.ubc.ece.salt.pangor.learn.analysis.LearningDataSet;
 
 public class LearningAnalysisMain {
 
@@ -49,9 +53,12 @@ public class LearningAnalysisMain {
 			return;
 		}
 
-		/* Create the runner that will run the analysis. */
-		LearningAnalysisRunner runner = new LearningAnalysisRunner(options.getDataSetPath(),
-				options.getSupplementaryFolder(), options.getMaxChangeComplexity());
+		/* Create the commit analyiss that will analyze commits. */
+		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath());
+		DomainAnalysis learning = LearningAnalysis.createLearningAnalysis(options.getMaxChangeComplexity());
+		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
+		domains.add(learning);
+		CommitAnalysis commitAnalysis = new CommitAnalysis(dataSet, domains);
 
         GitProjectAnalysis gitProjectAnalysis;
 
@@ -60,7 +67,7 @@ public class LearningAnalysisMain {
 
 			try {
                 gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(),
-                		CHECKOUT_DIR, "fix|repair", null);
+                		CHECKOUT_DIR, "fix|repair", commitAnalysis);
 				gitProjectAnalysis.analyze();
 
 			} catch (Exception e) {

@@ -37,7 +37,7 @@ public class ScriptAnalysis extends SourceCodeFileAnalysis {
 	/** Used to generate unique IDs for anonymous functions. **/
 	private static int anonymousIDGen = 0;
 
-	protected ScriptAnalysis(List<FunctionAnalysis> functionAnalyses) {
+	public ScriptAnalysis(List<FunctionAnalysis> functionAnalyses) {
 		this.functionAnalyses = functionAnalyses;
 	}
 

@@ -28,18 +28,18 @@ import org.mozilla.javascript.ast.WithStatement;
  */
 public class ChangeComplexityVisitor implements NodeVisitor {
 
-	private int score;
+	private ChangeComplexity changeComplexity;
 
-	public static int getChangeComplexity(AstRoot root) {
+	public static ChangeComplexity getChangeComplexity(AstRoot root) {
 
 		ChangeComplexityVisitor visitor = new ChangeComplexityVisitor();
 		root.visit(visitor);
-		return visitor.score;
+		return visitor.changeComplexity;
 
 	}
 
 	public ChangeComplexityVisitor() {
-		this.score = 0;
+		this.changeComplexity = new ChangeComplexity();
 	}
 
 	@Override
@@ -51,61 +51,51 @@ public class ChangeComplexityVisitor implements NodeVisitor {
 				|| node instanceof BreakStatement
 				|| node instanceof ContinueStatement
 				|| node instanceof ThrowStatement) {
-			if(this.checkSubExpression(node)) this.incrementScore(node);
+			this.checkSubExpression(node);
 		}
 		else if(node instanceof IfStatement) {
 			IfStatement ifStatement = (IfStatement) node;
-			if(changeTypeModified(ifStatement)) this.incrementScore(node);
-			else if(this.checkSubExpression(ifStatement.getCondition())) this.incrementScore(node);
+			if(!changeTypeModified(ifStatement)) this.checkSubExpression(ifStatement.getCondition());
 		}
 		else if(node instanceof WithStatement) {
 			WithStatement withStatement = (WithStatement) node;
-			if(changeTypeModified(withStatement)) this.incrementScore(node);
-			else if(this.checkSubExpression(withStatement.getExpression())) this.incrementScore(node);
+			if(!changeTypeModified(withStatement)) this.checkSubExpression(withStatement.getExpression());
 		}
 		else if(node instanceof TryStatement) {
-			if(changeTypeModified(node)) this.incrementScore(node);
+			changeTypeModified(node);
 		}
 		else if(node instanceof CatchClause) {
 			CatchClause clause = (CatchClause) node;
-			if(changeTypeModified(clause)) this.incrementScore(node);
-			else if(this.checkSubExpression(clause.getCatchCondition())) this.incrementScore(node);
+			if(!changeTypeModified(clause)) this.checkSubExpression(clause.getCatchCondition());
 		}
 		else if(node instanceof SwitchStatement) {
 			SwitchStatement switchStatement = (SwitchStatement) node;
-			if(changeTypeModified(switchStatement)) this.incrementScore(node);
-			else if(this.checkSubExpression(switchStatement.getExpression())) this.incrementScore(node);
+			if(!changeTypeModified(switchStatement)) this.checkSubExpression(switchStatement.getExpression());
 		}
 		else if(node instanceof SwitchCase) {
-			if(changeTypeModified(node)) this.incrementScore(node);
+			changeTypeModified(node);
 		}
 		else if(node instanceof DoLoop) {
 			DoLoop doLoop = (DoLoop) node;
-			if(changeTypeModified(doLoop))  this.incrementScore(node);
-			else if(this.checkSubExpression(doLoop.getCondition())) this.incrementScore(node);
+			if(!changeTypeModified(doLoop)) this.checkSubExpression(doLoop.getCondition());
 		}
 		else if(node instanceof ForInLoop) {
 			ForInLoop loop = (ForInLoop) node;
-			if(changeTypeModified(loop)) this.incrementScore(node);
-			else if(this.checkSubExpression(loop)) this.incrementScore(node);
+			if(!changeTypeModified(loop)) this.checkSubExpression(loop);
 		}
 		else if(node instanceof ForLoop) {
 			ForLoop loop = (ForLoop) node;
-			if(changeTypeModified(loop)) this.incrementScore(node);
-			else if (this.checkSubExpression(loop)) this.incrementScore(node);
+			if(!changeTypeModified(loop)) this.checkSubExpression(loop);
 		}
 		else if(node instanceof WhileLoop) {
 			WhileLoop loop = (WhileLoop) node;
-			if(changeTypeModified(loop)) this.incrementScore(node);
-			else if (this.checkSubExpression(loop)) this.incrementScore(node);
+			if(!changeTypeModified(loop)) this.checkSubExpression(loop);
 		}
 		else if(node instanceof FunctionNode) {
 			FunctionNode function = (FunctionNode) node;
-			if(changeTypeModified(function)) this.incrementScore(node);
-			else {
+			if(!changeTypeModified(function)) {
 				for(AstNode param : function.getParams()) {
 					if(this.checkSubExpression(param)) {
-						this.incrementScore(node);
 						break;
 					}
 				}
@@ -117,22 +107,20 @@ public class ChangeComplexityVisitor implements NodeVisitor {
 	}
 
 	/**
-	 * Increment the score. Good for debugging.
-	 */
-	private void incrementScore(AstNode node) {
-		this.score++;
-	}
-
-	/**
 	 * Checks if a statement has changes (i.e., is inserted, removed or updated).
 	 * @param node The statement
 	 * @return
 	 */
-	private static boolean changeTypeModified(AstNode node) {
+	private boolean changeTypeModified(AstNode node) {
 		switch(node.getChangeType()) {
 		case INSERTED:
+			this.changeComplexity.insertedStatements++;
+			return true;
 		case REMOVED:
+			this.changeComplexity.removedStatements++;
+			return true;
 		case UPDATED:
+			this.changeComplexity.updatedStatements++;
 			return true;
 		case MOVED:
 		case UNCHANGED:
@@ -182,6 +170,22 @@ public class ChangeComplexityVisitor implements NodeVisitor {
 
 		}
 
+	}
+
+	/**
+	 * Stores the change complexity by the number of updated, inserted and
+	 * removed statements.
+	 */
+	public class ChangeComplexity {
+		public int updatedStatements;
+		public int insertedStatements;
+		public int removedStatements;
+
+		public ChangeComplexity() {
+			this.updatedStatements = 0;
+			this.insertedStatements = 0;
+			this.removedStatements = 0;
+		}
 	}
 
 }

@@ -1,6 +1,14 @@
 package ca.ubc.ece.salt.pangor.js.learn.analysis;
 
 
+import java.util.Map;
+
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.api.basics.ITuple;
+import org.deri.iris.factory.Factory;
+import org.deri.iris.storage.IRelation;
+import org.deri.iris.storage.IRelationFactory;
+import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
@@ -20,7 +28,8 @@ import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 
-import ca.ubc.ece.salt.pangor.analysis.FeatureVector;
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.AnalysisUtilities;
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeAnalysisUtilities;
 import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
@@ -33,8 +42,11 @@ import ca.ubc.ece.salt.pangor.learn.pointsto.PointsToPrediction;
  */
 public class LearningAnalysisVisitor implements NodeVisitor {
 
-	/** The feature vector for the visited function. **/
-	private FeatureVector featureVector;
+	/** True if this is a destination file analysis. **/
+	private boolean dst;
+
+	/** The fact database. **/
+	private Map<IPredicate, IRelation> facts;
 
 	/** The root of the function or script we are visiting. **/
 	private ScriptNode root;
@@ -62,41 +74,45 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 	 * @return A feature vector containing the keywords extracted from the
 	 * 		   script.
 	 */
-	public static FeatureVector getScriptFeatureVector(AnalysisMetaInformation ami, AstRoot script) {
+	public static void getLearningFacts(Map<IPredicate, IRelation> facts,
+			SourceCodeFileChange scfc, AstRoot script, boolean dst) {
 
 		/* Create the feature vector by visiting the function. */
-		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(ami,
-				AnalysisUtilities.getFunctionName(script), script, null, true);
+		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(facts, scfc,
+				AnalysisUtilities.getFunctionName(script), script, null, true,
+				dst);
 		script.visit(visitor);
-
-		return visitor.featureVector;
-
 	}
 
 	/**
 	 * Visits the script or function and returns a feature vector for it.
+	 * @param facts
+	 * @param scfc
 	 * @param function the script or function to visit.
+	 * @param packageModel
 	 * @return the feature vector for the function.
 	 */
-	public static FeatureVector getFunctionFeatureVector(AnalysisMetaInformation ami,
-			ScriptNode function, PointsToPrediction packageModel) {
+	public static void getLearningFacts(Map<IPredicate, IRelation> facts,
+			SourceCodeFileChange scfc, ScriptNode function,
+			PointsToPrediction packageModel, boolean dst) {
 
 		/* Create the feature vector by visiting the function. */
-		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(ami,
-				AnalysisUtilities.getFunctionName(function), function, packageModel, false);
+		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(facts, scfc,
+				AnalysisUtilities.getFunctionName(function), function, packageModel,
+				false, dst);
 		function.visit(visitor);
-
-		return visitor.featureVector;
 	}
 
 
-	private LearningAnalysisVisitor(AnalysisMetaInformation ami,
-			String functionName, ScriptNode root,
-			PointsToPrediction packageModel, boolean visitFunctions) {
+	private LearningAnalysisVisitor(Map<IPredicate, IRelation> facts,
+			SourceCodeFileChange scfc, String functionName, ScriptNode root,
+			PointsToPrediction packageModel, boolean visitFunctions,
+			boolean dst) {
+		this.facts = facts;
 		this.packageModel = packageModel;
-		this.featureVector = new FeatureVector(ami, functionName, root.toSource(), root.toSource());
 		this.root = root;
 		this.visitFunctions = visitFunctions;
+		this.dst = dst;
 	}
 
 	@Override
@@ -151,10 +167,12 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 			}
 			else {
 				keyword = new KeywordUse(type, context, "falsey", changeType);
-				keyword.apiString = "global";
+				keyword.apiPackage = "global";
 			}
 
-			if(keyword != null) this.featureVector.addKeyword(keyword);
+			if(keyword != null) {
+				this.addKeywordChangeFact(keyword);
+			}
 
 		}
 
@@ -242,9 +260,45 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 
 		/* Add the keyword to the feature vector. */
 		if(keyword != null) {
-			this.featureVector.addKeyword(keyword);
+			this.addKeywordChangeFact(keyword);
 		}
 
+	}
+
+	/**
+	 * Adds a KeywordUse fact to the fact database.
+	 * @param keyword The keyword change to record.
+	 */
+	private void addKeywordChangeFact(KeywordUse keyword) {
+
+		/* Check the change type against the analysis we're doing. */
+		if(this.dst && !(keyword.changeType == ChangeType.INSERTED
+				|| keyword.changeType == ChangeType.UPDATED)) return;
+		if(!this.dst && !(keyword.changeType == ChangeType.REMOVED)) return;
+
+		/* Get the relation for this predicate from the fact base. */
+		IPredicate predicate = Factory.BASIC.createPredicate("KeywordChange", 5);
+		IRelation relation = facts.get(predicate);
+		if(relation == null) {
+
+			/* The predicate does not yet exist in the fact base. Create a
+			 * relation for the predicate and add it to the fact base. */
+			IRelationFactory relationFactory = new SimpleRelationFactory();
+			relation = relationFactory.createRelation();
+			facts.put(predicate, relation);
+
+		}
+
+		/* Add the new tuple to the relation. */
+		ITuple tuple = Factory.BASIC.createTuple(
+				Factory.TERM.createString(keyword.type.toString()),
+				Factory.TERM.createString(keyword.context.toString()),
+				Factory.TERM.createString(keyword.apiPackage),
+				Factory.TERM.createString(keyword.changeType.toString()),
+				Factory.TERM.createString(keyword.keyword));
+		relation.add(tuple);
+
+		this.facts.put(predicate, relation);
 	}
 
 }
