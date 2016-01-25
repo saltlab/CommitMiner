@@ -11,7 +11,6 @@ import org.deri.iris.storage.IRelationFactory;
 import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.BreakStatement;
 import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.FunctionNode;
@@ -64,26 +63,6 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 	 * when collecting features at the function level.
 	 */
 	private boolean visitFunctions;
-
-	/**
-	 * Visits the script and returns a feature vector containing only the
-	 * keywords in the script. The feature vector will not contain package
-	 * associations for the keywords. Unlike {@code getFunctionFeatureVector},
-	 * this method extracts keywords from the entire script (i.e., it visits
-	 * function declarations and bodies).
-	 * @param script The script to extract keywords from.
-	 * @return A feature vector containing the keywords extracted from the
-	 * 		   script.
-	 */
-	public static void getLearningFacts(Map<IPredicate, IRelation> facts,
-			SourceCodeFileChange scfc, AstRoot script, boolean dst) {
-
-		/* Create the feature vector by visiting the function. */
-		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(facts, scfc,
-				AnalysisUtilities.getFunctionName(script), script, null, true,
-				dst);
-		script.visit(visitor);
-	}
 
 	/**
 	 * Visits the script or function and returns a feature vector for it.
@@ -155,8 +134,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		 * as MOVED, and all keywords within this function are also marked as
 		 * MOVED. For now, we relabel MOVED change types as UNCHANGED.
 		 */
-		if (changeType == ChangeType.MOVED)
-			changeType = ChangeType.UNCHANGED;
+		if (changeType == ChangeType.MOVED) changeType = ChangeType.UNCHANGED;
 
 		/* Add a typeof keyword if we're checking if this node is truthy or
 		 * falsey. */

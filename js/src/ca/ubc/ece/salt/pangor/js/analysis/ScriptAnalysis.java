@@ -7,6 +7,7 @@ import java.util.Stack;
 
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.storage.IRelation;
+import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.ScriptNode;
@@ -17,6 +18,7 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.FunctionTreeVisitor;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.JavaScriptScope;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeVisitor;
 import ca.ubc.ece.salt.pangor.js.api.APIModelVisitor;
 import ca.ubc.ece.salt.pangor.js.api.JSAPIFactory;
@@ -73,6 +75,9 @@ public class ScriptAnalysis extends SourceCodeFileAnalysis {
 				functionAnalysis.analyze(sourceCodeFileChange, facts,
 						getFunctionCFG(functionDeclaration, cfgs),
 						currentScope, model);
+			}
+			for(Scope<AstNode> child : currentScope.children) {
+				stack.push((JavaScriptScope)child);
 			}
 		}
 

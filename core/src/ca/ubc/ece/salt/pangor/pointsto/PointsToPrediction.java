@@ -5,10 +5,10 @@ import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.api.AbstractAPI;
-import ca.ubc.ece.salt.pangor.api.KeywordUse;
-import ca.ubc.ece.salt.pangor.api.TopLevelAPI;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.pangor.api.TopLevelAPI;
 
 /**
  * Predicts the points-to relationships for all keywords (methods, fields,
