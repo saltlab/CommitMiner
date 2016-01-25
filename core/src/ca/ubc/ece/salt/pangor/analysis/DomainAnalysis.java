@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.storage.IRelation;
-import org.mozilla.javascript.EvaluatorException;
 
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
@@ -120,10 +119,10 @@ public class DomainAnalysis {
 				System.err.println("ArrayIndexOutOfBoundsException: possibly caused by empty file.");
 				return;
 			}
-			catch(EvaluatorException e) {
-				System.err.println("Evaluator exception: " + e.getMessage());
-				return;
-			}
+//			catch(EvaluatorException e) {
+//				System.err.println("Evaluator exception: " + e.getMessage());
+//				return;
+//			}
 			catch(Exception e) {
 				throw e;
 			}

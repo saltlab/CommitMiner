@@ -46,10 +46,13 @@ public class TestASTLearning {
 		KeywordFilter pathFilter = KeywordFilter.buildPackageFilter("path");
 		KeywordFilter DateFilter = KeywordFilter.buildPackageFilter("global");
 
+		/* TODO: Temporary until we get the API model working. */
+		KeywordFilter unknownFilter = KeywordFilter.buildPackageFilter("_unknownapi_");
+
 		/* Set up the FeatureVectorManager, which will store all the feature
 		 * vectors produced by our analysis and perform pre-processing tasks
 		 * for data mining. */
-		List<KeywordFilter> filters = Arrays.asList(fsFilter, pathFilter, DateFilter);
+		List<KeywordFilter> filters = Arrays.asList(fsFilter, pathFilter, DateFilter, unknownFilter);
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(filters);
 
 		/* Set up the analysis. */

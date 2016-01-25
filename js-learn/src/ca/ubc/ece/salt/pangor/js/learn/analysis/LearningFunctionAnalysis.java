@@ -12,7 +12,6 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.js.analysis.FunctionAnalysis;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
-import ca.ubc.ece.salt.pangor.js.learn.api.JSAPIFactory;
 import ca.ubc.ece.salt.pangor.learn.pointsto.PointsToPrediction;
 
 public class LearningFunctionAnalysis extends FunctionAnalysis {
@@ -35,8 +34,10 @@ public class LearningFunctionAnalysis extends FunctionAnalysis {
 		 *  	  ScopeAnalysis so all analyses have access to detailed
 		 *   	  points-to info (for APIs at least). */
 
-		PointsToPrediction packageModel = new PointsToPrediction(JSAPIFactory.buildTopLevelAPI(),
-				/*TODO: Build a model with a new visitor.*/null);
+		/* TODO: Create a JS function that visits a file and extracts a HashMap<KeywordUse, Integer> of the model. */
+//		PointsToPrediction packageModel = new PointsToPrediction(JSAPIFactory.buildTopLevelAPI(),
+//				/*TODO:*/new HashMap<KeywordUse, Integer>());
+		PointsToPrediction packageModel = null;
 
 		/* If the function was inserted or deleted, there is nothing to do. We
 		 * only want functions that were repaired. Class-level repairs are left

@@ -209,19 +209,19 @@ public class LearningDataSet extends DataSet {
 			/* Add the feature vector if it is not yet in the map. */
 			if(featureVector == null) {
 				featureVector = new LearningFeatureVector(commit,
-						tuple.get(0).getValue().toString(),
-						tuple.get(1).getValue().toString());
+						"NA",	// Change if we want to do class-level changes
+						"NA");	// Change if we want to do method-level changes
 				featureVectors.put(key, featureVector);
 			}
 
 			/* Add the keyword or statement change to the bag of words. */
 			if(query.toString().contains("KeywordChange")) {
 				KeywordUse ku = new KeywordUse(
-						KeywordType.valueOf(tuple.get(2).getValue().toString()),	// KeywordType
-						KeywordContext.valueOf(tuple.get(3).getValue().toString()),	// KeywordContext
+						KeywordType.valueOf(tuple.get(0).getValue().toString()),	// KeywordType
+						KeywordContext.valueOf(tuple.get(1).getValue().toString()),	// KeywordContext
 						tuple.get(4).getValue().toString(),							// Keyword
-						ChangeType.valueOf(tuple.get(5).getValue().toString()),		// ChangeType
-						tuple.get(6).getValue().toString());						// API String
+						ChangeType.valueOf(tuple.get(3).getValue().toString()),		// ChangeType
+						tuple.get(2).getValue().toString());						// API String
 				Integer count = featureVector.keywordMap.get(ku);
 				count = count == null ? 1 : count + 1;
 				featureVector.keywordMap.put(ku, count);
