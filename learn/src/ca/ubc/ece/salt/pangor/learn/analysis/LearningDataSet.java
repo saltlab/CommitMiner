@@ -35,10 +35,10 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
-import ca.ubc.ece.salt.pangor.api.KeywordUse;
-import ca.ubc.ece.salt.pangor.api.StatementUse;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.pangor.api.StatementUse;
 import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter.FilterType;
 
 /**
@@ -203,7 +203,8 @@ public class LearningDataSet extends DataSet {
 
 			/* Lookup or create the LearningFeatureVector. */
 			String key = commit.projectID + "_" + commit.repairedCommitID 	// Identifies the commit
-						 + "_" + tuple.get(0) + "_" + tuple.get(1); 		// Identifies the class/method
+						 + "_" + "NA" + "_" + "NA"; 						// TODO: Update when we add classes and functions to facts
+//						 + "_" + tuple.get(0) + "_" + tuple.get(1); 		// Identifies the class/method
 			LearningFeatureVector featureVector = featureVectors.get(key);
 
 			/* Add the feature vector if it is not yet in the map. */
@@ -701,6 +702,7 @@ public class LearningDataSet extends DataSet {
 	public boolean contains(String function, List<Pair<KeywordUse, Integer>> keywords) {
 		outer:
 		for(LearningFeatureVector featureVector : this.featureVectors) {
+			System.out.println(featureVector);
 			for(Pair<KeywordUse, Integer> keyword : keywords) {
 				if(keyword.getRight() > 0 && !featureVector.keywordMap.containsKey(keyword.getLeft())) continue outer;
 				if(keyword.getRight() > 0 && !featureVector.keywordMap.get(keyword.getLeft()).equals(keyword.getRight())) continue outer;
