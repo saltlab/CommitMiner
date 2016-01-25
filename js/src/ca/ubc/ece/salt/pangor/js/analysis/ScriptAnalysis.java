@@ -95,7 +95,7 @@ public class ScriptAnalysis extends SourceCodeFileAnalysis {
 		if(identity == null) {
 			identity = String.valueOf(getAnonymousFunctionID());
 			function.setIdentity(identity);
-			((ScriptNode)function.getMapping()).setIdentity(identity);
+			if(function.getMapping() != null) ((ScriptNode)function.getMapping()).setIdentity(identity);
 		}
 
 		/* Create a unique name for the function. */

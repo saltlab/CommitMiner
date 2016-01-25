@@ -42,6 +42,9 @@ import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
  */
 public class LearningAnalysisVisitor implements NodeVisitor {
 
+	/** Store unique IDs for KeywordChange facts. **/
+	private static Integer uniqueID = 0;
+
 	/** True if this is a destination file analysis. **/
 	private boolean dst;
 
@@ -256,7 +259,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		if(!this.dst && !(keyword.changeType == ChangeType.REMOVED)) return;
 
 		/* Get the relation for this predicate from the fact base. */
-		IPredicate predicate = Factory.BASIC.createPredicate("KeywordChange", 5);
+		IPredicate predicate = Factory.BASIC.createPredicate("KeywordChange", 6);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 
@@ -274,10 +277,20 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 				Factory.TERM.createString(keyword.context.toString()),
 				Factory.TERM.createString(keyword.getPackageName()),
 				Factory.TERM.createString(keyword.changeType.toString()),
-				Factory.TERM.createString(keyword.keyword));
+				Factory.TERM.createString(keyword.keyword),
+				Factory.TERM.createString(getUniqueID().toString()));
 		relation.add(tuple);
 
 		this.facts.put(predicate, relation);
+	}
+
+	/**
+	 * @return A unique ID to assign to a KeywordChange fact.
+	 */
+	private static synchronized Integer getUniqueID() {
+		Integer id = uniqueID;
+		uniqueID = uniqueID + 1;
+		return id;
 	}
 
 }

@@ -38,7 +38,6 @@ import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.pangor.api.StatementUse;
 import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter.FilterType;
 
 /**
@@ -163,21 +162,14 @@ public class LearningDataSet extends DataSet {
 		queries.add(
 			Factory.BASIC.createQuery(
 				Factory.BASIC.createLiteral(true,
-					Factory.BASIC.createPredicate("KeywordChange", 5),
+					Factory.BASIC.createPredicate("KeywordChange", 6),
 					Factory.BASIC.createTuple(
 						Factory.TERM.createVariable("KeywordType"),
 						Factory.TERM.createVariable("KeywordContext"),
 						Factory.TERM.createVariable("Package"),
 						Factory.TERM.createVariable("ChangeType"),
-						Factory.TERM.createVariable("Keyword")))));
-
-		queries.add(
-			Factory.BASIC.createQuery(
-				Factory.BASIC.createLiteral(true,
-					Factory.BASIC.createPredicate("StatementChange", 2),
-					Factory.BASIC.createTuple(
-						Factory.TERM.createVariable("StatementType"),
-						Factory.TERM.createVariable("ChangeType")))));
+						Factory.TERM.createVariable("Keyword"),
+						Factory.TERM.createVariable("ID")))));
 
 		return queries;
 
@@ -226,14 +218,6 @@ public class LearningDataSet extends DataSet {
 				Integer count = featureVector.keywordMap.get(ku);
 				count = count == null ? 1 : count + 1;
 				featureVector.keywordMap.put(ku, count);
-			}
-			else if(query.toString().contains("StatementChange")) {
-				StatementUse su = new StatementUse(
-						tuple.get(2).getValue().toString(),							// StatementType
-						ChangeType.valueOf(tuple.get(3).getValue().toString()));	// ChangeType
-				Integer count = featureVector.statementMap.get(su);
-				count = count == null ? 1 : count + 1;
-				featureVector.statementMap.put(su, count);
 			}
 
 		}
