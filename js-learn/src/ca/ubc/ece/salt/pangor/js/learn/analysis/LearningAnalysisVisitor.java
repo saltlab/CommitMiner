@@ -294,7 +294,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		ITuple tuple = Factory.BASIC.createTuple(
 				Factory.TERM.createString(keyword.type.toString()),
 				Factory.TERM.createString(keyword.context.toString()),
-				Factory.TERM.createString(keyword.apiPackage),
+				Factory.TERM.createString(keyword.getPackageName()),
 				Factory.TERM.createString(keyword.changeType.toString()),
 				Factory.TERM.createString(keyword.keyword));
 		relation.add(tuple);
