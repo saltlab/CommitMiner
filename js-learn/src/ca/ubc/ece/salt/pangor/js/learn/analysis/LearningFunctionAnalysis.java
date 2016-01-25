@@ -12,7 +12,7 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.js.analysis.FunctionAnalysis;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
-import ca.ubc.ece.salt.pangor.learn.pointsto.PointsToPrediction;
+import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
 
 public class LearningFunctionAnalysis extends FunctionAnalysis {
 
@@ -25,7 +25,8 @@ public class LearningFunctionAnalysis extends FunctionAnalysis {
 
 	@Override
 	public void analyze(SourceCodeFileChange sourceCodeFileChange,
-			Map<IPredicate, IRelation> facts, CFG cfg, Scope<AstNode> scope)
+			Map<IPredicate, IRelation> facts, CFG cfg, Scope<AstNode> scope,
+			PointsToPrediction model)
 			throws Exception {
 
 		/* Initialize the points-to analysis. It may take some time to build the package model.
@@ -37,7 +38,8 @@ public class LearningFunctionAnalysis extends FunctionAnalysis {
 		/* TODO: Create a JS function that visits a file and extracts a HashMap<KeywordUse, Integer> of the model. */
 //		PointsToPrediction packageModel = new PointsToPrediction(JSAPIFactory.buildTopLevelAPI(),
 //				/*TODO:*/new HashMap<KeywordUse, Integer>());
-		PointsToPrediction packageModel = null;
+		//APIModelVisitor.getScriptFeatureVector((ScriptNode)scope.getScope());
+		//PointsToPrediction packageModel = null;
 
 		/* If the function was inserted or deleted, there is nothing to do. We
 		 * only want functions that were repaired. Class-level repairs are left
@@ -47,7 +49,7 @@ public class LearningFunctionAnalysis extends FunctionAnalysis {
 
            /* Visit the function to extract features. */
 			LearningAnalysisVisitor.getLearningFacts(facts, sourceCodeFileChange,
-					(ScriptNode)scope.getScope(), packageModel, this.dst);
+					(ScriptNode)scope.getScope(), model, this.dst);
 
 		}
 

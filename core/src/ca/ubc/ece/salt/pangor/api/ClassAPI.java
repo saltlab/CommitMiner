@@ -1,8 +1,8 @@
-package ca.ubc.ece.salt.pangor.learn.api;
+package ca.ubc.ece.salt.pangor.api;
 
 import java.util.List;
 
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 
 /**
  * Defines the API of a Node.js class.

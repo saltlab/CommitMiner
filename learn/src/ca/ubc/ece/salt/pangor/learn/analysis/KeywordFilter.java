@@ -1,8 +1,8 @@
 package ca.ubc.ece.salt.pangor.learn.analysis;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 
 public class KeywordFilter {
 

@@ -1,11 +1,11 @@
-package ca.ubc.ece.salt.pangor.learn.api;
+package ca.ubc.ece.salt.pangor.api;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 
 /**
  * Provides functions to extract keywords from APIs and determine which APIs a

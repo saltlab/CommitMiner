@@ -1,14 +1,14 @@
-package ca.ubc.ece.salt.pangor.learn.pointsto;
+package ca.ubc.ece.salt.pangor.pointsto;
 
 import java.util.Map;
 import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.learn.api.AbstractAPI;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.pangor.learn.api.TopLevelAPI;
+import ca.ubc.ece.salt.pangor.api.AbstractAPI;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
+import ca.ubc.ece.salt.pangor.api.TopLevelAPI;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 
 /**
  * Predicts the points-to relationships for all keywords (methods, fields,

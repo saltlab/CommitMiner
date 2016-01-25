@@ -1,11 +1,11 @@
-package ca.ubc.ece.salt.pangor.js.learn.api;
+package ca.ubc.ece.salt.pangor.js.api;
 
 import java.util.Arrays;
 import java.util.List;
 
-import ca.ubc.ece.salt.pangor.learn.api.ClassAPI;
-import ca.ubc.ece.salt.pangor.learn.api.PackageAPI;
-import ca.ubc.ece.salt.pangor.learn.api.TopLevelAPI;
+import ca.ubc.ece.salt.pangor.api.ClassAPI;
+import ca.ubc.ece.salt.pangor.api.PackageAPI;
+import ca.ubc.ece.salt.pangor.api.TopLevelAPI;
 
 /**
  * Builds the APIs. Right now APIs are hard coded into this class. In the

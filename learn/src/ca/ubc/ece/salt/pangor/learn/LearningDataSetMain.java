@@ -12,13 +12,13 @@ import org.kohsuke.args4j.CmdLineParser;
 
 import weka.core.WekaException;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter;
 import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter.FilterType;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningDataSet;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningMetrics;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningMetrics.KeywordFrequency;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse.KeywordContext;
 
 /**
  * Creates clusters similar repairs.

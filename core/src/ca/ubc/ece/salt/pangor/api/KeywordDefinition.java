@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.learn.api;
+package ca.ubc.ece.salt.pangor.api;
 
 /**
  * Stores a keyword and the context under which it is used (which we call its type).

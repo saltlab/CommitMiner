@@ -9,6 +9,7 @@ import org.mozilla.javascript.ast.AstNode;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
+import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
 
 /**
  * An analysis of a JavaScript function.
@@ -29,6 +30,7 @@ public abstract class FunctionAnalysis {
 	 */
 	public abstract void analyze(SourceCodeFileChange sourceCodeFileChange,
 						Map<IPredicate, IRelation> facts,
-						CFG cfg, Scope<AstNode> scope) throws Exception;
+						CFG cfg, Scope<AstNode> scope,
+						PointsToPrediction model) throws Exception;
 
 }

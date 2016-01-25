@@ -34,12 +34,12 @@ import weka.filters.unsupervised.attribute.RemoveByName;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
+import ca.ubc.ece.salt.pangor.api.StatementUse;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter.FilterType;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.pangor.learn.api.StatementUse;
 
 /**
  * The {@code LearningDataSet} manages the data set for data mining

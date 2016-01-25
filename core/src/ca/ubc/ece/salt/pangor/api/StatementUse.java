@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.learn.api;
+package ca.ubc.ece.salt.pangor.api;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 

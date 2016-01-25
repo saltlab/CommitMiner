@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.learn.api;
+package ca.ubc.ece.salt.pangor.api;
 
 import java.util.Arrays;
 import java.util.HashMap;

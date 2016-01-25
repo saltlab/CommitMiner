@@ -1,6 +1,6 @@
 package ca.ubc.ece.salt.pangor.learn;
 
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
 
 /**
  * Stores meta data for a cluster. Used to summarize clustering results.

@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.learn.analysis;
+package ca.ubc.ece.salt.pangor.js.api;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,15 +23,15 @@ import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeAnalysisUtilities;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse.KeywordContext;
 
 /**
  * Provides AST utilities to help collect feature information (i.e., keyword
  * info) from the source code analysis.
  */
-public class LearningUtilities {
+public class JSAPIUtilities {
 
 	/**
 	 * Gets the type of artifact the keyword refers to.

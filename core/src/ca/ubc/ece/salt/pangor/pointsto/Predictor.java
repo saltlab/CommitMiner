@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.learn.pointsto;
+package ca.ubc.ece.salt.pangor.pointsto;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.learn.api.AbstractAPI;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse;
-import ca.ubc.ece.salt.pangor.learn.api.TopLevelAPI;
+import ca.ubc.ece.salt.pangor.api.AbstractAPI;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
+import ca.ubc.ece.salt.pangor.api.TopLevelAPI;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 
 /**
  * Abstract class to model a Predictor

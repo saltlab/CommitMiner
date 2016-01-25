@@ -1,14 +1,8 @@
-package ca.ubc.ece.salt.pangor.js.learn.analysis;
+package ca.ubc.ece.salt.pangor.js.api;
 
-
+import java.util.HashMap;
 import java.util.Map;
 
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.api.basics.ITuple;
-import org.deri.iris.factory.Factory;
-import org.deri.iris.storage.IRelation;
-import org.deri.iris.storage.IRelationFactory;
-import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
@@ -29,34 +23,21 @@ import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.pangor.js.analysis.utilities.AnalysisUtilities;
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeAnalysisUtilities;
-import ca.ubc.ece.salt.pangor.js.api.JSAPIUtilities;
-import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
 
 /**
- * Inspects scripts and functions for API keywords.
+ * Creates a map of keywords and how frequently they are used.
  */
-public class LearningAnalysisVisitor implements NodeVisitor {
+public class APIModelVisitor implements NodeVisitor {
 
-	/** True if this is a destination file analysis. **/
-	private boolean dst;
-
-	/** The fact database. **/
-	private Map<IPredicate, IRelation> facts;
+	/** The keyword counts for the file. **/
+	private Map<KeywordUse, Integer> keywordMap;
 
 	/** The root of the function or script we are visiting. **/
 	private ScriptNode root;
-
-	/**
-	 * Utility for predicting points-to relationships between keywords and
-	 * methods/fields/events in packages.
-	 */
-	private PointsToPrediction packageModel;
 
 	/**
 	 * If true, will visit function signatures and bodies. This should be true
@@ -75,45 +56,27 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 	 * @return A feature vector containing the keywords extracted from the
 	 * 		   script.
 	 */
-	public static void getLearningFacts(Map<IPredicate, IRelation> facts,
-			SourceCodeFileChange scfc, AstRoot script, boolean dst) {
+	public static Map<KeywordUse, Integer> getScriptFeatureVector(AstRoot script) {
 
 		/* Create the feature vector by visiting the function. */
-		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(facts, scfc,
-				AnalysisUtilities.getFunctionName(script), script, null, true,
-				dst);
+		APIModelVisitor visitor = new APIModelVisitor(script, true);
 		script.visit(visitor);
+
+		return visitor.getKeywordMap();
+
+	}
+
+	private APIModelVisitor(ScriptNode root, boolean visitFunctions) {
+		this.keywordMap = new HashMap<KeywordUse, Integer>();
+		this.root = root;
+		this.visitFunctions = visitFunctions;
 	}
 
 	/**
-	 * Visits the script or function and returns a feature vector for it.
-	 * @param facts
-	 * @param scfc
-	 * @param function the script or function to visit.
-	 * @param packageModel
-	 * @return the feature vector for the function.
+	 * @return The keyword model for this file.
 	 */
-	public static void getLearningFacts(Map<IPredicate, IRelation> facts,
-			SourceCodeFileChange scfc, ScriptNode function,
-			PointsToPrediction packageModel, boolean dst) {
-
-		/* Create the feature vector by visiting the function. */
-		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(facts, scfc,
-				AnalysisUtilities.getFunctionName(function), function, packageModel,
-				false, dst);
-		function.visit(visitor);
-	}
-
-
-	private LearningAnalysisVisitor(Map<IPredicate, IRelation> facts,
-			SourceCodeFileChange scfc, String functionName, ScriptNode root,
-			PointsToPrediction packageModel, boolean visitFunctions,
-			boolean dst) {
-		this.facts = facts;
-		this.packageModel = packageModel;
-		this.root = root;
-		this.visitFunctions = visitFunctions;
-		this.dst = dst;
+	public Map<KeywordUse, Integer> getKeywordMap() {
+		return this.keywordMap;
 	}
 
 	@Override
@@ -163,17 +126,10 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
 
 			KeywordUse keyword = null;
-			if(this.packageModel != null) {
-				keyword = this.packageModel.getKeyword(type, context, "falsey", changeType);
-			}
-			else {
-				keyword = new KeywordUse(type, context, "falsey", changeType);
-				keyword.apiPackage = "global";
-			}
+			keyword = new KeywordUse(type, context, "falsey", changeType);
+			keyword.apiPackage = "global";
 
-			if(keyword != null) {
-				this.addKeywordChangeFact(keyword);
-			}
+			if(keyword != null) this.increment(keyword);
 
 		}
 
@@ -251,55 +207,21 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 
 		/* Insert the token into the feature vector if it is a keyword. */
 		KeywordUse keyword = null;
-
-		if(this.packageModel != null) {
-			keyword = this.packageModel.getKeyword(type, context, token, changeType);
-		}
-		else {
-			keyword = new KeywordUse(type, context, token, changeType);
-		}
+		keyword = new KeywordUse(type, context, token, changeType);
 
 		/* Add the keyword to the feature vector. */
-		if(keyword != null) {
-			this.addKeywordChangeFact(keyword);
-		}
+		if(keyword != null) this.increment(keyword);
 
 	}
 
 	/**
-	 * Adds a KeywordUse fact to the fact database.
-	 * @param keyword The keyword change to record.
+	 * Increment the keyword count.
+	 * @param keyword The key to increment in the map.
 	 */
-	private void addKeywordChangeFact(KeywordUse keyword) {
-
-		/* Check the change type against the analysis we're doing. */
-		if(this.dst && !(keyword.changeType == ChangeType.INSERTED
-				|| keyword.changeType == ChangeType.UPDATED)) return;
-		if(!this.dst && !(keyword.changeType == ChangeType.REMOVED)) return;
-
-		/* Get the relation for this predicate from the fact base. */
-		IPredicate predicate = Factory.BASIC.createPredicate("KeywordChange", 5);
-		IRelation relation = facts.get(predicate);
-		if(relation == null) {
-
-			/* The predicate does not yet exist in the fact base. Create a
-			 * relation for the predicate and add it to the fact base. */
-			IRelationFactory relationFactory = new SimpleRelationFactory();
-			relation = relationFactory.createRelation();
-			facts.put(predicate, relation);
-
-		}
-
-		/* Add the new tuple to the relation. */
-		ITuple tuple = Factory.BASIC.createTuple(
-				Factory.TERM.createString(keyword.type.toString()),
-				Factory.TERM.createString(keyword.context.toString()),
-				Factory.TERM.createString(keyword.apiPackage),
-				Factory.TERM.createString(keyword.changeType.toString()),
-				Factory.TERM.createString(keyword.keyword));
-		relation.add(tuple);
-
-		this.facts.put(predicate, relation);
+	private void increment(KeywordUse keyword) {
+		Integer count = this.keywordMap.get(keyword);
+		count = count == null ? 1 : count + 1;
+		this.keywordMap.put(keyword, count);
 	}
 
 }

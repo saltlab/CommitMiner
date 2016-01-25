@@ -18,6 +18,9 @@ import ca.ubc.ece.salt.pangor.analysis.flow.FunctionTreeVisitor;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.JavaScriptScope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeVisitor;
+import ca.ubc.ece.salt.pangor.js.api.APIModelVisitor;
+import ca.ubc.ece.salt.pangor.js.api.JSAPIFactory;
+import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
 
 /**
  * An analysis of a JavaScript file.
@@ -55,6 +58,11 @@ public class ScriptAnalysis extends SourceCodeFileAnalysis {
 		Map<ScriptNode, JavaScriptScope> scopeMap = new HashMap<ScriptNode, JavaScriptScope>();
 		JavaScriptScope scope = this.buildScopeTree(script, null, scopeMap, null);
 
+		/* Build the points-to prediction model. */
+		PointsToPrediction model = new PointsToPrediction(
+				JSAPIFactory.buildTopLevelAPI(),
+				APIModelVisitor.getScriptFeatureVector(script));
+
 		/* Analyze each of the functions in this class. */
 		Stack<JavaScriptScope> stack = new Stack<JavaScriptScope>();
 		stack.push(scope);
@@ -63,7 +71,8 @@ public class ScriptAnalysis extends SourceCodeFileAnalysis {
 			ScriptNode functionDeclaration = currentScope.scope;
 			for(FunctionAnalysis functionAnalysis : this.functionAnalyses) {
 				functionAnalysis.analyze(sourceCodeFileChange, facts,
-						getFunctionCFG(functionDeclaration, cfgs), currentScope);
+						getFunctionCFG(functionDeclaration, cfgs),
+						currentScope, model);
 			}
 		}
 

@@ -12,10 +12,10 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import ca.ubc.ece.salt.pangor.js.learn.api.JSAPIFactory;
-import ca.ubc.ece.salt.pangor.learn.api.AbstractAPI;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.AbstractAPI;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.js.api.JSAPIFactory;
 
 public class TestAPI {
 

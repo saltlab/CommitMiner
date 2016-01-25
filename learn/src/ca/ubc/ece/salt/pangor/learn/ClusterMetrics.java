@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
 
 public class ClusterMetrics {
 

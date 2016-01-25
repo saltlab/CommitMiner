@@ -1,7 +1,7 @@
-package ca.ubc.ece.salt.pangor.learn.pointsto;
+package ca.ubc.ece.salt.pangor.pointsto;
 
 
-import ca.ubc.ece.salt.pangor.learn.api.AbstractAPI;
+import ca.ubc.ece.salt.pangor.api.AbstractAPI;
 
 /**
  * Data structure to store an API and a likelihood calculated by a prediction

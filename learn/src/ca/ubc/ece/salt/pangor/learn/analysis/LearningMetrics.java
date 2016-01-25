@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
 
 /**
  * Stores a set of metrics for a learning data set.

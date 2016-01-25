@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.learn.pointsto;
+package ca.ubc.ece.salt.pangor.pointsto;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ca.ubc.ece.salt.pangor.learn.api.AbstractAPI;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse;
-import ca.ubc.ece.salt.pangor.learn.api.TopLevelAPI;
+import ca.ubc.ece.salt.pangor.api.AbstractAPI;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
+import ca.ubc.ece.salt.pangor.api.TopLevelAPI;
 
 /**
  * Predictor implementation using "confidence" and "support" measures.

@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.learn.pointsto;
+package ca.ubc.ece.salt.pangor.pointsto;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;

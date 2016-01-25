@@ -16,6 +16,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
+import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
 
 /**
  * A fixed point analysis.
@@ -35,7 +36,8 @@ public abstract class PathInsensitiveFlowAnalysis<LE extends AbstractLatticeElem
 	@Override
 	public void analyze(SourceCodeFileChange sourceCodeFileChange,
 								 Map<IPredicate, IRelation> facts,
-								 CFG cfg, Scope<AstNode> scope) {
+								 CFG cfg, Scope<AstNode> scope,
+								 PointsToPrediction model) {
 
 		@SuppressWarnings("unused")
 		long pathsComplete = 0;

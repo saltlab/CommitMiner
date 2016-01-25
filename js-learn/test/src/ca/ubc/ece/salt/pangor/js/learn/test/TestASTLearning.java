@@ -17,15 +17,15 @@ import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
+import ca.ubc.ece.salt.pangor.api.AbstractAPI;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
+import ca.ubc.ece.salt.pangor.api.TopLevelAPI;
+import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.pangor.js.api.JSAPIFactory;
 import ca.ubc.ece.salt.pangor.js.learn.analysis.LearningAnalysis;
-import ca.ubc.ece.salt.pangor.js.learn.api.JSAPIFactory;
 import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningDataSet;
-import ca.ubc.ece.salt.pangor.learn.api.AbstractAPI;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse;
-import ca.ubc.ece.salt.pangor.learn.api.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.pangor.learn.api.TopLevelAPI;
 
 public class TestASTLearning {
 
