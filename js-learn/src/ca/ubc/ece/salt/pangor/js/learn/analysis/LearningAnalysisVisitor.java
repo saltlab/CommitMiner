@@ -259,7 +259,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		if(!this.dst && !(keyword.changeType == ChangeType.REMOVED)) return;
 
 		/* Get the relation for this predicate from the fact base. */
-		IPredicate predicate = Factory.BASIC.createPredicate("KeywordChange", 6);
+		IPredicate predicate = Factory.BASIC.createPredicate("KeywordChange", 8);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 
@@ -273,6 +273,8 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 
 		/* Add the new tuple to the relation. */
 		ITuple tuple = Factory.BASIC.createTuple(
+				Factory.TERM.createString("ClassNA"),
+				Factory.TERM.createString("MethodNA"),
 				Factory.TERM.createString(keyword.type.toString()),
 				Factory.TERM.createString(keyword.context.toString()),
 				Factory.TERM.createString(keyword.getPackageName()),

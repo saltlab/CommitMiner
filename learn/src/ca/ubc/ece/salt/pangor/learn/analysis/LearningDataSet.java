@@ -162,8 +162,10 @@ public class LearningDataSet extends DataSet {
 		queries.add(
 			Factory.BASIC.createQuery(
 				Factory.BASIC.createLiteral(true,
-					Factory.BASIC.createPredicate("KeywordChange", 6),
+					Factory.BASIC.createPredicate("KeywordChange", 8),
 					Factory.BASIC.createTuple(
+						Factory.TERM.createVariable("Class"),
+						Factory.TERM.createVariable("Method"),
 						Factory.TERM.createVariable("KeywordType"),
 						Factory.TERM.createVariable("KeywordContext"),
 						Factory.TERM.createVariable("Package"),
@@ -195,26 +197,25 @@ public class LearningDataSet extends DataSet {
 
 			/* Lookup or create the LearningFeatureVector. */
 			String key = commit.projectID + "_" + commit.repairedCommitID 	// Identifies the commit
-						 + "_" + "NA" + "_" + "NA"; 						// TODO: Update when we add classes and functions to facts
-//						 + "_" + tuple.get(0) + "_" + tuple.get(1); 		// Identifies the class/method
+						 + "_" + tuple.get(0) + "_" + tuple.get(1); 		// Identifies the class/method
 			LearningFeatureVector featureVector = featureVectors.get(key);
 
 			/* Add the feature vector if it is not yet in the map. */
 			if(featureVector == null) {
 				featureVector = new LearningFeatureVector(commit,
-						"NA",	// Change if we want to do class-level changes
-						"NA");	// Change if we want to do method-level changes
+						tuple.get(0).toString(),
+						tuple.get(1).toString());
 				featureVectors.put(key, featureVector);
 			}
 
 			/* Add the keyword or statement change to the bag of words. */
 			if(query.toString().contains("KeywordChange")) {
 				KeywordUse ku = new KeywordUse(
-						KeywordType.valueOf(tuple.get(0).getValue().toString()),	// KeywordType
-						KeywordContext.valueOf(tuple.get(1).getValue().toString()),	// KeywordContext
-						tuple.get(4).getValue().toString(),							// Keyword
-						ChangeType.valueOf(tuple.get(3).getValue().toString()),		// ChangeType
-						tuple.get(2).getValue().toString());						// API String
+						KeywordType.valueOf(tuple.get(2).getValue().toString()),	// KeywordType
+						KeywordContext.valueOf(tuple.get(3).getValue().toString()),	// KeywordContext
+						tuple.get(6).getValue().toString(),							// Keyword
+						ChangeType.valueOf(tuple.get(5).getValue().toString()),		// ChangeType
+						tuple.get(4).getValue().toString());						// API String
 				Integer count = featureVector.keywordMap.get(ku);
 				count = count == null ? 1 : count + 1;
 				featureVector.keywordMap.put(ku, count);
@@ -339,9 +340,9 @@ public class LearningDataSet extends DataSet {
 	 */
 	public String getLearningFeatureVectorHeader() {
 
-		String header = String.join(",", "ID", "ProjectID", "CommitURL", "BuggyFile",
-				"RepairedFile", "BuggyCommitID", "RepairedCommitID",
-				"FunctionName");
+		String header = String.join(",", "ID", "ProjectID", "CommitURL",
+				"BuggyCommitID", "RepairedCommitID",
+				"Class", "Method");
 
 		for(KeywordDefinition keyword : this.keywords) {
 			header += "," + keyword.toString();
@@ -526,8 +527,8 @@ public class LearningDataSet extends DataSet {
 		/* Attribute filter for Context Group 3 (API Methods and Properties). */
 		removeKeywordOptions[1] = "(.*typeof.*)|(.*null.*)|(.*undefined.*)|(.*falsey.*)|(.*this.*)|(.*true.*)|(.*false.*)|(.*_STATEMENT.*)|(.*_global_test)";
 		RemoveByName removeKeyword = new RemoveByName();
-		/* TODO: Uncomment for full data set. Get "NO ATTRIBUTE" error when small." */
-		//removeKeyword.setOptions(removeKeywordOptions);
+		/* TODO: May get "NO ATTRIBUTE" error when small." */
+		removeKeyword.setOptions(removeKeywordOptions);
 		removeKeyword.setInputFormat(filteredData);
 		filteredData = Filter.useFilter(filteredData, removeKeyword);
 
@@ -686,7 +687,6 @@ public class LearningDataSet extends DataSet {
 	public boolean contains(String function, List<Pair<KeywordUse, Integer>> keywords) {
 		outer:
 		for(LearningFeatureVector featureVector : this.featureVectors) {
-			System.out.println(featureVector);
 			for(Pair<KeywordUse, Integer> keyword : keywords) {
 				if(keyword.getRight() > 0 && !featureVector.keywordMap.containsKey(keyword.getLeft())) continue outer;
 				if(keyword.getRight() > 0 && !featureVector.keywordMap.get(keyword.getLeft()).equals(keyword.getRight())) continue outer;
