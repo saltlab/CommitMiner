@@ -53,16 +53,30 @@ public class LearningAnalysis extends DomainAnalysis {
 		int complexity = 0;
 		for(SourceCodeFileChange sourceCodeFileChange : commit.sourceCodeFileChanges) {
 
-			ChangeComplexitySCFA srcComplexity = new ChangeComplexitySCFA();
-			ChangeComplexitySCFA dstComplexity = new ChangeComplexitySCFA();
+			/* Get the file extension. */
+			String fileExtension = getSourceCodeFileExtension(sourceCodeFileChange.buggyFile, sourceCodeFileChange.repairedFile);
 
-			/* Compute the change complexity for this file. */
-			this.analyzeFile(sourceCodeFileChange, facts, srcComplexity, dstComplexity);
+			/* Check the file extension. */
+			if(fileExtension != null && cfgFactory.acceptsExtension(fileExtension)) {
 
-			/* Update the total change complexity. */
-			complexity += srcComplexity.getChangeComplexity().removedStatements;
-			complexity += dstComplexity.getChangeComplexity().insertedStatements;
-			complexity += dstComplexity.getChangeComplexity().updatedStatements;
+				ChangeComplexitySCFA srcComplexity = new ChangeComplexitySCFA();
+				ChangeComplexitySCFA dstComplexity = new ChangeComplexitySCFA();
+
+				/* Compute the change complexity for this file.
+				 * NOTE: If an exception occurs while analyzing the file, no results
+				 * 		 will be returned and the complexity will not be correct. */
+				this.analyzeFile(sourceCodeFileChange, facts, srcComplexity, dstComplexity);
+
+				/* Update the total change complexity. */
+				if(srcComplexity.getChangeComplexity() != null) {
+					complexity += srcComplexity.getChangeComplexity().removedStatements;
+				}
+				if(dstComplexity.getChangeComplexity() != null) {
+					complexity += dstComplexity.getChangeComplexity().insertedStatements;
+					complexity += dstComplexity.getChangeComplexity().updatedStatements;
+				}
+
+			}
 
 		}
 

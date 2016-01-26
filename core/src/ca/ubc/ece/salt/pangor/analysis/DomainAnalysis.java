@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.storage.IRelation;
+import org.mozilla.javascript.EvaluatorException;
 
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
@@ -24,7 +25,7 @@ public class DomainAnalysis {
 	/**
 	 * A map of file extensions to CFGFactories (used for control flow differencing).
 	 */
-	private CFGFactory cfgFactory;
+	protected CFGFactory cfgFactory;
 
 	/** Set to true to enable AST pre-processing. **/
 	private boolean preProcess;
@@ -119,10 +120,10 @@ public class DomainAnalysis {
 				System.err.println("ArrayIndexOutOfBoundsException: possibly caused by empty file.");
 				return;
 			}
-//			catch(EvaluatorException e) {
-//				System.err.println("Evaluator exception: " + e.getMessage());
-//				return;
-//			}
+			catch(EvaluatorException e) {
+				System.err.println("Evaluator exception: " + e.getMessage());
+				return;
+			}
 			catch(Exception e) {
 				throw e;
 			}
@@ -172,7 +173,7 @@ public class DomainAnalysis {
 	 * @return The extension of the source code file or null if none is found
 	 * 	or the extensions of the pre and post paths do not match.
 	 */
-	private static String getSourceCodeFileExtension(String preCommitPath, String postCommitPath) {
+	protected static String getSourceCodeFileExtension(String preCommitPath, String postCommitPath) {
 
 		java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\.([a-z]+)$");
 		Matcher preMatcher = pattern.matcher(preCommitPath);
