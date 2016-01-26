@@ -14,9 +14,8 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.FeatureVector;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
-import ca.ubc.ece.salt.pangor.api.KeywordUse;
-import ca.ubc.ece.salt.pangor.api.StatementUse;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 
 /**
@@ -44,9 +43,6 @@ public class LearningFeatureVector extends FeatureVector {
 	/** The method that was analyzed (if at or below method granularity). **/
 	public String method;
 
-	/** The statement counts in each commit, class or method (depending on desired granularity). **/
-	public Map<StatementUse, Integer> statementMap;
-
 	/** The keyword counts in each commit, class or method (depending on desired granularity). **/
 	public Map<KeywordUse, Integer> keywordMap;
 
@@ -59,7 +55,6 @@ public class LearningFeatureVector extends FeatureVector {
 		super(commit);
 		this.klass = klass;
 		this.method = method;
-		this.statementMap = new HashMap<StatementUse, Integer>();
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
 	}
 
@@ -77,7 +72,6 @@ public class LearningFeatureVector extends FeatureVector {
 		super(commit, id);
 		this.klass = klass;
 		this.method = method;
-		this.statementMap = new HashMap<StatementUse, Integer>();
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
 	}
 
@@ -100,34 +94,7 @@ public class LearningFeatureVector extends FeatureVector {
 			serialized += "," + entry.getKey().toString() + ":" + entry.getValue();
 		}
 
-		/* Iterate through the statement uses. */
-		for(Entry<StatementUse, Integer> entry : this.statementMap.entrySet()) {
-			serialized += "," + entry.getKey().toString() + ":" + entry.getValue();
-		}
-
 		return serialized;
-
-	}
-
-	/**
-	 * If the given token is a statement, that statement's count is incremented by
-	 * one.
-	 * @param token The string to check against the statement list.
-	 */
-	public void addStatement(StatementUse statement) {
-
-		Integer count = this.statementMap.containsKey(statement) ? this.statementMap.get(statement) + 1 : 1;
-		this.statementMap.put(statement,  count);
-
-	}
-
-	/**
-	 * Add the statement to the feature vector and set its count.
-	 * @param token The string to check against the statement list.
-	 */
-	public void addStatement(StatementUse statement, Integer count) {
-
-		this.statementMap.put(statement,  count);
 
 	}
 

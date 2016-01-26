@@ -127,14 +127,14 @@ public class KeywordUse extends KeywordDefinition {
 
 		if(this.type == KeywordType.PACKAGE) {
 			/* Don't print the package twice if the keyword type is a package. */
-			return "KEYWORD:" + this.type.toString() + ":" + this.context.toString() + ":" +
+			return this.type.toString() + ":" + this.context.toString() + ":" +
 				   this.changeType.toString() + ":" + this.keyword;
 		}
 		else if(this.api != null) {
-			return "KEYWORD:" + this.type.toString() + ":" + this.context.toString() + ":" +
+			return this.type.toString() + ":" + this.context.toString() + ":" +
 				   this.changeType.toString() + ":" + this.api.getName() + ":" + this.keyword;
 		}
-		return "KEYWORD:" + this.type.toString() + ":" + this.context.toString() + ":" +
+		return this.type.toString() + ":" + this.context.toString() + ":" +
 			   this.changeType.toString() + ":" + this.apiPackage + ":" + this.keyword;
 
 	}
