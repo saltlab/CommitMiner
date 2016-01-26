@@ -2,6 +2,9 @@ package ca.ubc.ece.salt.pangor.learn;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -13,6 +16,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import weka.core.WekaException;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter;
 import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter.FilterType;
@@ -59,7 +63,7 @@ public class LearningDataSetMain {
 		}
 
 		/* Re-construct the data set. */
-		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath(), Arrays.asList(nofilter));
+		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath(), Arrays.asList(nofilter), null);
 
 		/* Print the metrics from the data set. */
 		if(options.getPrintMetrics()) {
@@ -96,13 +100,26 @@ public class LearningDataSetMain {
 
 			for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
 
-				/* Build the filter. */
+				/* Build the row filter. */
 				KeywordFilter clusterFilter = new KeywordFilter(FilterType.INCLUDE,
 						frequency.keyword.type, frequency.keyword.context, frequency.keyword.changeType,
 						frequency.keyword.apiPackage, frequency.keyword.keyword);
 
+				// TODO: Create Weka filter that removes keyword attributes with frequency > current keyword.
+				//		 This list is in metrics (dataSet.getMetrics())
+
+				/* Build the column filter. */
+				List<KeywordUse> excludedKeywords = new LinkedList<KeywordUse>();
+				NavigableSet<KeywordFrequency> toExcludeSet = metrics.changedKeywordFrequency.descendingSet().tailSet(frequency, false);
+				System.out.println("Exclude list for " + frequency.keyword + ":" + frequency.frequency);
+				for(KeywordFrequency toExclude : toExcludeSet) {
+					System.out.println(toExclude.keyword);
+					excludedKeywords.add(toExclude.keyword);
+				}
+				System.out.println("-----");
+
 				/* Re-construct the data set. */
-				LearningDataSet clusteringDataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath(), Arrays.asList(clusterFilter));
+				LearningDataSet clusteringDataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath(), Arrays.asList(clusterFilter), excludedKeywords);
 
 				/* Pre-process the file. */
 				clusteringDataSet.preProcess();

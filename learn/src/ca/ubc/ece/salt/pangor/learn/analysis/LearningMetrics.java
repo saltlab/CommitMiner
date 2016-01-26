@@ -1,7 +1,6 @@
 package ca.ubc.ece.salt.pangor.learn.analysis;
 
 import java.util.Comparator;
-import java.util.Set;
 import java.util.TreeSet;
 
 import ca.ubc.ece.salt.pangor.api.KeywordUse;
@@ -12,10 +11,10 @@ import ca.ubc.ece.salt.pangor.api.KeywordUse;
 public class LearningMetrics {
 
 	/** ChangeType == INSERTED, REMOVED or UPDATED **/
-	public Set<KeywordFrequency> changedKeywordFrequency;
+	public TreeSet<KeywordFrequency> changedKeywordFrequency;
 
 	/** Includes all change types. **/
-	public Set<KeywordFrequency> keywordFrequency; // Includes all change types.
+	public TreeSet<KeywordFrequency> keywordFrequency; // Includes all change types.
 
 	public LearningMetrics() {
 

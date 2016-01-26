@@ -58,7 +58,13 @@ public class LearningDataSet extends DataSet {
 	 * filters out any LearningFeatureVector which does not contain one of these
 	 * packages.
 	 */
-	private List<KeywordFilter> filters;
+	private List<KeywordFilter> rowFilters;
+
+	/**
+	 * The keywords we want to ommit as features from the data set during
+	 * clustering.
+	 */
+	private List<KeywordUse> columnFilters;
 
 	/**
 	 * The path to the file where the data set will be cached. This allows us
@@ -81,13 +87,15 @@ public class LearningDataSet extends DataSet {
 	 * a file on disk. This {@code LearningDataSet} can pre-process the data
 	 * set and create a data set file for Weka.
 	 * @param dataSetPath The file path to read the data set.
-	 * @param filters Filters out rows by requiring keywords to be present.
+	 * @param rowFilters Filters out rows by requiring keywords to be present.
 	 * @throws Exception Throws an exception when the {@code dataSetPath}
 	 * 					 cannot be read.
 	 */
-	private LearningDataSet(String dataSetPath, List<KeywordFilter> filters) throws Exception {
+	private LearningDataSet(String dataSetPath, List<KeywordFilter> rowFilters,
+							List<KeywordUse> columnFilters, boolean x) throws Exception {
 		super(null, null);
-		this.filters = filters;
+		this.rowFilters = rowFilters;
+		this.columnFilters = columnFilters;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
 		this.dataSetPath = dataSetPath;
@@ -103,7 +111,7 @@ public class LearningDataSet extends DataSet {
 	 */
 	private LearningDataSet(String dataSetPath, List<IRule> rules, List<IQuery> queries) {
 		super(rules, queries);
-		this.filters = null;
+		this.rowFilters = null;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
 		this.dataSetPath = dataSetPath;
@@ -116,7 +124,7 @@ public class LearningDataSet extends DataSet {
 	 */
 	private LearningDataSet(List<KeywordFilter> filters, List<IRule> rules, List<IQuery> queries) {
 		super(rules, queries);
-		this.filters = filters;
+		this.rowFilters = filters;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
 		this.dataSetPath = null;
@@ -127,12 +135,16 @@ public class LearningDataSet extends DataSet {
 	 * a file on disk. This {@code LearningDataSet} can pre-process the data
 	 * set and create a data set file for Weka.
 	 * @param dataSetPath The file path to read the data set.
-	 * @param filters Filters out rows by requiring keywords to be present.
+	 * @param rowFilters Filters out rows by requiring keywords to be present.
+	 * @param columnFilters The keywords we want to omit from the dataset
+	 * 						during clustering.
 	 * @throws Exception Throws an exception when the {@code dataSetPath}
 	 * 					 cannot be read.
 	 */
-	public static LearningDataSet createLearningDataSet(String dataSetPath, List<KeywordFilter> filters) throws Exception {
-		return new LearningDataSet(dataSetPath, filters);
+	public static LearningDataSet createLearningDataSet(String dataSetPath,
+														List<KeywordFilter> rowFilters,
+														List<KeywordUse> columnFilters) throws Exception {
+		return new LearningDataSet(dataSetPath, rowFilters, columnFilters, false);
 	}
 
 	/**
@@ -515,6 +527,15 @@ public class LearningDataSet extends DataSet {
 		removeByName.setInputFormat(filteredData);
 		filteredData = Filter.useFilter(filteredData, removeByName);
 
+		/* Create the keyword (column) filter. */
+		String filter = "(.*_STATEMENT.*)|(.*_global_test)";
+		for(KeywordUse keywordUse : this.columnFilters) {
+			filter += "|(" + keywordUse.type.toString();
+			filter += "_" + keywordUse.context.toString();
+			filter += "_" + keywordUse.getPackageName();
+			filter += "_" + keywordUse.keyword + ")";
+		}
+
 		/* Filter out the statement columns. */
 		String[] removeKeywordOptions = new String[2];
 		removeKeywordOptions[0] = "-E";
@@ -525,7 +546,8 @@ public class LearningDataSet extends DataSet {
 		/* Attribute filter for Context Group 2 (Reserved Words and Operators) */
 //		removeKeywordOptions[1] = "(.*_falsey.*)|(.*_this.*)|(.*_STATEMENT_.*)|(.*_global_test)";
 		/* Attribute filter for Context Group 3 (API Methods and Properties). */
-		removeKeywordOptions[1] = "(.*typeof.*)|(.*null.*)|(.*undefined.*)|(.*falsey.*)|(.*this.*)|(.*true.*)|(.*false.*)|(.*_STATEMENT.*)|(.*_global_test)";
+//		removeKeywordOptions[1] = "(.*typeof.*)|(.*null.*)|(.*undefined.*)|(.*falsey.*)|(.*this.*)|(.*true.*)|(.*false.*)|(.*_STATEMENT.*)|(.*_global_test)";
+		removeKeywordOptions[1] = filter;
 		RemoveByName removeKeyword = new RemoveByName();
 		/* TODO: May get "NO ATTRIBUTE" error when small." */
 		removeKeyword.setOptions(removeKeywordOptions);
@@ -600,7 +622,7 @@ public class LearningDataSet extends DataSet {
 	 * @return True if the keyword set matches an include filter.
 	 */
 	private boolean includeRow(Set<KeywordUse> keywords) {
-		return includeRow(keywords, this.filters);
+		return includeRow(keywords, this.rowFilters);
 	}
 
 	/**
