@@ -67,7 +67,7 @@ public class LearningAnalysisMain {
 
 			try {
                 gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(),
-                		CHECKOUT_DIR, "fix|repair", commitAnalysis);
+                		CHECKOUT_DIR, /*"fix|repair"*/".*", commitAnalysis);
 				gitProjectAnalysis.analyze();
 
 			} catch (Exception e) {
