@@ -35,8 +35,10 @@ public class GitProjectAnalysis extends GitProject {
 	/**
 	 * Constructor that is used by our static factory methods.
 	 */
-	protected GitProjectAnalysis(GitProject gitProject, CommitAnalysis commitAnalysis) {
-		super(gitProject);
+	protected GitProjectAnalysis(GitProject gitProject,
+								 CommitAnalysis commitAnalysis,
+								 String commitMessageRegex) {
+		super(gitProject, commitMessageRegex);
 		this.commitAnalysis = commitAnalysis;
 	}
 
@@ -203,7 +205,7 @@ public class GitProjectAnalysis extends GitProject {
 			throws GitProjectAnalysisException {
 		GitProject gitProject = GitProject.fromDirectory(directory, commitMessageRegex);
 
-		return new GitProjectAnalysis(gitProject, commitAnalysis);
+		return new GitProjectAnalysis(gitProject, commitAnalysis, commitMessageRegex);
 	}
 
 	/**
@@ -223,7 +225,7 @@ public class GitProjectAnalysis extends GitProject {
 			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
 		GitProject gitProject = GitProject.fromURI(uri, directory, commitMessageRegex);
 
-		return new GitProjectAnalysis(gitProject, commitAnalysis);
+		return new GitProjectAnalysis(gitProject, commitAnalysis, commitMessageRegex);
 	}
 
 }

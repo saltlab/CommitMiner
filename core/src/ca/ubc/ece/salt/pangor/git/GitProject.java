@@ -78,13 +78,17 @@ public class GitProject {
 	/** Dates of last (most recent) and first commit */
 	protected Date lastCommitDate, firstCommitDate;
 
+	protected String commitMessageRegex;
+
 	/**
 	 * Constructor that is used by our static factory methods.
+	 * @param commitMessageRegex
 	 */
-	protected GitProject(Git git, Repository repository, String URI) {
+	protected GitProject(Git git, Repository repository, String URI, String commitMessageRegex) {
 		this.git = git;
 		this.repository = repository;
 		this.URI = URI;
+		this.commitMessageRegex = commitMessageRegex;
 
 		try {
 			this.projectID = getGitProjectName(URI);
@@ -98,8 +102,8 @@ public class GitProject {
 	 * Constructor that clones another Git Project. Particularly useful for
 	 * subclasses
 	 */
-	protected GitProject(GitProject project) {
-		this(project.git, project.repository, project.URI);
+	protected GitProject(GitProject project, String commitMessageRegex) {
+		this(project.git, project.repository, project.URI, commitMessageRegex);
 	}
 
 	/*
@@ -273,8 +277,7 @@ public class GitProject {
 			authorsEmails.add(authorIdent.getEmailAddress());
 
 			String message = commit.getFullMessage();
-			/* TODO: Make this an option. */
-			Pattern p = Pattern.compile(/*"fix|repair"*/".*", Pattern.CASE_INSENSITIVE);
+			Pattern p = Pattern.compile(this.commitMessageRegex, Pattern.CASE_INSENSITIVE);
 			Matcher m = p.matcher(message);
 			commitCounter++;
 
@@ -381,7 +384,7 @@ public class GitProject {
 			throw new GitProjectAnalysisException("The git project was not found in the directory " + directory + ".");
 		}
 
-		return new GitProject(git, repository, repository.getConfig().getString("remote", "origin", "url"));
+		return new GitProject(git, repository, repository.getConfig().getString("remote", "origin", "url"), commitMessageRegex);
 	}
 
 	/**
@@ -437,7 +440,7 @@ public class GitProject {
 			repository = git.getRepository();
 		}
 
-		GitProject gitProject = new GitProject(git, repository, uri);
+		GitProject gitProject = new GitProject(git, repository, uri, commitMessageRegex);
 
 		return gitProject;
 	}
