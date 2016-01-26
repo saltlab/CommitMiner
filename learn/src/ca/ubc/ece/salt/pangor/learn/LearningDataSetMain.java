@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -105,16 +104,15 @@ public class LearningDataSetMain {
 						frequency.keyword.type, frequency.keyword.context, frequency.keyword.changeType,
 						frequency.keyword.apiPackage, frequency.keyword.keyword);
 
-				// TODO: Create Weka filter that removes keyword attributes with frequency > current keyword.
-				//		 This list is in metrics (dataSet.getMetrics())
-
-				/* Build the column filter. */
+				/* Build the column filter (removes keyword features with
+				 * frequency > current keyword frequency). */
 				List<KeywordUse> excludedKeywords = new LinkedList<KeywordUse>();
-				NavigableSet<KeywordFrequency> toExcludeSet = metrics.changedKeywordFrequency.descendingSet().tailSet(frequency, false);
 				System.out.println("Exclude list for " + frequency.keyword + ":" + frequency.frequency);
-				for(KeywordFrequency toExclude : toExcludeSet) {
-					System.out.println(toExclude.keyword);
-					excludedKeywords.add(toExclude.keyword);
+				for(KeywordFrequency toExclude : metrics.changedKeywordFrequency) {
+					if(toExclude.frequency > frequency.frequency) {
+						System.out.println(toExclude.keyword);
+						excludedKeywords.add(toExclude.keyword);
+					}
 				}
 				System.out.println("-----");
 

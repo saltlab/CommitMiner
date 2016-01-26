@@ -23,9 +23,12 @@ public class LearningMetrics {
 
 			@Override
 			public int compare(KeywordFrequency o1, KeywordFrequency o2) {
-				if(o1.frequency == o2.frequency) return 0;
-				else if(o1.frequency > o2.frequency) return -1;
-				else return 1;
+
+				if(o1.frequency > o2.frequency) return -1;
+				else if(o1.frequency < o2.frequency) return 1;
+
+				return o1.keyword.toString().compareTo(o2.keyword.toString());
+
 			}
 
 		};
