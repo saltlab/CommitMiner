@@ -99,7 +99,7 @@ public class TestLearningAnalysis {
 		function.expectedKeywords.add(Pair.of(parse, 1));
 
 		/* Read the source files. */
-		SourceCodeFileChange sourceCodeFileChange = TestLearningAnalysis.getSourceCodeFileChange(src, dst);
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
 
 		this.runTest(sourceCodeFileChange, Arrays.asList(function), true);
 	}
