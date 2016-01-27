@@ -136,7 +136,6 @@ public class LearningDataSetMain {
 						rankedClusters.add(cluster);
 					}
 
-
 					/* Save arff file */
 					if (options.getArffFolder() != null)
 						clusteringDataSet.writeArffFile(options.getArffFolder(),

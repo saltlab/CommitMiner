@@ -113,7 +113,7 @@ public class LearningAnalysisMain {
 				try {
 					/* Build git repository object */
 					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri,
-							LearningAnalysisMain.CHECKOUT_DIR, "fix|repair", null);
+							LearningAnalysisMain.CHECKOUT_DIR, /*"fix|repair"*/".*", commitAnalysis);
 
 					/* Perform the analysis (this may take some time) */
 					executor.submit(new GitProjectAnalysisTask(gitProjectAnalysis, latch));
