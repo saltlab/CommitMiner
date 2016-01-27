@@ -58,6 +58,7 @@
 		<module>java-classify</module>
 		<module>js</module>
 		<module>js-learn</module>
+		<module>main</module>
 	</modules>
 			
 	<repositories>
