@@ -144,14 +144,6 @@ public class LearningDataSetMain {
 
 
 					if(c.length > 0 && frequency.keyword.context != KeywordContext.STATEMENT) {
-//							&& !(frequency.keyword.keyword.equals("typeof") // Context Group 2
-//							|| frequency.keyword.keyword.equals("undefined")
-//							|| frequency.keyword.keyword.equals("null")
-//							|| frequency.keyword.keyword.equals("true")
-//							|| frequency.keyword.keyword.equals("false"))
-//							&& !(frequency.keyword.keyword.equals("falsey") // Context Group 1
-//							|| frequency.keyword.keyword.equals("this"))
-//							&& !frequency.keyword.keyword.equals("test")) {
 						keywordClusters.add(clusterMetrics);
 					}
 
@@ -164,14 +156,6 @@ public class LearningDataSetMain {
 			int i = 0;
 			for(Cluster cluster : rankedClusters) {
 				if(cluster.keyword.context != KeywordContext.STATEMENT) {
-//						&& !(cluster.keyword.keyword.equals("typeof") // Context Group 2
-//						|| cluster.keyword.keyword.equals("undefined")
-//						|| cluster.keyword.keyword.equals("null")
-//						|| cluster.keyword.keyword.equals("true")
-//						|| cluster.keyword.keyword.equals("false"))
-//						&& !(cluster.keyword.keyword.equals("falsey") // Context Group 1
-//						|| cluster.keyword.keyword.equals("this"))
-//						&& !cluster.keyword.keyword.equals("test")) {
 					System.out.println(i + "\t" + cluster);
 					i++;
 				}

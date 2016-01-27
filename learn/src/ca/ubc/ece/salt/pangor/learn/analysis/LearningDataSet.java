@@ -528,7 +528,7 @@ public class LearningDataSet extends DataSet {
 		filteredData = Filter.useFilter(filteredData, removeByName);
 
 		/* Create the keyword (column) filter. */
-		String filter = "(.*_STATEMENT.*)|(.*_global_test)";
+		String filter = "(.*_global_test)";
 		for(KeywordUse keywordUse : this.columnFilters) {
 			filter += "|(" + keywordUse.type.toString();
 			filter += "_" + keywordUse.context.toString();
@@ -561,7 +561,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.01 -M 30".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.01 -M 3".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);
@@ -574,7 +574,7 @@ public class LearningDataSet extends DataSet {
 		for (Instance instance : wekaData) {
 			try {
 				Integer cluster = dbScan.clusterInstance(instance);
-				instance.setValue(8, "cluster" + cluster.toString());
+				instance.setValue(7, "cluster" + cluster.toString());
 				clusters[cluster]++;
 			} catch (Exception ignore) { }
 		}
