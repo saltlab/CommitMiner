@@ -539,14 +539,6 @@ public class LearningDataSet extends DataSet {
 		/* Filter out the statement columns. */
 		String[] removeKeywordOptions = new String[2];
 		removeKeywordOptions[0] = "-E";
-		/* Attribute filter for Context Group 0 (Statements) */
-//		removeKeywordOptions[1] = "(.*_falsey.*)|(.*_this.*)|(.*_STATEMENT_.*)|(.*_global_test)";
-		/* Attribute filter for Context Group 1 (Common Reserved Words and Operators) */
-//		removeKeywordOptions[1] = "(.*_global_test)";
-		/* Attribute filter for Context Group 2 (Reserved Words and Operators) */
-//		removeKeywordOptions[1] = "(.*_falsey.*)|(.*_this.*)|(.*_STATEMENT_.*)|(.*_global_test)";
-		/* Attribute filter for Context Group 3 (API Methods and Properties). */
-//		removeKeywordOptions[1] = "(.*typeof.*)|(.*null.*)|(.*undefined.*)|(.*falsey.*)|(.*this.*)|(.*true.*)|(.*false.*)|(.*_STATEMENT.*)|(.*_global_test)";
 		removeKeywordOptions[1] = filter;
 		RemoveByName removeKeyword = new RemoveByName();
 		/* TODO: May get "NO ATTRIBUTE" error when small." */
@@ -561,7 +553,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.01 -M 3".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.01 -M 25".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);

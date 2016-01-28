@@ -107,14 +107,11 @@ public class LearningDataSetMain {
 				/* Build the column filter (removes keyword features with
 				 * frequency > current keyword frequency). */
 				List<KeywordUse> excludedKeywords = new LinkedList<KeywordUse>();
-				System.out.println("Exclude list for " + frequency.keyword + ":" + frequency.frequency);
 				for(KeywordFrequency toExclude : metrics.changedKeywordFrequency) {
 					if(toExclude.frequency > frequency.frequency) {
-						System.out.println(toExclude.keyword);
 						excludedKeywords.add(toExclude.keyword);
 					}
 				}
-				System.out.println("-----");
 
 				/* Re-construct the data set. */
 				LearningDataSet clusteringDataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath(), Arrays.asList(clusterFilter), excludedKeywords);
