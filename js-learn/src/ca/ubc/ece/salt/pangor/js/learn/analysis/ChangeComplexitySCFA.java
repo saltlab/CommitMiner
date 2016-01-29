@@ -21,6 +21,9 @@ public class ChangeComplexitySCFA extends SourceCodeFileAnalysis {
 
 	private ChangeComplexity complexity;
 
+	/**
+	 * @param dst True if the destination file is being analyzed.
+	 */
 	public ChangeComplexitySCFA() {
 		this.complexity = null;
 	}

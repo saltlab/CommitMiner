@@ -16,6 +16,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.deri.iris.EvaluationException;
+import org.deri.iris.ProgramNotStratifiedException;
+import org.deri.iris.RuleUnsafeException;
+import org.deri.iris.api.IKnowledgeBase;
 import org.deri.iris.api.basics.IQuery;
 import org.deri.iris.api.basics.IRule;
 import org.deri.iris.api.basics.ITuple;
@@ -185,6 +189,15 @@ public class LearningDataSet extends DataSet {
 						Factory.TERM.createVariable("Keyword"),
 						Factory.TERM.createVariable("ID")))));
 
+		queries.add(
+			Factory.BASIC.createQuery(
+				Factory.BASIC.createLiteral(true,
+					Factory.BASIC.createPredicate("ModifiedStatementCount", 3),
+					Factory.BASIC.createTuple(
+						Factory.TERM.createVariable("Class"),
+						Factory.TERM.createVariable("Method"),
+						Factory.TERM.createVariable("Count")))));
+
 		return queries;
 
 	}
@@ -195,42 +208,55 @@ public class LearningDataSet extends DataSet {
 	 * the file. Otherwise, the feature vector is stored in memory in
 	 * {@code LearningDataSet}.
 	 * @param featureVector The feature vector to be managed by this class.
+	 * @throws EvaluationException
+	 * @throws RuleUnsafeException
+	 * @throws ProgramNotStratifiedException
 	 */
 	@Override
-	protected void registerAlert(Commit commit, IQuery query, IRelation results) {
+	protected void registerAlerts(Commit commit, IKnowledgeBase knowledgeBase) throws ProgramNotStratifiedException, RuleUnsafeException, EvaluationException {
 
 		Map<String, LearningFeatureVector> featureVectors = new HashMap<String, LearningFeatureVector>();
 
-		/* Iterate through the tuples that are members of the relation and add
-		 * them as alerts. */
-		for(int i = 0; i < results.size(); i++) {
+		for(IQuery query : this.queries) {
 
-			ITuple tuple = results.get(i);
+			IRelation results = knowledgeBase.execute(query);
 
-			/* Lookup or create the LearningFeatureVector. */
-			String key = commit.projectID + "_" + commit.repairedCommitID 	// Identifies the commit
-						 + "_" + tuple.get(0) + "_" + tuple.get(1); 		// Identifies the class/method
-			LearningFeatureVector featureVector = featureVectors.get(key);
+			/* Iterate through the tuples that are members of the relation and add
+			 * them as alerts. */
+			for(int i = 0; i < results.size(); i++) {
 
-			/* Add the feature vector if it is not yet in the map. */
-			if(featureVector == null) {
-				featureVector = new LearningFeatureVector(commit,
-						tuple.get(0).toString(),
-						tuple.get(1).toString());
-				featureVectors.put(key, featureVector);
-			}
+				ITuple tuple = results.get(i);
 
-			/* Add the keyword or statement change to the bag of words. */
-			if(query.toString().contains("KeywordChange")) {
-				KeywordUse ku = new KeywordUse(
-						KeywordType.valueOf(tuple.get(2).getValue().toString()),	// KeywordType
-						KeywordContext.valueOf(tuple.get(3).getValue().toString()),	// KeywordContext
-						tuple.get(6).getValue().toString(),							// Keyword
-						ChangeType.valueOf(tuple.get(5).getValue().toString()),		// ChangeType
-						tuple.get(4).getValue().toString());						// API String
-				Integer count = featureVector.keywordMap.get(ku);
-				count = count == null ? 1 : count + 1;
-				featureVector.keywordMap.put(ku, count);
+				/* Lookup or create the LearningFeatureVector. */
+				String key = commit.projectID + "_" + commit.repairedCommitID 	// Identifies the commit
+							 + "_" + tuple.get(0) + "_" + tuple.get(1); 		// Identifies the class/method
+				LearningFeatureVector featureVector = featureVectors.get(key);
+
+				/* Add the feature vector if it is not yet in the map. */
+				if(featureVector == null) {
+					featureVector = new LearningFeatureVector(commit,
+							tuple.get(0).toString(),
+							tuple.get(1).toString());
+					featureVectors.put(key, featureVector);
+				}
+
+				/* Add the keyword or statement change to the bag of words. */
+				if(query.toString().contains("KeywordChange")) {
+					KeywordUse ku = new KeywordUse(
+							KeywordType.valueOf(tuple.get(2).getValue().toString()),	// KeywordType
+							KeywordContext.valueOf(tuple.get(3).getValue().toString()),	// KeywordContext
+							tuple.get(6).getValue().toString(),							// Keyword
+							ChangeType.valueOf(tuple.get(5).getValue().toString()),		// ChangeType
+							tuple.get(4).getValue().toString());						// API String
+					Integer count = featureVector.keywordMap.get(ku);
+					count = count == null ? 1 : count + 1;
+					featureVector.keywordMap.put(ku, count);
+				}
+				/* Update the number of modified statements in the feature vector. */
+				if(query.toString().contains("ModifiedStatementCount")) {
+					featureVector.modifiedStatementCount += Integer.parseInt(tuple.get(2).getValue().toString());
+				}
+
 			}
 
 		}
@@ -333,9 +359,10 @@ public class LearningDataSet extends DataSet {
 		attributes.add(new Attribute("RepairedCommitID", (ArrayList<String>)null, 4));
 		attributes.add(new Attribute("Class", (ArrayList<String>)null, 5));
 		attributes.add(new Attribute("Method", (ArrayList<String>)null, 6));
-		attributes.add(new Attribute("Cluster", (ArrayList<String>) null, 7));
+		attributes.add(new Attribute("ModifiedStatementCount", (ArrayList<String>)null, 7));
+		attributes.add(new Attribute("Cluster", (ArrayList<String>) null, 8));
 
-		int i = 8;
+		int i = 9;
 		for(KeywordDefinition keyword : this.keywords) {
 			attributes.add(new Attribute(keyword.toString(), i));
 			i++;
@@ -512,7 +539,7 @@ public class LearningDataSet extends DataSet {
 		/* Filter out the columns we don't want. */
 		String[] removeOptions = new String[2];
 		removeOptions[0] = "-R";
-		removeOptions[1] = "1-8";
+		removeOptions[1] = "1-9";
 		Remove remove = new Remove();
 		remove.setOptions(removeOptions);
 		remove.setInputFormat(wekaData);
@@ -553,7 +580,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.01 -M 25".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.01 -M 1".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);

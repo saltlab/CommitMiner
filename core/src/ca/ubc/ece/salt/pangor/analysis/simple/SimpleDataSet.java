@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.pangor.analysis.simple;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.deri.iris.api.IKnowledgeBase;
 import org.deri.iris.api.basics.IQuery;
 import org.deri.iris.api.basics.IRule;
 import org.deri.iris.api.basics.ITuple;
@@ -25,16 +26,22 @@ public class SimpleDataSet extends DataSet {
 	}
 
 	@Override
-	public void registerAlert(Commit commit, IQuery query, IRelation results) {
+	public void registerAlerts(Commit commit, IKnowledgeBase knowledgeBase) throws Exception {
 
-		/* Iterate through the tuples that are members of the relation and
-		 * add them as alerts. */
-		for(int i = 0; i < results.size(); i++) {
+		for(IQuery query : this.queries) {
 
-			ITuple tuple = results.get(i);
+			IRelation results = knowledgeBase.execute(query);
 
-			/* Create a SimpleAlert and store it in the data set. */
-			this.alerts.add(new SimpleFeatureVector(commit, "[" + query.toString() + "](" + tuple.toString() + ")"));
+			/* Iterate through the tuples that are members of the relation and
+			 * add them as alerts. */
+			for(int i = 0; i < results.size(); i++) {
+
+				ITuple tuple = results.get(i);
+
+				/* Create a SimpleAlert and store it in the data set. */
+				this.alerts.add(new SimpleFeatureVector(commit, "[" + query.toString() + "](" + tuple.toString() + ")"));
+
+			}
 
 		}
 

@@ -43,6 +43,9 @@ public class LearningFeatureVector extends FeatureVector {
 	/** The method that was analyzed (if at or below method granularity). **/
 	public String method;
 
+	/** The number of modified statements in the feature vector. **/
+	public int modifiedStatementCount;
+
 	/** The keyword counts in each commit, class or method (depending on desired granularity). **/
 	public Map<KeywordUse, Integer> keywordMap;
 
@@ -55,6 +58,7 @@ public class LearningFeatureVector extends FeatureVector {
 		super(commit);
 		this.klass = klass;
 		this.method = method;
+		this.modifiedStatementCount = 0;
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
 	}
 
@@ -68,10 +72,12 @@ public class LearningFeatureVector extends FeatureVector {
 	 * @param method The method that the features were extracted from.
 	 * @param id The unique id for the alert.
 	 */
-	public LearningFeatureVector(Commit commit, String klass, String method, int id) {
+	public LearningFeatureVector(Commit commit, String klass, String method,
+								 int modifiedStatementCount, int id) {
 		super(commit, id);
 		this.klass = klass;
 		this.method = method;
+		this.modifiedStatementCount = modifiedStatementCount;
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
 	}
 
@@ -87,7 +93,7 @@ public class LearningFeatureVector extends FeatureVector {
 		String serialized = id + "," + this.commit.projectID
 				+ "," + this.commit.url + "/commit/" + this.commit.repairedCommitID
 				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
-				+ "," + this.klass + "," + this.method;
+				+ "," + this.klass + "," + this.method + "," + this.modifiedStatementCount;
 
 		/* Iterate through the keyword uses. */
 		for(Entry<KeywordUse, Integer> entry : this.keywordMap.entrySet()) {
@@ -130,14 +136,16 @@ public class LearningFeatureVector extends FeatureVector {
 
 		String[] features = serialized.split(",");
 
-		if(features.length < 7) throw new Exception("De-serialization exception. Serial format not recognized.");
+		if(features.length < 8) throw new Exception("De-serialization exception. Serial format not recognized.");
 
 		Commit commit = new Commit(features[1], features[2], features[3],
 								   features[4]);
 
-		LearningFeatureVector featureVector = new LearningFeatureVector(commit, features[5], features[6], Integer.parseInt(features[0]));
+		LearningFeatureVector featureVector = new LearningFeatureVector(commit,
+				features[5], features[6], Integer.parseInt(features[7]),
+				Integer.parseInt(features[0]));
 
-		for(int i = 7; i < features.length; i++) {
+		for(int i = 8; i < features.length; i++) {
 			String[] feature = features[i].split(":");
 			if(feature.length < 6) throw new Exception("De-serialization exception. Serial format not recognized.");
 			KeywordUse keyword = new KeywordUse(KeywordType.valueOf(feature[0]),
@@ -169,10 +177,11 @@ public class LearningFeatureVector extends FeatureVector {
 		instance.setValue(4, this.commit.repairedCommitID);
 		instance.setValue(5, this.klass);
 		instance.setValue(6, this.method);
-		instance.setValue(7, "?"); // assigned cluster
+		instance.setValue(7, this.modifiedStatementCount);
+		instance.setValue(8, "?"); // assigned cluster
 
 		/* Set the keyword values. */
-		int i = 8;
+		int i = 9;
 		for(KeywordDefinition keyword : keywords) {
 			if(this.keywordMap.containsKey(keyword)) {
 				instance.setValue(i, this.keywordMap.get(keyword));
@@ -196,7 +205,7 @@ public class LearningFeatureVector extends FeatureVector {
 
 		String vector = id + "," + this.commit.projectID + "," + this.commit.url + ","
 				+ this.commit.buggyCommitID + "," + this.commit.repairedCommitID
-				+ "," + this.klass + "," + this.method;
+				+ "," + this.klass + "," + this.method + this.modifiedStatementCount;
 
 		for(KeywordDefinition keyword : keywords) {
 			if(this.keywordMap.containsKey(keyword)) vector += "," + this.keywordMap.get(keyword).toString();

@@ -26,7 +26,7 @@ public class WekaMain {
 		/* Filter out the columns we don't want. */
 		String[] removeOptions = new String[2];
 		removeOptions[0] = "-R";
-		removeOptions[1] = "1-7";
+		removeOptions[1] = "1-8";
 		Remove remove = new Remove();
 		remove.setOptions(removeOptions);
 		remove.setInputFormat(data);

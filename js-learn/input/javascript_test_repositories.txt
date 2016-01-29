@@ -1,0 +1,3 @@
+https://github.com/jansmolders86/mediacenterjs.git
+https://github.com/Unitech/pm2.git
+https://github.com/prawnsalad/KiwiIRC.git

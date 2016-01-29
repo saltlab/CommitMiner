@@ -19,13 +19,13 @@ import org.deri.iris.storage.IRelation;
 public abstract class DataSet {
 
 	/** The datalog rules that will be part of each IRIS KnowledgeBase. **/
-	private List<IRule> rules;
+	protected List<IRule> rules;
 
 	/**
 	 * The datalog queries that we will use to generate the feature vectors
 	 * for this data set.
 	 */
-	private List<IQuery> queries;
+	protected List<IQuery> queries;
 
 	/**
 	 * @param rules The datalog rules that are part of the IRIS KnowledgeBase.
@@ -44,25 +44,22 @@ public abstract class DataSet {
 	 * @throws EvaluationException when there is an error in the Datalog facts,
 	 * 							   rules or queries.
 	 */
-	public void addCommitAnalysisResults(Commit commit, Map<IPredicate, IRelation> facts) throws EvaluationException {
+	public void addCommitAnalysisResults(Commit commit, Map<IPredicate, IRelation> facts) throws Exception {
 
 		/* Since we are not doing any further analysis for the commit, we can
 		 * create the knowledge base, run the queries and create the alerts. */
 		IKnowledgeBase knowledgeBase = new KnowledgeBase(facts, this.rules, new Configuration());
 
-		for(IQuery query : this.queries) {
-			IRelation result = knowledgeBase.execute(query);
-			registerAlert(commit, query, result);
-		}
+		registerAlerts(commit, knowledgeBase);
+
 
 	}
 
 	/**
 	 * A Datalog query has found a match. Register the result as an alert.
 	 * @param commit The commit that the alert was generated for.
-	 * @param query The query that matched.
-	 * @param result The set of results from the query.
+	 * @param knowledgeBase The knowledge base to query.
 	 */
-	protected abstract void registerAlert(Commit commit, IQuery query, IRelation result);
+	protected abstract void registerAlerts(Commit commit, IKnowledgeBase knowledgeBase) throws Exception;
 
 }

@@ -23,7 +23,7 @@ import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.api.TopLevelAPI;
 import ca.ubc.ece.salt.pangor.js.api.JSAPIFactory;
-import ca.ubc.ece.salt.pangor.js.learn.analysis.LearningAnalysis;
+import ca.ubc.ece.salt.pangor.js.learn.analysis.LearningDomainAnalysis;
 import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningDataSet;
 
@@ -54,7 +54,7 @@ public class TestLearningAnalysis {
 
 		/* Set up the analysis. */
 		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
-		LearningAnalysis analysis = LearningAnalysis.createLearningAnalysis(10);
+		LearningDomainAnalysis analysis = LearningDomainAnalysis.createLearningAnalysis(10);
 		domains.add(analysis);
 
 		/* Set up the commit analysis. */

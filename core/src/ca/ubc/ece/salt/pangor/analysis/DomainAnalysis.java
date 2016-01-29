@@ -17,10 +17,10 @@ import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 public class DomainAnalysis {
 
 	/** The source file analysis to use. **/
-	private SourceCodeFileAnalysis srcAnalysis;
+	protected SourceCodeFileAnalysis srcAnalysis;
 
 	/** The destination file analysis to use. **/
-	private SourceCodeFileAnalysis dstAnalysis;
+	protected SourceCodeFileAnalysis dstAnalysis;
 
 	/**
 	 * A map of file extensions to CFGFactories (used for control flow differencing).
@@ -99,9 +99,7 @@ public class DomainAnalysis {
 	 * @param dstAnalysis The analysis to run on the repaired file.
 	 */
 	protected void analyzeFile(SourceCodeFileChange sourceCodeFileChange,
-							   Map<IPredicate, IRelation> facts,
-							   SourceCodeFileAnalysis srcAnalysis,
-							   SourceCodeFileAnalysis dstAnalysis) throws Exception {
+							   Map<IPredicate, IRelation> facts) throws Exception {
 
 		/* Get the file extension. */
 		String fileExtension = getSourceCodeFileExtension(sourceCodeFileChange.buggyFile, sourceCodeFileChange.repairedFile);
@@ -150,21 +148,6 @@ public class DomainAnalysis {
 
 		}
 
-	}
-
-	/**
-	 * Performs AST-differencing and launches the analysis of the pre-commit/post-commit
-	 * source code file pair.
-	 *
-	 * @param sourceCodeFileChange The source code file change information.
-	 * @param facts Stores the facts from this analysis.
-	 * @param preProcess Set to true to enable AST pre-processing.
-	 * @param srcAnalysis The analysis to run on the buggy file.
-	 * @param dstAnalysis The analysis to run on the repaired file.
-	 */
-	protected void analyzeFile(SourceCodeFileChange sourceCodeFileChange,
-							   Map<IPredicate, IRelation> facts) throws Exception {
-		this.analyzeFile(sourceCodeFileChange, facts, null, null);
 	}
 
 	/**
