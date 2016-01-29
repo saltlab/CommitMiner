@@ -177,7 +177,7 @@ public class LearningFeatureVector extends FeatureVector {
 		instance.setValue(4, this.commit.repairedCommitID);
 		instance.setValue(5, this.klass);
 		instance.setValue(6, this.method);
-		instance.setValue(7, this.modifiedStatementCount);
+		instance.setValue(7, String.valueOf(this.modifiedStatementCount));
 		instance.setValue(8, "?"); // assigned cluster
 
 		/* Set the keyword values. */
