@@ -23,8 +23,7 @@ public class LearningDomainAnalysis extends DomainAnalysis {
 	 * @param domainAnalyses The domains to extract facts from.
 	 */
 	private LearningDomainAnalysis(SourceCodeFileAnalysis srcSCFA,
-							SourceCodeFileAnalysis dstSCFA,
-							int maxChangeComplexity) {
+							SourceCodeFileAnalysis dstSCFA) {
 		super(srcSCFA, dstSCFA, new JavaScriptCFGFactory(), false);
 	}
 
@@ -33,7 +32,7 @@ public class LearningDomainAnalysis extends DomainAnalysis {
 	 * @param maxChangeComplexity The maximum number of statements that can change in a commit.
 	 * @return an analysis for extracting facts in the learning domain.
 	 */
-	public static LearningDomainAnalysis createLearningAnalysis(int maxChangeComplexity) {
+	public static LearningDomainAnalysis createLearningAnalysis() {
 
 		List<FunctionAnalysis> srcFunctionAnalyses = new LinkedList<FunctionAnalysis>();
 		List<FunctionAnalysis> dstFunctionAnalyses = new LinkedList<FunctionAnalysis>();
@@ -44,8 +43,7 @@ public class LearningDomainAnalysis extends DomainAnalysis {
 		SourceCodeFileAnalysis srcSCFA = new ScriptAnalysis(srcFunctionAnalyses);
 		SourceCodeFileAnalysis dstSCFA = new ScriptAnalysis(dstFunctionAnalyses);
 
-		LearningDomainAnalysis analysis = new LearningDomainAnalysis(srcSCFA, dstSCFA,
-														 maxChangeComplexity);
+		LearningDomainAnalysis analysis = new LearningDomainAnalysis(srcSCFA, dstSCFA);
 
 		return analysis;
 	}

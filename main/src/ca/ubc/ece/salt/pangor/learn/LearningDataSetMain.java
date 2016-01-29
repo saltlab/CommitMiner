@@ -62,7 +62,9 @@ public class LearningDataSetMain {
 		}
 
 		/* Re-construct the data set. */
-		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath(), Arrays.asList(nofilter), null);
+		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(
+				options.getDataSetPath(), Arrays.asList(nofilter), null,
+				options.getMaxChangeComplexity());
 
 		/* Print the metrics from the data set. */
 		if(options.getPrintMetrics()) {
@@ -114,7 +116,12 @@ public class LearningDataSetMain {
 				}
 
 				/* Re-construct the data set. */
-				LearningDataSet clusteringDataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath(), Arrays.asList(clusterFilter), excludedKeywords);
+				LearningDataSet clusteringDataSet =
+						LearningDataSet.createLearningDataSet(
+								options.getDataSetPath(),
+								Arrays.asList(clusterFilter),
+								excludedKeywords,
+								options.getMaxChangeComplexity());
 
 				/* Pre-process the file. */
 				clusteringDataSet.preProcess();

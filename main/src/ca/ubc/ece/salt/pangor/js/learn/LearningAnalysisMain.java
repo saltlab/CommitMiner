@@ -56,7 +56,7 @@ public class LearningAnalysisMain {
 
 		/* Create the commit analyiss that will analyze commits. */
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath());
-		DomainAnalysis learning = LearningDomainAnalysis.createLearningAnalysis(options.getMaxChangeComplexity());
+		DomainAnalysis learning = LearningDomainAnalysis.createLearningAnalysis();
 		DomainAnalysis complexity = ChangeComplexityDomainAnalysis.createComplexityAnalysis();
 		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
 		domains.add(learning);

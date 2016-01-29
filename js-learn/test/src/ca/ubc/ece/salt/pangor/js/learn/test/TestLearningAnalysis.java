@@ -54,7 +54,7 @@ public class TestLearningAnalysis {
 
 		/* Set up the analysis. */
 		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
-		LearningDomainAnalysis analysis = LearningDomainAnalysis.createLearningAnalysis(10);
+		LearningDomainAnalysis analysis = LearningDomainAnalysis.createLearningAnalysis();
 		domains.add(analysis);
 
 		/* Set up the commit analysis. */

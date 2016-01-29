@@ -19,6 +19,9 @@ public class LearningDataSetOptions {
 	@Option(name="-c", aliases={"--clusters"}, usage="Print the clusters from the data set.")
 	private boolean printClusters = false;
 
+	@Option(name="-cc", aliases={"--complexity"}, usage="The maximum number of modified statements for a feature vector.")
+	private int maxChangeComplexity = 10;
+
 	@Option(name = "-a", aliases = { "--arff-path" }, usage = "Folder to write the ARFF files.")
 	private String arffFolder = null;
 
@@ -44,6 +47,10 @@ public class LearningDataSetOptions {
 
 	public boolean getPrintClusters() {
 		return this.printClusters;
+	}
+
+	public Integer getMaxChangeComplexity() {
+		return this.maxChangeComplexity;
 	}
 
 }

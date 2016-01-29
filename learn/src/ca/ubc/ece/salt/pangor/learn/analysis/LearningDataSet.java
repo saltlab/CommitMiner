@@ -77,6 +77,9 @@ public class LearningDataSet extends DataSet {
 	 */
 	private String dataSetPath;
 
+	/** The maximum number of modified statements for a feature vector. **/
+	private int maxModifiedStatements;
+
 	/** An ordered list of the keywords to print in the feature vector. **/
 	private Set<KeywordDefinition> keywords;
 
@@ -92,17 +95,20 @@ public class LearningDataSet extends DataSet {
 	 * set and create a data set file for Weka.
 	 * @param dataSetPath The file path to read the data set.
 	 * @param rowFilters Filters out rows by requiring keywords to be present.
+	 * @param maxModifiedStatements The maximum number of modified statements
+	 * 								for a feature vector.
 	 * @throws Exception Throws an exception when the {@code dataSetPath}
 	 * 					 cannot be read.
 	 */
 	private LearningDataSet(String dataSetPath, List<KeywordFilter> rowFilters,
-							List<KeywordUse> columnFilters, boolean x) throws Exception {
+							List<KeywordUse> columnFilters, int maxModifiedStatements) throws Exception {
 		super(null, null);
 		this.rowFilters = rowFilters;
 		this.columnFilters = columnFilters;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
 		this.dataSetPath = dataSetPath;
+		this.maxModifiedStatements = maxModifiedStatements;
 
 		/* Read the data set file and de-serialize the feature vectors. */
 		this.importDataSet(dataSetPath);
@@ -142,13 +148,16 @@ public class LearningDataSet extends DataSet {
 	 * @param rowFilters Filters out rows by requiring keywords to be present.
 	 * @param columnFilters The keywords we want to omit from the dataset
 	 * 						during clustering.
+	 * @param maxModifiedStatements The maximum number of modified statements
+	 * 								for a feature vector.
 	 * @throws Exception Throws an exception when the {@code dataSetPath}
 	 * 					 cannot be read.
 	 */
 	public static LearningDataSet createLearningDataSet(String dataSetPath,
 														List<KeywordFilter> rowFilters,
-														List<KeywordUse> columnFilters) throws Exception {
-		return new LearningDataSet(dataSetPath, rowFilters, columnFilters, false);
+														List<KeywordUse> columnFilters,
+														int maxModifiedStatements) throws Exception {
+		return new LearningDataSet(dataSetPath, rowFilters, columnFilters, maxModifiedStatements);
 	}
 
 	/**
@@ -465,7 +474,7 @@ public class LearningDataSet extends DataSet {
 		for(LearningFeatureVector featureVector : this.featureVectors) {
 
 			/* Check if the feature vector references the any of the interesting packages. */
-			if(!includeRow(featureVector.keywordMap.keySet())) {
+			if(!includeRow(featureVector.keywordMap.keySet(), featureVector.modifiedStatementCount)) {
 
 				/* Schedule this LearningFeatureVector for removal. */
 				toRemove.add(featureVector);
@@ -580,7 +589,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.01 -M 1".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.01 -M 5".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);
@@ -600,7 +609,6 @@ public class LearningDataSet extends DataSet {
 
 		return clusters;
 	}
-
 
 	/**
 	 * Print the data set to a file. The filtered data set will be in a CSV
@@ -638,9 +646,11 @@ public class LearningDataSet extends DataSet {
 
 	/**
 	 * @param keywords The keywords from a feature vector.
+	 * @param maxModifiedStatements The maximum number of modified statements.
 	 * @return True if the keyword set matches an include filter.
 	 */
-	private boolean includeRow(Set<KeywordUse> keywords) {
+	private boolean includeRow(Set<KeywordUse> keywords, int modifiedStatementCount) {
+		if(modifiedStatementCount > this.maxModifiedStatements) return false;
 		return includeRow(keywords, this.rowFilters);
 	}
 
