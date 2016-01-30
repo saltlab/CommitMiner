@@ -42,6 +42,7 @@ import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.pangor.learn.ClusterMetrics;
 import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter.FilterType;
 
 /**
@@ -535,12 +536,13 @@ public class LearningDataSet extends DataSet {
 	/**
 	 * Generates the clusters for this data set using DBScan, epsilon = 0.01 and
 	 * min = 25.
+	 * @param clusterMetrics Structure to store the clusters and their metrics.
 	 *
 	 * @return The number of instances in each cluster. The array index is the
 	 *         cluster number.
 	 * @throws Exception
 	 */
-	public int[] getWekaClusters() throws Exception {
+	public int[] getWekaClusters(ClusterMetrics clusterMetrics) throws Exception {
 
 		/* Convert the data set to a Weka-usable format. */
 		wekaData = this.getWekaDataSet();
@@ -604,6 +606,17 @@ public class LearningDataSet extends DataSet {
 				Integer cluster = dbScan.clusterInstance(instance);
 				instance.setValue(7, "cluster" + cluster.toString());
 				clusters[cluster]++;
+
+				/* Update the cluster with the set of keywords and complexity. */
+				List<String> keywords = new LinkedList<String>();
+				for(int i = 9; i < instance.numAttributes(); i++) {
+					if(instance.value(i) > 0) {
+						keywords.add(instance.attribute(i).toString()
+										+ ":" + instance.value(i));
+					}
+				}
+				clusterMetrics.addInstance(cluster, (int)instance.value(9), keywords);
+
 			} catch (Exception ignore) { }
 		}
 

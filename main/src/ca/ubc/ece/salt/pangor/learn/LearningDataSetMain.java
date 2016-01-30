@@ -130,25 +130,20 @@ public class LearningDataSetMain {
 				try {
 
 					ClusterMetrics clusterMetrics = new ClusterMetrics(frequency.keyword);
-					int[] c = clusteringDataSet.getWekaClusters();
+					clusteringDataSet.getWekaClusters(clusterMetrics);
 
-					for(int i = 0; i < c.length; i++) {
-						Cluster cluster = new Cluster(frequency.keyword, i, c[i]);
-						clusterMetrics.addCluster(cluster);
+					/* Add the clusters to the sorted list. */
+					rankedClusters.addAll(clusterMetrics.clusters.values());
 
-						/* Sorted by instances. */
-						rankedClusters.add(cluster);
+					/* Add the clustering metrics for this keyword to the sorted list. */
+					if(clusterMetrics.clusters.size() > 0 && frequency.keyword.context != KeywordContext.STATEMENT) {
+						keywordClusters.add(clusterMetrics);
 					}
 
 					/* Save arff file */
 					if (options.getArffFolder() != null)
 						clusteringDataSet.writeArffFile(options.getArffFolder(),
 								frequency.keyword.toString() + ".arff");
-
-
-					if(c.length > 0 && frequency.keyword.context != KeywordContext.STATEMENT) {
-						keywordClusters.add(clusterMetrics);
-					}
 
 				} catch (WekaException ex) {
 					logger.error("Weka error on building clusters.", ex);
