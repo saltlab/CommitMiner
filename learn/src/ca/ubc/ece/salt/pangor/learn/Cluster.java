@@ -31,6 +31,7 @@ public class Cluster {
 				   List<String> keywords) {
 		this.keyword = keyword;
 		this.cluster = cluster;
+		this.modifiedStatements = modifiedStatements;
 		this.instances = 1;
 		this.keywords = new HashMap<String, Integer>();
 
@@ -41,7 +42,7 @@ public class Cluster {
 	 * @return The average number of modified statements.
 	 */
 	public int getAverageModifiedStatements() {
-		return this.modifiedStatements / this.instances;
+		return Math.round(this.modifiedStatements / this.instances);
 	}
 
 	/**
