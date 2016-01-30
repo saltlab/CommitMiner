@@ -80,7 +80,7 @@ public class Cluster {
 
 	@Override
 	public String toString() {
-		return keyword.toString() + ": C = " + cluster + ", I = " + instances;
+		return keyword.toString() + ": C = " + cluster + ", I = " + instances + ", X = " + this.getAverageModifiedStatements();
 	}
 
 }

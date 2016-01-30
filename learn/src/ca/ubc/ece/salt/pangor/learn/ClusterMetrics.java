@@ -18,14 +18,14 @@ public class ClusterMetrics {
 	public KeywordUse keyword;
 
 	/** Stores the clusters. **/
-	public Map<Cluster, Cluster> clusters;
+	public Map<Integer, Cluster> clusters;
 
 	/** The total number of instances that were clustered. **/
 	public int totalInstances;
 
 	public ClusterMetrics(KeywordUse keyword) {
 		this.keyword = keyword;
-		this.clusters = new HashMap<Cluster, Cluster>();
+		this.clusters = new HashMap<Integer, Cluster>();
 		this.totalInstances = 0;
 	}
 
@@ -40,12 +40,11 @@ public class ClusterMetrics {
 							List<String> keywords) {
 
 		/* Get the cluster from the map. */
-		Cluster instance = new Cluster(this.keyword, clusterNumber, modifiedStatements, keywords);
-		Cluster cluster = this.clusters.get(instance);
+		Cluster cluster = this.clusters.get(clusterNumber);
 
 		if(cluster == null) {
 			/* First instance for cluster. */
-			cluster = instance;
+			cluster = new Cluster(this.keyword, clusterNumber, modifiedStatements, keywords);
 		}
 		else {
 			/* Update the cluster metrics. */
@@ -56,6 +55,8 @@ public class ClusterMetrics {
 				cluster.keywords.put(modified, f);
 			}
 		}
+
+		this.clusters.put(clusterNumber, cluster);
 
 	}
 

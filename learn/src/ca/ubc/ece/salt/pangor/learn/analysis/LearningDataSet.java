@@ -369,8 +369,8 @@ public class LearningDataSet extends DataSet {
 		attributes.add(new Attribute("RepairedCommitID", (ArrayList<String>)null, 4));
 		attributes.add(new Attribute("Class", (ArrayList<String>)null, 5));
 		attributes.add(new Attribute("Method", (ArrayList<String>)null, 6));
-		attributes.add(new Attribute("ModifiedStatementCount", (ArrayList<String>)null, 7));
-		attributes.add(new Attribute("Cluster", (ArrayList<String>) null, 8));
+		attributes.add(new Attribute("Cluster", (ArrayList<String>) null, 7));
+		attributes.add(new Attribute("ModifiedStatementCount", 8));
 
 		int i = 9;
 		for(KeywordDefinition keyword : this.keywords) {
@@ -391,7 +391,7 @@ public class LearningDataSet extends DataSet {
 
 		String header = String.join(",", "ID", "ProjectID", "CommitURL",
 				"BuggyCommitID", "RepairedCommitID",
-				"Class", "Method");
+				"Class", "Method", "ModifiedStatements");
 
 		for(KeywordDefinition keyword : this.keywords) {
 			header += "," + keyword.toString();
@@ -542,7 +542,7 @@ public class LearningDataSet extends DataSet {
 	 *         cluster number.
 	 * @throws Exception
 	 */
-	public int[] getWekaClusters(ClusterMetrics clusterMetrics) throws Exception {
+	public void getWekaClusters(ClusterMetrics clusterMetrics) throws Exception {
 
 		/* Convert the data set to a Weka-usable format. */
 		wekaData = this.getWekaDataSet();
@@ -550,7 +550,7 @@ public class LearningDataSet extends DataSet {
 		/* Filter out the columns we don't want. */
 		String[] removeOptions = new String[2];
 		removeOptions[0] = "-R";
-		removeOptions[1] = "1-9";
+		removeOptions[1] = "1-8";
 		Remove remove = new Remove();
 		remove.setOptions(removeOptions);
 		remove.setInputFormat(wekaData);
@@ -596,31 +596,26 @@ public class LearningDataSet extends DataSet {
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);
 
-		/* Initialize the array for storing cluster metrics. */
-		int[] clusters = new int[dbScan.numberOfClusters()];
-		for(int i = 0; i < clusters.length; i++) clusters[i] = 0;
-
 		/* Compute the metrics for the clustering. */
 		for (Instance instance : wekaData) {
 			try {
 				Integer cluster = dbScan.clusterInstance(instance);
 				instance.setValue(7, "cluster" + cluster.toString());
-				clusters[cluster]++;
 
 				/* Update the cluster with the set of keywords and complexity. */
 				List<String> keywords = new LinkedList<String>();
 				for(int i = 9; i < instance.numAttributes(); i++) {
 					if(instance.value(i) > 0) {
-						keywords.add(instance.attribute(i).toString()
-										+ ":" + instance.value(i));
+						keywords.add(instance.attribute(i).name()
+										+ ":" + (int)instance.value(i));
 					}
 				}
-				clusterMetrics.addInstance(cluster, (int)instance.value(9), keywords);
+				clusterMetrics.addInstance(cluster, (int)instance.value(8), keywords);
 
-			} catch (Exception ignore) { }
+			} catch (Exception ignore) { } // Instance is not part of any cluster
+
 		}
 
-		return clusters;
 	}
 
 	/**
