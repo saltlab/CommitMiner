@@ -38,7 +38,7 @@ public class TestSimpleAnalysis {
 	public void test() throws Exception {
 
 		/* Set up a dummy commit. */
-		Commit commit = new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1");
+		Commit commit = new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1", true);
 
 		/* Add a source code file change. */
 		String buggyFile = "/Users/qhanam/Documents/workspace_commitminer/pangor/core/test/input/java-source/User.java";

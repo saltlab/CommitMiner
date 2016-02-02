@@ -73,7 +73,7 @@ public class TestAnalysis extends TestCase {
 	 * @return A dummy commit for testing.
 	 */
 	public static Commit getCommit() {
-		return new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1");
+		return new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1", true);
 	}
 
 	/**

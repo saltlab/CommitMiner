@@ -26,6 +26,9 @@ public class LearningAnalysisOptions {
 	@Option(name = "-tr", aliases = { "--threads" }, usage = "The number of threads to be used.")
 	private Integer nThreads = 6;
 
+	@Option(name = "-rx", aliases = { "--regex" }, usage = "The regular expression to match to the commit message.")
+	private String regex = null;
+
 	public Integer getNThreads() {
 		return this.nThreads;
 	}
@@ -52,6 +55,10 @@ public class LearningAnalysisOptions {
 
 	public String getSupplementaryFolder() {
 		return this.supplement;
+	}
+
+	public String getRegex() {
+		return this.regex;
 	}
 
 }

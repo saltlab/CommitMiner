@@ -90,7 +90,7 @@ public class LearningFeatureVector extends FeatureVector {
 	 */
 	public String serialize() {
 
-		String serialized = id + "," + this.commit.projectID
+		String serialized = id + "," + this.commit.projectID + "," + this.commit.bugFixingCommit
 				+ "," + this.commit.url + "/commit/" + this.commit.repairedCommitID
 				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
 				+ "," + this.klass + "," + this.method + "," + this.modifiedStatementCount;
@@ -138,14 +138,14 @@ public class LearningFeatureVector extends FeatureVector {
 
 		if(features.length < 8) throw new Exception("De-serialization exception. Serial format not recognized.");
 
-		Commit commit = new Commit(features[1], features[2], features[3],
-								   features[4]);
+		Commit commit = new Commit(features[1], features[3], features[4],
+								   features[5], Boolean.parseBoolean(features[2]));
 
 		LearningFeatureVector featureVector = new LearningFeatureVector(commit,
-				features[5], features[6], Integer.parseInt(features[7]),
+				features[6], features[7], Integer.parseInt(features[8]),
 				Integer.parseInt(features[0]));
 
-		for(int i = 8; i < features.length; i++) {
+		for(int i = 9; i < features.length; i++) {
 			String[] feature = features[i].split(":");
 			if(feature.length < 6) throw new Exception("De-serialization exception. Serial format not recognized.");
 			KeywordUse keyword = new KeywordUse(KeywordType.valueOf(feature[0]),
@@ -171,17 +171,18 @@ public class LearningFeatureVector extends FeatureVector {
 
 		/* Set the meta info for the instance. */
 		instance.setValue(0, this.id);
-		instance.setValue(1, this.commit.projectID);
-		instance.setValue(2, this.commit.url);
-		instance.setValue(3, this.commit.buggyCommitID);
-		instance.setValue(4, this.commit.repairedCommitID);
-		instance.setValue(5, this.klass);
-		instance.setValue(6, this.method);
-		instance.setValue(7, "?"); // assigned cluster
-		instance.setValue(8, this.modifiedStatementCount);
+		instance.setValue(1, this.commit.bugFixingCommit.toString());
+		instance.setValue(2, this.commit.projectID);
+		instance.setValue(3, this.commit.url);
+		instance.setValue(4, this.commit.buggyCommitID);
+		instance.setValue(5, this.commit.repairedCommitID);
+		instance.setValue(6, this.klass);
+		instance.setValue(7, this.method);
+		instance.setValue(8, "?"); // assigned cluster
+		instance.setValue(9, this.modifiedStatementCount);
 
 		/* Set the keyword values. */
-		int i = 9;
+		int i = 10;
 		for(KeywordDefinition keyword : keywords) {
 			if(this.keywordMap.containsKey(keyword)) {
 				instance.setValue(i, this.keywordMap.get(keyword));
@@ -203,8 +204,9 @@ public class LearningFeatureVector extends FeatureVector {
 	 */
 	public String getFeatureVector(Set<KeywordDefinition> keywords) {
 
-		String vector = id + "," + this.commit.projectID + "," + this.commit.url + ","
-				+ this.commit.buggyCommitID + "," + this.commit.repairedCommitID
+		String vector = id + "," + this.commit.projectID + "," + this.commit.url
+				+ "," + this.commit.bugFixingCommit
+				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
 				+ "," + this.klass + "," + this.method + this.modifiedStatementCount;
 
 		for(KeywordDefinition keyword : keywords) {

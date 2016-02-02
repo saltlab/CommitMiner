@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.CloneCommand;
@@ -60,24 +60,25 @@ public class GitProject {
 	/** The total number of commits inspected. **/
 	protected Integer totalCommits;
 
-	/** The number of commit authors (uniquely identified by their emails) */
+	/** The number of commit authors (uniquely identified by their emails) **/
 	protected Integer numberAuthors;
 
-	/** The number of javascript files */
+	/** The number of javascript files **/
 	protected Integer numberOfFiles;
 
-	/** The number of javascript lines of code */
+	/** The number of javascript lines of code **/
 	protected Integer numberOfLines;
 
-	/** The number of downloads over the last month */
+	/** The number of downloads over the last month **/
 	protected Integer downloadsLastMonth = -1;
 
-	/** The number of stargazers on GitHub */
+	/** The number of stargazers on GitHub **/
 	protected Integer stargazers = -1;
 
-	/** Dates of last (most recent) and first commit */
+	/** Dates of last (most recent) and first commit **/
 	protected Date lastCommitDate, firstCommitDate;
 
+	/** The regex which identifies bug fixing commits. **/
 	protected String commitMessageRegex;
 
 	/**
@@ -248,8 +249,8 @@ public class GitProject {
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	protected List<Pair<String, String>> getBugFixingCommitPairs() {
-		List<Pair<String, String>> bugFixingCommits = new LinkedList<Pair<String, String>>();
+	protected List<Triple<String, String, Boolean>> getBugFixingCommitPairs() {
+		List<Triple<String, String, Boolean>> bugFixingCommits = new LinkedList<Triple<String, String, Boolean>>();
 		int bugFixingCommitCounter = 0, commitCounter = 0;
 
 		Set<String> authorsEmails = new HashSet<>();
@@ -282,15 +283,11 @@ public class GitProject {
 			commitCounter++;
 
 			/*
-			 * If the commit message contains one of our fix keywords, store it.
+			 * If the commit message contains one of our fix keywords, label it as a bug fixing commit.
 			 */
-			if (m.find()) {
-
-				if(commit.getParentCount()  > 0) {
-					bugFixingCommits.add(Pair.of(commit.getParent(0).name(), commit.name()));
-					bugFixingCommitCounter++;
-				}
-
+			if(commit.getParentCount()  > 0) {
+				bugFixingCommits.add(Triple.of(commit.getParent(0).name(), commit.name(), m.find()));
+				bugFixingCommitCounter++;
 			}
 
 			/*

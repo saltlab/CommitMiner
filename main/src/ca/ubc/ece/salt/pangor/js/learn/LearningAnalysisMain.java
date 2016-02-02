@@ -70,7 +70,7 @@ public class LearningAnalysisMain {
 
 			try {
                 gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(),
-                		CHECKOUT_DIR, /*"fix|repair"*/".*", commitAnalysis);
+                		CHECKOUT_DIR, options.getRegex(), commitAnalysis);
 				gitProjectAnalysis.analyze();
 
 			} catch (Exception e) {
@@ -116,7 +116,7 @@ public class LearningAnalysisMain {
 				try {
 					/* Build git repository object */
 					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri,
-							LearningAnalysisMain.CHECKOUT_DIR, /*"fix|repair"*/".*", commitAnalysis);
+							LearningAnalysisMain.CHECKOUT_DIR, options.getRegex(), commitAnalysis);
 
 					/* Perform the analysis (this may take some time) */
 					executor.submit(new GitProjectAnalysisTask(gitProjectAnalysis, latch));

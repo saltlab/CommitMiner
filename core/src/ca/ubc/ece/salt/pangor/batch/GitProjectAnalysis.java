@@ -3,7 +3,7 @@ package ca.ubc.ece.salt.pangor.batch;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.eclipse.jgit.api.DiffCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
@@ -53,14 +53,14 @@ public class GitProjectAnalysis extends GitProject {
 		logger.info("[START ANALYSIS] {}", this.getURI());
 
 		/* Get the list of bug fixing commits from version history. */
-		List<Pair<String, String>> bugFixingCommits = this.getBugFixingCommitPairs();
+		List<Triple<String, String, Boolean>> bugFixingCommits = this.getBugFixingCommitPairs();
 
 		logger.info(" [ANALYZING] {} bug fixing commits", bugFixingCommits.size());
 
 		/* Analyze the changes made in each bug fixing commit. */
-		for(Pair<String, String> bugFixingCommit : bugFixingCommits) {
+		for(Triple<String, String, Boolean> bugFixingCommit : bugFixingCommits) {
 
-			this.analyzeDiff(bugFixingCommit.getLeft(), bugFixingCommit.getRight());
+			this.analyzeDiff(bugFixingCommit.getLeft(), bugFixingCommit.getMiddle(), bugFixingCommit.getRight());
 		}
 
 		long endTime = System.currentTimeMillis();
@@ -73,10 +73,12 @@ public class GitProjectAnalysis extends GitProject {
 	 *
 	 * @param buggyRevision The hash that identifies the buggy revision.
 	 * @param bugFixingRevision The hash that identifies the fixed revision.
+	 * @param bugFixingCommit True if the commit is labeled as a bug fixing
+	 * 		  commit (from NLP).
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	private void analyzeDiff(String buggyRevision, String bugFixingRevision) throws IOException, GitAPIException, Exception {
+	private void analyzeDiff(String buggyRevision, String bugFixingRevision, Boolean bugFixingCommit) throws IOException, GitAPIException, Exception {
 
 		ObjectId buggy = this.repository.resolve(buggyRevision + "^{tree}");
 		ObjectId repaired = this.repository.resolve(bugFixingRevision + "^{tree}");
@@ -97,7 +99,8 @@ public class GitProjectAnalysis extends GitProject {
 		Commit commit = new Commit(
 				this.projectID,
 				this.projectHomepage,
-				buggyRevision, bugFixingRevision);
+				buggyRevision, bugFixingRevision,
+				bugFixingCommit);
 
 		/* Iterate through the modified files and add them as
 		 * {@code SourceCodeFileChange}s in the commit. */

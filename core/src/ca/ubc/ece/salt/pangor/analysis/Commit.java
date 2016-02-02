@@ -26,6 +26,9 @@ public class Commit {
 	/** The ID for the current commit. **/
 	public String repairedCommitID;
 
+	/** True if this commit is a bug fixing commit. **/
+	public Boolean bugFixingCommit;
+
 	/** The list of source code file changes that occur in this commit. */
 	public List<SourceCodeFileChange> sourceCodeFileChanges;
 
@@ -36,12 +39,14 @@ public class Commit {
 	 * @param repairedCommitID The ID for the current commit.
 	 */
 	public Commit(String projectID, String projectHomepage,
-				  String buggyCommitID, String repairedCommitID) {
+				  String buggyCommitID, String repairedCommitID,
+				  Boolean bugFixingCommit) {
 
 		this.projectID = projectID;
 		this.url = projectHomepage;
 		this.buggyCommitID = buggyCommitID;
 		this.repairedCommitID = repairedCommitID;
+		this.bugFixingCommit = bugFixingCommit;
 
 		this.sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
 
