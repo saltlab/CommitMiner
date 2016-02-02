@@ -105,7 +105,7 @@ public class TestChangeComplexity {
 		String src = "./test/input/special_type_handling/Common_old.js";
 		String dst = "./test/input/special_type_handling/Common_new.js";
 
-		this.runTest(src, dst, 9, 12, 2, true);
+		this.runTest(src, dst, 7, 10, 2, true);
 
 	}
 
@@ -115,7 +115,14 @@ public class TestChangeComplexity {
 		String dst = "./test/input/complexity/grunt_new.js";
 
 		this.runTest(src, dst, 1, 0, 0, true);
+	}
 
+	@Test
+	public void testMediaCenterJS() throws Exception {
+		String src = "./test/input/complexity/plugin-functions_old.js";
+		String dst = "./test/input/complexity/plugin-functions_new.js";
+
+		this.runTest(src, dst, 0, 2, 0, true);
 	}
 
 
