@@ -95,8 +95,8 @@ public class ChangeComplexityDomainAnalysis extends DomainAnalysis {
 	 */
 	public static ChangeComplexityDomainAnalysis createComplexityAnalysis() {
 
-		ChangeComplexitySCFA srcSCFA = new ChangeComplexitySCFA();
-		ChangeComplexitySCFA dstSCFA = new ChangeComplexitySCFA();
+		ChangeComplexitySCFA srcSCFA = new ChangeComplexitySCFA(false);
+		ChangeComplexitySCFA dstSCFA = new ChangeComplexitySCFA(true);
 
 		ChangeComplexityDomainAnalysis analysis = new ChangeComplexityDomainAnalysis(srcSCFA, dstSCFA);
 

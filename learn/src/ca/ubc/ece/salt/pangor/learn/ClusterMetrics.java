@@ -58,12 +58,16 @@ public class ClusterMetrics {
 
 		this.clusters.put(clusterNumber, cluster);
 
+		/* Increment the total number of instances clustered. */
+		this.totalInstances++;
+
 	}
 
 	/**
 	 * @return The total number of instances in all clusters.
 	 */
 	public int getTotalInstances() {
+
 		return this.totalInstances;
 	}
 
@@ -92,6 +96,17 @@ public class ClusterMetrics {
 	 */
 	public int getClusterCount() {
 		return this.clusters.size();
+	}
+
+	/**
+	 * @return The average complexity of each cluster.
+	 */
+	public int getAverageComplexity() {
+		int complexity = 0;
+		for(Cluster cluster : this.clusters.values()) {
+			complexity += cluster.getAverageModifiedStatements();
+		}
+		return Math.round(complexity / this.clusters.size());
 	}
 
 	/**
@@ -126,12 +141,12 @@ public class ClusterMetrics {
 		table += "\t\\caption{Clustering and Inspection Results}\n";
 		table += "\t\\label{tbl:clusteringResults}\n";
 		table += "{\\scriptsize\n";
-		table += "\t\\begin{tabular}{ | l | r | r | r | r | r | r | }\n";
+		table += "\t\\begin{tabular}{ | l | r | r | r | r | r | }\n";
 		table += "\t\t\\hline\n";
-		table += "\t\t\\textbf{Keyword} & \\textbf{TotC} & \\textbf{Clusters} & \\textbf{AvgI} & \\textbf{MdnI. Size} & \\textbf{BG} & \\textbf{RG} \\\\ \\hline\n";
+		table += "\t\t\\textbf{Keyword} & \\textbf{Clusters} & \\textbf{Tot Intances (I)}  & \\textbf{Avg I} & \\textbf{Mdn I} & \\textbf{Avg Complex.} \\\\ \\hline\n";
 
 		for(ClusterMetrics metric : metrics) {
-			table += "\t\t" + metric.keyword + " & " + metric.totalInstances + " & " + metric.clusters.size() + " & " + Math.round(metric.getAverageInsances()) + " & " + metric.getMedianInstances() + " & & \\\\\n";
+			table += "\t\t" + metric.keyword + " & " + metric.clusters.size() + " & " + metric.totalInstances + " & " + Math.round(metric.getAverageInsances()) + " & " + metric.getMedianInstances() + " & " + metric.getAverageComplexity() + "\\\\\n";
 		}
 
 		table += "\t\t\\hline\n";

@@ -21,11 +21,14 @@ public class ChangeComplexitySCFA extends SourceCodeFileAnalysis {
 
 	private ChangeComplexity complexity;
 
+	private boolean dst;
+
 	/**
 	 * @param dst True if the destination file is being analyzed.
 	 */
-	public ChangeComplexitySCFA() {
+	public ChangeComplexitySCFA(boolean dst) {
 		this.complexity = null;
+		this.dst = dst;
 	}
 
 	/**
@@ -40,7 +43,7 @@ public class ChangeComplexitySCFA extends SourceCodeFileAnalysis {
 			Map<IPredicate, IRelation> facts, ClassifiedASTNode root,
 			List<CFG> cfgs) throws Exception {
 
-		this.complexity = ChangeComplexityVisitor.getChangeComplexity((AstRoot)root);
+		this.complexity = ChangeComplexityVisitor.getChangeComplexity((AstRoot)root, this.dst);
 
 	}
 

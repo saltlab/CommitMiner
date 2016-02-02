@@ -42,12 +42,12 @@ public class TestChangeComplexity {
 		CFDContext context = cfd.getContext();
 
 		/* Analyze the file. */
-		ChangeComplexitySCFA srcAnalysis = new ChangeComplexitySCFA();
+		ChangeComplexitySCFA srcAnalysis = new ChangeComplexitySCFA(false);
 		srcAnalysis.analyze(sourceCodeFileChange,
 						 new HashMap<IPredicate, IRelation>(),
 						 context.srcScript, null);
 
-		ChangeComplexitySCFA dstAnalysis = new ChangeComplexitySCFA();
+		ChangeComplexitySCFA dstAnalysis = new ChangeComplexitySCFA(true);
 		dstAnalysis.analyze(sourceCodeFileChange,
 						 new HashMap<IPredicate, IRelation>(),
 						 context.dstScript, null);
@@ -105,9 +105,19 @@ public class TestChangeComplexity {
 		String src = "./test/input/special_type_handling/Common_old.js";
 		String dst = "./test/input/special_type_handling/Common_new.js";
 
-		this.runTest(src, dst, 7, 9, 3, true);
+		this.runTest(src, dst, 9, 12, 2, true);
 
 	}
+
+	@Test
+	public void testGruntUpdated() throws Exception {
+		String src = "./test/input/complexity/grunt_old.js";
+		String dst = "./test/input/complexity/grunt_new.js";
+
+		this.runTest(src, dst, 1, 0, 0, true);
+
+	}
+
 
 	/**
 	 * @return A dummy source code file change for testing.
