@@ -364,13 +364,14 @@ public class LearningDataSet extends DataSet {
 
 		attributes.add(new Attribute("ID", 0));
 		attributes.add(new Attribute("ProjectID", (ArrayList<String>)null, 1));
-		attributes.add(new Attribute("CommitURL", (ArrayList<String>)null, 2));
-		attributes.add(new Attribute("BuggyCommitID", (ArrayList<String>)null, 3));
-		attributes.add(new Attribute("RepairedCommitID", (ArrayList<String>)null, 4));
-		attributes.add(new Attribute("Class", (ArrayList<String>)null, 5));
-		attributes.add(new Attribute("Method", (ArrayList<String>)null, 6));
-		attributes.add(new Attribute("Cluster", (ArrayList<String>) null, 7));
-		attributes.add(new Attribute("ModifiedStatementCount", 8));
+		attributes.add(new Attribute("BugFixingCommit", (ArrayList<String>)null, 2));
+		attributes.add(new Attribute("CommitURL", (ArrayList<String>)null, 3));
+		attributes.add(new Attribute("BuggyCommitID", (ArrayList<String>)null, 4));
+		attributes.add(new Attribute("RepairedCommitID", (ArrayList<String>)null, 5));
+		attributes.add(new Attribute("Class", (ArrayList<String>)null, 6));
+		attributes.add(new Attribute("Method", (ArrayList<String>)null, 7));
+		attributes.add(new Attribute("Cluster", (ArrayList<String>) null, 8));
+		attributes.add(new Attribute("ModifiedStatementCount", 9));
 
 		int i = 9;
 		for(KeywordDefinition keyword : this.keywords) {
@@ -550,7 +551,7 @@ public class LearningDataSet extends DataSet {
 		/* Filter out the columns we don't want. */
 		String[] removeOptions = new String[2];
 		removeOptions[0] = "-R";
-		removeOptions[1] = "1-8";
+		removeOptions[1] = "1-9";
 		Remove remove = new Remove();
 		remove.setOptions(removeOptions);
 		remove.setInputFormat(wekaData);
@@ -591,7 +592,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.01 -M 5".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.10 -M 3".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);
@@ -604,7 +605,7 @@ public class LearningDataSet extends DataSet {
 
 				/* Update the cluster with the set of keywords and complexity. */
 				List<String> keywords = new LinkedList<String>();
-				for(int i = 9; i < instance.numAttributes(); i++) {
+				for(int i = 10; i < instance.numAttributes(); i++) {
 					if(instance.value(i) > 0) {
 						keywords.add(instance.attribute(i).name()
 										+ ":" + (int)instance.value(i));

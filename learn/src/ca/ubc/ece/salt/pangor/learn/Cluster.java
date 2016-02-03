@@ -62,7 +62,7 @@ public class Cluster {
 				modified += entry.getKey() + ",";
 			}
 		}
-		return modified.substring(0, modified.length() - 2) + "}";
+		return modified.substring(0, modified.length() - 1) + "}";
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class Cluster {
 
 	@Override
 	public String toString() {
-		return keyword.toString() + ": C = " + cluster + ", I = " + instances + ", X = " + this.getAverageModifiedStatements();
+		return this.getModifiedKeywords() + ": C = " + cluster + ", I = " + instances + ", X = " + this.getAverageModifiedStatements();
 	}
 
 }
