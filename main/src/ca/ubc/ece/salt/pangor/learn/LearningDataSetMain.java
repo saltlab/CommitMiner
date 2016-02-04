@@ -97,66 +97,45 @@ public class LearningDataSetMain {
 				}
 			});
 
-			LearningMetrics metrics = dataSet.getMetrics();
+			/* Add a filter that includes all rows. */
+			List<KeywordFilter> rowFilters = new LinkedList<KeywordFilter>();
+			rowFilters.add(new KeywordFilter());
 
-			for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
+			/* Re-construct the data set. */
+			LearningDataSet clusteringDataSet =
+					LearningDataSet.createLearningDataSet(
+							options.getDataSetPath(),
+							rowFilters,
+							new LinkedList<KeywordUse>(), // columnFilters
+							options.getMaxChangeComplexity());
 
-				/* Build the row filter. */
-				KeywordFilter clusterFilter = new KeywordFilter(FilterType.INCLUDE,
-						frequency.keyword.type, frequency.keyword.context, frequency.keyword.changeType,
-						frequency.keyword.apiPackage, frequency.keyword.keyword);
+			/* Pre-process the file. */
+			clusteringDataSet.preProcess();
 
-				/* Build the column filter (removes keyword features with
-				 * frequency > current keyword frequency). */
-				List<KeywordUse> excludedKeywords = new LinkedList<KeywordUse>();
-				for(KeywordFrequency toExclude : metrics.changedKeywordFrequency) {
-					if(toExclude.frequency > frequency.frequency) {
-						excludedKeywords.add(toExclude.keyword);
-					}
-				}
+			/* Get the clusters. */
+			try {
 
-				/* Re-construct the data set. */
-				LearningDataSet clusteringDataSet =
-						LearningDataSet.createLearningDataSet(
-								options.getDataSetPath(),
-								Arrays.asList(clusterFilter),
-								excludedKeywords,
-								options.getMaxChangeComplexity());
+				ClusterMetrics clusterMetrics = new ClusterMetrics();
+				clusteringDataSet.getWekaClusters(clusterMetrics);
 
-				/* Pre-process the file. */
-				clusteringDataSet.preProcess();
+				/* Add the clusters to the sorted list. */
+				rankedClusters.addAll(clusterMetrics.clusters.values());
 
-				/* Get the clusters. */
-				try {
+				/* Save arff file */
+				if (options.getArffFolder() != null)
+					clusteringDataSet.writeArffFile(options.getArffFolder(), "ALL_KEYWORDS.arff");
 
-					ClusterMetrics clusterMetrics = new ClusterMetrics(frequency.keyword);
-					clusteringDataSet.getWekaClusters(clusterMetrics);
+				/* We only have one ClusterMetrics now. */
+				keywordClusters.add(clusterMetrics);
 
-					/* Add the clusters to the sorted list. */
-					rankedClusters.addAll(clusterMetrics.clusters.values());
-
-					/* Add the clustering metrics for this keyword to the sorted list. */
-					if(clusterMetrics.clusters.size() > 0 && frequency.keyword.context != KeywordContext.STATEMENT) {
-						keywordClusters.add(clusterMetrics);
-					}
-
-					/* Save arff file */
-					if (options.getArffFolder() != null)
-						clusteringDataSet.writeArffFile(options.getArffFolder(),
-								frequency.keyword.toString() + ".arff");
-
-				} catch (WekaException ex) {
-					logger.error("Weka error on building clusters.", ex);
-				}
-
+			} catch (WekaException ex) {
+				logger.error("Weka error on building clusters.", ex);
 			}
 
 			int i = 0;
 			for(Cluster cluster : rankedClusters) {
-				if(cluster.keyword.context != KeywordContext.STATEMENT) {
-					System.out.println(i + "\t" + cluster);
-					i++;
-				}
+				System.out.println(i + "\t" + cluster);
+				i++;
 			}
 
 			System.out.println(ClusterMetrics.getLatexTable(keywordClusters));

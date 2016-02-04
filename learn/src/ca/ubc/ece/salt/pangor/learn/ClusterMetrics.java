@@ -7,15 +7,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import ca.ubc.ece.salt.pangor.api.KeywordUse;
-
 /**
  * Stores the metrics for the clusters of one keyword.
  */
 public class ClusterMetrics {
-
-	/** The keyword which produced these clusters. **/
-	public KeywordUse keyword;
 
 	/** Stores the clusters. **/
 	public Map<Integer, Cluster> clusters;
@@ -23,8 +18,7 @@ public class ClusterMetrics {
 	/** The total number of instances that were clustered. **/
 	public int totalInstances;
 
-	public ClusterMetrics(KeywordUse keyword) {
-		this.keyword = keyword;
+	public ClusterMetrics() {
 		this.clusters = new HashMap<Integer, Cluster>();
 		this.totalInstances = 0;
 	}
@@ -44,7 +38,7 @@ public class ClusterMetrics {
 
 		if(cluster == null) {
 			/* First instance for cluster. */
-			cluster = new Cluster(this.keyword, clusterNumber, modifiedStatements, keywords);
+			cluster = new Cluster(clusterNumber, modifiedStatements, keywords);
 		}
 		else {
 			/* Update the cluster metrics. */
@@ -146,7 +140,7 @@ public class ClusterMetrics {
 		table += "\t\t\\textbf{Keyword} & \\textbf{Clusters} & \\textbf{Tot Intances (I)}  & \\textbf{Avg I} & \\textbf{Mdn I} & \\textbf{Avg Complex.} \\\\ \\hline\n";
 
 		for(ClusterMetrics metric : metrics) {
-			table += "\t\t" + metric.keyword + " & " + metric.clusters.size() + " & " + metric.totalInstances + " & " + Math.round(metric.getAverageInsances()) + " & " + metric.getMedianInstances() + " & " + metric.getAverageComplexity() + "\\\\\n";
+			table += "\t\t" + "ALL_KEYWORDS" + " & " + metric.clusters.size() + " & " + metric.totalInstances + " & " + Math.round(metric.getAverageInsances()) + " & " + metric.getMedianInstances() + " & " + metric.getAverageComplexity() + "\\\\\n";
 		}
 
 		table += "\t\t\\hline\n";
@@ -158,7 +152,7 @@ public class ClusterMetrics {
 
 	@Override
 	public String toString() {
-		return keyword.toString() + ": C = " + clusters + ", I = " + totalInstances + ", AVGI = " + this.getAverageInsances() + ", MDNI = " + this.getMedianInstances();
+		return "C = " + clusters + ", I = " + totalInstances + ", AVGI = " + this.getAverageInsances() + ", MDNI = " + this.getMedianInstances();
 	}
 
 }

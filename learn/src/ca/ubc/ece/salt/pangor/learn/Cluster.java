@@ -5,15 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import ca.ubc.ece.salt.pangor.api.KeywordUse;
-
 /**
  * Stores meta data for a cluster. Used to summarize clustering results.
  */
 public class Cluster {
-
-	/** The keyword the cluster was produced for. **/
-	public KeywordUse keyword;
 
 	/** The cluster number. **/
 	public int cluster;
@@ -27,9 +22,7 @@ public class Cluster {
 	/** Tracks how frequently which keywords are modified in the cluster. */
 	public Map<String, Integer> keywords;
 
-	public Cluster(KeywordUse keyword, int cluster, int modifiedStatements,
-				   List<String> keywords) {
-		this.keyword = keyword;
+	public Cluster(int cluster, int modifiedStatements, List<String> keywords) {
 		this.cluster = cluster;
 		this.modifiedStatements = modifiedStatements;
 		this.instances = 1;
@@ -49,7 +42,7 @@ public class Cluster {
 	 * @return The unique ID for the cluster.
 	 */
 	public String getClusterID() {
-		return this.keyword.toString() + ":" + this.cluster;
+		return String.valueOf(this.cluster);
 	}
 
 	/**
@@ -69,14 +62,14 @@ public class Cluster {
 	public boolean equals(Object o) {
 		if(o instanceof Cluster) {
 			Cluster c = (Cluster) o;
-			if(this.keyword.equals(c.keyword) && this.cluster == c.cluster) return true;
+			if(this.cluster == c.cluster) return true;
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return (keyword.toString() + "_" + cluster).hashCode();
+		return Integer.hashCode(this.cluster);
 	}
 
 	@Override

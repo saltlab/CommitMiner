@@ -179,7 +179,7 @@ public class LearningFeatureVector extends FeatureVector {
 		instance.setValue(6, this.klass);
 		instance.setValue(7, this.method);
 		instance.setValue(8, "?"); // assigned cluster
-		instance.setValue(9, this.modifiedStatementCount);
+		instance.setValue(9, this.modifiedStatementCount * 0.05); // Weight the statement count
 
 		/* Set the keyword values. */
 		int i = 10;

@@ -587,12 +587,13 @@ public class LearningDataSet extends DataSet {
 
 		/* Set up the distance function. We want Manhattan Distance. */
 		ManhattanDistance distanceFunction = new ManhattanDistance();
-		String[] distanceFunctionOptions = "-R first-last".split("\\s");
+		// -R specifies list of column to use, -D turns off normalization of attribute values
+		String[] distanceFunctionOptions = "-R first-last -D".split("\\s");
 		distanceFunction.setOptions(distanceFunctionOptions);
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.10 -M 3".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.20 -M 3".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);

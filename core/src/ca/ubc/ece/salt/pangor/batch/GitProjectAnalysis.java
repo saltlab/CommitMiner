@@ -60,7 +60,11 @@ public class GitProjectAnalysis extends GitProject {
 		/* Analyze the changes made in each bug fixing commit. */
 		for(Triple<String, String, Boolean> bugFixingCommit : bugFixingCommits) {
 
+			try {
 			this.analyzeDiff(bugFixingCommit.getLeft(), bugFixingCommit.getMiddle(), bugFixingCommit.getRight());
+			} catch (Exception e) {
+				logger.error("[ERROR] {} ", e.getMessage());
+			}
 		}
 
 		long endTime = System.currentTimeMillis();
