@@ -10,9 +10,6 @@ public class LearningDataSetOptions {
 	@Option(name="-ds", aliases={"--dataset"}, usage="The data set file to read.")
 	private String dataSetPath = null;
 
-	@Option(name="-f", aliases={"--filtered"}, usage="The file to write the filtered data set to.")
-	private String filteredPath = null;
-
 	@Option(name="-m", aliases={"--metrics"}, usage="Print the metrics from the data set.")
 	private boolean printMetrics = false;
 
@@ -24,6 +21,9 @@ public class LearningDataSetOptions {
 
 	@Option(name = "-a", aliases = { "--arff-path" }, usage = "Folder to write the ARFF files.")
 	private String arffFolder = null;
+
+	@Option(name = "-o", aliases = {"--oracle"}, usage="The oracle to use for cluster evaluation.")
+	private String oracle = null;
 
 	public String getArffFolder() {
 		return this.arffFolder;
@@ -37,8 +37,8 @@ public class LearningDataSetOptions {
 		return this.dataSetPath;
 	}
 
-	public String getFilteredPath() {
-		return this.filteredPath;
+	public String getOraclePath() {
+		return this.oracle;
 	}
 
 	public boolean getPrintMetrics() {

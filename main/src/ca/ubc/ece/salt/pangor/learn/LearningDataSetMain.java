@@ -63,7 +63,8 @@ public class LearningDataSetMain {
 
 		/* Re-construct the data set. */
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(
-				options.getDataSetPath(), Arrays.asList(nofilter), null,
+				options.getDataSetPath(), options.getOraclePath(),
+				Arrays.asList(nofilter), null,
 				options.getMaxChangeComplexity());
 
 		/* Print the metrics from the data set. */
@@ -105,6 +106,7 @@ public class LearningDataSetMain {
 			LearningDataSet clusteringDataSet =
 					LearningDataSet.createLearningDataSet(
 							options.getDataSetPath(),
+							options.getOraclePath(),
 							rowFilters,
 							new LinkedList<KeywordUse>(), // columnFilters
 							options.getMaxChangeComplexity());
@@ -127,6 +129,10 @@ public class LearningDataSetMain {
 
 				/* We only have one ClusterMetrics now. */
 				keywordClusters.add(clusterMetrics);
+
+				/* Write the evaluation results from the clustering. */
+				clusteringDataSet.evaluate(clusterMetrics);
+
 
 			} catch (WekaException ex) {
 				logger.error("Weka error on building clusters.", ex);

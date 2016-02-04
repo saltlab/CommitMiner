@@ -63,10 +63,9 @@ public class LearningFeatureVector extends FeatureVector {
 	}
 
 	/**
-	 * An alert is always associated a concrete Checker. This constructor
-	 * should only be used if making a LearningAlert from serial. Otherwise
-	 * the other constructor should be used so the ID is automatically
-	 * generated.
+	 * This constructor should only be used if making a feature vector from
+	 * serial. Otherwise the other constructor should be used so the ID is
+	 * automatically generated.
 	 * @param commit The commit that the features were extracted from.
 	 * @param klass The class that the features were extracted from.
 	 * @param method The method that the features were extracted from.

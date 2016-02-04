@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -27,10 +28,11 @@ public class ClusterMetrics {
 	 * Add the cluster and re-compute the metrics.
 	 * @param clusterNumber The cluster number for the keyword.
 	 * @param instanceID The ID for the instance.
+	 * @param expected The expected class for the instance.
 	 * @param modifiedStatements The number of modified statements in the instance.
 	 * @param keywords The list of modified keywords in the instance.
 	 */
-	public void addInstance(int clusterNumber, int instanceID,
+	public void addInstance(int clusterNumber, int instanceID, String expected,
 							int modifiedStatements, List<String> keywords) {
 
 		/* Get the cluster from the map. */
@@ -43,7 +45,7 @@ public class ClusterMetrics {
 		}
 
 		/* Add the instance to the cluster. */
-		cluster.addInstance(instanceID, modifiedStatements, keywords);
+		cluster.addInstance(instanceID, modifiedStatements, expected, keywords);
 
 		/* Increment the total number of instances clustered. */
 		this.totalInstances++;
@@ -116,6 +118,28 @@ public class ClusterMetrics {
 		return rankedClusters;
 	}
 
+	/**
+	 * Compute the evaluation metrics if an oracle was provided.
+	 */
+	public void evaluate(Map<Integer, String> oracle) {
+
+
+		/* Compute the composition of each cluster. */
+		for(Cluster cluster : this.clusters.values()) {
+
+			System.out.println("Composition of cluster " + cluster.getClusterID());
+
+			List<Entry<String, Integer>> composition = cluster.getClusterComposition();
+			for(Entry<String, Integer> entry : composition) {
+				if(!entry.getKey().equals("?")) {
+					System.out.println(entry.getKey() + ": " + entry.getValue() + "(" + Math.round(100*((double)entry.getValue() / (double)cluster.instances.size())) + "%)");
+				}
+			}
+
+
+		}
+
+	}
 
 	/**
 	 * Prints a LaTex table from an ordered set of {@code ClusterMetrics}.
