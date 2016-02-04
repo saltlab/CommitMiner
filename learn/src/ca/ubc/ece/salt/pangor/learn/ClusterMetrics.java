@@ -25,32 +25,25 @@ public class ClusterMetrics {
 
 	/**
 	 * Add the cluster and re-compute the metrics.
-	 * @param keyword The keyword that this cluster was produced for.
 	 * @param clusterNumber The cluster number for the keyword.
+	 * @param instanceID The ID for the instance.
 	 * @param modifiedStatements The number of modified statements in the instance.
 	 * @param keywords The list of modified keywords in the instance.
 	 */
-	public void addInstance(int clusterNumber, int modifiedStatements,
-							List<String> keywords) {
+	public void addInstance(int clusterNumber, int instanceID,
+							int modifiedStatements, List<String> keywords) {
 
 		/* Get the cluster from the map. */
 		Cluster cluster = this.clusters.get(clusterNumber);
 
 		if(cluster == null) {
 			/* First instance for cluster. */
-			cluster = new Cluster(clusterNumber, modifiedStatements, keywords);
-		}
-		else {
-			/* Update the cluster metrics. */
-			cluster.instances++;
-			cluster.modifiedStatements += modifiedStatements;
-			for(String modified : keywords) {
-				int f = cluster.keywords.containsKey(modified) ? cluster.keywords.get(modified) + 1 : 1;
-				cluster.keywords.put(modified, f);
-			}
+			cluster = new Cluster(clusterNumber);
+			this.clusters.put(clusterNumber, cluster);
 		}
 
-		this.clusters.put(clusterNumber, cluster);
+		/* Add the instance to the cluster. */
+		cluster.addInstance(instanceID, modifiedStatements, keywords);
 
 		/* Increment the total number of instances clustered. */
 		this.totalInstances++;
@@ -79,7 +72,7 @@ public class ClusterMetrics {
 		int[] instances = new int[this.clusters.size()];
 		int i = 0;
 		for(Cluster cluster : this.clusters.values()) {
-			instances[i] = cluster.instances;
+			instances[i] = cluster.instances.size();
 			i++;
 		}
 		return instances[instances.length / 2];
@@ -112,7 +105,7 @@ public class ClusterMetrics {
 			@Override
 			public int compare(Cluster c1, Cluster c2) {
 				if(c1.instances == c2.instances) return c1.toString().compareTo(c2.toString());
-				else if(c1.instances < c2.instances) return 1;
+				else if(c1.instances.size() < c2.instances.size()) return 1;
 				else return -1;
 			}
 		});

@@ -92,7 +92,7 @@ public class LearningDataSetMain {
 				@Override
 				public int compare(Cluster c1, Cluster c2) {
 					if(c1.instances == c2.instances) return c1.toString().compareTo(c2.toString());
-					else if(c1.instances < c2.instances) return 1;
+					else if(c1.instances.size() < c2.instances.size()) return 1;
 					else return -1;
 				}
 			});

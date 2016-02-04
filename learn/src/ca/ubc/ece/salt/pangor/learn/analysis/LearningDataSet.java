@@ -602,7 +602,7 @@ public class LearningDataSet extends DataSet {
 		for (Instance instance : wekaData) {
 			try {
 				Integer cluster = dbScan.clusterInstance(instance);
-				instance.setValue(7, "cluster" + cluster.toString());
+				instance.setValue(8, "cluster" + cluster.toString());
 
 				/* Update the cluster with the set of keywords and complexity. */
 				List<String> keywords = new LinkedList<String>();
@@ -612,7 +612,7 @@ public class LearningDataSet extends DataSet {
 										+ ":" + (int)instance.value(i));
 					}
 				}
-				clusterMetrics.addInstance(cluster, (int)instance.value(8), keywords);
+				clusterMetrics.addInstance(cluster, (int)instance.value(0), (int)instance.value(8), keywords);
 
 			} catch (Exception ignore) { } // Instance is not part of any cluster
 

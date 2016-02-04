@@ -13,8 +13,11 @@ public class Cluster {
 	/** The cluster number. **/
 	public int cluster;
 
-	/** Tracks the number of instances in the cluster. **/
-	public int instances;
+	/**
+	 * Tracks the instances in the cluster. The key is the instance ID while
+	 * the value is the actual class.
+	 */
+	public Map<Integer, Integer> instances;
 
 	/** Tracks the total number of statements that were modified in the cluster. **/
 	public int modifiedStatements;
@@ -22,20 +25,33 @@ public class Cluster {
 	/** Tracks how frequently which keywords are modified in the cluster. */
 	public Map<String, Integer> keywords;
 
-	public Cluster(int cluster, int modifiedStatements, List<String> keywords) {
+	public Cluster(int cluster) {
 		this.cluster = cluster;
-		this.modifiedStatements = modifiedStatements;
-		this.instances = 1;
+		this.modifiedStatements = 0;
+		this.instances = new HashMap<Integer, Integer>();
 		this.keywords = new HashMap<String, Integer>();
+	}
 
-		for(String modified : keywords) this.keywords.put(modified, 1);
+	/**
+	 * Add the instance to the cluster.
+	 * @param instanceID The ID for the instance.
+	 * @param modifiedStatements The number of modified statements in the instance.
+	 * @param keywords The list of modified keywords in the instance.
+	 */
+	public void addInstance(int instanceID, int modifiedStatements, List<String> keywords) {
+		this.modifiedStatements += modifiedStatements;
+		this.instances.put(instanceID, -1);
+		for(String modified : keywords) {
+			int f = this.keywords.containsKey(modified) ? this.keywords.get(modified) + 1 : 1;
+			this.keywords.put(modified, f);
+		}
 	}
 
 	/**
 	 * @return The average number of modified statements.
 	 */
 	public int getAverageModifiedStatements() {
-		return Math.round(this.modifiedStatements / this.instances);
+		return Math.round(this.modifiedStatements / this.instances.size());
 	}
 
 	/**
@@ -51,7 +67,7 @@ public class Cluster {
 	public String getModifiedKeywords() {
 		String modified = "{";
 		for(Entry<String, Integer> entry : keywords.entrySet()) {
-			if(entry.getValue()/this.instances >= 0.9) {
+			if(entry.getValue()/this.instances.size() >= 0.9) {
 				modified += entry.getKey() + ",";
 			}
 		}
