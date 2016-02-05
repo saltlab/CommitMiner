@@ -122,7 +122,7 @@ public class Cluster {
 
 	@Override
 	public String toString() {
-		return this.getModifiedKeywords() + ": C = " + cluster + ", I = " + instances + ", X = " + this.getAverageModifiedStatements();
+		return this.getModifiedKeywords() + ": C = " + cluster + ", I = " + instances.size() + ", X = " + this.getAverageModifiedStatements();
 	}
 
 }

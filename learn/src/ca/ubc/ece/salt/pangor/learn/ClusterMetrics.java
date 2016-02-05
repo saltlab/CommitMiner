@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.pangor.learn;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -120,9 +121,31 @@ public class ClusterMetrics {
 
 	/**
 	 * Compute the evaluation metrics if an oracle was provided.
+	 * @param oracle Key = feature vector ID, Value = class
 	 */
 	public void evaluate(Map<Integer, String> oracle) {
 
+		/* The metrics for the confusion matrix. */
+		int tp = 0, fp = 0, tn = 0, fn = 0;
+
+		/* Create a map of expected classes. */
+		Map<String, List<Integer>> expected = new HashMap<String, List<Integer>>();
+		for(Entry<Integer, String> entity : oracle.entrySet()) {
+
+			if(entity.getValue().equals("?")) {
+				tn++;
+			}
+			else {
+				List<Integer> instancesInClass = expected.get(entity.getValue());
+				if(instancesInClass == null) {
+					instancesInClass = new LinkedList<Integer>();
+					expected.put(entity.getValue(), instancesInClass);
+				}
+				instancesInClass.add(entity.getKey());
+				fn++;
+			}
+
+		}
 
 		/* Compute the composition of each cluster. */
 		for(Cluster cluster : this.clusters.values()) {
@@ -131,13 +154,53 @@ public class ClusterMetrics {
 
 			List<Entry<String, Integer>> composition = cluster.getClusterComposition();
 			for(Entry<String, Integer> entry : composition) {
+
+				int tpForCluster = 0;
+
 				if(!entry.getKey().equals("?")) {
-					System.out.println(entry.getKey() + ": " + entry.getValue() + "(" + Math.round(100*((double)entry.getValue() / (double)cluster.instances.size())) + "%)");
+
+					/* A cluster ~= a class when:
+					 * 	1. The cluster contains >= 50% of the instances in a class (we don't need the list then).
+					 * 	2. The class is the largest group in the dataset (this may be flexible). */
+
+					/* Get the base metrics. */
+					double intersection = entry.getValue();
+					double classSize = expected.get(entry.getKey()).size();
+					double clusterSize = cluster.instances.size();
+
+					/* Compute the percent of the class this cluster represents. */
+					double percentOfClass = intersection / classSize;
+
+					/* Compute the percent of the cluster this class represents. */
+					double percentOfCluster = intersection / clusterSize;
+
+					/* If both are > 50%, all these are TPs */
+					if(percentOfClass >= 0.5 && percentOfCluster >= 0.5) {
+						tp += intersection;
+						tpForCluster += intersection;
+					}
+
+					System.out.println(entry.getKey() + ": " + entry.getValue()
+							+ "(" + Math.round(100 * percentOfCluster) + "% of cluster)"
+							+ "(" + Math.round(100 * percentOfClass) + "% of class)");
 				}
+
+				fp += cluster.instances.size() - tpForCluster;
 			}
 
-
 		}
+
+		/* Compute the number of true and false negatives.
+		 * FN = # of instances with a class - #TPs
+		 * TN = # of instances without a class - #FPs */
+		fn = fn - tp;
+		tn = tn - fp;
+
+		System.out.println("Confusion Matrix:");
+		System.out.println("              \tClustered\tNot Clustered");
+		System.out.println("Classified    \t" + tp + "\t\t" + fn);
+		System.out.println("Not Classified\t" + fp + "\t\t" + tn);
+
 
 	}
 
