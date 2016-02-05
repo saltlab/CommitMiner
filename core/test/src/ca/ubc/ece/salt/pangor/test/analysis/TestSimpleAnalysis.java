@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.pangor.analysis.Commit;
+import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
@@ -38,7 +39,7 @@ public class TestSimpleAnalysis {
 	public void test() throws Exception {
 
 		/* Set up a dummy commit. */
-		Commit commit = new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1", true);
+		Commit commit = new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1", Type.BUG_FIX);
 
 		/* Add a source code file change. */
 		String buggyFile = "/Users/qhanam/Documents/workspace_commitminer/pangor/core/test/input/java-source/User.java";

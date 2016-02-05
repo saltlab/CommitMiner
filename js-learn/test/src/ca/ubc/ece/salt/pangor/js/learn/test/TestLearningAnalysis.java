@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
+import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
@@ -415,7 +416,7 @@ public class TestLearningAnalysis {
 	 * @return A dummy commit for testing.
 	 */
 	public static Commit getCommit() {
-		return new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1", true);
+		return new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1", Type.BUG_FIX);
 	}
 
 	/**

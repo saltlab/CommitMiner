@@ -27,7 +27,7 @@ public class Commit {
 	public String repairedCommitID;
 
 	/** True if this commit is a bug fixing commit. **/
-	public Boolean bugFixingCommit;
+	public Type commitMessageType;
 
 	/** The list of source code file changes that occur in this commit. */
 	public List<SourceCodeFileChange> sourceCodeFileChanges;
@@ -40,13 +40,13 @@ public class Commit {
 	 */
 	public Commit(String projectID, String projectHomepage,
 				  String buggyCommitID, String repairedCommitID,
-				  Boolean bugFixingCommit) {
+				  Type commitMessageType) {
 
 		this.projectID = projectID;
 		this.url = projectHomepage;
 		this.buggyCommitID = buggyCommitID;
 		this.repairedCommitID = repairedCommitID;
-		this.bugFixingCommit = bugFixingCommit;
+		this.commitMessageType = commitMessageType;
 
 		this.sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
 
@@ -82,6 +82,16 @@ public class Commit {
 	@Override
 	public int hashCode() {
 		return (projectID + repairedCommitID).hashCode();
+	}
+
+	/**
+	 * Specifies nominal values for the commit type based on an NLP analysis
+	 * of the commit message.
+	 */
+	public enum Type {
+		BUG_FIX,
+		MERGE,
+		OTHER
 	}
 
 }

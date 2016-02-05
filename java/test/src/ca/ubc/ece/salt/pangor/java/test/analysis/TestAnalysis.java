@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Ignore;
 
 import ca.ubc.ece.salt.pangor.analysis.Commit;
+import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
@@ -73,7 +74,7 @@ public class TestAnalysis extends TestCase {
 	 * @return A dummy commit for testing.
 	 */
 	public static Commit getCommit() {
-		return new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1", true);
+		return new Commit("test", "http://github.com/saltlab/Pangor", "c0", "c1", Type.BUG_FIX);
 	}
 
 	/**

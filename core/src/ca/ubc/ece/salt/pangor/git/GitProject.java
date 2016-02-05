@@ -30,6 +30,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 
+import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysisException;
 
@@ -120,35 +121,35 @@ public class GitProject {
 
 	public Integer getTotalCommits() {
 		if (this.totalCommits == null)
-			getBugFixingCommitPairs();
+			getCommitPairs();
 
 		return this.totalCommits;
 	}
 
 	public Integer getBugFixingCommits() {
 		if (this.mergeCommits == null || this.totalCommits == null)
-			getBugFixingCommitPairs();
+			getCommitPairs();
 
 		return this.mergeCommits - this.totalCommits;
 	}
 
 	public Integer getNumberAuthors() {
 		if (this.numberAuthors == null)
-			getBugFixingCommitPairs();
+			getCommitPairs();
 
 		return this.numberAuthors;
 	}
 
 	public Date getLastCommitDate() {
 		if (this.lastCommitDate == null)
-			getBugFixingCommitPairs();
+			getCommitPairs();
 
 		return this.lastCommitDate;
 	}
 
 	public Date getFirstCommitDate() {
 		if (this.firstCommitDate == null)
-			getBugFixingCommitPairs();
+			getCommitPairs();
 
 		return this.firstCommitDate;
 	}
@@ -249,8 +250,8 @@ public class GitProject {
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	protected List<Triple<String, String, Boolean>> getBugFixingCommitPairs() {
-		List<Triple<String, String, Boolean>> bugFixingCommits = new LinkedList<Triple<String, String, Boolean>>();
+	protected List<Triple<String, String, Type>> getCommitPairs() {
+		List<Triple<String, String, Type>> bugFixingCommits = new LinkedList<Triple<String, String, Type>>();
 		int mergeCommits = 0, commitCounter = 0;
 
 		Set<String> authorsEmails = new HashSet<>();
@@ -271,48 +272,47 @@ public class GitProject {
 
 		/* Starts with the most recent commit and goes back in time. */
 		for (RevCommit commit : commits) {
+
 			/*
 			 * Add author to authors list
 			 */
 			PersonIdent authorIdent = commit.getAuthorIdent();
 			authorsEmails.add(authorIdent.getEmailAddress());
 
+			/* Try to infer the commit type from the commit message. */
+			Type commitMessageType = Type.OTHER;
 			String message = commit.getFullMessage();
 			commitCounter++;
 
-			/* Merge pattern (exclude) */
+			/* Merge pattern */
 			Pattern pEx = Pattern.compile("merge", Pattern.CASE_INSENSITIVE);
 			Matcher mEx = pEx.matcher(message);
 
-			if(!mEx.find()) {
+			/* Bug fixing commit pattern */
+			Pattern pBFC = Pattern.compile(this.commitMessageRegex, Pattern.CASE_INSENSITIVE);
+			Matcher mBFC = pBFC.matcher(message);
 
-				/* Bug fixing commit pattern (label). */
-				Pattern pBFC = Pattern.compile(this.commitMessageRegex, Pattern.CASE_INSENSITIVE);
-				Matcher mBFC = pBFC.matcher(message);
+			if(mEx.find()) commitMessageType = Type.MERGE;
+			else if(mBFC.find()) commitMessageType = Type.BUG_FIX;
 
-				/*
-				 * If the commit message contains one of our fix keywords, label it as a bug fixing commit.
-				 */
-				if(commit.getParentCount()  > 0) {
-					bugFixingCommits.add(Triple.of(commit.getParent(0).name(), commit.name(), mBFC.find()));
-				}
-
-				/*
-				 * First commit on iteration is most recent one (what we call "last")
-				 */
-				if (commitCounter == 1)
-					lastCommitDate = authorIdent.getWhen();
-
-				/*
-				 * Store the date of this commit. When iteration is over, we have
-				 * the date for first one
-				 */
-				firstCommitDate = authorIdent.getWhen();
-
+			/*
+			 * If the commit message contains one of our fix keywords, label it as a bug fixing commit.
+			 */
+			if(commit.getParentCount()  > 0) {
+				bugFixingCommits.add(Triple.of(commit.getParent(0).name(), commit.name(), commitMessageType));
 			}
-			else {
-				mergeCommits++;
-			}
+
+			/*
+			 * First commit on iteration is most recent one (what we call "last")
+			 */
+			if (commitCounter == 1)
+				lastCommitDate = authorIdent.getWhen();
+
+			/*
+			 * Store the date of this commit. When iteration is over, we have
+			 * the date for first one
+			 */
+			firstCommitDate = authorIdent.getWhen();
 
 		}
 

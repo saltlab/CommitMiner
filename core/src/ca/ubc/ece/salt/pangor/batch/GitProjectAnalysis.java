@@ -20,6 +20,7 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 import ca.ubc.ece.salt.pangor.analysis.Commit;
+import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.git.GitProject;
@@ -53,15 +54,15 @@ public class GitProjectAnalysis extends GitProject {
 		logger.info("[START ANALYSIS] {}", this.getURI());
 
 		/* Get the list of bug fixing commits from version history. */
-		List<Triple<String, String, Boolean>> bugFixingCommits = this.getBugFixingCommitPairs();
+		List<Triple<String, String, Type>> commits = this.getCommitPairs();
 
-		logger.info(" [ANALYZING] {} bug fixing commits", bugFixingCommits.size());
+		logger.info(" [ANALYZING] {} bug fixing commits", commits.size());
 
 		/* Analyze the changes made in each bug fixing commit. */
-		for(Triple<String, String, Boolean> bugFixingCommit : bugFixingCommits) {
+		for(Triple<String, String, Type> commit : commits) {
 
 			try {
-			this.analyzeDiff(bugFixingCommit.getLeft(), bugFixingCommit.getMiddle(), bugFixingCommit.getRight());
+			this.analyzeDiff(commit.getLeft(), commit.getMiddle(), commit.getRight());
 			} catch (Exception e) {
 				logger.error("[ERROR] {} ", e.getMessage());
 			}
@@ -82,7 +83,7 @@ public class GitProjectAnalysis extends GitProject {
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	private void analyzeDiff(String buggyRevision, String bugFixingRevision, Boolean bugFixingCommit) throws IOException, GitAPIException, Exception {
+	private void analyzeDiff(String buggyRevision, String bugFixingRevision, Type commitMessageType) throws IOException, GitAPIException, Exception {
 
 		ObjectId buggy = this.repository.resolve(buggyRevision + "^{tree}");
 		ObjectId repaired = this.repository.resolve(bugFixingRevision + "^{tree}");
@@ -104,7 +105,7 @@ public class GitProjectAnalysis extends GitProject {
 				this.projectID,
 				this.projectHomepage,
 				buggyRevision, bugFixingRevision,
-				bugFixingCommit);
+				commitMessageType);
 
 		/* Iterate through the modified files and add them as
 		 * {@code SourceCodeFileChange}s in the commit. */

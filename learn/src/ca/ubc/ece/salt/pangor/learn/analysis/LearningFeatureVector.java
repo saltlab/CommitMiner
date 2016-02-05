@@ -12,6 +12,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
+import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.FeatureVector;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
@@ -89,7 +90,8 @@ public class LearningFeatureVector extends FeatureVector {
 	 */
 	public String serialize() {
 
-		String serialized = id + "," + this.commit.projectID + "," + this.commit.bugFixingCommit
+		String serialized = id + "," + this.commit.projectID
+				+ "," + this.commit.commitMessageType.toString()
 				+ "," + this.commit.url + "/commit/" + this.commit.repairedCommitID
 				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
 				+ "," + this.klass + "," + this.method + "," + this.modifiedStatementCount;
@@ -138,7 +140,7 @@ public class LearningFeatureVector extends FeatureVector {
 		if(features.length < 8) throw new Exception("De-serialization exception. Serial format not recognized.");
 
 		Commit commit = new Commit(features[1], features[3], features[4],
-								   features[5], Boolean.parseBoolean(features[2]));
+								   features[5], Type.valueOf(features[2]));
 
 		LearningFeatureVector featureVector = new LearningFeatureVector(commit,
 				features[6], features[7], Integer.parseInt(features[8]),
@@ -170,7 +172,7 @@ public class LearningFeatureVector extends FeatureVector {
 
 		/* Set the meta info for the instance. */
 		instance.setValue(0, this.id);
-		instance.setValue(1, this.commit.bugFixingCommit.toString());
+		instance.setValue(1, this.commit.commitMessageType.toString());
 		instance.setValue(2, this.commit.projectID);
 		instance.setValue(3, this.commit.url);
 		instance.setValue(4, this.commit.buggyCommitID);
@@ -204,7 +206,7 @@ public class LearningFeatureVector extends FeatureVector {
 	public String getFeatureVector(Set<KeywordDefinition> keywords) {
 
 		String vector = id + "," + this.commit.projectID + "," + this.commit.url
-				+ "," + this.commit.bugFixingCommit
+				+ "," + this.commit.commitMessageType
 				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
 				+ "," + this.klass + "," + this.method + this.modifiedStatementCount;
 
