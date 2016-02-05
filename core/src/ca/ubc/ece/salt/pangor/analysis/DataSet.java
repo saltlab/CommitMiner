@@ -52,7 +52,6 @@ public abstract class DataSet {
 
 		registerAlerts(commit, knowledgeBase);
 
-
 	}
 
 	/**

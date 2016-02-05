@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -385,34 +384,33 @@ public class LearningDataSet extends DataSet {
 	 */
 	private synchronized void storeLearningFeatureVector(LearningFeatureVector featureVector) throws Exception {
 
+		/* TODO: Add this to LearningDataSetMain and clean up. */
 		/* The KeywordFilter that will filter out unwanted feature vectors. */
-		KeywordFilter insertedFilter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
-				ChangeType.INSERTED, "", "");
-		KeywordFilter removedFilter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
-				ChangeType.REMOVED, "", "");
+//		KeywordFilter insertedFilter = new KeywordFilter(FilterType.INCLUDE,
+//				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
+//				ChangeType.INSERTED, "", "");
+//		KeywordFilter removedFilter = new KeywordFilter(FilterType.INCLUDE,
+//				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
+//				ChangeType.REMOVED, "", "");
 
-		List<KeywordFilter> filters = Arrays.asList(insertedFilter, removedFilter);
+//		List<KeywordFilter> filters = Arrays.asList(insertedFilter/*, removedFilter*/);
 
 		/* Include this row in the output if it passes the filters. */
-		if(LearningDataSet.includeRow(featureVector.keywordMap.keySet(), filters)) {
+//		if(LearningDataSet.includeRow(featureVector.keywordMap.keySet(), filters)) {
 
-			/* The path to the file may not exist. Create it if needed. */
-			File path = new File(this.dataSetPath);
-			path.getParentFile().mkdirs();
-			path.createNewFile();
+		/* The path to the file may not exist. Create it if needed. */
+		File path = new File(this.dataSetPath);
+		path.getParentFile().mkdirs();
+		path.createNewFile();
 
-			/* May throw IOException if the path does not exist. */
-			PrintStream stream = new PrintStream(new FileOutputStream(path, true));
+		/* May throw IOException if the path does not exist. */
+		PrintStream stream = new PrintStream(new FileOutputStream(path, true));
 
-			/* Write the data set. */
-			stream.println(featureVector.serialize());
+		/* Write the data set. */
+		stream.println(featureVector.serialize());
 
-			/* Finished writing the feature vector. */
-			stream.close();
-
-		}
+		/* Finished writing the feature vector. */
+		stream.close();
 
 	}
 
