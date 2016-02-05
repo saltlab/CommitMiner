@@ -54,8 +54,8 @@ public class GitProject {
 	/** The URI **/
 	protected String URI;
 
-	/** The number of bug fixing commits analyzed. **/
-	protected Integer bugFixingCommits;
+	/** The number of commits that merged two branches. **/
+	protected Integer mergeCommits;
 
 	/** The total number of commits inspected. **/
 	protected Integer totalCommits;
@@ -126,10 +126,10 @@ public class GitProject {
 	}
 
 	public Integer getBugFixingCommits() {
-		if (this.bugFixingCommits == null)
+		if (this.mergeCommits == null || this.totalCommits == null)
 			getBugFixingCommitPairs();
 
-		return this.bugFixingCommits;
+		return this.mergeCommits - this.totalCommits;
 	}
 
 	public Integer getNumberAuthors() {
@@ -251,7 +251,7 @@ public class GitProject {
 	 */
 	protected List<Triple<String, String, Boolean>> getBugFixingCommitPairs() {
 		List<Triple<String, String, Boolean>> bugFixingCommits = new LinkedList<Triple<String, String, Boolean>>();
-		int bugFixingCommitCounter = 0, commitCounter = 0;
+		int mergeCommits = 0, commitCounter = 0;
 
 		Set<String> authorsEmails = new HashSet<>();
 
@@ -278,34 +278,46 @@ public class GitProject {
 			authorsEmails.add(authorIdent.getEmailAddress());
 
 			String message = commit.getFullMessage();
-			Pattern p = Pattern.compile(this.commitMessageRegex, Pattern.CASE_INSENSITIVE);
-			Matcher m = p.matcher(message);
 			commitCounter++;
 
-			/*
-			 * If the commit message contains one of our fix keywords, label it as a bug fixing commit.
-			 */
-			if(commit.getParentCount()  > 0) {
-				bugFixingCommits.add(Triple.of(commit.getParent(0).name(), commit.name(), m.find()));
-				bugFixingCommitCounter++;
+			/* Merge pattern (exclude) */
+			Pattern pEx = Pattern.compile("merge", Pattern.CASE_INSENSITIVE);
+			Matcher mEx = pEx.matcher(message);
+
+			if(!mEx.find()) {
+
+				/* Bug fixing commit pattern (label). */
+				Pattern pBFC = Pattern.compile(this.commitMessageRegex, Pattern.CASE_INSENSITIVE);
+				Matcher mBFC = pBFC.matcher(message);
+
+				/*
+				 * If the commit message contains one of our fix keywords, label it as a bug fixing commit.
+				 */
+				if(commit.getParentCount()  > 0) {
+					bugFixingCommits.add(Triple.of(commit.getParent(0).name(), commit.name(), mBFC.find()));
+				}
+
+				/*
+				 * First commit on iteration is most recent one (what we call "last")
+				 */
+				if (commitCounter == 1)
+					lastCommitDate = authorIdent.getWhen();
+
+				/*
+				 * Store the date of this commit. When iteration is over, we have
+				 * the date for first one
+				 */
+				firstCommitDate = authorIdent.getWhen();
+
 			}
-
-			/*
-			 * First commit on iteration is most recent one (what we call "last")
-			 */
-			if (commitCounter == 1)
-				lastCommitDate = authorIdent.getWhen();
-
-			/*
-			 * Store the date of this commit. When iteration is over, we have
-			 * the date for first one
-			 */
-			firstCommitDate = authorIdent.getWhen();
+			else {
+				mergeCommits++;
+			}
 
 		}
 
 		/* Keep track of the number of commits and other metrics for reporting. */
-		this.bugFixingCommits = bugFixingCommitCounter;
+		this.mergeCommits = mergeCommits;
 		this.totalCommits = commitCounter;
 		this.numberAuthors = authorsEmails.size();
 		this.lastCommitDate = lastCommitDate;

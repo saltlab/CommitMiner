@@ -58,6 +58,8 @@ import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter.FilterType;
  */
 public class LearningDataSet extends DataSet {
 
+	public static int ctr = 0;
+
 	/**
 	 * The packages we want to investigate. LearningFeatureVectorManager
 	 * filters out any LearningFeatureVector which does not contain one of these
@@ -653,7 +655,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.01 -M 2".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.2 -M 3".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);
