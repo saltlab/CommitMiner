@@ -100,7 +100,16 @@ public class LearningDataSetMain {
 
 			/* Add a filter that includes all rows. */
 			List<KeywordFilter> rowFilters = new LinkedList<KeywordFilter>();
-			rowFilters.add(new KeywordFilter());
+
+			KeywordFilter insertedFilter = new KeywordFilter(FilterType.INCLUDE,
+				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
+				ChangeType.INSERTED, "", "");
+			rowFilters.add(insertedFilter);
+
+			KeywordFilter removedFilter = new KeywordFilter(FilterType.INCLUDE,
+				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
+				ChangeType.REMOVED, "", "");
+			rowFilters.add(removedFilter);
 
 			/* Re-construct the data set. */
 			LearningDataSet clusteringDataSet =

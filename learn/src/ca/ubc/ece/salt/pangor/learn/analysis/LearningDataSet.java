@@ -36,6 +36,7 @@ import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.attribute.RemoveByName;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
+import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
@@ -384,20 +385,6 @@ public class LearningDataSet extends DataSet {
 	 */
 	private synchronized void storeLearningFeatureVector(LearningFeatureVector featureVector) throws Exception {
 
-		/* TODO: Add this to LearningDataSetMain and clean up. */
-		/* The KeywordFilter that will filter out unwanted feature vectors. */
-//		KeywordFilter insertedFilter = new KeywordFilter(FilterType.INCLUDE,
-//				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
-//				ChangeType.INSERTED, "", "");
-//		KeywordFilter removedFilter = new KeywordFilter(FilterType.INCLUDE,
-//				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
-//				ChangeType.REMOVED, "", "");
-
-//		List<KeywordFilter> filters = Arrays.asList(insertedFilter/*, removedFilter*/);
-
-		/* Include this row in the output if it passes the filters. */
-//		if(LearningDataSet.includeRow(featureVector.keywordMap.keySet(), filters)) {
-
 		/* The path to the file may not exist. Create it if needed. */
 		File path = new File(this.dataSetPath);
 		path.getParentFile().mkdirs();
@@ -535,8 +522,12 @@ public class LearningDataSet extends DataSet {
 		List<LearningFeatureVector> toRemove = new LinkedList<LearningFeatureVector>();
 		for(LearningFeatureVector featureVector : this.featureVectors) {
 
+			/* Ignore merge commits. */
+			if(featureVector.commit.commitMessageType == Type.MERGE) {
+				toRemove.add(featureVector);
+			}
 			/* Check if the feature vector references the any of the interesting packages. */
-			if(!includeRow(featureVector.keywordMap.keySet(), featureVector.modifiedStatementCount)) {
+			else if(!includeRow(featureVector.keywordMap.keySet(), featureVector.modifiedStatementCount)) {
 
 				/* Schedule this LearningFeatureVector for removal. */
 				toRemove.add(featureVector);
@@ -676,6 +667,8 @@ public class LearningDataSet extends DataSet {
 				/* Get the expected class for the instance. */
 				String expected = this.oracle != null ?
 						this.oracle.get((int)instance.value(0)) : "?";
+
+				if(expected == null) throw new Error("A feature vector was not classified in the oracle: " + (int)instance.value(0));
 
 				clusterMetrics.addInstance(cluster, (int)instance.value(0),
 											expected, (int)instance.value(8),
