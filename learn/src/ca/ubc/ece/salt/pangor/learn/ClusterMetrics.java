@@ -127,13 +127,15 @@ public class ClusterMetrics {
 
 		/* The metrics for the confusion matrix. */
 		int tp = 0, fp = 0, tn = 0, fn = 0;
+		int unclassified = 0, classified = 0;
+		int clustered = 0, unclustered = 0;
 
 		/* Create a map of expected classes. */
 		Map<String, List<Integer>> expected = new HashMap<String, List<Integer>>();
 		for(Entry<Integer, String> entity : oracle.entrySet()) {
 
 			if(entity.getValue().equals("?")) {
-				tn++;
+				unclassified++; 	// All unclassified values are considered true negatives by default.
 			}
 			else {
 				List<Integer> instancesInClass = expected.get(entity.getValue());
@@ -142,7 +144,7 @@ public class ClusterMetrics {
 					expected.put(entity.getValue(), instancesInClass);
 				}
 				instancesInClass.add(entity.getKey());
-				fn++;
+				classified++;	// All classified values are considered false negatives by default.
 			}
 
 		}
@@ -150,12 +152,13 @@ public class ClusterMetrics {
 		/* Compute the composition of each cluster. */
 		for(Cluster cluster : this.clusters.values()) {
 
+			int tpForCluster = 0;
+			clustered += cluster.instances.size();
+
 			System.out.println("Composition of cluster " + cluster.getClusterID());
 
 			List<Entry<String, Integer>> composition = cluster.getClusterComposition();
 			for(Entry<String, Integer> entry : composition) {
-
-				int tpForCluster = 0;
 
 				if(!entry.getKey().equals("?")) {
 
@@ -184,17 +187,22 @@ public class ClusterMetrics {
 							+ "(" + Math.round(100 * percentOfCluster) + "% of cluster)"
 							+ "(" + Math.round(100 * percentOfClass) + "% of class)");
 				}
+				else {
+					System.out.println("?: " + entry.getValue());
+				}
 
-				fp += cluster.instances.size() - tpForCluster;
 			}
+
+			fp += cluster.instances.size() - tpForCluster;
 
 		}
 
 		/* Compute the number of true and false negatives.
 		 * FN = # of instances with a class - #TPs
 		 * TN = # of instances without a class - #FPs */
-		fn = fn - tp;
-		tn = tn - fp;
+
+		fn = classified - tp;
+		tn = unclassified - fp;
 
 		System.out.println("Confusion Matrix:");
 		System.out.println("              \tClustered\tNot Clustered");
