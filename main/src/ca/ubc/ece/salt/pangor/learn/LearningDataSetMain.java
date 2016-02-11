@@ -13,13 +13,9 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import weka.core.WekaException;
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
-import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter;
-import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter.FilterType;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningDataSet;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningMetrics;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningMetrics.KeywordFrequency;
@@ -41,10 +37,6 @@ public class LearningDataSetMain {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-
-		KeywordFilter nofilter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.UNKNOWN,
-				"", "");
 
 		LearningDataSetOptions options = new LearningDataSetOptions();
 		CmdLineParser parser = new CmdLineParser(options);
@@ -99,30 +91,11 @@ public class LearningDataSetMain {
 				}
 			});
 
-			/* Add a filter that includes all rows. */
-//			List<KeywordFilter> rowFilters = new LinkedList<KeywordFilter>();
-
-//			KeywordFilter movedFilter = new KeywordFilter(FilterType.INCLUDE,
-//				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
-//				ChangeType.MOVED, "", "");
-//			rowFilters.add(movedFilter);
-//
-//			KeywordFilter updatedFilter = new KeywordFilter(FilterType.INCLUDE,
-//				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
-//				ChangeType.UPDATED, "", "");
-//			rowFilters.add(updatedFilter);
-//
-//			KeywordFilter statementFilter = new KeywordFilter(FilterType.EXCLUDE,
-//				KeywordType.UNKNOWN, KeywordContext.STATEMENT,
-//				ChangeType.UNKNOWN, "", "");
-//			rowFilters.add(statementFilter);
-
 			/* Re-construct the data set. */
 			LearningDataSet clusteringDataSet =
 					LearningDataSet.createLearningDataSet(
 							options.getDataSetPath(),
 							options.getOraclePath(),
-//							rowFilters,
 							new LinkedList<KeywordUse>(), // columnFilters
 							options.getMaxChangeComplexity());
 

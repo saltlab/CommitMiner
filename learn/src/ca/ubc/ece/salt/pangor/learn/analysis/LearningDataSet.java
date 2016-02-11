@@ -65,13 +65,6 @@ public class LearningDataSet extends DataSet {
 	public static int ctr = 0;
 
 	/**
-	 * The packages we want to investigate. LearningFeatureVectorManager
-	 * filters out any LearningFeatureVector which does not contain one of these
-	 * packages.
-	 */
-//	private List<KeywordFilter> rowFilters;
-
-	/**
 	 * The keywords we want to ommit as features from the data set during
 	 * clustering.
 	 */
@@ -118,11 +111,9 @@ public class LearningDataSet extends DataSet {
 	 * 					 cannot be read.
 	 */
 	private LearningDataSet(String dataSetPath, String oraclePath,
-							/*List<KeywordFilter> rowFilters,*/
 							List<KeywordUse> columnFilters,
 							int maxModifiedStatements) throws Exception {
 		super(null, null);
-//		this.rowFilters = rowFilters;
 		this.columnFilters = columnFilters;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
@@ -149,7 +140,6 @@ public class LearningDataSet extends DataSet {
 	 */
 	private LearningDataSet(String dataSetPath, List<IRule> rules, List<IQuery> queries) {
 		super(rules, queries);
-//		this.rowFilters = null;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
 		this.dataSetPath = dataSetPath;
@@ -165,7 +155,6 @@ public class LearningDataSet extends DataSet {
 	 */
 	private LearningDataSet(List<KeywordFilter> filters, List<IRule> rules, List<IQuery> queries) {
 		super(rules, queries);
-//		this.rowFilters = filters;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
 		this.dataSetPath = null;
@@ -190,10 +179,9 @@ public class LearningDataSet extends DataSet {
 	 */
 	public static LearningDataSet createLearningDataSet(String dataSetPath,
 														String oraclePath,
-//														List<KeywordFilter> rowFilters,
 														List<KeywordUse> columnFilters,
 														int maxModifiedStatements) throws Exception {
-		return new LearningDataSet(dataSetPath, oraclePath, /*rowFilters,*/ columnFilters, maxModifiedStatements);
+		return new LearningDataSet(dataSetPath, oraclePath, columnFilters, maxModifiedStatements);
 	}
 
 	/**
@@ -546,48 +534,6 @@ public class LearningDataSet extends DataSet {
 
 		this.featureVectors = newFeatureVectorList;
 
-//		/* Remove rows that do not reference the packages we are interested in. */
-//
-//		List<LearningFeatureVector> toRemove = new LinkedList<LearningFeatureVector>();
-//		for(LearningFeatureVector featureVector : this.featureVectors) {
-//
-//			/* Ignore merge commits. */
-//			if(featureVector.commit.commitMessageType == Type.MERGE) {
-//				toRemove.add(featureVector);
-//			}
-//			/* Check if the feature vector references the any of the interesting packages. */
-//			else if(!includeRow(featureVector.keywordMap.keySet(), featureVector.modifiedStatementCount)) {
-//
-//				/* Schedule this LearningFeatureVector for removal. */
-//				toRemove.add(featureVector);
-//
-//			}
-//
-//		}
-//
-//		for(LearningFeatureVector featureVector : toRemove) {
-//			this.featureVectors.remove(featureVector);
-//		}
-//
-//		/* Remove rows that do not fall within the desired change score. */
-//
-//		toRemove = new LinkedList<LearningFeatureVector>();
-//		for(LearningFeatureVector featureVector : this.featureVectors) {
-//
-//			/* Check if the feature vector references the any of the interesting packages. */
-//			if(getChangeScore(featureVector.keywordMap.keySet()) == 0) {
-//
-//				/* Schedule this LearningFeatureVector for removal. */
-//				toRemove.add(featureVector);
-//
-//			}
-//
-//		}
-//
-//		for(LearningFeatureVector featureVector : toRemove) {
-//			this.featureVectors.remove(featureVector);
-//		}
-
 		/* Get the set of keywords from all the feature vectors. */
 
 		for(LearningFeatureVector featureVector : this.featureVectors) {
@@ -742,64 +688,6 @@ public class LearningDataSet extends DataSet {
 		stream.println(this.getLearningFeatureVector());
 
 	}
-
-	/**
-	 * @param keywords The keywords from a feature vector.
-	 * @param maxModifiedStatements The maximum number of modified statements.
-	 * @return True if the keyword set matches an include filter.
-	 */
-//	private boolean includeRow(Set<KeywordUse> keywords, int modifiedStatementCount) {
-//		if(modifiedStatementCount > this.maxModifiedStatements) return false;
-//		return includeRow(keywords, this.rowFilters);
-//	}
-
-	/**
-	 * @param keywords The keywords from a feature vector.
-	 * @param filers The filters to apply to the row.
-	 * @return True if the keyword set matches an include filter.
-	 */
-//	private static boolean includeRow(Set<KeywordUse> keywords, List<KeywordFilter> filters) {
-//		for(KeywordUse keyword : keywords) {
-//			for(KeywordFilter filter : filters) {
-//
-//				/* This keyword must match the filter to be included. */
-//				if(filter.type != KeywordType.UNKNOWN && filter.type != keyword.type) continue;
-//				if(filter.context != KeywordContext.UNKNOWN && filter.context != keyword.context) continue;
-//				if(filter.changeType != ChangeType.UNKNOWN && filter.changeType != keyword.changeType) continue;
-//				if(!filter.pack.isEmpty() && !filter.pack.equals(keyword.getPackageName())) continue;
-//				if(!filter.keyword.isEmpty() && !filter.keyword.equals(keyword.keyword)) continue;
-//
-//				/* The keyword matches the filter. */
-//				if(filter.filterType == FilterType.INCLUDE) return true;
-//				if(filter.filterType == FilterType.EXCLUDE) return false;
-//
-//			}
-//		}
-//		return false;
-//	}
-
-	/**
-	 * Computes a score to determine how much a function has changed (using the
-	 * number of inserted/removed/updated keywords).
-	 * @param keywords The keywords from a feature vector.
-	 * @return A score that represents how much the function has changed with
-	 * 		   respect to its keywords. A score of zero means no keywords
-	 * 		   changed.
-	 */
-//	private int getChangeScore(Set<KeywordUse> keywords) {
-//
-//		int score = 0;
-//
-//		for(KeywordUse keyword : keywords) {
-//			if(keyword.changeType != ChangeType.UNCHANGED &&
-//					keyword.changeType != ChangeType.UNKNOWN) {
-//				score++;
-//			}
-//		}
-//
-//		return score;
-//
-//	}
 
 	/**
 	 * Writes the result of a clustering on an ARFF file
