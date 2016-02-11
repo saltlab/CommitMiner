@@ -151,9 +151,8 @@ public class LearningDataSet extends DataSet {
 	/**
 	 * Used for testing. Creates a {@code LearningDataSet} that will add
 	 * features directly to the data set (instead of writing them to a file).
-	 * @param filters Filters out rows by requiring keywords to be present.
 	 */
-	private LearningDataSet(List<KeywordFilter> filters, List<IRule> rules, List<IQuery> queries) {
+	private LearningDataSet(List<IRule> rules, List<IQuery> queries) {
 		super(rules, queries);
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
@@ -198,8 +197,8 @@ public class LearningDataSet extends DataSet {
 	 * features directly to the data set (instead of writing them to a file).
 	 * @param filters Filters out rows by requiring keywords to be present.
 	 */
-	public static LearningDataSet createLearningDataSet(List<KeywordFilter> filters) {
-		return new LearningDataSet(filters, new LinkedList<IRule>(), getQueries());
+	public static LearningDataSet createLearningDataSet() {
+		return new LearningDataSet(new LinkedList<IRule>(), getQueries());
 	}
 
 	/**

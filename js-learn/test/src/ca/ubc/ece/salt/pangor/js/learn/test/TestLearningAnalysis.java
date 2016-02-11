@@ -27,7 +27,6 @@ import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.api.TopLevelAPI;
 import ca.ubc.ece.salt.pangor.js.api.JSAPIFactory;
 import ca.ubc.ece.salt.pangor.js.learn.analysis.LearningDomainAnalysis;
-import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningDataSet;
 
 public class TestLearningAnalysis {
@@ -44,16 +43,10 @@ public class TestLearningAnalysis {
 		Commit commit = getCommit();
 		commit.addSourceCodeFileChange(sourceFileChange);
 
-		/* The packages we want to use. */
-		KeywordFilter fsFilter = KeywordFilter.buildPackageFilter("fs");
-		KeywordFilter pathFilter = KeywordFilter.buildPackageFilter("path");
-		KeywordFilter DateFilter = KeywordFilter.buildPackageFilter("global");
-
 		/* Set up the FeatureVectorManager, which will store all the feature
 		 * vectors produced by our analysis and perform pre-processing tasks
 		 * for data mining. */
-		List<KeywordFilter> filters = Arrays.asList(fsFilter, pathFilter, DateFilter);
-		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(filters);
+		LearningDataSet dataSet = LearningDataSet.createLearningDataSet();
 
 		/* Set up the analysis. */
 		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
