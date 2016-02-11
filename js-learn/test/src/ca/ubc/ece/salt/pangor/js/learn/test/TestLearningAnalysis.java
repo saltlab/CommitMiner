@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.deri.iris.api.basics.IQuery;
+import org.deri.iris.factory.Factory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,7 +67,7 @@ public class TestLearningAnalysis {
 		commitAnalysis.analyze(commit);
 
         /* Pre-process the alerts. */
-        dataSet.preProcess();
+        dataSet.preProcess(getRowFilterQuery(6));
 
         /* Print the data set. */
         System.out.println(dataSet.getLearningFeatureVectorHeader());
@@ -437,6 +439,56 @@ public class TestLearningAnalysis {
 	 */
 	private static String readFile(String path) throws IOException {
 		return FileUtils.readFileToString(new File(path));
+	}
+
+	/**
+	 * Selects feature vectors with:
+	 *  - Complexity <= {@code complexity}
+	 *  - Commit message != MERGE
+	 *  - At least one keyword with context != STATEMENT
+	 * @param complexity The maximum complexity for the feature vector.
+	 * @return The Datalog query that selects which rows to data mine.
+	 */
+	public static IQuery getRowFilterQuery(Integer complexity) {
+
+		IQuery query =
+			Factory.BASIC.createQuery(
+				Factory.BASIC.createLiteral(true,
+					Factory.BASIC.createPredicate("FeatureVector", 8),
+					Factory.BASIC.createTuple(
+						Factory.TERM.createVariable("ID"),
+						Factory.TERM.createVariable("CommitMessage"),
+						Factory.TERM.createVariable("URL"),
+						Factory.TERM.createVariable("BuggyCommitID"),
+						Factory.TERM.createVariable("RepairedCommitID"),
+						Factory.TERM.createVariable("Class"),
+						Factory.TERM.createVariable("Method"),
+						Factory.TERM.createVariable("Complexity"))),
+				Factory.BASIC.createLiteral(true,
+					Factory.BUILTIN.createLessEqual(
+						Factory.TERM.createVariable("Complexity"),
+						Factory.TERM.createString(complexity.toString()))),
+				Factory.BASIC.createLiteral(true,
+					Factory.BUILTIN.createNotExactEqual(
+						Factory.TERM.createVariable("CommitMessage"),
+						Factory.TERM.createString(Type.MERGE.toString()))),
+				Factory.BASIC.createLiteral(true,
+					Factory.BASIC.createPredicate("KeywordChange", 7),
+					Factory.BASIC.createTuple(
+						Factory.TERM.createVariable("ID"),
+						Factory.TERM.createVariable("KeywordType"),
+						Factory.TERM.createVariable("KeywordContext"),
+						Factory.TERM.createVariable("ChangeType"),
+						Factory.TERM.createVariable("Package"),
+						Factory.TERM.createVariable("Keyword"),
+						Factory.TERM.createVariable("Count"))),
+				Factory.BASIC.createLiteral(true,
+					Factory.BUILTIN.createNotExactEqual(
+						Factory.TERM.createVariable("KeywordContext"),
+						Factory.TERM.createString(KeywordContext.STATEMENT.toString()))));
+
+		return query;
+
 	}
 
 }

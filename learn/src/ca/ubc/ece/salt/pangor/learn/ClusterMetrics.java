@@ -128,7 +128,6 @@ public class ClusterMetrics {
 		/* The metrics for the confusion matrix. */
 		int tp = 0, fp = 0, tn = 0, fn = 0;
 		int unclassified = 0, classified = 0;
-		int clustered = 0, unclustered = 0;
 
 		/* Create a map of expected classes. */
 		Map<String, List<Integer>> expected = new HashMap<String, List<Integer>>();
@@ -153,7 +152,6 @@ public class ClusterMetrics {
 		for(Cluster cluster : this.clusters.values()) {
 
 			int tpForCluster = 0;
-			clustered += cluster.instances.size();
 
 			System.out.println("Composition of cluster " + cluster.getClusterID());
 

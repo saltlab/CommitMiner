@@ -1,19 +1,20 @@
 package ca.ubc.ece.salt.pangor.learn;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.deri.iris.api.basics.IQuery;
+import org.deri.iris.factory.Factory;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import weka.core.WekaException;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
@@ -64,7 +65,7 @@ public class LearningDataSetMain {
 		/* Re-construct the data set. */
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(
 				options.getDataSetPath(), options.getOraclePath(),
-				Arrays.asList(nofilter), null,
+				/*Arrays.asList(nofilter),*/ null,
 				options.getMaxChangeComplexity());
 
 		/* Print the metrics from the data set. */
@@ -99,29 +100,34 @@ public class LearningDataSetMain {
 			});
 
 			/* Add a filter that includes all rows. */
-			List<KeywordFilter> rowFilters = new LinkedList<KeywordFilter>();
+//			List<KeywordFilter> rowFilters = new LinkedList<KeywordFilter>();
 
-			KeywordFilter insertedFilter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
-				ChangeType.INSERTED, "", "");
-			rowFilters.add(insertedFilter);
-
-			KeywordFilter removedFilter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
-				ChangeType.REMOVED, "", "");
-			rowFilters.add(removedFilter);
+//			KeywordFilter movedFilter = new KeywordFilter(FilterType.INCLUDE,
+//				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
+//				ChangeType.MOVED, "", "");
+//			rowFilters.add(movedFilter);
+//
+//			KeywordFilter updatedFilter = new KeywordFilter(FilterType.INCLUDE,
+//				KeywordType.UNKNOWN, KeywordContext.UNKNOWN,
+//				ChangeType.UPDATED, "", "");
+//			rowFilters.add(updatedFilter);
+//
+//			KeywordFilter statementFilter = new KeywordFilter(FilterType.EXCLUDE,
+//				KeywordType.UNKNOWN, KeywordContext.STATEMENT,
+//				ChangeType.UNKNOWN, "", "");
+//			rowFilters.add(statementFilter);
 
 			/* Re-construct the data set. */
 			LearningDataSet clusteringDataSet =
 					LearningDataSet.createLearningDataSet(
 							options.getDataSetPath(),
 							options.getOraclePath(),
-							rowFilters,
+//							rowFilters,
 							new LinkedList<KeywordUse>(), // columnFilters
 							options.getMaxChangeComplexity());
 
 			/* Pre-process the file. */
-			clusteringDataSet.preProcess();
+			clusteringDataSet.preProcess(getRowFilterQuery(options.getMaxChangeComplexity()));
 
 			/* Get the clusters. */
 			try {
@@ -185,6 +191,56 @@ public class LearningDataSetMain {
         parser.printSingleLineUsage(System.out);
         System.out.println("");
         return;
+	}
+
+	/**
+	 * Selects feature vectors with:
+	 *  - Complexity <= {@code complexity}
+	 *  - Commit message != MERGE
+	 *  - At least one keyword with context != STATEMENT
+	 * @param complexity The maximum complexity for the feature vector.
+	 * @return The Datalog query that selects which rows to data mine.
+	 */
+	public static IQuery getRowFilterQuery(Integer complexity) {
+
+		IQuery query =
+			Factory.BASIC.createQuery(
+				Factory.BASIC.createLiteral(true,
+					Factory.BASIC.createPredicate("FeatureVector", 8),
+					Factory.BASIC.createTuple(
+						Factory.TERM.createVariable("ID"),
+						Factory.TERM.createVariable("CommitMessage"),
+						Factory.TERM.createVariable("URL"),
+						Factory.TERM.createVariable("BuggyCommitID"),
+						Factory.TERM.createVariable("RepairedCommitID"),
+						Factory.TERM.createVariable("Class"),
+						Factory.TERM.createVariable("Method"),
+						Factory.TERM.createVariable("Complexity"))),
+				Factory.BASIC.createLiteral(true,
+					Factory.BUILTIN.createLessEqual(
+						Factory.TERM.createVariable("Complexity"),
+						Factory.TERM.createString(complexity.toString()))),
+				Factory.BASIC.createLiteral(true,
+					Factory.BUILTIN.createNotExactEqual(
+						Factory.TERM.createVariable("CommitMessage"),
+						Factory.TERM.createString(Type.MERGE.toString()))),
+				Factory.BASIC.createLiteral(true,
+					Factory.BASIC.createPredicate("KeywordChange", 7),
+					Factory.BASIC.createTuple(
+						Factory.TERM.createVariable("ID"),
+						Factory.TERM.createVariable("KeywordType"),
+						Factory.TERM.createVariable("KeywordContext"),
+						Factory.TERM.createVariable("ChangeType"),
+						Factory.TERM.createVariable("Package"),
+						Factory.TERM.createVariable("Keyword"),
+						Factory.TERM.createVariable("Count"))),
+				Factory.BASIC.createLiteral(true,
+					Factory.BUILTIN.createNotExactEqual(
+						Factory.TERM.createVariable("KeywordContext"),
+						Factory.TERM.createString(KeywordContext.STATEMENT.toString()))));
+
+		return query;
+
 	}
 
 }

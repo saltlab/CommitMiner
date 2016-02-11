@@ -12,18 +12,24 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.deri.iris.Configuration;
 import org.deri.iris.EvaluationException;
+import org.deri.iris.KnowledgeBase;
 import org.deri.iris.ProgramNotStratifiedException;
 import org.deri.iris.RuleUnsafeException;
 import org.deri.iris.api.IKnowledgeBase;
+import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.api.basics.IQuery;
 import org.deri.iris.api.basics.IRule;
 import org.deri.iris.api.basics.ITuple;
 import org.deri.iris.factory.Factory;
 import org.deri.iris.storage.IRelation;
+import org.deri.iris.storage.IRelationFactory;
+import org.deri.iris.storage.simple.SimpleRelationFactory;
 
 import weka.clusterers.DBSCAN;
 import weka.core.Attribute;
@@ -36,14 +42,12 @@ import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.attribute.RemoveByName;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
-import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.learn.ClusterMetrics;
-import ca.ubc.ece.salt.pangor.learn.analysis.KeywordFilter.FilterType;
 
 /**
  * The {@code LearningDataSet} manages the data set for data mining
@@ -65,7 +69,7 @@ public class LearningDataSet extends DataSet {
 	 * filters out any LearningFeatureVector which does not contain one of these
 	 * packages.
 	 */
-	private List<KeywordFilter> rowFilters;
+//	private List<KeywordFilter> rowFilters;
 
 	/**
 	 * The keywords we want to ommit as features from the data set during
@@ -114,11 +118,11 @@ public class LearningDataSet extends DataSet {
 	 * 					 cannot be read.
 	 */
 	private LearningDataSet(String dataSetPath, String oraclePath,
-							List<KeywordFilter> rowFilters,
+							/*List<KeywordFilter> rowFilters,*/
 							List<KeywordUse> columnFilters,
 							int maxModifiedStatements) throws Exception {
 		super(null, null);
-		this.rowFilters = rowFilters;
+//		this.rowFilters = rowFilters;
 		this.columnFilters = columnFilters;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
@@ -145,7 +149,7 @@ public class LearningDataSet extends DataSet {
 	 */
 	private LearningDataSet(String dataSetPath, List<IRule> rules, List<IQuery> queries) {
 		super(rules, queries);
-		this.rowFilters = null;
+//		this.rowFilters = null;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
 		this.dataSetPath = dataSetPath;
@@ -161,7 +165,7 @@ public class LearningDataSet extends DataSet {
 	 */
 	private LearningDataSet(List<KeywordFilter> filters, List<IRule> rules, List<IQuery> queries) {
 		super(rules, queries);
-		this.rowFilters = filters;
+//		this.rowFilters = filters;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
 		this.dataSetPath = null;
@@ -186,10 +190,10 @@ public class LearningDataSet extends DataSet {
 	 */
 	public static LearningDataSet createLearningDataSet(String dataSetPath,
 														String oraclePath,
-														List<KeywordFilter> rowFilters,
+//														List<KeywordFilter> rowFilters,
 														List<KeywordUse> columnFilters,
 														int maxModifiedStatements) throws Exception {
-		return new LearningDataSet(dataSetPath, oraclePath, rowFilters, columnFilters, maxModifiedStatements);
+		return new LearningDataSet(dataSetPath, oraclePath, /*rowFilters,*/ columnFilters, maxModifiedStatements);
 	}
 
 	/**
@@ -514,50 +518,75 @@ public class LearningDataSet extends DataSet {
 	 * Performs pre-processing operations for data-mining. Specifically,
 	 * filters out rows which do not use the specified packages and filters
 	 * out columns which do not contain any data.
+	 * @param query The query that will be used to select the rows to use.
+	 * @throws EvaluationException When an error occurs with the iris knowledge base.
 	 */
-	public void preProcess() {
+	public void preProcess(IQuery query) throws EvaluationException {
 
-		/* Remove rows that do not reference the packages we are interested in. */
+		/* The IDs of the feature vectors that we will work with. */
+		Set<Integer> toInclude = new HashSet<Integer>();
 
-		List<LearningFeatureVector> toRemove = new LinkedList<LearningFeatureVector>();
+		/* Run the query against the fact database. The query should return
+		 * tuples for which the first element is the ID of the feature vector. */
+		Map<IPredicate, IRelation> facts = this.getDataSetAsFactDatabase();
+		IKnowledgeBase knowledgeBase = new KnowledgeBase(facts, rules, new Configuration());
+		IRelation relation = knowledgeBase.execute(query);
+
+		for(int i = 0; i < relation.size(); i++) {
+			ITuple tuple = relation.get(i);
+			if(tuple.isEmpty()) throw new EvaluationException("No id was found.");
+			Integer id = Integer.parseInt(tuple.get(0).getValue().toString());
+			toInclude.add(id);
+		}
+
+		List<LearningFeatureVector> newFeatureVectorList = new LinkedList<LearningFeatureVector>();
 		for(LearningFeatureVector featureVector : this.featureVectors) {
-
-			/* Ignore merge commits. */
-			if(featureVector.commit.commitMessageType == Type.MERGE) {
-				toRemove.add(featureVector);
-			}
-			/* Check if the feature vector references the any of the interesting packages. */
-			else if(!includeRow(featureVector.keywordMap.keySet(), featureVector.modifiedStatementCount)) {
-
-				/* Schedule this LearningFeatureVector for removal. */
-				toRemove.add(featureVector);
-
-			}
-
+			if(toInclude.contains(featureVector.id)) newFeatureVectorList.add(featureVector);
 		}
 
-		for(LearningFeatureVector featureVector : toRemove) {
-			this.featureVectors.remove(featureVector);
-		}
+		this.featureVectors = newFeatureVectorList;
 
-		/* Remove rows that do not fall within the desired change score. */
-
-		toRemove = new LinkedList<LearningFeatureVector>();
-		for(LearningFeatureVector featureVector : this.featureVectors) {
-
-			/* Check if the feature vector references the any of the interesting packages. */
-			if(getChangeScore(featureVector.keywordMap.keySet()) == 0) {
-
-				/* Schedule this LearningFeatureVector for removal. */
-				toRemove.add(featureVector);
-
-			}
-
-		}
-
-		for(LearningFeatureVector featureVector : toRemove) {
-			this.featureVectors.remove(featureVector);
-		}
+//		/* Remove rows that do not reference the packages we are interested in. */
+//
+//		List<LearningFeatureVector> toRemove = new LinkedList<LearningFeatureVector>();
+//		for(LearningFeatureVector featureVector : this.featureVectors) {
+//
+//			/* Ignore merge commits. */
+//			if(featureVector.commit.commitMessageType == Type.MERGE) {
+//				toRemove.add(featureVector);
+//			}
+//			/* Check if the feature vector references the any of the interesting packages. */
+//			else if(!includeRow(featureVector.keywordMap.keySet(), featureVector.modifiedStatementCount)) {
+//
+//				/* Schedule this LearningFeatureVector for removal. */
+//				toRemove.add(featureVector);
+//
+//			}
+//
+//		}
+//
+//		for(LearningFeatureVector featureVector : toRemove) {
+//			this.featureVectors.remove(featureVector);
+//		}
+//
+//		/* Remove rows that do not fall within the desired change score. */
+//
+//		toRemove = new LinkedList<LearningFeatureVector>();
+//		for(LearningFeatureVector featureVector : this.featureVectors) {
+//
+//			/* Check if the feature vector references the any of the interesting packages. */
+//			if(getChangeScore(featureVector.keywordMap.keySet()) == 0) {
+//
+//				/* Schedule this LearningFeatureVector for removal. */
+//				toRemove.add(featureVector);
+//
+//			}
+//
+//		}
+//
+//		for(LearningFeatureVector featureVector : toRemove) {
+//			this.featureVectors.remove(featureVector);
+//		}
 
 		/* Get the set of keywords from all the feature vectors. */
 
@@ -719,35 +748,35 @@ public class LearningDataSet extends DataSet {
 	 * @param maxModifiedStatements The maximum number of modified statements.
 	 * @return True if the keyword set matches an include filter.
 	 */
-	private boolean includeRow(Set<KeywordUse> keywords, int modifiedStatementCount) {
-		if(modifiedStatementCount > this.maxModifiedStatements) return false;
-		return includeRow(keywords, this.rowFilters);
-	}
+//	private boolean includeRow(Set<KeywordUse> keywords, int modifiedStatementCount) {
+//		if(modifiedStatementCount > this.maxModifiedStatements) return false;
+//		return includeRow(keywords, this.rowFilters);
+//	}
 
 	/**
 	 * @param keywords The keywords from a feature vector.
 	 * @param filers The filters to apply to the row.
 	 * @return True if the keyword set matches an include filter.
 	 */
-	private static boolean includeRow(Set<KeywordUse> keywords, List<KeywordFilter> filters) {
-		for(KeywordUse keyword : keywords) {
-			for(KeywordFilter filter : filters) {
-
-				/* This keyword must match the filter to be included. */
-				if(filter.type != KeywordType.UNKNOWN && filter.type != keyword.type) continue;
-				if(filter.context != KeywordContext.UNKNOWN && filter.context != keyword.context) continue;
-				if(filter.changeType != ChangeType.UNKNOWN && filter.changeType != keyword.changeType) continue;
-				if(!filter.pack.isEmpty() && !filter.pack.equals(keyword.getPackageName())) continue;
-				if(!filter.keyword.isEmpty() && !filter.keyword.equals(keyword.keyword)) continue;
-
-				/* The keyword matches the filter. */
-				if(filter.filterType == FilterType.INCLUDE) return true;
-				if(filter.filterType == FilterType.EXCLUDE) return false;
-
-			}
-		}
-		return false;
-	}
+//	private static boolean includeRow(Set<KeywordUse> keywords, List<KeywordFilter> filters) {
+//		for(KeywordUse keyword : keywords) {
+//			for(KeywordFilter filter : filters) {
+//
+//				/* This keyword must match the filter to be included. */
+//				if(filter.type != KeywordType.UNKNOWN && filter.type != keyword.type) continue;
+//				if(filter.context != KeywordContext.UNKNOWN && filter.context != keyword.context) continue;
+//				if(filter.changeType != ChangeType.UNKNOWN && filter.changeType != keyword.changeType) continue;
+//				if(!filter.pack.isEmpty() && !filter.pack.equals(keyword.getPackageName())) continue;
+//				if(!filter.keyword.isEmpty() && !filter.keyword.equals(keyword.keyword)) continue;
+//
+//				/* The keyword matches the filter. */
+//				if(filter.filterType == FilterType.INCLUDE) return true;
+//				if(filter.filterType == FilterType.EXCLUDE) return false;
+//
+//			}
+//		}
+//		return false;
+//	}
 
 	/**
 	 * Computes a score to determine how much a function has changed (using the
@@ -757,20 +786,20 @@ public class LearningDataSet extends DataSet {
 	 * 		   respect to its keywords. A score of zero means no keywords
 	 * 		   changed.
 	 */
-	private int getChangeScore(Set<KeywordUse> keywords) {
-
-		int score = 0;
-
-		for(KeywordUse keyword : keywords) {
-			if(keyword.changeType != ChangeType.UNCHANGED &&
-					keyword.changeType != ChangeType.UNKNOWN) {
-				score++;
-			}
-		}
-
-		return score;
-
-	}
+//	private int getChangeScore(Set<KeywordUse> keywords) {
+//
+//		int score = 0;
+//
+//		for(KeywordUse keyword : keywords) {
+//			if(keyword.changeType != ChangeType.UNCHANGED &&
+//					keyword.changeType != ChangeType.UNKNOWN) {
+//				score++;
+//			}
+//		}
+//
+//		return score;
+//
+//	}
 
 	/**
 	 * Writes the result of a clustering on an ARFF file
@@ -805,6 +834,63 @@ public class LearningDataSet extends DataSet {
 		if(this.oracle != null) {
 			clusterMetrics.evaluate(this.oracle);
 		}
+
+	}
+
+	/**
+	 * Converts the data set into a database of Datalog facts.
+	 */
+	public Map<IPredicate, IRelation> getDataSetAsFactDatabase() {
+
+		IRelationFactory relationFactory = new SimpleRelationFactory();
+
+		/* The fact database. */
+		Map<IPredicate, IRelation> facts = new HashMap<IPredicate, IRelation>();
+
+		/* Create the feature vector predicate and relation. */
+		IPredicate fvPredicate = Factory.BASIC.createPredicate("FeatureVector", 8);
+		IRelation fvRelation = relationFactory.createRelation();
+		facts.put(fvPredicate, fvRelation);
+
+		/* Create the keyword change predicate and relation. */
+		IPredicate kcPredicate = Factory.BASIC.createPredicate("KeywordChange", 7);
+		IRelation kcRelation = relationFactory.createRelation();
+		facts.put(kcPredicate, kcRelation);
+
+		/* Create a new fact (tuple) for each feature vector. */
+		for(LearningFeatureVector featureVector : this.featureVectors) {
+
+			/* Add the feature vector tuple to the relation. */
+			fvRelation.add(Factory.BASIC.createTuple(
+					Factory.TERM.createString(String.valueOf(featureVector.id)),
+					Factory.TERM.createString(featureVector.commit.commitMessageType.toString()),
+					Factory.TERM.createString(featureVector.commit.url),
+					Factory.TERM.createString(featureVector.commit.buggyCommitID),
+					Factory.TERM.createString(featureVector.commit.repairedCommitID),
+					Factory.TERM.createString(featureVector.klass),
+					Factory.TERM.createString(featureVector.method),
+					Factory.TERM.createString(String.valueOf(featureVector.modifiedStatementCount))));
+
+			/* Create a new fact (tuple) for each keyword change. */
+			for(Entry<KeywordUse, Integer> entry : featureVector.keywordMap.entrySet()) {
+
+				/* Add the keyword change tuple to the relation. */
+				KeywordUse keyword = entry.getKey();
+				Integer count = entry.getValue();
+				kcRelation.add(Factory.BASIC.createTuple(
+						Factory.TERM.createString(String.valueOf(featureVector.id)),
+						Factory.TERM.createString(keyword.type.toString()),
+						Factory.TERM.createString(keyword.context.toString()),
+						Factory.TERM.createString(keyword.changeType.toString()),
+						Factory.TERM.createString(keyword.getPackageName()),
+						Factory.TERM.createString(keyword.keyword),
+						Factory.TERM.createString(count.toString())));
+
+			}
+
+		}
+
+		return facts;
 
 	}
 
