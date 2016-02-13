@@ -573,31 +573,22 @@ public class LearningDataSet extends DataSet {
 		/* Convert the data set to a Weka-usable format. */
 		wekaData = this.getWekaDataSet();
 
-		/* Filter out the columns we don't want. */
-		String[] removeOptions = new String[2];
-		removeOptions[0] = "-R";
-		removeOptions[1] = "1-9";
-		Remove remove = new Remove();
-		remove.setOptions(removeOptions);
-		remove.setInputFormat(wekaData);
-		Instances filteredData = Filter.useFilter(wekaData, remove);
-
 		/* Filter out the UNCHANGED columns. */
 		String[] removeByNameOptions = new String[2];
 		removeByNameOptions[0] = "-E";
 		removeByNameOptions[1] = ".*UNCHANGED.*";
 		RemoveByName removeByName = new RemoveByName();
 		removeByName.setOptions(removeByNameOptions);
-		removeByName.setInputFormat(filteredData);
-		filteredData = Filter.useFilter(filteredData, removeByName);
+		removeByName.setInputFormat(wekaData);
+		wekaData = Filter.useFilter(wekaData, removeByName);
 
 		/* Create the keyword (column) filter. */
-		String filter = "(.*_global_test)";
+		String filter = "(.*:global:test)|(.*:UPDATED:.*)";
 		for(KeywordUse keywordUse : this.columnFilters) {
 			filter += "|(" + keywordUse.type.toString();
-			filter += "_" + keywordUse.context.toString();
-			filter += "_" + keywordUse.getPackageName();
-			filter += "_" + keywordUse.keyword + ")";
+			filter += ":" + keywordUse.context.toString();
+			filter += ":" + keywordUse.getPackageName();
+			filter += ":" + keywordUse.keyword + ")";
 		}
 
 		/* Filter out the statement columns. */
@@ -607,13 +598,34 @@ public class LearningDataSet extends DataSet {
 		RemoveByName removeKeyword = new RemoveByName();
 		/* TODO: May get "NO ATTRIBUTE" error when small." */
 		removeKeyword.setOptions(removeKeywordOptions);
-		removeKeyword.setInputFormat(filteredData);
-		filteredData = Filter.useFilter(filteredData, removeKeyword);
+		removeKeyword.setInputFormat(wekaData);
+		wekaData = Filter.useFilter(wekaData, removeKeyword);
+
+		/* Remove instances that have no values after filtering. */
+		for(int i = 0; i < wekaData.size(); i++) {
+			int total = 0;
+			Instance instance = wekaData.get(i);
+			for(int j = 10; j < instance.numAttributes(); j++) {
+				total += (int)instance.value(j);
+			}
+			if(total == 0) {
+				wekaData.remove(instance);
+			}
+		}
+
+		/* Filter out the columns we don't want. */
+		String[] removeOptions = new String[2];
+		removeOptions[0] = "-R";
+		removeOptions[1] = "2-9";
+		Remove remove = new Remove();
+		remove.setOptions(removeOptions);
+		remove.setInputFormat(wekaData);
+		Instances filteredData = Filter.useFilter(wekaData, remove);
 
 		/* Set up the distance function. We want Manhattan Distance. */
 		ManhattanDistance distanceFunction = new ManhattanDistance();
 		// -R specifies list of column to use, -D turns off normalization of attribute values
-		String[] distanceFunctionOptions = "-R first-last -D".split("\\s");
+		String[] distanceFunctionOptions = "-R 2-last -D".split("\\s");
 		distanceFunction.setOptions(distanceFunctionOptions);
 
 		/* DBScan Clusterer. */
@@ -625,6 +637,7 @@ public class LearningDataSet extends DataSet {
 
 		/* Compute the metrics for the clustering. */
 		for (Instance instance : wekaData) {
+
 			try {
 				Integer cluster = dbScan.clusterInstance(instance);
 				instance.setValue(8, "cluster" + cluster.toString());
@@ -642,10 +655,10 @@ public class LearningDataSet extends DataSet {
 				String expected = this.oracle != null ?
 						this.oracle.get((int)instance.value(0)) : "?";
 
-				if(expected == null) throw new Error("A feature vector was not classified in the oracle: " + (int)instance.value(0));
+				if(expected == null) expected = "?"; // throw new Error("A feature vector was not classified in the oracle: " + (int)instance.value(0));
 
 				clusterMetrics.addInstance(cluster, (int)instance.value(0),
-											expected, (int)instance.value(8),
+											expected, cluster,
 											keywords);
 
 			} catch (Exception ignore) { } // Instance is not part of any cluster

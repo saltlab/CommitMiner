@@ -56,8 +56,7 @@ public class LearningDataSetMain {
 
 		/* Re-construct the data set. */
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(
-				options.getDataSetPath(), options.getOraclePath(),
-				/*Arrays.asList(nofilter),*/ null,
+				options.getDataSetPath(), options.getOraclePath(), null,
 				options.getMaxChangeComplexity());
 
 		/* Print the metrics from the data set. */
