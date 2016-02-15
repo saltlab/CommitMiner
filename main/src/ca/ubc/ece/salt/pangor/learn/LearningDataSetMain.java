@@ -197,6 +197,10 @@ public class LearningDataSetMain {
 						Factory.TERM.createVariable("CommitMessage"),
 						Factory.TERM.createString(Type.MERGE.toString()))),
 				Factory.BASIC.createLiteral(true,
+					Factory.BUILTIN.createEqual(
+						Factory.TERM.createVariable("CommitMessage"),
+						Factory.TERM.createString(Type.BUG_FIX.toString()))),
+				Factory.BASIC.createLiteral(true,
 					Factory.BASIC.createPredicate("KeywordChange", 7),
 					Factory.BASIC.createTuple(
 						Factory.TERM.createVariable("ID"),

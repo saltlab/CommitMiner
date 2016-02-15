@@ -52,6 +52,10 @@ public class ChangeComplexityDomainAnalysis extends DomainAnalysis {
 				complexity += dstComplexity.getChangeComplexity().updatedStatements;
 			}
 
+			/* Reset the change complexity for the next run. */
+			srcComplexity.resetComplexity();
+			dstComplexity.resetComplexity();
+
 		}
 
 		/* Create a fact with the change complexity information. */

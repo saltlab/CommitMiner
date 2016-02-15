@@ -38,6 +38,13 @@ public class ChangeComplexitySCFA extends SourceCodeFileAnalysis {
 		return this.complexity;
 	}
 
+	/**
+	 * Reset the complexity after the class has been used.
+	 */
+	public void resetComplexity() {
+		this.complexity = null;
+	}
+
 	@Override
 	public void analyze(SourceCodeFileChange sourceCodeFileChange,
 			Map<IPredicate, IRelation> facts, ClassifiedASTNode root,

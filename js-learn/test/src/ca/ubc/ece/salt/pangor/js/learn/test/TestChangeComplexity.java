@@ -125,7 +125,6 @@ public class TestChangeComplexity {
 		this.runTest(src, dst, 0, 2, 0, true);
 	}
 
-
 	/**
 	 * @return A dummy source code file change for testing.
 	 * @throws IOException
