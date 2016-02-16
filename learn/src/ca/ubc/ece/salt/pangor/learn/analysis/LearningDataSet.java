@@ -642,7 +642,7 @@ public class LearningDataSet extends DataSet {
 				for(int i = 10; i < instance.numAttributes(); i++) {
 					if(instance.value(i) > 0) {
 						keywords.add(instance.attribute(i).name()
-										+ ":" + (int)instance.value(i));
+										+ ":" + instance.value(i));
 					}
 				}
 
@@ -653,7 +653,7 @@ public class LearningDataSet extends DataSet {
 				if(expected == null) expected = "?"; // throw new Error("A feature vector was not classified in the oracle: " + (int)instance.value(0));
 
 				clusterMetrics.addInstance(cluster, (int)instance.value(0),
-											expected, (int)instance.value(7),
+											expected, (int)(instance.value(9)/LearningFeatureVector.COMPLEXITY_WEIGHT),
 											keywords);
 
 			} catch (Exception ignore) { } // Instance is not part of any cluster

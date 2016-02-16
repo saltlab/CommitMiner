@@ -44,8 +44,6 @@ public class Cluster {
 	 */
 	public void addInstance(int instanceID, int modifiedStatements,
 							String expected, List<String> keywords) {
-		System.out.println("# modified statements = " + this.modifiedStatements + " + " + modifiedStatements);
-		System.out.println("# instances = " + this.instances.size());
 		this.modifiedStatements += modifiedStatements;
 		this.instances.put(instanceID, expected);
 		for(String modified : keywords) {
@@ -58,7 +56,8 @@ public class Cluster {
 	 * @return The average number of modified statements.
 	 */
 	public int getAverageModifiedStatements() {
-		return Math.round(this.modifiedStatements / this.instances.size());
+		double avg = this.modifiedStatements / this.instances.size();
+		return (int) Math.round(avg);
 	}
 
 	/**
