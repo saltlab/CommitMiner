@@ -83,9 +83,6 @@ public class LearningDataSet extends DataSet {
 	 */
 	private String oraclePath;
 
-	/** The maximum number of modified statements for a feature vector. **/
-	private int maxModifiedStatements;
-
 	/** An ordered list of the keywords to print in the feature vector. **/
 	private Set<KeywordDefinition> keywords;
 
@@ -111,15 +108,13 @@ public class LearningDataSet extends DataSet {
 	 * 					 cannot be read.
 	 */
 	private LearningDataSet(String dataSetPath, String oraclePath,
-							List<KeywordUse> columnFilters,
-							int maxModifiedStatements) throws Exception {
+							List<KeywordUse> columnFilters) throws Exception {
 		super(null, null);
 		this.columnFilters = columnFilters;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<LearningFeatureVector>();
 		this.dataSetPath = dataSetPath;
 		this.oraclePath = oraclePath;
-		this.maxModifiedStatements = maxModifiedStatements;
 		this.oracle = null;
 		this.wekaData = null;
 
@@ -178,9 +173,9 @@ public class LearningDataSet extends DataSet {
 	 */
 	public static LearningDataSet createLearningDataSet(String dataSetPath,
 														String oraclePath,
-														List<KeywordUse> columnFilters,
-														int maxModifiedStatements) throws Exception {
-		return new LearningDataSet(dataSetPath, oraclePath, columnFilters, maxModifiedStatements);
+														List<KeywordUse> columnFilters
+														) throws Exception {
+		return new LearningDataSet(dataSetPath, oraclePath, columnFilters);
 	}
 
 	/**
@@ -630,7 +625,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.2 -M 3".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.2 -M 5".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);
@@ -658,7 +653,7 @@ public class LearningDataSet extends DataSet {
 				if(expected == null) expected = "?"; // throw new Error("A feature vector was not classified in the oracle: " + (int)instance.value(0));
 
 				clusterMetrics.addInstance(cluster, (int)instance.value(0),
-											expected, cluster,
+											expected, (int)instance.value(7),
 											keywords);
 
 			} catch (Exception ignore) { } // Instance is not part of any cluster

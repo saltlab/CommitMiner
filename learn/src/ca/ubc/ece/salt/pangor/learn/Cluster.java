@@ -23,7 +23,7 @@ public class Cluster {
 	public Map<Integer, String> instances;
 
 	/** Tracks the total number of statements that were modified in the cluster. **/
-	public int modifiedStatements;
+	private int modifiedStatements;
 
 	/** Tracks how frequently which keywords are modified in the cluster. */
 	public Map<String, Integer> keywords;
@@ -44,6 +44,8 @@ public class Cluster {
 	 */
 	public void addInstance(int instanceID, int modifiedStatements,
 							String expected, List<String> keywords) {
+		System.out.println("# modified statements = " + this.modifiedStatements + " + " + modifiedStatements);
+		System.out.println("# instances = " + this.instances.size());
 		this.modifiedStatements += modifiedStatements;
 		this.instances.put(instanceID, expected);
 		for(String modified : keywords) {

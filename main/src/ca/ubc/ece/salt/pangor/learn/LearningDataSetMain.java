@@ -56,8 +56,7 @@ public class LearningDataSetMain {
 
 		/* Re-construct the data set. */
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(
-				options.getDataSetPath(), options.getOraclePath(), null,
-				options.getMaxChangeComplexity());
+				options.getDataSetPath(), options.getOraclePath(), null);
 
 		/* Print the metrics from the data set. */
 		if(options.getPrintMetrics()) {
@@ -95,8 +94,7 @@ public class LearningDataSetMain {
 					LearningDataSet.createLearningDataSet(
 							options.getDataSetPath(),
 							options.getOraclePath(),
-							new LinkedList<KeywordUse>(), // columnFilters
-							options.getMaxChangeComplexity());
+							new LinkedList<KeywordUse>()); // column filters
 
 			/* Pre-process the file. */
 			clusteringDataSet.preProcess(getRowFilterQuery(options.getMaxChangeComplexity()));
@@ -192,10 +190,10 @@ public class LearningDataSetMain {
 					Factory.BUILTIN.createLessEqual(
 						Factory.TERM.createVariable("Complexity"),
 						Factory.TERM.createString(complexity.toString()))),
-				Factory.BASIC.createLiteral(true,
-					Factory.BUILTIN.createNotExactEqual(
-						Factory.TERM.createVariable("CommitMessage"),
-						Factory.TERM.createString(Type.MERGE.toString()))),
+//				Factory.BASIC.createLiteral(true,
+//					Factory.BUILTIN.createNotExactEqual(
+//						Factory.TERM.createVariable("CommitMessage"),
+//						Factory.TERM.createString(Type.MERGE.toString()))),
 				Factory.BASIC.createLiteral(true,
 					Factory.BUILTIN.createEqual(
 						Factory.TERM.createVariable("CommitMessage"),
