@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.deri.iris.api.basics.IQuery;
+import org.deri.iris.api.terms.IVariable;
 import org.deri.iris.factory.Factory;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -168,10 +169,12 @@ public class LearningDataSetMain {
 	 *  - Complexity <= {@code complexity}
 	 *  - Commit message != MERGE
 	 *  - At least one keyword with context != STATEMENT
-	 * @param complexity The maximum complexity for the feature vector.
+	 * @param maxComplexity The maximum complexity for the feature vector.
 	 * @return The Datalog query that selects which rows to data mine.
 	 */
-	public static IQuery getRowFilterQuery(Integer complexity) {
+	public static IQuery getRowFilterQuery(Integer maxComplexity) {
+
+		IVariable complexity = Factory.TERM.createVariable("Complexity");
 
 		IQuery query =
 			Factory.BASIC.createQuery(
@@ -185,11 +188,11 @@ public class LearningDataSetMain {
 						Factory.TERM.createVariable("RepairedCommitID"),
 						Factory.TERM.createVariable("Class"),
 						Factory.TERM.createVariable("Method"),
-						Factory.TERM.createVariable("Complexity"))),
+						complexity)),
 				Factory.BASIC.createLiteral(true,
 					Factory.BUILTIN.createLessEqual(
-						Factory.TERM.createVariable("Complexity"),
-						Factory.TERM.createString(complexity.toString()))),
+						complexity,
+						Factory.CONCRETE.createInt(maxComplexity))),
 //				Factory.BASIC.createLiteral(true,
 //					Factory.BUILTIN.createNotExactEqual(
 //						Factory.TERM.createVariable("CommitMessage"),

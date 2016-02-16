@@ -523,7 +523,9 @@ public class LearningDataSet extends DataSet {
 
 		List<LearningFeatureVector> newFeatureVectorList = new LinkedList<LearningFeatureVector>();
 		for(LearningFeatureVector featureVector : this.featureVectors) {
-			if(toInclude.contains(featureVector.id)) newFeatureVectorList.add(featureVector);
+			if(toInclude.contains(featureVector.id)) {
+				newFeatureVectorList.add(featureVector);
+			}
 		}
 
 		this.featureVectors = newFeatureVectorList;
@@ -764,7 +766,7 @@ public class LearningDataSet extends DataSet {
 					Factory.TERM.createString(featureVector.commit.repairedCommitID),
 					Factory.TERM.createString(featureVector.klass),
 					Factory.TERM.createString(featureVector.method),
-					Factory.TERM.createString(String.valueOf(featureVector.modifiedStatementCount))));
+					Factory.CONCRETE.createInt(featureVector.modifiedStatementCount)));
 
 			/* Create a new fact (tuple) for each keyword change. */
 			for(Entry<KeywordUse, Integer> entry : featureVector.keywordMap.entrySet()) {
