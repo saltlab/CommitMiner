@@ -6,7 +6,6 @@ import java.util.List;
 import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileAnalysis;
 import ca.ubc.ece.salt.pangor.js.analysis.FunctionAnalysis;
-import ca.ubc.ece.salt.pangor.js.analysis.ScriptAnalysis;
 import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
 
 /**
@@ -40,8 +39,8 @@ public class CTETDomainAnalysis extends DomainAnalysis {
 		srcFunctionAnalyses.add(new CTETFunctionAnalysis(false));
 		dstFunctionAnalyses.add(new CTETFunctionAnalysis(true));
 
-		SourceCodeFileAnalysis srcSCFA = new ScriptAnalysis(srcFunctionAnalyses);
-		SourceCodeFileAnalysis dstSCFA = new ScriptAnalysis(dstFunctionAnalyses);
+		SourceCodeFileAnalysis srcSCFA = new CTETScriptAnalysis();
+		SourceCodeFileAnalysis dstSCFA = new CTETScriptAnalysis();
 
 		CTETDomainAnalysis analysis = new CTETDomainAnalysis(srcSCFA, dstSCFA);
 

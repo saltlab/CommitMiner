@@ -36,7 +36,7 @@ public class CTETFunctionAnalysis extends FunctionAnalysis {
 		   scope.getScope().getChangeType() != ChangeType.REMOVED) {
 
            /* Visit the function to extract features. */
-			CTETAnalysisVisitor.getLearningFacts(facts, sourceCodeFileChange,
+			CTETSourceAnalysisVisitor.getLearningFacts(facts, sourceCodeFileChange,
 					(ScriptNode)scope.getScope(), model, this.dst);
 
 		}
