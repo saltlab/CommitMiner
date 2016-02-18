@@ -10,10 +10,25 @@ import org.deri.iris.storage.IRelation;
 import org.deri.iris.storage.IRelationFactory;
 import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.Block;
+import org.mozilla.javascript.ast.BreakStatement;
+import org.mozilla.javascript.ast.ContinueStatement;
+import org.mozilla.javascript.ast.DoLoop;
+import org.mozilla.javascript.ast.EmptyStatement;
+import org.mozilla.javascript.ast.ExpressionStatement;
+import org.mozilla.javascript.ast.ForInLoop;
+import org.mozilla.javascript.ast.ForLoop;
+import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.ast.IfStatement;
+import org.mozilla.javascript.ast.LabeledStatement;
 import org.mozilla.javascript.ast.NodeVisitor;
-import org.mozilla.javascript.ast.Scope;
+import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.ScriptNode;
+import org.mozilla.javascript.ast.SwitchStatement;
+import org.mozilla.javascript.ast.ThrowStatement;
+import org.mozilla.javascript.ast.TryStatement;
+import org.mozilla.javascript.ast.VariableDeclaration;
+import org.mozilla.javascript.ast.WhileLoop;
+import org.mozilla.javascript.ast.WithStatement;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
@@ -71,14 +86,32 @@ public class StatementAnalysisVisitor implements NodeVisitor {
 
 		if(type == KeywordType.UNKNOWN || context == KeywordContext.UNKNOWN) return true;
 
-		if(node.isStatement()
-			&& node.getChangeType() != ChangeType.UNCHANGED
-			&& node.getChangeType() != ChangeType.UNKNOWN
-			&& ((node.getChangeType() == ChangeType.REMOVED && !this.dst) // Source file only consider removed
-				|| this.dst) // Destination file consider everything else
-			&& node.getClass() != Block.class
-			&& node.getClass() != Scope.class) {
-			addStatementFact(node);
+		if(node instanceof BreakStatement
+				|| node instanceof ContinueStatement
+				|| node instanceof EmptyStatement
+				|| node instanceof ExpressionStatement
+				|| node instanceof IfStatement
+				|| node instanceof LabeledStatement
+				|| node instanceof ReturnStatement
+				|| node instanceof SwitchStatement
+				|| node instanceof ThrowStatement
+				|| node instanceof TryStatement
+				|| node instanceof WithStatement
+				|| node instanceof ForLoop
+				|| node instanceof ForInLoop
+				|| node instanceof WhileLoop
+				|| node instanceof DoLoop
+				|| node instanceof FunctionNode
+				|| (node instanceof VariableDeclaration && node.isStatement())) {
+
+			if(node.getChangeType() != ChangeType.UNCHANGED
+				&& node.getChangeType() != ChangeType.UNKNOWN
+				&& ((node.getChangeType() == ChangeType.REMOVED && !this.dst) || this.dst)) {
+
+				addStatementFact(node);
+
+			}
+
 		}
 
 		return true;

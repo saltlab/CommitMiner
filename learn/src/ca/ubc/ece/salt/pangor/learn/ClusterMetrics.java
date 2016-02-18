@@ -176,7 +176,7 @@ public class ClusterMetrics {
 					double percentOfCluster = intersection / clusterSize;
 
 					/* If both are > 50%, all these are TPs */
-					if(percentOfClass >= 0.05 && percentOfCluster >= 0.2) {
+					if(percentOfClass >= 0 && percentOfCluster >= 0) {
 						tp += intersection;
 						tpForCluster += intersection;
 					}

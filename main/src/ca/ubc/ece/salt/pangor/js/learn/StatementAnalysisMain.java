@@ -19,6 +19,7 @@ import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysisTask;
+import ca.ubc.ece.salt.pangor.js.learn.analysis.ChangeComplexityDomainAnalysis;
 import ca.ubc.ece.salt.pangor.js.learn.statements.StatementDomainAnalysis;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningDataSet;
 
@@ -56,8 +57,10 @@ public class StatementAnalysisMain {
 		/* Create the commit analyiss that will analyze commits. */
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath());
 		DomainAnalysis learning = StatementDomainAnalysis.createLearningAnalysis();
+		DomainAnalysis complexity = ChangeComplexityDomainAnalysis.createComplexityAnalysis();
 		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
 		domains.add(learning);
+		domains.add(complexity);
 		CommitAnalysis commitAnalysis = new CommitAnalysis(dataSet, domains);
 
         GitProjectAnalysis gitProjectAnalysis;

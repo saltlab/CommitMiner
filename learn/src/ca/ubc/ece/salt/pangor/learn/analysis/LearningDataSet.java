@@ -627,7 +627,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.2 -M 5".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.02 -M 3".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);
