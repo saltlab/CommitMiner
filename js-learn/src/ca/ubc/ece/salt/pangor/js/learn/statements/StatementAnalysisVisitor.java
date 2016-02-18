@@ -92,7 +92,7 @@ public class StatementAnalysisVisitor implements NodeVisitor {
 	private void addStatementFact(AstNode node) {
 
 		/* Get the relation for this predicate from the fact base. */
-		IPredicate predicate = Factory.BASIC.createPredicate("StatementChange", 5);
+		IPredicate predicate = Factory.BASIC.createPredicate("KeywordChange", 8);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 
@@ -108,8 +108,11 @@ public class StatementAnalysisVisitor implements NodeVisitor {
 		ITuple tuple = Factory.BASIC.createTuple(
 				Factory.TERM.createString("ClassNA"),
 				Factory.TERM.createString("MethodNA"),
-				Factory.TERM.createString(node.getClass().getSimpleName()),
+				Factory.TERM.createString(KeywordType.UNKNOWN.toString()),
+				Factory.TERM.createString(KeywordContext.UNKNOWN.toString()),
+				Factory.TERM.createString("unknown"),
 				Factory.TERM.createString(node.getChangeType().toString()),
+				Factory.TERM.createString(node.getClass().getSimpleName()),
 				Factory.TERM.createString(getUniqueID().toString()));
 		relation.add(tuple);
 
