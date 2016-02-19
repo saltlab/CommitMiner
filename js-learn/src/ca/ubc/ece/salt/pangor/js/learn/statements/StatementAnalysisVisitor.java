@@ -35,7 +35,6 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.AnalysisUtilities;
-import ca.ubc.ece.salt.pangor.js.api.JSAPIUtilities;
 import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
 
 /**
@@ -80,11 +79,6 @@ public class StatementAnalysisVisitor implements NodeVisitor {
 
 	@Override
 	public boolean visit(AstNode node) {
-
-		KeywordType type = JSAPIUtilities.getTokenType(node);
-		KeywordContext context = JSAPIUtilities.getTokenContext(node);
-
-		if(type == KeywordType.UNKNOWN || context == KeywordContext.UNKNOWN) return true;
 
 		if(node instanceof BreakStatement
 				|| node instanceof ContinueStatement
