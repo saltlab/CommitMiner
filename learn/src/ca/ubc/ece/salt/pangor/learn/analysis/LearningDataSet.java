@@ -197,6 +197,13 @@ public class LearningDataSet extends DataSet {
 	}
 
 	/**
+	 * @return The number of feature vectors in the data set.
+	 */
+	public int getSize() {
+		return this.featureVectors.size();
+	}
+
+	/**
 	 * @return The list of queries for the test.
 	 */
 	private static List<IQuery> getQueries() {
@@ -627,7 +634,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.02 -M 3".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.2 -M 3".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);

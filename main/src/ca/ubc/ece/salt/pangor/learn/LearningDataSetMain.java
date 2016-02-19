@@ -97,13 +97,17 @@ public class LearningDataSetMain {
 							options.getOraclePath(),
 							new LinkedList<KeywordUse>()); // column filters
 
+			/* Store the total instances in the dataset before filtering. */
+			ClusterMetrics clusterMetrics = new ClusterMetrics();
+
 			/* Pre-process the file. */
-			clusteringDataSet.preProcess(getRowFilterQuery(options.getMaxChangeComplexity()));
+			clusteringDataSet.preProcess(getBasicRowFilterQuery(options.getMaxChangeComplexity()));
+			clusterMetrics.setTotalInstances(clusteringDataSet.getSize());
+			clusteringDataSet.preProcess(getStatementRowFilterQuery(options.getMaxChangeComplexity()));
 
 			/* Get the clusters. */
 			try {
 
-				ClusterMetrics clusterMetrics = new ClusterMetrics();
 				clusteringDataSet.getWekaClusters(clusterMetrics);
 
 				/* Add the clusters to the sorted list. */
@@ -168,11 +172,10 @@ public class LearningDataSetMain {
 	 * Selects feature vectors with:
 	 *  - Complexity <= {@code complexity}
 	 *  - Commit message != MERGE
-	 *  - At least one keyword with context != STATEMENT
 	 * @param maxComplexity The maximum complexity for the feature vector.
 	 * @return The Datalog query that selects which rows to data mine.
 	 */
-	public static IQuery getRowFilterQuery(Integer maxComplexity) {
+	public static IQuery getBasicRowFilterQuery(Integer maxComplexity) {
 
 		IVariable complexity = Factory.TERM.createVariable("Complexity");
 
@@ -196,11 +199,39 @@ public class LearningDataSetMain {
 				Factory.BASIC.createLiteral(true,
 					Factory.BUILTIN.createNotExactEqual(
 						Factory.TERM.createVariable("CommitMessage"),
-						Factory.TERM.createString(Type.MERGE.toString()))),
+						Factory.TERM.createString(Type.MERGE.toString()))));
 //				Factory.BASIC.createLiteral(true,
 //					Factory.BUILTIN.createEqual(
 //						Factory.TERM.createVariable("CommitMessage"),
-//						Factory.TERM.createString(Type.BUG_FIX.toString()))),
+//						Factory.TERM.createString(Type.BUG_FIX.toString())))
+
+		return query;
+
+	}
+
+	/**
+	 * Selects feature vectors with:
+	 *  - At least one keyword with context != STATEMENT
+	 * @param maxComplexity The maximum complexity for the feature vector.
+	 * @return The Datalog query that selects which rows to data mine.
+	 */
+	public static IQuery getStatementRowFilterQuery(Integer maxComplexity) {
+
+		IVariable complexity = Factory.TERM.createVariable("Complexity");
+
+		IQuery query =
+			Factory.BASIC.createQuery(
+				Factory.BASIC.createLiteral(true,
+					Factory.BASIC.createPredicate("FeatureVector", 8),
+					Factory.BASIC.createTuple(
+						Factory.TERM.createVariable("ID"),
+						Factory.TERM.createVariable("CommitMessage"),
+						Factory.TERM.createVariable("URL"),
+						Factory.TERM.createVariable("BuggyCommitID"),
+						Factory.TERM.createVariable("RepairedCommitID"),
+						Factory.TERM.createVariable("Class"),
+						Factory.TERM.createVariable("Method"),
+						complexity)),
 				Factory.BASIC.createLiteral(true,
 					Factory.BASIC.createPredicate("KeywordChange", 7),
 					Factory.BASIC.createTuple(

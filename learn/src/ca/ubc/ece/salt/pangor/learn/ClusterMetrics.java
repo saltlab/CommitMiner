@@ -17,12 +17,23 @@ public class ClusterMetrics {
 	/** Stores the clusters. **/
 	public Map<Integer, Cluster> clusters;
 
-	/** The total number of instances that were clustered. **/
+	/** The total number of instances. **/
 	public int totalInstances;
+
+	/** The total number of instances that were clustered. **/
+	public int totalClusteredInstances;
 
 	public ClusterMetrics() {
 		this.clusters = new HashMap<Integer, Cluster>();
+		this.totalClusteredInstances = 0;
 		this.totalInstances = 0;
+	}
+
+	/**
+	 * @param totalInstances The total number of instances in the data set.
+	 */
+	public void setTotalInstances(int totalInstances) {
+		this.totalInstances = totalInstances;
 	}
 
 	/**
@@ -49,7 +60,7 @@ public class ClusterMetrics {
 		cluster.addInstance(instanceID, modifiedStatements, expected, keywords);
 
 		/* Increment the total number of instances clustered. */
-		this.totalInstances++;
+		this.totalClusteredInstances++;
 
 	}
 
@@ -58,14 +69,14 @@ public class ClusterMetrics {
 	 */
 	public int getTotalInstances() {
 
-		return this.totalInstances;
+		return this.totalClusteredInstances;
 	}
 
 	/**
 	 * @return The average number of instances in each cluster.
 	 */
 	public int getAverageInsances() {
-		return this.totalInstances / this.clusters.size();
+		return this.totalClusteredInstances / this.clusters.size();
 	}
 
 	/**
@@ -127,16 +138,13 @@ public class ClusterMetrics {
 
 		/* The metrics for the confusion matrix. */
 		int tp = 0, fp = 0, tn = 0, fn = 0;
-		int unclassified = 0, classified = 0;
+		int classified = 0;
 
 		/* Create a map of expected classes. */
 		Map<String, List<Integer>> expected = new HashMap<String, List<Integer>>();
 		for(Entry<Integer, String> entity : oracle.entrySet()) {
 
-			if(entity.getValue().equals("?")) {
-				unclassified++; 	// All unclassified values are considered true negatives by default.
-			}
-			else {
+			if(!entity.getValue().equals("?")) {
 				List<Integer> instancesInClass = expected.get(entity.getValue());
 				if(instancesInClass == null) {
 					instancesInClass = new LinkedList<Integer>();
@@ -200,7 +208,7 @@ public class ClusterMetrics {
 		 * TN = # of instances without a class - #FPs */
 
 		fn = classified - tp;
-		tn = unclassified - fp;
+		tn = this.totalInstances - tp - fp - fn;
 
 		System.out.println("Confusion Matrix:");
 		System.out.println("              \tClustered\tNot Clustered");
@@ -226,7 +234,7 @@ public class ClusterMetrics {
 		table += "\t\t\\textbf{Keyword} & \\textbf{Clusters} & \\textbf{Tot Intances (I)}  & \\textbf{Avg I} & \\textbf{Mdn I} & \\textbf{Avg Complex.} \\\\ \\hline\n";
 
 		for(ClusterMetrics metric : metrics) {
-			table += "\t\t" + "ALL_KEYWORDS" + " & " + metric.clusters.size() + " & " + metric.totalInstances + " & " + Math.round(metric.getAverageInsances()) + " & " + metric.getMedianInstances() + " & " + metric.getAverageComplexity() + "\\\\\n";
+			table += "\t\t" + "ALL_KEYWORDS" + " & " + metric.clusters.size() + " & " + metric.totalClusteredInstances + " & " + Math.round(metric.getAverageInsances()) + " & " + metric.getMedianInstances() + " & " + metric.getAverageComplexity() + "\\\\\n";
 		}
 
 		table += "\t\t\\hline\n";
@@ -238,7 +246,7 @@ public class ClusterMetrics {
 
 	@Override
 	public String toString() {
-		return "C = " + clusters + ", I = " + totalInstances + ", AVGI = " + this.getAverageInsances() + ", MDNI = " + this.getMedianInstances();
+		return "C = " + clusters + ", I = " + totalClusteredInstances + ", AVGI = " + this.getAverageInsances() + ", MDNI = " + this.getMedianInstances();
 	}
 
 }
