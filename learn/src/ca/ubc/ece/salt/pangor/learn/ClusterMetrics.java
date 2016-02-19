@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.pangor.learn;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -137,8 +138,9 @@ public class ClusterMetrics {
 	public void evaluate(Map<Integer, String> oracle) {
 
 		/* The metrics for the confusion matrix. */
-		int tp = 0, fp = 0, tn = 0, fn = 0;
-		int classified = 0;
+		double tp = 0, fp = 0, tn = 0, fn = 0;
+		double classified = 0;
+		double p = 0, r = 0, f = 0, fm = 0, inspect = 0, captured = 0;
 
 		/* Create a map of expected classes. */
 		Map<String, List<Integer>> expected = new HashMap<String, List<Integer>>();
@@ -157,6 +159,7 @@ public class ClusterMetrics {
 		}
 
 		/* Compute the composition of each cluster. */
+		Set<String> actual = new HashSet<String>();
 		for(Cluster cluster : this.clusters.values()) {
 
 			int tpForCluster = 0;
@@ -184,7 +187,8 @@ public class ClusterMetrics {
 					double percentOfCluster = intersection / clusterSize;
 
 					/* If both are > 50%, all these are TPs */
-					if(percentOfClass >= 0 && percentOfCluster >= 0) {
+					if(percentOfClass >= 0 && percentOfCluster >= 0 && intersection >= 2) {
+						actual.add(String.valueOf(expected.get(entry.getKey())));
 						tp += intersection;
 						tpForCluster += intersection;
 					}
@@ -210,11 +214,23 @@ public class ClusterMetrics {
 		fn = classified - tp;
 		tn = this.totalInstances - tp - fp - fn;
 
+		p = tp/fp;
+		r = tp/fn;
+
+		f = 2*((p*r)/(p+r));
+		fm = Math.sqrt((tp/(tp+fp)) * (tp/(tp+fn)));
+
+		inspect = (tp + fp) / (tp + fp + tn + fn);
+
+		captured = ((double)actual.size()) / ((double)expected.size());
+
 		System.out.println("Confusion Matrix:");
 		System.out.println("              \tClustered\tNot Clustered");
-		System.out.println("Classified    \t" + tp + "\t\t" + fn);
-		System.out.println("Not Classified\t" + fp + "\t\t" + tn);
+		System.out.println("Classified    \t" + (int)tp + "\t\t" + (int)fn);
+		System.out.println("Not Classified\t" + (int)fp + "\t\t" + (int)tn);
 
+		System.out.println("P, R, F, F-M, I, C");
+		System.out.printf("%.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n", p, r, f, fm, inspect, captured);
 
 	}
 
