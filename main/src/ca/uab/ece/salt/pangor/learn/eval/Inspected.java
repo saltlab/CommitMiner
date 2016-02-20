@@ -23,4 +23,9 @@ class Inspected implements Data {
 		return new double[]{ 0, 0.3, 3 };
 	}
 
+	@Override
+	public String getLabel() {
+		return "Inspected";
+	}
+
 }

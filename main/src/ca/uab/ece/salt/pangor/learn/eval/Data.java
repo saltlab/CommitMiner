@@ -6,4 +6,5 @@ interface Data {
 	double[] getData(EvaluationResult[] dataSetResult);
 	double[] getLim();
 	double[] getAxp();
+	String getLabel();
 }

@@ -23,4 +23,9 @@ class Epsilon implements Data {
 		return new double[]{ 0.1, 5.9, 29 };
 	}
 
+	@Override
+	public String getLabel() {
+		return "Epsilon";
+	}
+
 }

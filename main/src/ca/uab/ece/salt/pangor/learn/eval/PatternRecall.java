@@ -23,4 +23,9 @@ public class PatternRecall implements Data {
 		return new double[]{ 0, 1, 5 };
 	}
 
+	@Override
+	public String getLabel() {
+		return "Pattern Recall";
+	}
+
 }

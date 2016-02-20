@@ -56,12 +56,16 @@ public class RLineChart {
 	private static String printChart(EvaluationResult[][] results, Data xdata, Data ydata) {
 		String[] colours = {"black", "red", "green", "blue", "orange", "grey", "pink"};
 		String script = "";
-		script += "chartName <- \"Inspected vs Epsilon\"\n";
+		script += String.format("chartName <- \"%s vs %s\"\n", xdata.getLabel(), ydata.getLabel());
 		script += "\n";
 		script += String.format("xData <- c(%s)\n", StringUtils.join(xdata.getData(results[0]), ','));
 		script += String.format("yData <- c(%s)\n", StringUtils.join(ydata.getData(results[0]), ','));
-		script += String.format("plot(xData,yData,main=chartName,xlab=\"epsilon\",ylab=\"Inspected\",xlim=c(%s,%s),ylim=c(%s,%s),xaxp=c(%s,%s,%s),yaxp=c(%s,%s,%s),yaxs=\"i\",xaxs=\"i\",type=\"l\")\n",
-				xdata.getLim()[0], xdata.getLim()[1], ydata.getLim()[0], ydata.getLim()[1], xdata.getAxp()[0], xdata.getAxp()[1], xdata.getAxp()[2], ydata.getAxp()[0], ydata.getAxp()[1], ydata.getAxp()[2]);
+		script += String.format("plot(xData,yData,main=chartName,xlab=\"%s\",ylab=\"%s\",xlim=c(%s,%s),ylim=c(%s,%s),xaxp=c(%s,%s,%s),yaxp=c(%s,%s,%s),yaxs=\"i\",xaxs=\"i\",type=\"l\")\n",
+				xdata.getLabel(), ydata.getLabel(),
+				xdata.getLim()[0], xdata.getLim()[1],
+				ydata.getLim()[0], ydata.getLim()[1],
+				xdata.getAxp()[0], xdata.getAxp()[1], xdata.getAxp()[2],
+				ydata.getAxp()[0], ydata.getAxp()[1], ydata.getAxp()[2]);
 
 		for(int i = 1; i < results.length; i++) {
 			script += String.format("yData <- c(%s)\n", StringUtils.join(ydata.getData(results[i]), ','));
