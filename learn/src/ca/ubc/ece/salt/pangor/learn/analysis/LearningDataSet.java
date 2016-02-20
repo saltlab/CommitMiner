@@ -48,6 +48,7 @@ import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.learn.ClusterMetrics;
+import ca.ubc.ece.salt.pangor.learn.ClusterMetrics.EvaluationResult;
 
 /**
  * The {@code LearningDataSet} manages the data set for data mining
@@ -754,12 +755,9 @@ public class LearningDataSet extends DataSet {
 	/**
 	 * Compute the evaluation metrics if an oracle was provided.
 	 */
-	public void evaluate(ClusterMetrics clusterMetrics) {
-
-		if(this.oracle != null) {
-			clusterMetrics.evaluate(this.oracle);
-		}
-
+	public EvaluationResult evaluate(ClusterMetrics clusterMetrics) {
+		if(this.oracle == null) return null;
+		return clusterMetrics.evaluate(this.oracle);
 	}
 
 	/**

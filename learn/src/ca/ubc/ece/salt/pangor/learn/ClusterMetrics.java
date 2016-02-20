@@ -27,6 +27,11 @@ public class ClusterMetrics {
 	/** The value of epsilon that was used by DBScan. **/
 	public double epsilon;
 
+	/** The confusion matrix for an evaluation. [TP,FP,TN,FN] **/
+	public int[] confusionMatrix;
+
+	/** The results matrix. **/
+
 	public ClusterMetrics() {
 		this.clusters = new HashMap<Integer, Cluster>();
 		this.totalClusteredInstances = 0;
@@ -147,7 +152,7 @@ public class ClusterMetrics {
 	 * Compute the evaluation metrics if an oracle was provided.
 	 * @param oracle Key = feature vector ID, Value = class
 	 */
-	public void evaluate(Map<Integer, String> oracle) {
+	public EvaluationResult evaluate(Map<Integer, String> oracle) {
 
 		/* The metrics for the confusion matrix. */
 		double tp = 0, fp = 0, tn = 0, fn = 0;
@@ -236,13 +241,11 @@ public class ClusterMetrics {
 
 		captured = ((double)actual.size()) / ((double)expected.size());
 
-		System.out.println("Confusion Matrix:");
-		System.out.println("              \tClustered\tNot Clustered");
-		System.out.println("Classified    \t" + (int)tp + "\t\t" + (int)fn);
-		System.out.println("Not Classified\t" + (int)fp + "\t\t" + (int)tn);
+		/* Store the results. */
+		ConfusionMatrix confusionMatrix = new ConfusionMatrix((int)tp,(int)fp, (int)tn, (int)fn);
+		EvaluationResult evaluationResult = new EvaluationResult(confusionMatrix, this.epsilon, p, r, f, fm, inspect, captured);
 
-		System.out.println("P, R, F, F-M, I, C");
-		System.out.printf("%.2f,%.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n", this.epsilon, p, r, f, fm, inspect, captured);
+		return evaluationResult;
 
 	}
 
@@ -275,6 +278,53 @@ public class ClusterMetrics {
 	@Override
 	public String toString() {
 		return "C = " + clusters + ", I = " + totalClusteredInstances + ", AVGI = " + this.getAverageInsances() + ", MDNI = " + this.getMedianInstances();
+	}
+
+	public class ConfusionMatrix {
+		public int tp, fp, tn, fn;
+		public ConfusionMatrix(int tp, int fp, int tn, int fn) {
+			this.tp = tp;
+			this.fp = fp;
+			this.tn = tn;
+			this.fn = fn;
+		}
+	}
+
+	public class EvaluationResult {
+		public ConfusionMatrix confusionMatrix;
+		public double epsilon, precision, recall, fMeasure, fowlkesMallows,
+				   inspected, patternRecall;
+
+		public EvaluationResult(ConfusionMatrix confusionMatrix, double epsilon,
+				double precision, double recall, double fMeasure,
+				double fowlkesMallows,  double inspected, double patternRecall) {
+			this.confusionMatrix = confusionMatrix;
+			this.precision = precision;
+			this.recall = recall;
+			this.fMeasure = fMeasure;
+			this.fowlkesMallows = fowlkesMallows;
+			this.inspected = inspected;
+			this.patternRecall = patternRecall;
+		}
+
+		public String getConfusionMatrix() {
+			String matrix = "              \tClustered\tNot Clustered";
+			matrix += "Classified    \t" + this.confusionMatrix.tp + "\t\t" + this.confusionMatrix.fn;
+			matrix += "Not Classified\t" + this.confusionMatrix.fp + "\t\t" + this.confusionMatrix.tn;
+			return matrix;
+		}
+
+		public String getResultsArrayHeader() {
+			return "Epsilon, Precision, Recall, F-Measure, Fowlkes-Mallows, Inspected, Captured-Patterns";
+		}
+
+		public String getResultsArray() {
+			String array = "";
+			array += String.format("%.2f,%.2f, %.2f, %.2f, %.2f, %.2f, %.2f",
+				this.epsilon, this.precision, this.recall, this.fMeasure,
+				this.fowlkesMallows, this.inspected, this.patternRecall);
+			return array;
+		}
 	}
 
 }
