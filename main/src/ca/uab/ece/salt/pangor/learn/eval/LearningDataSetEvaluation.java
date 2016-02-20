@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.learn;
+package ca.uab.ece.salt.pangor.learn.eval;
 
 import java.util.LinkedList;
 
@@ -14,6 +14,8 @@ import weka.core.WekaException;
 import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.pangor.learn.ClusterMetrics;
+import ca.ubc.ece.salt.pangor.learn.EvaluationResult;
 import ca.ubc.ece.salt.pangor.learn.analysis.LearningDataSet;
 
 /**
@@ -96,33 +98,8 @@ public class LearningDataSetEvaluation {
 
 		}
 
-		int i = 0;
-		for(EvaluationResult[] dataSetResult : results) {
-			System.out.println("Data Set " + i);
-			for(EvaluationResult epsilonResult : dataSetResult) {
-				System.out.println(epsilonResult.getResultsArray());
-			}
-			i++;
-		}
+		RLineChart.printRChart(results);
 
-	}
-
-	/**
-	 * Prints an R script to the console. When run, the script generates a
-	 * set of graphs showing the clusterig results.
-	 */
-	private static void printRChart(EvaluationResult[][] results) {
-		String script = "#!/usr/bin/Rscript\n";
-		script += "pdfFile <- \"tuning.pdf\"\n";
-		script += "cairo_pdf(filename=pdfFile, width=7, height=7)\n";
-		script += "par(mfrow = c(3,1)\n";
-		script += "par(oma = c(4,1,1,1))\n";
-		script += "\n";
-
-		for(int i = 0; i < results.length; i++) {
-			script += String.format("# Chart %s:\n", i);
-			script += "\n";
-		}
 	}
 
 	/**
