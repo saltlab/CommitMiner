@@ -38,9 +38,6 @@ import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
  */
 public class LearningFeatureVector extends FeatureVector {
 
-	public static final double COMPLEXITY_WEIGHT = 0.05;
-
-
 	/** The class that was analyzed (if at or below class granularity). **/
 	public String klass;
 
@@ -168,7 +165,10 @@ public class LearningFeatureVector extends FeatureVector {
 	 * Converts this feature vector into a Weka Instance.
 	 * @return This feature vector as a Weka Instance
 	 */
-	public Instance getWekaInstance(Instances dataSet, ArrayList<Attribute> attributes, Set<KeywordDefinition> keywords) {
+	public Instance getWekaInstance(Instances dataSet,
+									ArrayList<Attribute> attributes,
+									Set<KeywordDefinition> keywords,
+									double complexityWeight) {
 
 		Instance instance = new DenseInstance(attributes.size());
 		instance.setDataset(dataSet);
@@ -183,7 +183,7 @@ public class LearningFeatureVector extends FeatureVector {
 		instance.setValue(6, this.klass);
 		instance.setValue(7, this.method);
 		instance.setValue(8, "?"); // assigned cluster
-		instance.setValue(9, this.modifiedStatementCount * COMPLEXITY_WEIGHT); // Weight the statement count
+		instance.setValue(9, this.modifiedStatementCount * complexityWeight); // Weight the statement count
 
 		/* Set the keyword values. */
 		int i = 10;

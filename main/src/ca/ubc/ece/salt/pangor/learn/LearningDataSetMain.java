@@ -57,7 +57,8 @@ public class LearningDataSetMain {
 
 		/* Re-construct the data set. */
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(
-				options.getDataSetPath(), options.getOraclePath(), null);
+				options.getDataSetPath(), options.getOraclePath(), null,
+				options.getEpsilon(), options.getComplexityWeight());
 
 		/* Print the metrics from the data set. */
 		if(options.getPrintMetrics()) {
@@ -95,7 +96,9 @@ public class LearningDataSetMain {
 					LearningDataSet.createLearningDataSet(
 							options.getDataSetPath(),
 							options.getOraclePath(),
-							new LinkedList<KeywordUse>()); // column filters
+							new LinkedList<KeywordUse>(), // column filters
+							options.getEpsilon(),
+							options.getComplexityWeight());
 
 			/* Store the total instances in the dataset before filtering. */
 			ClusterMetrics clusterMetrics = new ClusterMetrics();

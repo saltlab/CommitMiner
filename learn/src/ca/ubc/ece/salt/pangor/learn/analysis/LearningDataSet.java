@@ -92,8 +92,14 @@ public class LearningDataSet extends DataSet {
 	/** The oracle containing expected feature vector classes. **/
 	private Map<Integer, String> oracle;
 
-	/** Weka-format data */
+	/** Weka-format data **/
 	private Instances wekaData;
+
+	/** The value of epsilon for DBScan. **/
+	private Double epsilon;
+
+	/** The weight of the complexity for the clusterer. **/
+	private Double complexityWeight;
 
 	/**
 	 * Used to produce a Weka data set. Create a {@code LearningDataSet} from
@@ -108,7 +114,8 @@ public class LearningDataSet extends DataSet {
 	 * 					 cannot be read.
 	 */
 	private LearningDataSet(String dataSetPath, String oraclePath,
-							List<KeywordUse> columnFilters) throws Exception {
+							List<KeywordUse> columnFilters,
+							double epsilon, double complexityWeight) throws Exception {
 		super(null, null);
 		this.columnFilters = columnFilters;
 		this.keywords = new HashSet<KeywordDefinition>();
@@ -117,6 +124,8 @@ public class LearningDataSet extends DataSet {
 		this.oraclePath = oraclePath;
 		this.oracle = null;
 		this.wekaData = null;
+		this.epsilon = epsilon;
+		this.complexityWeight = complexityWeight;
 
 		/* Read the data set file and de-serialize the feature vectors. */
 		this.importDataSet(dataSetPath);
@@ -132,6 +141,8 @@ public class LearningDataSet extends DataSet {
 	 * Used for keyword analysis. Create a {@code LearningDataSet} to write
 	 * the analysis results to disk.
 	 * @param dataSetPath The file path to store the data set.
+	 * @param rules The Datalog rules to apply to the fact database.
+	 * @param queries The Datalog queries to run on the fact database.
 	 */
 	private LearningDataSet(String dataSetPath, List<IRule> rules, List<IQuery> queries) {
 		super(rules, queries);
@@ -141,6 +152,8 @@ public class LearningDataSet extends DataSet {
 		this.oraclePath = null;
 		this.oracle = null;
 		this.wekaData = null;
+		this.epsilon = null;
+		this.complexityWeight = null;
 	}
 
 	/**
@@ -155,6 +168,8 @@ public class LearningDataSet extends DataSet {
 		this.oraclePath = null;
 		this.oracle = null;
 		this.wekaData = null;
+		this.epsilon = null;
+		this.complexityWeight = null;
 	}
 
 	/**
@@ -168,14 +183,18 @@ public class LearningDataSet extends DataSet {
 	 * 						during clustering.
 	 * @param maxModifiedStatements The maximum number of modified statements
 	 * 								for a feature vector.
+	 * @param epsilon The value of epsilon for DBScan
+	 * @param complexityWeight The weight of the complexity feature for DBScan.
 	 * @throws Exception Throws an exception when the {@code dataSetPath}
 	 * 					 cannot be read.
 	 */
 	public static LearningDataSet createLearningDataSet(String dataSetPath,
 														String oraclePath,
-														List<KeywordUse> columnFilters
+														List<KeywordUse> columnFilters,
+														double epsilon,
+														double complexityWeight
 														) throws Exception {
-		return new LearningDataSet(dataSetPath, oraclePath, columnFilters);
+		return new LearningDataSet(dataSetPath, oraclePath, columnFilters, epsilon,complexityWeight);
 	}
 
 	/**
@@ -557,15 +576,14 @@ public class LearningDataSet extends DataSet {
 		dataSet.setClassIndex(-1);
 
 		for(LearningFeatureVector featureVector : this.featureVectors) {
-			dataSet.add(featureVector.getWekaInstance(dataSet, attributes, this.keywords));
+			dataSet.add(featureVector.getWekaInstance(dataSet, attributes, this.keywords, this.complexityWeight));
 		}
 
 		return dataSet;
 	}
 
 	/**
-	 * Generates the clusters for this data set using DBScan, epsilon = 0.01 and
-	 * min = 25.
+	 * Generates the clusters for this data set using DBScan.
 	 * @param clusterMetrics Structure to store the clusters and their metrics.
 	 *
 	 * @return The number of instances in each cluster. The array index is the
@@ -573,6 +591,9 @@ public class LearningDataSet extends DataSet {
 	 * @throws Exception
 	 */
 	public void getWekaClusters(ClusterMetrics clusterMetrics) throws Exception {
+
+		/* Set the value of epsilon used by the clusterer. */
+		clusterMetrics.setEpsilon(this.epsilon);
 
 		/* Convert the data set to a Weka-usable format. */
 		wekaData = this.getWekaDataSet();
@@ -587,7 +608,7 @@ public class LearningDataSet extends DataSet {
 		wekaData = Filter.useFilter(wekaData, removeByName);
 
 		/* Create the keyword (column) filter. */
-		String filter = "(.*:global:test)|(.*:UPDATED:.*)";
+		String filter = "(.*:global:test)";//|(.*:UPDATED:.*)";
 		for(KeywordUse keywordUse : this.columnFilters) {
 			filter += "|(" + keywordUse.type.toString();
 			filter += ":" + keywordUse.context.toString();
@@ -634,7 +655,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.2 -M 3".split("\\s");
+		String[] dbScanClustererOptions = ("-E " + String.valueOf(this.epsilon) + " -M 3").split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);
@@ -662,7 +683,7 @@ public class LearningDataSet extends DataSet {
 				if(expected == null) expected = "?"; // throw new Error("A feature vector was not classified in the oracle: " + (int)instance.value(0));
 
 				clusterMetrics.addInstance(cluster, (int)instance.value(0),
-											expected, (int)(instance.value(9)/LearningFeatureVector.COMPLEXITY_WEIGHT),
+											expected, (int)(instance.value(9)/this.complexityWeight),
 											keywords);
 
 			} catch (Exception ignore) { } // Instance is not part of any cluster

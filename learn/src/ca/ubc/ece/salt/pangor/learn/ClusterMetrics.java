@@ -24,10 +24,14 @@ public class ClusterMetrics {
 	/** The total number of instances that were clustered. **/
 	public int totalClusteredInstances;
 
+	/** The value of epsilon that was used by DBScan. **/
+	public double epsilon;
+
 	public ClusterMetrics() {
 		this.clusters = new HashMap<Integer, Cluster>();
 		this.totalClusteredInstances = 0;
 		this.totalInstances = 0;
+		this.epsilon = 0;
 	}
 
 	/**
@@ -35,6 +39,14 @@ public class ClusterMetrics {
 	 */
 	public void setTotalInstances(int totalInstances) {
 		this.totalInstances = totalInstances;
+	}
+
+	/**
+	 * @param epsilon The value of epsilon (a distance measure) that was used
+	 * 				  by DBScan.
+	 */
+	public void setEpsilon(double epsilon) {
+		this.epsilon = epsilon;
 	}
 
 	/**
@@ -214,8 +226,8 @@ public class ClusterMetrics {
 		fn = classified - tp;
 		tn = this.totalInstances - tp - fp - fn;
 
-		p = tp/fp;
-		r = tp/fn;
+		p = tp/(tp+fp);
+		r = tp/(tp+fn);
 
 		f = 2*((p*r)/(p+r));
 		fm = Math.sqrt((tp/(tp+fp)) * (tp/(tp+fn)));
@@ -230,7 +242,7 @@ public class ClusterMetrics {
 		System.out.println("Not Classified\t" + (int)fp + "\t\t" + (int)tn);
 
 		System.out.println("P, R, F, F-M, I, C");
-		System.out.printf("%.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n", p, r, f, fm, inspect, captured);
+		System.out.printf("%.2f,%.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n", this.epsilon, p, r, f, fm, inspect, captured);
 
 	}
 

@@ -25,6 +25,12 @@ public class LearningDataSetOptions {
 	@Option(name = "-o", aliases = {"--oracle"}, usage="The oracle to use for cluster evaluation.")
 	private String oracle = null;
 
+	@Option(name = "-e", aliases = {"--epsilon"}, usage="The value of epsilon for clustering.")
+	private double epsilon = 0.1;
+
+	@Option(name = "-cw", aliases = {"--compexityWeight"}, usage="The weight of the complexity feature for clustering.")
+	private double complexityWeight = 0.2;
+
 	public String getArffFolder() {
 		return this.arffFolder;
 	}
@@ -51,6 +57,14 @@ public class LearningDataSetOptions {
 
 	public Integer getMaxChangeComplexity() {
 		return this.maxChangeComplexity;
+	}
+
+	public Double getEpsilon() {
+		return this.epsilon;
+	}
+
+	public Double getComplexityWeight() {
+		return this.complexityWeight;
 	}
 
 }
