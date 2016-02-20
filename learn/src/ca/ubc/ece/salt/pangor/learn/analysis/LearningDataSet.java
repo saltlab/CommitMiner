@@ -48,7 +48,7 @@ import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.api.KeywordUse;
 import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.pangor.learn.ClusterMetrics;
-import ca.ubc.ece.salt.pangor.learn.ClusterMetrics.EvaluationResult;
+import ca.ubc.ece.salt.pangor.learn.EvaluationResult;
 
 /**
  * The {@code LearningDataSet} manages the data set for data mining
