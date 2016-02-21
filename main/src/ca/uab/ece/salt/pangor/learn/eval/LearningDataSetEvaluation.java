@@ -98,7 +98,9 @@ public class LearningDataSetEvaluation {
 
 		}
 
-		RLineChart.printRChart(results);
+		RLineChart.printPRChart(results);
+		System.out.println("-----------------");
+		RLineChart.printDensityChart(results, new String[]{"3", "5", "6", "7"});
 
 	}
 

@@ -159,6 +159,12 @@ public class ClusterMetrics {
 		double classified = 0;
 		double p = 0, r = 0, f = 0, fm = 0, inspect = 0, captured = 0;
 
+		/* The % of a class that makes up a cluster. */
+		Map<String, Double> clusterCompositions = new HashMap<String, Double>();
+
+		/* The % of a cluster that makes up a class. */
+		Map<String, Double> classCompositions = new HashMap<String, Double>();
+
 		/* Create a map of expected classes. */
 		Map<String, List<Integer>> expected = new HashMap<String, List<Integer>>();
 		for(Entry<Integer, String> entity : oracle.entrySet()) {
@@ -186,7 +192,9 @@ public class ClusterMetrics {
 			List<Entry<String, Integer>> composition = cluster.getClusterComposition();
 			for(Entry<String, Integer> entry : composition) {
 
-				if(!entry.getKey().equals("?")) {
+				String classID = entry.getKey();
+
+				if(!classID.equals("?")) {
 
 					/* A cluster ~= a class when:
 					 * 	1. The cluster contains >= 50% of the instances in a class (we don't need the list then).
@@ -208,7 +216,18 @@ public class ClusterMetrics {
 						actual.add(String.valueOf(expected.get(entry.getKey())));
 						tp += intersection;
 						tpForCluster += intersection;
+
+						/* Check the cluster composition. */
+						Double clusterComposition = clusterCompositions.get(classID);
+						clusterComposition = clusterComposition == null ? 0 : clusterComposition;
+						if(percentOfCluster > clusterComposition) clusterCompositions.put(classID, percentOfCluster);
+
+						/* Check the class composition. */
+						Double classComposition = classCompositions.get(classID);
+						classComposition = classComposition == null ? 0 : classComposition;
+						if(percentOfClass > classComposition) classCompositions.put(classID, percentOfClass);
 					}
+
 
 					System.out.println(entry.getKey() + ": " + entry.getValue()
 							+ "(" + Math.round(100 * percentOfCluster) + "% of cluster)"
@@ -242,8 +261,12 @@ public class ClusterMetrics {
 		captured = ((double)actual.size()) / ((double)expected.size());
 
 		/* Store the results. */
-		ConfusionMatrix confusionMatrix = new ConfusionMatrix((int)tp,(int)fp, (int)tn, (int)fn);
-		EvaluationResult evaluationResult = new EvaluationResult(confusionMatrix, this.epsilon, p, r, f, fm, inspect, captured);
+		ConfusionMatrix confusionMatrix
+			= new ConfusionMatrix((int)tp,(int)fp, (int)tn, (int)fn);
+
+		EvaluationResult evaluationResult
+			= new EvaluationResult(confusionMatrix, this.epsilon, p, r, f, fm,
+					inspect, captured, clusterCompositions, classCompositions);
 
 		return evaluationResult;
 

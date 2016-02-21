@@ -1,5 +1,8 @@
 package ca.uab.ece.salt.pangor.learn.eval;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 
 import ca.ubc.ece.salt.pangor.learn.EvaluationResult;
@@ -9,14 +12,59 @@ public class RLineChart {
 
 	public static void main(String[] args) {
 
+		Map<String, Double> clusterCompositions = new HashMap<String, Double>();
+		clusterCompositions.put("3", 0.5);
+		clusterCompositions.put("5", 0.5);
+		clusterCompositions.put("6", 0.5);
+		clusterCompositions.put("7", 0.5);
+
+		Map<String, Double> classCompositions = new HashMap<String, Double>();
+		classCompositions.put("3", 0.5);
+		classCompositions.put("5", 0.5);
+		classCompositions.put("6", 0.5);
+		classCompositions.put("7", 0.5);
+
 		EvaluationResult[][] results = new EvaluationResult[2][3];
-		results[0][0] = new EvaluationResult(null, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1);
-		results[0][1] = new EvaluationResult(null, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2);
-		results[0][2] = new EvaluationResult(null, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3);
-		results[1][0] = new EvaluationResult(null, 0.1, 0.1, 0.1, 0.1, 0.1, 0.05, 0.1);
-		results[1][1] = new EvaluationResult(null, 0.2, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2);
-		results[1][2] = new EvaluationResult(null, 0.3, 0.3, 0.3, 0.3, 0.3, 0.2, 0.3);
-		printRChart(results);
+		results[0][0] = new EvaluationResult(null, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, clusterCompositions, classCompositions);
+		results[0][1] = new EvaluationResult(null, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, clusterCompositions, classCompositions);
+		results[0][2] = new EvaluationResult(null, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, clusterCompositions, classCompositions);
+		results[1][0] = new EvaluationResult(null, 0.1, 0.1, 0.1, 0.1, 0.1, 0.05, 0.1, clusterCompositions, classCompositions);
+		results[1][1] = new EvaluationResult(null, 0.2, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, clusterCompositions, classCompositions);
+		results[1][2] = new EvaluationResult(null, 0.3, 0.3, 0.3, 0.3, 0.3, 0.2, 0.3, clusterCompositions, classCompositions);
+
+		printDensityChart(results, new String[]{"3", "5", "6", "7"});
+		//printPRChart(results);
+
+	}
+
+	public static void printDensityChart(EvaluationResult[][] results, String[] classIDs) {
+
+		if(results.length == 0) {
+			System.out.println("No results.");
+			return;
+		}
+
+		String script = "#!/usr/bin/Rscript\n";
+		script += "pdfFile <- \"density.pdf\"\n";
+		script += "cairo_pdf(filename=pdfFile, width=14, height=7)\n";
+		script += "par(mfrow = c(2,4))\n";
+		script += "par(oma = c(4,1,1,1))\n";
+		script += "\n";
+		for(String classID : classIDs) {
+			script += printChart(results, new Epsilon(), new ClusterComposition(classID));
+			script += "\n";
+		}
+		for(String classID : classIDs) {
+			script += printChart(results, new Epsilon(), new ClassComposition(classID));
+			script += "\n";
+		}
+		script += "par(fig=c(0,1,0,1),oma=c(0,0,0,0),mar=c(0,0,0,0),new=TRUE)\n";
+		script += "plot(0,0,type=\"n\", bty=\"n\",xaxt=\"n\",yaxt=\"n\")\n";
+		script += "legend(\"bottom\",inset=.04,c(\"Language\",\"Statements\",\"Nodes\"),lty=1,bty=\"n\",col=c(\"black\",\"red\",\"green\"),pch=c(0,1,3),horiz=TRUE)\n";
+		script += "\n";
+		script += "dev.off()";
+
+		System.out.println(script);
 
 	}
 
@@ -24,7 +72,7 @@ public class RLineChart {
 	 * Prints an R script to the console. When run, the script generates a
 	 * set of graphs showing the clusterig results.
 	 */
-	public static void printRChart(EvaluationResult[][] results) {
+	public static void printPRChart(EvaluationResult[][] results) {
 
 		if(results.length == 0) {
 			System.out.println("No results.");
