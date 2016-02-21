@@ -294,12 +294,9 @@ public class JSAPIUtilities {
 		/* Special case: infix expression that compares a falsey keyword? */
 		else if(token instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression) token;
-			if(ie.getType() == Token.SHEQ || ie.getType() == Token.SHNE) {
-				if(SpecialTypeAnalysisUtilities.getSpecialType(ie.getLeft()) != null ||
-				   SpecialTypeAnalysisUtilities.getSpecialType(ie.getRight()) != null) {
-					/* Then we consider it a 'typeof' keyword. */
-					return KeywordContext.CONDITION;
-				}
+			if(ie.getType() == Token.SHEQ || ie.getType() == Token.SHNE
+					|| ie.getType() == Token.EQ || ie.getType() == Token.NE) {
+				return KeywordContext.CONDITION;
 			}
 		}
 		/* Check for class, method and parameter declarations. */
@@ -503,20 +500,24 @@ public class JSAPIUtilities {
 		case Token.THIS:
 		case Token.TRUE:
 		case Token.FALSE:
+		case Token.SHEQ:
+		case Token.SHNE:
+		case Token.EQ:
+		case Token.NE:
 			return true;
 		}
 
-		/* Infix expression that compares a falsey keyword? */
-		if(token instanceof InfixExpression) {
-			InfixExpression ie = (InfixExpression) token;
-			if(ie.getType() == Token.SHEQ || ie.getType() == Token.SHNE) {
-				if(SpecialTypeAnalysisUtilities.getSpecialType(ie.getLeft()) != null ||
-				   SpecialTypeAnalysisUtilities.getSpecialType(ie.getRight()) != null) {
-					/* Then we consider it a 'typeof' keyword. */
-					return true;
-				}
-			}
-		}
+//		/* Infix expression that compares a falsey keyword? */
+//		if(token instanceof InfixExpression) {
+//			InfixExpression ie = (InfixExpression) token;
+//			if(ie.getType() == Token.SHEQ || ie.getType() == Token.SHNE) {
+//				if(SpecialTypeAnalysisUtilities.getSpecialType(ie.getLeft()) != null ||
+//				   SpecialTypeAnalysisUtilities.getSpecialType(ie.getRight()) != null) {
+//					/* Then we consider it a 'typeof' keyword. */
+//					return true;
+//				}
+//			}
+//		}
 
 		return false;
 	}

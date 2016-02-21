@@ -202,6 +202,19 @@ public class APIModelVisitor implements NodeVisitor {
 					/* Then we consider it a 'typeof' keyword. */
 					token = "typeof";
 				}
+				else {
+					token = "sheq";
+				}
+			}
+			else if(ie.getType() == Token.EQ || ie.getType() == Token.NE) {
+				if(SpecialTypeAnalysisUtilities.getSpecialType(ie.getLeft()) != null ||
+				   SpecialTypeAnalysisUtilities.getSpecialType(ie.getRight()) != null) {
+					/* Then we consider it a 'typeof' keyword. */
+					token = "typeof";
+				}
+				else {
+					token = "eq";
+				}
 			}
 		}
 

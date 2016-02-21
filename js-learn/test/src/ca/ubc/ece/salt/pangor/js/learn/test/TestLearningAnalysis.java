@@ -60,7 +60,7 @@ public class TestLearningAnalysis {
 		commitAnalysis.analyze(commit);
 
         /* Pre-process the alerts. */
-        dataSet.preProcess(getRowFilterQuery(6));
+        dataSet.preProcess(getRowFilterQuery());
 
         /* Print the data set. */
         System.out.println(dataSet.getLearningFeatureVectorHeader());
@@ -351,6 +351,50 @@ public class TestLearningAnalysis {
 		this.runTest(sourceCodeFileChange, Arrays.asList(script), true);
 	}
 
+	/*
+	 * Tests sheq and eq keywords.
+	 */
+	@Test
+	public void testSHEQ() throws Exception {
+		String src = "./test/input/learning/InteractorDaemonizer_old.js";
+		String dst = "./test/input/learning/InteractorDaemonizer_new.js";
+
+		TopLevelAPI api = JSAPIFactory.buildTopLevelAPI();
+
+		KeywordUse eq = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "eq", ChangeType.REMOVED, api);
+		KeywordUse sheq = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "sheq", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(eq, 2));
+		script.expectedKeywords.add(Pair.of(sheq, 2));
+
+		SourceCodeFileChange sourceCodeFileChange = TestLearningAnalysis.getSourceCodeFileChange(src, dst);
+
+		this.runTest(sourceCodeFileChange, Arrays.asList(script), true);
+	}
+
+	/*
+	 * Tests sheq and eq keywords.
+	 */
+	@Test
+	public void testSHEQ2() throws Exception {
+		String src = "./test/input/learning/DeprecatedCalls_old.js";
+		String dst = "./test/input/learning/DeprecatedCalls_new.js";
+
+		TopLevelAPI api = JSAPIFactory.buildTopLevelAPI();
+
+		KeywordUse eq = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "eq", ChangeType.REMOVED, api);
+		KeywordUse sheq = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "sheq", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(eq, 1));
+		script.expectedKeywords.add(Pair.of(sheq, 2));
+
+		SourceCodeFileChange sourceCodeFileChange = TestLearningAnalysis.getSourceCodeFileChange(src, dst);
+
+		this.runTest(sourceCodeFileChange, Arrays.asList(script), true);
+	}
+
 //	@Test
 //	public void testFileSystem() throws Exception {
 //		String src = "./test/input/learning/lrn_fs_old.js";
@@ -439,10 +483,9 @@ public class TestLearningAnalysis {
 	 *  - Complexity <= {@code complexity}
 	 *  - Commit message != MERGE
 	 *  - At least one keyword with context != STATEMENT
-	 * @param complexity The maximum complexity for the feature vector.
 	 * @return The Datalog query that selects which rows to data mine.
 	 */
-	public static IQuery getRowFilterQuery(Integer complexity) {
+	public static IQuery getRowFilterQuery() {
 
 		IQuery query =
 			Factory.BASIC.createQuery(
@@ -456,29 +499,7 @@ public class TestLearningAnalysis {
 						Factory.TERM.createVariable("RepairedCommitID"),
 						Factory.TERM.createVariable("Class"),
 						Factory.TERM.createVariable("Method"),
-						Factory.TERM.createVariable("Complexity"))),
-				Factory.BASIC.createLiteral(true,
-					Factory.BUILTIN.createLessEqual(
-						Factory.TERM.createVariable("Complexity"),
-						Factory.TERM.createString(complexity.toString()))),
-				Factory.BASIC.createLiteral(true,
-					Factory.BUILTIN.createNotExactEqual(
-						Factory.TERM.createVariable("CommitMessage"),
-						Factory.TERM.createString(Type.MERGE.toString()))),
-				Factory.BASIC.createLiteral(true,
-					Factory.BASIC.createPredicate("KeywordChange", 7),
-					Factory.BASIC.createTuple(
-						Factory.TERM.createVariable("ID"),
-						Factory.TERM.createVariable("KeywordType"),
-						Factory.TERM.createVariable("KeywordContext"),
-						Factory.TERM.createVariable("ChangeType"),
-						Factory.TERM.createVariable("Package"),
-						Factory.TERM.createVariable("Keyword"),
-						Factory.TERM.createVariable("Count"))),
-				Factory.BASIC.createLiteral(true,
-					Factory.BUILTIN.createNotExactEqual(
-						Factory.TERM.createVariable("KeywordContext"),
-						Factory.TERM.createString(KeywordContext.STATEMENT.toString()))));
+						Factory.TERM.createVariable("Complexity"))));
 
 		return query;
 

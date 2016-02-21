@@ -151,7 +151,6 @@ public class StatementAnalysisMain {
 	 */
 	private static void printHelp(CmdLineParser parser) {
         System.out.print("Usage: DataSetMain ");
-        parser.setUsageWidth(Integer.MAX_VALUE);
         parser.printSingleLineUsage(System.out);
         System.out.println("\n");
         parser.printUsage(System.out);
@@ -167,7 +166,6 @@ public class StatementAnalysisMain {
 	private static void printUsage(String error, CmdLineParser parser) {
         System.out.println(error);
         System.out.print("Usage: DataSetMain ");
-        parser.setUsageWidth(Integer.MAX_VALUE);
         parser.printSingleLineUsage(System.out);
         System.out.println("");
         return;
