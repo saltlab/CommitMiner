@@ -73,11 +73,12 @@ public class Cluster {
 	public String getModifiedKeywords() {
 		String modified = "{";
 		for(Entry<String, Integer> entry : keywords.entrySet()) {
-			if(entry.getValue()/this.instances.size() >= 0.9) {
+			if(entry.getValue()/this.instances.size() >= 0.6) {
 				modified += entry.getKey() + ",";
 			}
 		}
-		return modified.substring(0, modified.length() - 1) + "}";
+		if(modified.length() > 1) modified = modified.substring(0, modified.length() - 1);
+		return modified + "}";
 	}
 
 	/**

@@ -272,6 +272,20 @@ public class ClusterMetrics {
 
 	}
 
+	public String getRankedClusterTable() {
+
+		/* Create the table. */
+		String ranked = "";
+		int i = 1;
+		for(Cluster cluster : this.getRankedClusters()) {
+			ranked += String.format("%-10s%s\n", i, cluster);
+			i++;
+		}
+
+		return ranked;
+
+	}
+
 	/**
 	 * Prints a LaTex table from an ordered set of {@code ClusterMetrics}.
 	 * @param metrics

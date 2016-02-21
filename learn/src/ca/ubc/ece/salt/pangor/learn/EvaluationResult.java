@@ -43,9 +43,9 @@ public class EvaluationResult {
 	}
 
 	public String getConfusionMatrix() {
-		String matrix = "              \tClustered\tNot Clustered";
-		matrix += "Classified    \t" + this.confusionMatrix.tp + "\t\t" + this.confusionMatrix.fn;
-		matrix += "Not Classified\t" + this.confusionMatrix.fp + "\t\t" + this.confusionMatrix.tn;
+		String matrix = "              \tClustered\tNot Clustered" + "\n";
+		matrix += "Classified    \t" + this.confusionMatrix.tp + "\t\t" + this.confusionMatrix.fn + "\n";
+		matrix += "Not Classified\t" + this.confusionMatrix.fp + "\t\t" + this.confusionMatrix.tn + "\n";
 		return matrix;
 	}
 
