@@ -157,7 +157,8 @@ public class ClusterMetrics {
 		/* The metrics for the confusion matrix. */
 		double tp = 0, fp = 0, tn = 0, fn = 0;
 		double classified = 0;
-		double p = 0, r = 0, f = 0, fm = 0, inspect = 0, captured = 0;
+		double p = 0, r = 0, f = 0, fm = 0, inspect = 0;
+		int captured = 0;
 
 		/* The % of a class that makes up a cluster. */
 		Map<String, Double> clusterCompositions = new HashMap<String, Double>();
@@ -258,7 +259,7 @@ public class ClusterMetrics {
 
 		inspect = (tp + fp) / (tp + fp + tn + fn);
 
-		captured = ((double)actual.size()) / ((double)expected.size());
+		captured = actual.size();
 
 		/* Store the results. */
 		ConfusionMatrix confusionMatrix

@@ -25,12 +25,12 @@ public class RLineChart {
 		classCompositions.put("7", 0.5);
 
 		EvaluationResult[][] results = new EvaluationResult[2][3];
-		results[0][0] = new EvaluationResult(null, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, clusterCompositions, classCompositions);
-		results[0][1] = new EvaluationResult(null, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, clusterCompositions, classCompositions);
-		results[0][2] = new EvaluationResult(null, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, clusterCompositions, classCompositions);
-		results[1][0] = new EvaluationResult(null, 0.1, 0.1, 0.1, 0.1, 0.1, 0.05, 0.1, clusterCompositions, classCompositions);
-		results[1][1] = new EvaluationResult(null, 0.2, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, clusterCompositions, classCompositions);
-		results[1][2] = new EvaluationResult(null, 0.3, 0.3, 0.3, 0.3, 0.3, 0.2, 0.3, clusterCompositions, classCompositions);
+		results[0][0] = new EvaluationResult(null, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 2, clusterCompositions, classCompositions);
+		results[0][1] = new EvaluationResult(null, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 3, clusterCompositions, classCompositions);
+		results[0][2] = new EvaluationResult(null, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 4, clusterCompositions, classCompositions);
+		results[1][0] = new EvaluationResult(null, 0.1, 0.1, 0.1, 0.1, 0.1, 0.05, 1, clusterCompositions, classCompositions);
+		results[1][1] = new EvaluationResult(null, 0.2, 0.2, 0.2, 0.2, 0.2, 0.1, 2, clusterCompositions, classCompositions);
+		results[1][2] = new EvaluationResult(null, 0.3, 0.3, 0.3, 0.3, 0.3, 0.2, 3, clusterCompositions, classCompositions);
 
 		printDensityChart(results, new String[]{"3", "5", "6", "7"});
 		//printPRChart(results);
