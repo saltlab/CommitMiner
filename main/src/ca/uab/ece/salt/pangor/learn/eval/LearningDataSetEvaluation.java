@@ -98,10 +98,25 @@ public class LearningDataSetEvaluation {
 
 		}
 
-		RLineChart.printPRChart(results);
-		System.out.println("-----------------");
-		RLineChart.printDensityChart(results, new String[]{"3", "5", "6", "7"});
+		LearningDataSetEvaluation.printCSV(results);
+		//System.out.println("-----------------");
+		//RLineChart.printPRChart(results);
+		//System.out.println("-----------------");
+		//RLineChart.printDensityChart(results, new String[]{"3", "5", "6", "7"});
 
+	}
+
+	/**
+	 * Print the evaluation results as a CSV file
+	 * @param results The results of the evaluation.
+	 */
+	private static void printCSV(EvaluationResult[][] results) {
+		System.out.println(results[0][0].getResultsArrayHeader());
+		for(int i = 0; i < results.length; i++) {
+			for(int j = 0; j < results[i].length; j++) {
+				System.out.println(i + " ," + results[i][j].getResultsArray());
+			}
+		}
 	}
 
 	/**
