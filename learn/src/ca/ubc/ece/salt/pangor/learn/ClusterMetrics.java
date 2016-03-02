@@ -58,12 +58,14 @@ public class ClusterMetrics {
 	 * Add the cluster and re-compute the metrics.
 	 * @param clusterNumber The cluster number for the keyword.
 	 * @param instanceID The ID for the instance.
+	 * @param project The project that the commit came from
 	 * @param expected The expected class for the instance.
 	 * @param modifiedStatements The number of modified statements in the instance.
 	 * @param keywords The list of modified keywords in the instance.
 	 */
-	public void addInstance(int clusterNumber, int instanceID, String expected,
-							int modifiedStatements, List<String> keywords) {
+	public void addInstance(int clusterNumber, int instanceID, String project,
+							String expected, int modifiedStatements,
+							List<String> keywords) {
 
 		/* Get the cluster from the map. */
 		Cluster cluster = this.clusters.get(clusterNumber);
@@ -75,7 +77,7 @@ public class ClusterMetrics {
 		}
 
 		/* Add the instance to the cluster. */
-		cluster.addInstance(instanceID, modifiedStatements, expected, keywords);
+		cluster.addInstance(instanceID, modifiedStatements, project, expected, keywords);
 
 		/* Increment the total number of instances clustered. */
 		this.totalClusteredInstances++;

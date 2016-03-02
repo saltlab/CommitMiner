@@ -20,10 +20,13 @@ public class LearningDataSetOptions {
 	private String oracle = null;
 
 	@Option(name = "-e", aliases = {"--epsilon"}, usage="The value of epsilon for clustering.")
-	private double epsilon = 0.1;
+	private double epsilon = 0.3;
 
 	@Option(name = "-cw", aliases = {"--complexityWeight"}, usage="The weight of the complexity feature for clustering.")
 	private double complexityWeight = 0.2;
+
+	@Option(name = "-min", aliases = {"--minClusterSize"}, usage="The minimum size parameter for DBSCAN.")
+	private int minClusterSize = 5;
 
 	public String getArffFolder() {
 		return this.arffFolder;
@@ -51,6 +54,10 @@ public class LearningDataSetOptions {
 
 	public Double getComplexityWeight() {
 		return this.complexityWeight;
+	}
+
+	public Integer getMinClusterSize() {
+		return this.minClusterSize;
 	}
 
 }

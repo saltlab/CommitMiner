@@ -56,10 +56,11 @@ public class LearningDataSetMain {
 			return;
 		}
 
-		/* Re-construct the data set. */
-		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(
-				options.getDataSetPath(), options.getOraclePath(), null,
-				options.getEpsilon(), options.getComplexityWeight());
+//		/* Re-construct the data set. */
+//		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(
+//				options.getDataSetPath(), options.getOraclePath(), null,
+//				options.getEpsilon(), options.getComplexityWeight(),
+//				options.getMinClusterSize());
 
 		/* Get the clusters for the data set. */
 
@@ -80,10 +81,11 @@ public class LearningDataSetMain {
 						options.getOraclePath(),
 						new LinkedList<KeywordUse>(), // column filters
 						options.getEpsilon(),
-						options.getComplexityWeight());
+						options.getComplexityWeight(),
+						options.getMinClusterSize());
 
 		/* Print the metrics from the data set. */
-		LearningMetrics metrics = dataSet.getMetrics();
+		LearningMetrics metrics = clusteringDataSet.getMetrics();
 		for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
 			System.out.println(frequency.keyword + " : " + frequency.frequency);
 		}
@@ -112,9 +114,9 @@ public class LearningDataSetMain {
 		keywordClusters.add(clusterMetrics);
 
 		/* Write the evaluation results from the clustering. */
-		EvaluationResult result = clusteringDataSet.evaluate(clusterMetrics);
+//		EvaluationResult result = clusteringDataSet.evaluate(clusterMetrics);
+//		System.out.println(result.getConfusionMatrix());
 
-		System.out.println(result.getConfusionMatrix());
 		System.out.println(clusterMetrics.getRankedClusterTable());
 		//System.out.println(ClusterMetrics.getLatexTable(keywordClusters));
 
@@ -174,6 +176,10 @@ public class LearningDataSetMain {
 					Factory.BUILTIN.createLessEqual(
 						complexity,
 						Factory.CONCRETE.createInt(maxComplexity))),
+				Factory.BASIC.createLiteral(true,
+					Factory.BUILTIN.createGreater(
+						complexity,
+						Factory.CONCRETE.createInt(0))),
 				Factory.BASIC.createLiteral(true,
 					Factory.BUILTIN.createNotExactEqual(
 						Factory.TERM.createVariable("CommitMessage"),

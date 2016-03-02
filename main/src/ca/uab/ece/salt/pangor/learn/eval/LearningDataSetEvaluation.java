@@ -73,7 +73,8 @@ public class LearningDataSetEvaluation {
 					LearningDataSet.createLearningDataSet(
 						dataSetPath, options.getOraclePath(),
 						new LinkedList<KeywordUse>(),
-						epsilon, complexityWeight);
+						epsilon, complexityWeight,
+						options.getMinClusterSize());
 
 				/* Store the total instances in the dataset before filtering. */
 				ClusterMetrics clusterMetrics = new ClusterMetrics();

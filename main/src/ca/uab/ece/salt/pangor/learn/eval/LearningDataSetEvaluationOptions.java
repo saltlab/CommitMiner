@@ -17,6 +17,9 @@ public class LearningDataSetEvaluationOptions {
 	@Option(name = "-o", aliases = {"--oracle"}, usage="The oracle to use for cluster evaluation.", required=true)
 	private String oracle = null;
 
+	@Option(name = "-min", aliases = {"--minClusterSize"}, usage="The minimum size parameter for DBSCAN.")
+	private int minClusterSize = 3;
+
 	public boolean getHelp() {
 		return this.help;
 	}
@@ -31,6 +34,10 @@ public class LearningDataSetEvaluationOptions {
 
 	public Integer getMaxChangeComplexity() {
 		return this.maxChangeComplexity;
+	}
+
+	public Integer getMinClusterSize() {
+		return this.minClusterSize;
 	}
 
 }

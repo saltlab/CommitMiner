@@ -96,11 +96,14 @@ public class LearningDataSet extends DataSet {
 	/** Weka-format data **/
 	private Instances wekaData;
 
-	/** The value of epsilon for DBScan. **/
+	/** The value of epsilon for DBSCAN. **/
 	private Double epsilon;
 
 	/** The weight of the complexity for the clusterer. **/
 	private Double complexityWeight;
+
+	/** The minimum cluster size for DBSCAN. **/
+	private Integer minClusterSize;
 
 	/**
 	 * Used to produce a Weka data set. Create a {@code LearningDataSet} from
@@ -116,7 +119,8 @@ public class LearningDataSet extends DataSet {
 	 */
 	private LearningDataSet(String dataSetPath, String oraclePath,
 							List<KeywordUse> columnFilters,
-							double epsilon, double complexityWeight) throws Exception {
+							double epsilon, double complexityWeight,
+							int minClusterSize) throws Exception {
 		super(null, null);
 		this.columnFilters = columnFilters;
 		this.keywords = new HashSet<KeywordDefinition>();
@@ -127,6 +131,7 @@ public class LearningDataSet extends DataSet {
 		this.wekaData = null;
 		this.epsilon = epsilon;
 		this.complexityWeight = complexityWeight;
+		this.minClusterSize = minClusterSize;
 
 		/* Read the data set file and de-serialize the feature vectors. */
 		this.importDataSet(dataSetPath);
@@ -155,6 +160,7 @@ public class LearningDataSet extends DataSet {
 		this.wekaData = null;
 		this.epsilon = null;
 		this.complexityWeight = null;
+		this.minClusterSize = null;
 	}
 
 	/**
@@ -171,6 +177,7 @@ public class LearningDataSet extends DataSet {
 		this.wekaData = null;
 		this.epsilon = null;
 		this.complexityWeight = null;
+		this.minClusterSize = null;
 	}
 
 	/**
@@ -193,9 +200,10 @@ public class LearningDataSet extends DataSet {
 														String oraclePath,
 														List<KeywordUse> columnFilters,
 														double epsilon,
-														double complexityWeight
+														double complexityWeight,
+														int minClusterSize
 														) throws Exception {
-		return new LearningDataSet(dataSetPath, oraclePath, columnFilters, epsilon,complexityWeight);
+		return new LearningDataSet(dataSetPath, oraclePath, columnFilters, epsilon,complexityWeight,minClusterSize);
 	}
 
 	/**
@@ -656,7 +664,7 @@ public class LearningDataSet extends DataSet {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = ("-E " + String.valueOf(this.epsilon) + " -M 3").split("\\s");
+		String[] dbScanClustererOptions = ("-E " + String.valueOf(this.epsilon) + " -M " + this.minClusterSize).split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);
@@ -683,7 +691,7 @@ public class LearningDataSet extends DataSet {
 
 				if(expected == null) expected = "?"; // throw new Error("A feature vector was not classified in the oracle: " + (int)instance.value(0));
 
-				clusterMetrics.addInstance(cluster, (int)instance.value(0),
+				clusterMetrics.addInstance(cluster, (int)instance.value(0), instance.stringValue(1),
 											expected, (int)(instance.value(9)/this.complexityWeight),
 											keywords);
 

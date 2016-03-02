@@ -38,6 +38,9 @@ import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
  */
 public class LearningFeatureVector extends FeatureVector {
 
+	/** The cluster assigned to this feature vector. **/
+	public String cluster;
+
 	/** The class that was analyzed (if at or below class granularity). **/
 	public String klass;
 
@@ -61,6 +64,7 @@ public class LearningFeatureVector extends FeatureVector {
 		this.method = method;
 		this.modifiedStatementCount = 0;
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
+		this.cluster = "?";
 	}
 
 	/**
@@ -79,6 +83,7 @@ public class LearningFeatureVector extends FeatureVector {
 		this.method = method;
 		this.modifiedStatementCount = modifiedStatementCount;
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
+		this.cluster = "?";
 	}
 
 	/**
@@ -95,6 +100,31 @@ public class LearningFeatureVector extends FeatureVector {
 				+ "," + this.commit.url + "/commit/" + this.commit.repairedCommitID
 				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
 				+ "," + this.klass + "," + this.method + "," + this.modifiedStatementCount;
+
+		/* Iterate through the keyword uses. */
+		for(Entry<KeywordUse, Integer> entry : this.keywordMap.entrySet()) {
+			serialized += "," + entry.getKey().toString() + ":" + entry.getValue();
+		}
+
+		return serialized;
+
+	}
+
+	/**
+	 * This method serializes the alert with the cluster. This is useful when
+	 * creating a CSV of clustered instances for evaluation.
+	 * @return The serialized version of the alert including the cluster number.
+	 * 		   Has the format [ID, ProjectID, URL, BuggyCommit, RepairedCommit, ClusterID, [KeywordList]]
+	 * 		   where KeywordList = [Type:Context:ChangeType:Package:Keyword:COUNT].
+	 */
+	public String serializeWithCluster() {
+
+		String serialized = id + "," + this.commit.projectID
+				+ "," + this.commit.commitMessageType.toString()
+				+ "," + this.commit.url + "/commit/" + this.commit.repairedCommitID
+				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
+				+ "," + this.klass + "," + this.method + "," + this.modifiedStatementCount
+				+ "," + this.cluster;
 
 		/* Iterate through the keyword uses. */
 		for(Entry<KeywordUse, Integer> entry : this.keywordMap.entrySet()) {
@@ -182,7 +212,7 @@ public class LearningFeatureVector extends FeatureVector {
 		instance.setValue(5, this.commit.repairedCommitID);
 		instance.setValue(6, this.klass);
 		instance.setValue(7, this.method);
-		instance.setValue(8, "?"); // assigned cluster
+		instance.setValue(8, this.cluster); // assigned cluster
 		instance.setValue(9, this.modifiedStatementCount * complexityWeight); // Weight the statement count
 
 		/* Set the keyword values. */
