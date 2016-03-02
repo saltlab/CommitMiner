@@ -691,7 +691,7 @@ public class LearningDataSet extends DataSet {
 
 				if(expected == null) expected = "?"; // throw new Error("A feature vector was not classified in the oracle: " + (int)instance.value(0));
 
-				clusterMetrics.addInstance(cluster, (int)instance.value(0), instance.stringValue(1),
+				clusterMetrics.addInstance(cluster, (int)instance.value(0), instance.stringValue(2),
 											expected, (int)(instance.value(9)/this.complexityWeight),
 											keywords);
 
