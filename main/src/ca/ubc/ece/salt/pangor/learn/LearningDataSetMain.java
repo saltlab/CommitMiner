@@ -56,12 +56,6 @@ public class LearningDataSetMain {
 			return;
 		}
 
-//		/* Re-construct the data set. */
-//		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(
-//				options.getDataSetPath(), options.getOraclePath(), null,
-//				options.getEpsilon(), options.getComplexityWeight(),
-//				options.getMinClusterSize());
-
 		/* Get the clusters for the data set. */
 
 		/* The clusters stored according to their keyword. */
@@ -84,12 +78,6 @@ public class LearningDataSetMain {
 						options.getComplexityWeight(),
 						options.getMinClusterSize());
 
-		/* Print the metrics from the data set. */
-		LearningMetrics metrics = clusteringDataSet.getMetrics();
-		for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
-			System.out.println(frequency.keyword + " : " + frequency.frequency);
-		}
-
 		/* Store the total instances in the dataset before filtering. */
 		ClusterMetrics clusterMetrics = new ClusterMetrics();
 
@@ -97,6 +85,12 @@ public class LearningDataSetMain {
 		clusteringDataSet.preProcess(getBasicRowFilterQuery(options.getMaxChangeComplexity()));
 		clusterMetrics.setTotalInstances(clusteringDataSet.getSize());
 		clusteringDataSet.preProcess(getStatementRowFilterQuery(options.getMaxChangeComplexity()));
+
+		/* Print the metrics from the processed data set. */
+		LearningMetrics metrics = clusteringDataSet.getMetrics();
+		for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
+			System.out.println(frequency.keyword + " : " + frequency.frequency);
+		}
 
 		/* Get the clusters. */
 		try {

@@ -9,14 +9,14 @@
 
 	<name>Pangor parent POM</name>
 	<description>
-		Pangor is a software repository mining framework that provides tools for
+		CommitMiner is a software repository mining framework that provides tools for
 		deep static analysis of source code and source code changes. More 
-		specifically, Pangor (1) automates the collection of source code artifacts
+		specifically, CommitMiner (1) automates the collection of source code artifacts
 		from Git repositories, (2) provides a framework for building custom static 
 		analyses (including AST, flow and differential) and (3) provides a framework
 		for building and analysing datasets of static analysis results.
 	</description>
-	<url>https://github.com/saltlab/Pangor</url>
+	<url>https://github.com/saltlab/CommitMiner</url>
 	<inceptionYear>2015</inceptionYear>
 
 	<prerequisites>
@@ -53,9 +53,9 @@
 	<modules>
 		<module>core</module>
 		<module>learn</module>
-		<module>classify</module>
-		<module>java</module>
-		<module>java-classify</module>
+		<!--<module>classify</module>-->
+		<!--<module>java</module>-->
+		<!--<module>java-classify</module>-->
 		<module>js</module>
 		<module>js-learn</module>
 		<module>main</module>
@@ -63,8 +63,8 @@
 			
 	<repositories>
 		<repository>
-			<id>pangor</id>
-			<name>Pangor dependency repository</name>
+			<id>commitminer</id>
+			<name>CommitMiner dependency repository</name>
 			<url>http://ece.ubc.ca/~qhanam/maven/</url>
 		</repository>
 		<repository>
@@ -108,6 +108,11 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-core</artifactId>
+			<version>1.3</version>
 		</dependency>
 
 		<!-- Argument parsing -->
@@ -173,22 +178,42 @@
 			<version>1.0-20130410.213900-5</version>
 		</dependency>
 
-		<!-- Pangor specific forks -->
+		<!-- CommitMiner specific forks -->
 
 		<dependency>
-			<groupId>ca.ubc.ece.salt.pangor</groupId>
+			<groupId>ca.ubc.ece.salt</groupId>
 			<artifactId>optics_dbscan</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>ca.ubc.ece.salt.pangor</groupId>
+			<groupId>ca.ubc.ece.salt</groupId>
 			<artifactId>rhino</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>ca.ubc.ece.salt.pangor</groupId>
-			<artifactId>gumtree</artifactId>
+			<groupId>ca.ubc.ece.salt</groupId>
+			<artifactId>jdt-core</artifactId>
 			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>ca.ubc.ece.salt</groupId>
+			<artifactId>iris</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>fr.labri.gumtree</groupId>
+			<artifactId>core</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>fr.labri.gumtree</groupId>
+			<artifactId>gen.js</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>fr.labri.gumtree</groupId>
+			<artifactId>gen.jdt</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>

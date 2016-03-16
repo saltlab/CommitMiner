@@ -15,9 +15,6 @@ import org.junit.Test;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.java.cfg.JavaCFGFactory;
-import ca.ubc.ece.salt.pangor.test.cfg.MockCFG;
-import ca.ubc.ece.salt.pangor.test.cfg.MockCFGEdge;
-import ca.ubc.ece.salt.pangor.test.cfg.MockCFGNode;
 
 
 public class TestJavaCFGFactory {
