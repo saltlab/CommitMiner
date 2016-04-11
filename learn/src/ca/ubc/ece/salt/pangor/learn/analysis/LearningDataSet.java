@@ -269,7 +269,8 @@ public class LearningDataSet extends DataSet {
 	 * ({@code dataSetPath}), serializes the feature vector and writes it to
 	 * the file. Otherwise, the feature vector is stored in memory in
 	 * {@code LearningDataSet}.
-	 * @param featureVector The feature vector to be managed by this class.
+	 * @param commit The commit that is being analyzed.
+	 * @param knowledgeBase The fact database to query.
 	 * @throws EvaluationException
 	 * @throws RuleUnsafeException
 	 * @throws ProgramNotStratifiedException
