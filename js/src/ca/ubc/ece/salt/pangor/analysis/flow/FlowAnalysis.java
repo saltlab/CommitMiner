@@ -1,8 +1,13 @@
 package ca.ubc.ece.salt.pangor.analysis.flow;
 
+import java.util.Map;
+
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.js.analysis.FunctionAnalysis;
@@ -31,13 +36,15 @@ public abstract class FlowAnalysis<LE extends AbstractLatticeElement> extends Fu
 	 * Transfer the lattice element over the CFGEdge.
 	 * @param edge The edge to transfer over.
 	 */
-	public abstract void transfer(CFGEdge edge, LE sourceLE, Scope<AstNode> scope);
+	public abstract void transfer(CFGEdge edge, LE sourceLE, Scope<AstNode> scope,
+			Map<IPredicate, IRelation> facts, SourceCodeFileChange sourceCodeFileChange);
 
 	/**
 	 * Transfer the lattice element over the CFGNode.
 	 * @param node The node to transfer over.
 	 */
-	public abstract void transfer(CFGNode node, LE sourceLE, Scope<AstNode> scope);
+	public abstract void transfer(CFGNode node, LE sourceLE, Scope<AstNode> scope,
+			Map<IPredicate, IRelation> facts, SourceCodeFileChange sourceCodeFileChange);
 
 	/**
 	 * @param le The lattice element to copy.

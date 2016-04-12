@@ -15,9 +15,7 @@ import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
 
 /**
- * A path sensitive flow analysis.
- *
- * @author qhanam
+ * A path sensitive flow analysis. Not thread safe.
  *
  * @param <LE> The type that stores the analysis information.
  */
@@ -47,10 +45,10 @@ public abstract class PathSensitiveFlowAnalysis<LE extends AbstractLatticeElemen
 			edgesVisited++;
 
 			/* Transfer over the edge. */
-			this.transfer(state.edge, state.le, scope);
+			this.transfer(state.edge, state.le, scope, facts, sourceCodeFileChange);
 
 			/* Transfer over the node. */
-			this.transfer(state.edge.getTo(), state.le, scope);
+			this.transfer(state.edge.getTo(), state.le, scope, facts, sourceCodeFileChange);
 
 			/* Push the new edges onto the stack. */
 			for(CFGEdge edge : state.edge.getTo().getEdges()) {
