@@ -61,7 +61,7 @@ public abstract class PathInsensitiveFlowAnalysis<LE extends AbstractLatticeElem
 			edgesVisited++;
 
 			/* Transfer over the edge. */
-			this.transfer(state.edge, state.le, scope);
+			this.transfer(state.edge, state.le, scope, facts, sourceCodeFileChange);
 
 			/* Join with the lattice element in the node. */
 			LE joined = this.join(state.le, leMap.get(state.edge.getTo()));
@@ -73,7 +73,7 @@ public abstract class PathInsensitiveFlowAnalysis<LE extends AbstractLatticeElem
 			if(state.edge.getTo().decrementEdges()) {
 
                 /* Transfer over the node. */
-                this.transfer(state.edge.getTo(), joined, scope);
+                this.transfer(state.edge.getTo(), joined, scope, facts, sourceCodeFileChange);
 
                 /* Push the new edges onto the stack. */
                 for(CFGEdge edge : state.edge.getTo().getEdges()) {
@@ -104,7 +104,7 @@ public abstract class PathInsensitiveFlowAnalysis<LE extends AbstractLatticeElem
 
                         /* Transfer over the node. */
 						LE copy = this.copy(joined);
-                        this.transfer(state.edge.getTo(), copy, scope);
+                        this.transfer(state.edge.getTo(), copy, scope, facts, sourceCodeFileChange);
 
 	                    /* If an edge has been visited on this path, don't visit it
 	                     * again (only loop once). */
