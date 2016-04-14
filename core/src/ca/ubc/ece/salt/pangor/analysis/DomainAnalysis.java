@@ -4,11 +4,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.api.basics.ITuple;
-import org.deri.iris.factory.Factory;
 import org.deri.iris.storage.IRelation;
-import org.deri.iris.storage.IRelationFactory;
-import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.EvaluatorException;
 
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
@@ -81,56 +77,9 @@ public class DomainAnalysis {
 	 * @throws Exception when an error occurs during domain analysis.
 	 */
 	protected boolean preAnalysis(Commit commit, Map<IPredicate, IRelation> facts) throws Exception {
-
-		/* Create and add the relation for this predicate to the fact base. */
-		IPredicate predicate = Factory.BASIC.createPredicate("Stronger", 2);
-		IRelationFactory relationFactory = new SimpleRelationFactory();
-		IRelation relation = relationFactory.createRelation();
-		facts.put(predicate, relation);
-
-		/* Define all stonger than relations. We will also need to define a
-		 * transitive rule though the data set constructor */
-
-		strongerThan(relation, "NO_VALUE", "FALSEY");
-		strongerThan(relation, "EMPTY", "FALSEY");
-
-		strongerThan(relation, "NULL", "NO_VALUE");
-		strongerThan(relation, "UNDEFINED", "NO_VALUE");
-		strongerThan(relation, "NAN", "NO_VALUE");
-		strongerThan(relation, "BLANK", "NO_VALUE");
-		strongerThan(relation, "ZERO", "NO_VALUE");
-		strongerThan(relation, "EMPTY_ARRAY", "NO_VALUE");
-		strongerThan(relation, "FUNCTION", "NO_VALUE");
-
-		strongerThan(relation, "NULL", "EMPTY");
-		strongerThan(relation, "UNDEFINED", "EMPTY");
-		strongerThan(relation, "NAN", "EMPTY");
-		strongerThan(relation, "BLANK", "EMPTY");
-		strongerThan(relation, "ZERO", "EMPTY");
-		strongerThan(relation, "EMPTY_ARRAY", "EMPTY");
-		strongerThan(relation, "FUNCTION", "EMPTY");
-
-		ITuple tuple = Factory.BASIC.createTuple(
-				Factory.TERM.createString("FALSEY"),
-				Factory.TERM.createString("NO_VALUE"));
-		relation.add(tuple);
-
-		facts.put(predicate, relation);
 		return true;
 	}
 
-	/**
-	 * Creates a new fact "special type A is stronger than special type B"
-	 * @param relation The relation to add the fact to.
-	 * @param stronger The stronger special type.
-	 * @param weaker The weaker special type.
-	 */
-	private void strongerThan(IRelation relation, String stronger, String weaker) {
-		ITuple tuple = Factory.BASIC.createTuple(
-				Factory.TERM.createString(stronger),
-				Factory.TERM.createString(weaker));
-		relation.add(tuple);
-	}
 
 	/**
 	 * Override to run a custom post-file analysis.
