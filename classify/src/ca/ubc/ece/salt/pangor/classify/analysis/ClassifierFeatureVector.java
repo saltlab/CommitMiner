@@ -63,12 +63,15 @@ public class ClassifierFeatureVector extends FeatureVector {
 	 * @param method The method that the features were extracted from.
 	 * @param id The unique id for the alert.
 	 */
-	public ClassifierFeatureVector(Commit commit, String klass, String method,
-								   String type, String subtype,
+	public ClassifierFeatureVector(Commit commit, String version,
+								   String klass, String method,
+								   String line, String type, String subtype,
 								   String description, int id) {
 		super(commit, id);
+		this.version = version;
 		this.klass = klass;
 		this.method = method;
+		this.line = line;
 		this.type = type;
 		this.subtype = subtype;
 		this.description = description;
@@ -113,6 +116,7 @@ public class ClassifierFeatureVector extends FeatureVector {
 		ClassifierFeatureVector featureVector = new ClassifierFeatureVector(commit,
 				features[6], features[7],
 				features[8], features[9], features[10],
+				features[11], features[12],
 				Integer.parseInt(features[0]));
 
 		return featureVector;

@@ -139,6 +139,13 @@ public class ClassifierDataSet extends DataSet {
 	}
 
 	/**
+	 * @return The list of feature vectors in the data set.
+	 */
+	public List<ClassifierFeatureVector> getFeatureVectors() {
+		return this.featureVectors;
+	}
+
+	/**
 	 * Stores the feature vector in the file specified by {@code dataSetPath}.
 	 * This method is synchronized because it may be used by several
 	 * GitProjectAnalysis thread at the same time, which may cause race

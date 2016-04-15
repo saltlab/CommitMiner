@@ -12,6 +12,7 @@ import org.deri.iris.api.basics.IQuery;
 import org.deri.iris.api.basics.IRule;
 import org.deri.iris.compiler.Parser;
 import org.deri.iris.compiler.ParserException;
+import org.junit.Assert;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.pangor.analysis.Commit;
@@ -32,6 +33,7 @@ public class TestUseDomain {
 	 * @throws Exception
 	 */
 	protected void runTest(SourceCodeFileChange sourceFileChange,
+						  List<ClassifierFeatureVector> expected,
 						   boolean printAlerts) throws Exception {
 
 		Commit commit = getCommit();
@@ -56,10 +58,11 @@ public class TestUseDomain {
 		dataSet.printDataSet();
 
         /* Verify the expected feature vectors match the actual feature vectors. */
-		// TODO
-//        for(MockFeatureVector fv : expected) {
-//        	Assert.assertTrue(dataSet.contains(fv.functionName, fv.expectedKeywords));
-//        }
+		List<ClassifierFeatureVector> actual = dataSet.getFeatureVectors();
+		Assert.assertTrue(actual.size() == expected.size());
+        for(ClassifierFeatureVector fv : expected) {
+        	Assert.assertTrue(actual.contains(fv));
+        }
 	}
 
 	@Test
@@ -72,7 +75,20 @@ public class TestUseDomain {
 		/* Read the source files. */
 		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
 
-		this.runTest(sourceCodeFileChange, true);
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/learning/falsey_new.js", "MethodNA", "3", "TST", "USE", "UNCHANGED_process"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/learning/falsey_new.js", "MethodNA", "4", "TST", "USE", "MOVED_console"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/learning/falsey_new.js", "MethodNA", "4", "TST", "USE", "MOVED_console.log"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/learning/falsey_new.js", "MethodNA", "4", "TST", "USE", "MOVED_x"));
+
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "3", "TST", "USE", "UNCHANGED_process"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "USE", "MOVED_console"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "USE", "MOVED_console.log"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "USE", "MOVED_x"));
+
+		this.runTest(sourceCodeFileChange, expected, true);
 	}
 
 	/**
