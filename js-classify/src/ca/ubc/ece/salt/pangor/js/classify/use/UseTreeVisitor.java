@@ -68,8 +68,9 @@ public class UseTreeVisitor implements NodeVisitor {
         }
         else if (node instanceof ElementGet) {
 
-        	AstNode element = ((ElementGet)node).getElement();
-        	this.check(element);
+        	ElementGet elementGet = (ElementGet)node;
+        	this.check(elementGet.getElement());
+        	this.check(elementGet.getTarget());
 
         }
         else if (node instanceof InfixExpression) {
