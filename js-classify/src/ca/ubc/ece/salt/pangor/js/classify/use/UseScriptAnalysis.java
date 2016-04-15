@@ -62,7 +62,7 @@ public class UseScriptAnalysis extends SourceCodeFileAnalysis {
 									  SourceCodeFileChange sourceCodeFileChange) {
 
 		/* Get the relation for this predicate from the fact base. */
-		IPredicate predicate = Factory.BASIC.createPredicate("Use", 5);
+		IPredicate predicate = Factory.BASIC.createPredicate("Use", 6);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 
@@ -76,11 +76,12 @@ public class UseScriptAnalysis extends SourceCodeFileAnalysis {
 
 		/* Add the new tuple to the relation. */
 		ITuple tuple = Factory.BASIC.createTuple(
-				Factory.TERM.createString(sourceCodeFileChange.repairedFile),
-				Factory.TERM.createString(statement.getVersion().toString()),
-				Factory.TERM.createString(statement.getID().toString()),
-				Factory.TERM.createString(changeType.toString()),
-				Factory.TERM.createString(identifier));
+				Factory.TERM.createString(statement.getVersion().toString()),		// Version
+				Factory.TERM.createString(sourceCodeFileChange.repairedFile), 		// File
+				Factory.TERM.createString(String.valueOf(statement.getLineno())),	// Line #
+				Factory.CONCRETE.createInt(statement.getID()),						// Statement ID
+				Factory.TERM.createString(changeType.toString()),					// Change Type
+				Factory.TERM.createString(identifier));								// Identifier
 		relation.add(tuple);
 
 		facts.put(predicate, relation);

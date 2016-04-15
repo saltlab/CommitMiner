@@ -14,14 +14,17 @@ import ca.ubc.ece.salt.pangor.analysis.FeatureVector;
  */
 public class ClassifierFeatureVector extends FeatureVector {
 
-	/** The cluster assigned to this feature vector. **/
-	public String cluster;
+	/** The version of the file (SOURCE or DESTINATION) **/
+	public String version;
 
 	/** The class that was analyzed (if at or below class granularity). **/
 	public String klass;
 
 	/** The method that was analyzed (if at or below method granularity). **/
 	public String method;
+
+	/** The line number for the alert. **/
+	public String line;
 
 	/** The type of pattern found. **/
 	public String type;
@@ -37,12 +40,15 @@ public class ClassifierFeatureVector extends FeatureVector {
 	 * @param klass The class that the features were extracted from.
 	 * @param method The method that the features were extracted from.
 	 */
-	public ClassifierFeatureVector(Commit commit, String klass, String method,
-								   String type, String subtype,
+	public ClassifierFeatureVector(Commit commit, String version,
+								   String klass, String method,
+								   String line, String type, String subtype,
 								   String description) {
 		super(commit);
+		this.version = version;
 		this.klass = klass;
 		this.method = method;
+		this.line = line;
 		this.type = type;
 		this.subtype = subtype;
 		this.description = description;
@@ -81,7 +87,8 @@ public class ClassifierFeatureVector extends FeatureVector {
 				+ "," + this.commit.commitMessageType.toString()
 				+ "," + this.commit.url + "/commit/" + this.commit.repairedCommitID
 				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
-				+ "," + this.klass + "," + this.method + "," + this.type
+				+ "," + this.version
+				+ "," + this.klass + "," + this.method + "," + this.line + "," + this.type
 				+ "," + this.subtype + "," + this.description;
 
 		return serialized;
@@ -122,6 +129,8 @@ public class ClassifierFeatureVector extends FeatureVector {
 		if(o instanceof ClassifierFeatureVector) {
 			ClassifierFeatureVector sa = (ClassifierFeatureVector)o;
 			if(this.commit.equals(sa.commit)
+					&& this.version.equals(sa.version)
+					&& this.method.equals(sa.method)
 					&& this.klass.equals(sa.klass)
 					&& this.method.equals(sa.method)
 					&& this.type.equals(sa.type)

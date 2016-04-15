@@ -127,8 +127,6 @@ public class UseTreeVisitor implements NodeVisitor {
 
         ChangeType changeType = node.getChangeType();
 
-        // TODO: Track the change type. We'll need to store more than the
-        //		 identifer string in the value.
         if(changeType == ChangeType.MOVED || changeType == ChangeType.UNCHANGED) {
             String identifier = AnalysisUtilities.getIdentifier(node);
 
@@ -146,7 +144,7 @@ public class UseTreeVisitor implements NodeVisitor {
             	}
 
             	/* Add the identifier as a use. */
-            	if(identifiers.contains(identifier)) identifiers.add(Pair.of(changeType, identifier));
+            	if(!identifiers.contains(identifier)) identifiers.add(Pair.of(changeType, identifier));
 
             }
 
