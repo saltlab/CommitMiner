@@ -10,7 +10,8 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.deri.iris.api.basics.IQuery;
 import org.deri.iris.api.basics.IRule;
-import org.deri.iris.factory.Factory;
+import org.deri.iris.compiler.Parser;
+import org.deri.iris.compiler.ParserException;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.pangor.analysis.Commit;
@@ -103,23 +104,18 @@ public class TestUseDomain {
 
 	/**
 	 * @return The Datalog query that selects identifier uses.
+	 * @throws ParserException when iris fails to parse the query string.
 	 */
-	public static Map<IQuery,Transformer> getUseQueries() {
+	public static Map<IQuery,Transformer> getUseQueries() throws ParserException {
 
 		Map<IQuery, Transformer> queries = new HashMap<IQuery, Transformer>();
 
-		IQuery query = Factory.BASIC.createQuery(
-				Factory.BASIC.createLiteral(true,
-				Factory.BASIC.createPredicate("Use", 6),
-				Factory.BASIC.createTuple(
-						Factory.TERM.createVariable("Version"),
-						Factory.TERM.createVariable("File"),
-						Factory.TERM.createVariable("Line"),
-						Factory.TERM.createVariable("StatementID"),
-						Factory.TERM.createVariable("ChangeType"),
-						Factory.TERM.createVariable("Identifier"))));
+		/* The query that produces the results. */
+		Parser parser = new Parser();
+		parser.parse("?- Use(?Version,?File,?Line,?StatementID,?ChangeType,?Identifier).");
+		IQuery query = parser.getQueries().get(0);
 
-
+		/* Transforms the query results to a ClassifierFeatureVector. */
 		Transformer transformer = (commit, tuple) -> {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
