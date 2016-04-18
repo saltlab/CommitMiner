@@ -457,9 +457,9 @@ public class SpecialTypeAnalysisUtilities {
 		BLANK,
 		ZERO,
 		EMPTY_ARRAY,
-		FUNCTION
+		FUNCTION,
+		OBJECT,
+		UNKNOWN
 	}
-
-
 
 }

@@ -18,13 +18,13 @@ import ca.ubc.ece.salt.pangor.js.analysis.FunctionAnalysis;
 import ca.ubc.ece.salt.pangor.js.analysis.ScriptAnalysis;
 import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
 
-public class STHDomainAnalysis extends DomainAnalysis {
+public class ProtectedDomainAnalysis extends DomainAnalysis {
 
 	/**
 	 * @param srcAnalysis the source analysis the anlaysis runs to extract domain facts
 	 * @param dstAnalysis the destination analysis the anlaysis runs to extract domain facts
 	 */
-	private STHDomainAnalysis(SourceCodeFileAnalysis srcAnalysis,
+	private ProtectedDomainAnalysis(SourceCodeFileAnalysis srcAnalysis,
 							 SourceCodeFileAnalysis dstAnalysis) {
 		super(srcAnalysis, dstAnalysis, new JavaScriptCFGFactory(), true);
 	}
@@ -66,7 +66,9 @@ public class STHDomainAnalysis extends DomainAnalysis {
 		relation.add(tuple);
 
 		facts.put(predicate, relation);
+
 		return true;
+
 	}
 
 	/**
@@ -88,18 +90,18 @@ public class STHDomainAnalysis extends DomainAnalysis {
 	 * @param maxChangeComplexity The maximum number of statements that can change in a commit.
 	 * @return an analysis for extracting facts in the learning domain.
 	 */
-	public static STHDomainAnalysis createLearningAnalysis() {
+	public static ProtectedDomainAnalysis createLearningAnalysis() {
 
 		List<FunctionAnalysis> srcFunctionAnalyses = new LinkedList<FunctionAnalysis>();
 		List<FunctionAnalysis> dstFunctionAnalyses = new LinkedList<FunctionAnalysis>();
 
-		srcFunctionAnalyses.add(new STHFlowAnalysis());
-		dstFunctionAnalyses.add(new STHFlowAnalysis());
+		srcFunctionAnalyses.add(new ProtectedFlowAnalysis());
+		dstFunctionAnalyses.add(new ProtectedFlowAnalysis());
 
 		SourceCodeFileAnalysis srcSCFA = new ScriptAnalysis(srcFunctionAnalyses);
 		SourceCodeFileAnalysis dstSCFA = new ScriptAnalysis(dstFunctionAnalyses);
 
-		STHDomainAnalysis analysis = new STHDomainAnalysis(srcSCFA, dstSCFA);
+		ProtectedDomainAnalysis analysis = new ProtectedDomainAnalysis(srcSCFA, dstSCFA);
 
 		return analysis;
 	}

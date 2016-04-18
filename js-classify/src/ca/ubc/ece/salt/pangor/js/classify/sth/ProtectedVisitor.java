@@ -14,7 +14,7 @@ import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeCheck;
  * A visitor for finding special type checks in conditions.
  * @author qhanam
  */
-public class SpecialTypeVisitor implements NodeVisitor {
+public class ProtectedVisitor implements NodeVisitor {
 
     private List<SpecialTypeCheck> specialTypeChecks;
     private AstNode condition;
@@ -25,7 +25,7 @@ public class SpecialTypeVisitor implements NodeVisitor {
      * @return A list of all the special type checks in the condition.
      */
     public static List<SpecialTypeCheck> getSpecialTypeChecks(AstNode condition) {
-    	SpecialTypeVisitor visitor = new SpecialTypeVisitor(condition);
+    	ProtectedVisitor visitor = new ProtectedVisitor(condition);
     	condition.visit(visitor);
     	return visitor.specialTypeChecks;
     }
@@ -37,7 +37,7 @@ public class SpecialTypeVisitor implements NodeVisitor {
      * @return A list of all the special type checks in the condition.
      */
     public static List<SpecialTypeCheck> getSpecialTypeChecks(AstNode condition, boolean newTypesOnly) {
-    	SpecialTypeVisitor visitor = new SpecialTypeVisitor(condition, newTypesOnly);
+    	ProtectedVisitor visitor = new ProtectedVisitor(condition, newTypesOnly);
     	condition.visit(visitor);
     	return visitor.specialTypeChecks;
     }
@@ -45,7 +45,7 @@ public class SpecialTypeVisitor implements NodeVisitor {
     /**
      * @param condition The condition to inspect for special types.
      */
-    public SpecialTypeVisitor(AstNode condition) {
+    public ProtectedVisitor(AstNode condition) {
 		this.specialTypeChecks = new LinkedList<SpecialTypeCheck>();
 		this.condition = condition;
 		this.newTypesOnly = true;
@@ -56,7 +56,7 @@ public class SpecialTypeVisitor implements NodeVisitor {
      * @param newTypesOnly If true, will only consider INSERTED and
      * 							REMOVED special types.
      */
-    public SpecialTypeVisitor(AstNode condition, boolean newTypesOnly) {
+    public ProtectedVisitor(AstNode condition, boolean newTypesOnly) {
 		this.specialTypeChecks = new LinkedList<SpecialTypeCheck>();
 		this.condition = condition;
 		this.newTypesOnly = newTypesOnly;

@@ -27,27 +27,25 @@ import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeAnalysisUtilities
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeCheck;
 
 /**
- * A change-sensitive analysis that finds special type repairs in JavaScript.
+ * A change-sensitive analysis that finds where special types are protected in JavaScript.
  *
- * Not special type path:
- * 	1. New edge conditions that check that an identifier is not a special type.
- *  2. That identifier is used after the check, but before it is assigned and
- *     that use was in the original program.
- *  *. If the variable is used or assigned, we remove it from the map (after
- *     generating an alert if needed).
+ * Protected (not special type) path:
+ * 	1. An edge conditions that check that an identifier is not a special type.
+ *  2. Condition is propagated to all nodes along the path until merged with the
+ *     opposite condition.
  *
  * Special type path:
  * 	1. New edge conditions that check that an identifier is a special type.
- *  2. That identifier is assigned before it is used. The assignment is
- *     inserted and the use is in the original program.
+ *  2. Condition is propagated to all nodes along the path until merged with the
+ *     opposite condition.
  *
  */
-public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement> {
+public class ProtectedFlowAnalysis extends PathSensitiveFlowAnalysis<ProtectedLatticeElement> {
 
 //	/** Stores the possible special type check repairs. */
 //	private Map<String, List<SpecialTypeCheckResult>> specialTypeCheckResults;
 
-	public STHFlowAnalysis() {
+	public ProtectedFlowAnalysis() {
 //		this.specialTypeCheckResults = new HashMap<String, List<SpecialTypeCheckResult>>();
 	}
 
@@ -60,12 +58,12 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
 ////	}
 
 	@Override
-	public STHLatticeElement entryValue(ScriptNode function) {
-		return new STHLatticeElement();
+	public ProtectedLatticeElement entryValue(ScriptNode function) {
+		return new ProtectedLatticeElement();
 	}
 
 	@Override
-	public void transfer(CFGEdge edge, STHLatticeElement sourceLE, Scope<AstNode> scope,
+	public void transfer(CFGEdge edge, ProtectedLatticeElement sourceLE, Scope<AstNode> scope,
 						 Map<IPredicate, IRelation> facts,
 						 SourceCodeFileChange sourceCodeFileChange) {
 
@@ -74,7 +72,7 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
 
 		/* Check if condition has an inserted special type check and whether
 		 * the check evaluates to true or false. */
-		SpecialTypeVisitor visitor = new SpecialTypeVisitor(condition);
+		ProtectedVisitor visitor = new ProtectedVisitor(condition);
 		condition.visit(visitor);
 
 		/* Add any special type checks to the lattice element. */
@@ -90,11 +88,11 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
 				if(declaration != null && declaration.getChangeType() == ChangeType.INSERTED) return;
 
 				/* Is the identifier already in the map? */
-				if(sourceLE.specialTypes.containsKey(specialTypeCheck.identifier)) {
+				if(sourceLE.specialTypeIdentifiers.containsKey(specialTypeCheck.identifier)) {
 
 					/* Add the special type to the list of types the
 					 * identifier could possibly be (based on the type check). */
-					List<SpecialType> couldBe = sourceLE.specialTypes.get(specialTypeCheck.identifier);
+					List<SpecialType> couldBe = sourceLE.specialTypeIdentifiers.get(specialTypeCheck.identifier);
 					if(!couldBe.contains(specialTypeCheck.specialType)) couldBe.add(specialTypeCheck.specialType);
 
 				}
@@ -104,7 +102,7 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
 					 * identifier could possibly be (based on the type check). */
 					LinkedList<SpecialType> couldBe = new LinkedList<SpecialType>();
 					couldBe.add(specialTypeCheck.specialType);
-                    sourceLE.specialTypes.put(specialTypeCheck.identifier, couldBe);
+                    sourceLE.specialTypeIdentifiers.put(specialTypeCheck.identifier, couldBe);
 
 				}
 
@@ -116,11 +114,11 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
 				if(declaration != null && declaration.getChangeType() == ChangeType.INSERTED) return;
 
 				/* Is the identifier already in the map? */
-				if(sourceLE.nonSpecialTypes.containsKey(specialTypeCheck.identifier)) {
+				if(sourceLE.protectedIdentifiers.containsKey(specialTypeCheck.identifier)) {
 
 					/* Add the special type to the list of types the
 					 * identifier could not possibly be (based on the type check). */
-					List<SpecialType> couldBe = sourceLE.nonSpecialTypes.get(specialTypeCheck.identifier);
+					List<SpecialType> couldBe = sourceLE.protectedIdentifiers.get(specialTypeCheck.identifier);
 					if(!couldBe.contains(specialTypeCheck.specialType)) couldBe.add(specialTypeCheck.specialType);
 
 				}
@@ -130,7 +128,7 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
 					 * identifier could not possibly be (based on the type check). */
 					LinkedList<SpecialType> couldNotBe = new LinkedList<SpecialType>();
 					couldNotBe.add(specialTypeCheck.specialType);
-                    sourceLE.nonSpecialTypes.put(specialTypeCheck.identifier, couldNotBe);
+                    sourceLE.protectedIdentifiers.put(specialTypeCheck.identifier, couldNotBe);
 				}
 			}
 		}
@@ -138,7 +136,7 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
 	}
 
 	@Override
-	public void transfer(CFGNode node, STHLatticeElement sourceLE, Scope<AstNode> scope,
+	public void transfer(CFGNode node, ProtectedLatticeElement sourceLE, Scope<AstNode> scope,
 						 Map<IPredicate, IRelation> facts,
 						 SourceCodeFileChange sourceCodeFileChange) {
 
@@ -147,10 +145,10 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
 		/* Loop through the moved or unchanged identifiers that are used in
 		 * this statement. */
         Set<String> usedIdentifiers = AnalysisUtilities.getUsedIdentifiers(statement);
-        for(String identifier : sourceLE.nonSpecialTypes.keySet()) {
+        for(String identifier : sourceLE.protectedIdentifiers.keySet()) {
 
         	/* Make sure this is a valid path... */
-        	if(sourceLE.specialTypes.containsKey(identifier)) continue;
+        	if(sourceLE.specialTypeIdentifiers.containsKey(identifier)) continue;
 
         	/* Is the identifier in our "definitely not a special type" list? */
         	if(usedIdentifiers.contains(identifier)) {
@@ -160,7 +158,7 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
         		SpecialType assignedTo = sourceLE.assignments.get(identifier);
         		if(assignedTo != SpecialType.FALSEY) {
 
-        			List<SpecialType> specialTypes = sourceLE.nonSpecialTypes.get(identifier);
+        			List<SpecialType> specialTypes = sourceLE.protectedIdentifiers.get(identifier);
         			for(SpecialType specialType : specialTypes) {
 
         				if(assignedTo != specialType) {
@@ -210,10 +208,10 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
         	}
 
         	/* Remove the identifier from the special type set (if it exists). */
-        	if(sourceLE.nonSpecialTypes.containsKey(assignment.getKey())) {
+        	if(sourceLE.protectedIdentifiers.containsKey(assignment.getKey())) {
 
         		/* Remove the identifier. */
-        		sourceLE.nonSpecialTypes.remove(assignment.getKey());
+        		sourceLE.protectedIdentifiers.remove(assignment.getKey());
 
         	}
 
@@ -222,8 +220,8 @@ public class STHFlowAnalysis extends PathSensitiveFlowAnalysis<STHLatticeElement
 	}
 
 	@Override
-	public STHLatticeElement copy(STHLatticeElement le) {
-		return STHLatticeElement.copy(le);
+	public ProtectedLatticeElement copy(ProtectedLatticeElement le) {
+		return ProtectedLatticeElement.copy(le);
 	}
 
 	/**
