@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.Token;
+import org.mozilla.javascript.ast.ArrayLiteral;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ConditionalExpression;
 import org.mozilla.javascript.ast.DoLoop;
 import org.mozilla.javascript.ast.ForLoop;
+import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.KeywordLiteral;
@@ -39,6 +41,9 @@ public class SpecialTypeAnalysisUtilities {
         else if (node instanceof KeywordLiteral) {
 
             if(node.getType() == Token.NULL) return SpecialType.NULL;
+            if(node.getType() == Token.TRUE || node.getType() == Token.FALSE)
+            	return SpecialType.BOOLEAN;
+            if(node.getType() == Token.THIS) return SpecialType.THIS;
             else return null;
 
         }
@@ -46,19 +51,28 @@ public class SpecialTypeAnalysisUtilities {
 
             String literal = ((StringLiteral) node).getValue();
             if(literal.isEmpty()) return SpecialType.BLANK;
-            else return null;
+            else return SpecialType.STRING;
 
         }
         else if (node instanceof NumberLiteral) {
 
             double literal = ((NumberLiteral) node).getNumber();
             if(literal == 0.0) return SpecialType.ZERO;
-            else return null;
+            else return SpecialType.NUMBER;
 
         }
-        else {
-            return null;
+        else if (node instanceof ArrayLiteral) {
+        	ArrayLiteral literal = (ArrayLiteral) node;
+        	if(literal.getElements().isEmpty()) return SpecialType.EMPTY_ARRAY;
+        	else return SpecialType.OBJECT;
         }
+        else if (node instanceof FunctionNode) {
+        	return SpecialType.FUNCTION;
+        }
+        else {
+            return SpecialType.OBJECT;
+        }
+
 	}
 
 	/**
@@ -459,9 +473,11 @@ public class SpecialTypeAnalysisUtilities {
 		ZERO,
 		EMPTY_ARRAY,
 		FUNCTION,
+		BOOLEAN,
 		STRING,
 		NUMBER,
 		OBJECT,
+		THIS,
 		UNKNOWN,
 		BOTTOM
 	}

@@ -24,17 +24,17 @@ import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
  *
  * Loops are executed once.
  *
- * NOTE: This class only works with the Mozilla Rhino AST.
+ * NOTE: This class only works with the Mozilla Rhino IAbstractStateT.
  *
- * @param <AS> The abstract state that stores the analysis information.
+ * @param <IAbstractState> The abstract state that stores the analysis information.
  */
-public abstract class FlowAnalysis<AS extends IAbstractState> extends FunctionAnalysis {
+public abstract class FlowAnalysis extends FunctionAnalysis {
 
 	/**
 	 * @param function The function under analysis.
 	 * @return an initialized lattice element for the function.
 	 */
-	public abstract AS entryValue(ScriptNode function);
+	public abstract IAbstractState entryValue(ScriptNode function);
 
 	@Override
 	public void analyze(SourceCodeFileChange sourceCodeFileChange,
@@ -60,16 +60,16 @@ public abstract class FlowAnalysis<AS extends IAbstractState> extends FunctionAn
 
 			/* Join the lattice elements from the current edge and 'from'
 			 * node. */
-			AS as = state.edge.getLE().join(state.le);
-			state.edge.setLE(as);
+			IAbstractState as = state.edge.getAS().join(state.le);
+			state.edge.setAS(as);
 
 			/* Transfer the abstract state over the edge. */
 			as = as.transfer(state.edge);
 
 			/* Join the abstract states from the 'to' node and current
 			 * edge. */
-			as = state.edge.getTo().getLE().join(as);
-			state.edge.getTo().setLE(as);
+			as = state.edge.getTo().getAS().join(as);
+			state.edge.getTo().setAS(as);
 
 			/* Add all unvisited edges to the stack.
 			 * We currently only execute loops once. */
@@ -93,9 +93,9 @@ public abstract class FlowAnalysis<AS extends IAbstractState> extends FunctionAn
 
 		public CFGEdge edge;
 		public Set<CFGEdge> visited;
-		public AS le;
+		public IAbstractState le;
 
-		public PathState (CFGEdge edge, Set<CFGEdge> visited, AS le) {
+		public PathState (CFGEdge edge, Set<CFGEdge> visited, IAbstractState le) {
 			this.edge = edge;
 			this.visited = visited;
 			this.le = le;

@@ -35,7 +35,7 @@ public class CFGNode {
 	 * been transfered over the node. The element will be converted to a fact
 	 * about this point in the program once the analysis has finished.
 	 */
-	private IAbstractState<?> as;
+	private IAbstractState as;
 
 	/**
 	 * @param statement The statement that is executed when this node is
@@ -67,14 +67,14 @@ public class CFGNode {
 	 * Set the lattice element at this point in the program.
 	 * @param as The abstract state.
 	 */
-	public void setLE(IAbstractState<?> as) {
+	public void setAS(IAbstractState as) {
 		this.as = as;
 	}
 
 	/**
 	 * @return the abstract state at this point in the program.
 	 */
-	public IAbstractState<?> getLE() {
+	public IAbstractState getAS() {
 		return this.as;
 	}
 
