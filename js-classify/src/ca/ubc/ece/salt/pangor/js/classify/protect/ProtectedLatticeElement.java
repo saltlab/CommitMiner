@@ -6,10 +6,10 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 public class ProtectedLatticeElement {
 
 	/** The knowledge we have about the type equivalence. **/
-	private Element element;
+	public Element element;
 
 	/** The knowledge we have about the change in type equivalence. **/
-	private Change change;
+	public Change change;
 
 	public ProtectedLatticeElement() {
 		this.element = Element.BOTTOM;

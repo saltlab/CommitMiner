@@ -36,6 +36,11 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 	 */
 	public abstract IAbstractState entryValue(ScriptNode function);
 
+	public abstract void createFacts(SourceCodeFileChange sourceCodeFileChange,
+			Map<IPredicate, IRelation> facts,
+			CFG cfg, Scope<AstNode> scope,
+			PointsToPrediction model);
+
 	@Override
 	public void analyze(SourceCodeFileChange sourceCodeFileChange,
 								 Map<IPredicate, IRelation> facts,
@@ -83,6 +88,9 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 			}
 
 		}
+
+		/* Generate facts from the LatticeElements in the CFG. */
+		this.createFacts(sourceCodeFileChange, facts, cfg, scope, model);
 
 	}
 

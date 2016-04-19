@@ -142,7 +142,7 @@ public class ProtectedAbstractState implements IAbstractState {
 	 * Identifies a lattice element. There is one lattice element for each
 	 * <identifier, special type> pair.
 	 */
-	private class LatticeElement {
+	public class LatticeElement {
 		public String identifier;
 		public SpecialType type;
 
