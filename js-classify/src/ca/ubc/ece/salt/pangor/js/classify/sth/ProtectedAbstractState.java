@@ -44,9 +44,20 @@ public class ProtectedAbstractState implements IAbstractState<ProtectedAbstractS
 			joined.latticeElements.put(le, TypeLatticeElement.join(left, right));
 		}
 
+		for(LatticeElement le : as.latticeElements.keySet()) {
+			if(joined.latticeElements.containsKey(le)) continue;
+			TypeLatticeElement left = as.latticeElements.get(le);
+			TypeLatticeElement right = new TypeLatticeElement();
+			joined.latticeElements.put(le,  TypeLatticeElement.join(left, right));
+		}
+
 		return joined;
 	}
 
+	/**
+	 * Identifies a lattice element. There is one lattice element for each
+	 * <identifier, special type> pair.
+	 */
 	private class LatticeElement {
 		public String identifier;
 		public SpecialType type;
