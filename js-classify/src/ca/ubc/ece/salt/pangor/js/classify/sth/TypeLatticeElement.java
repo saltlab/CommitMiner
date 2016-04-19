@@ -58,6 +58,13 @@ public class TypeLatticeElement {
 
 	}
 
+	/**
+	 * @return A deep copy of this {@code TypeLatticeElement}.
+	 */
+	public TypeLatticeElement copy() {
+		return new TypeLatticeElement(this.element, this.change);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof TypeLatticeElement) {

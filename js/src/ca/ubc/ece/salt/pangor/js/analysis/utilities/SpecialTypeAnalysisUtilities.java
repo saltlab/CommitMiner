@@ -181,18 +181,18 @@ public class SpecialTypeAnalysisUtilities {
 						switch(specialType) {
 						case UNDEFINED:
 						case NULL:
-							return new SpecialTypeCheck(identifier, SpecialType.NO_VALUE, isSpecialType);
+							return new SpecialTypeCheck(identifier, SpecialType.NO_VALUE, isSpecialType, node.getChangeType());
 						case BLANK:
 						case ZERO:
 						case EMPTY_ARRAY:
-							return new SpecialTypeCheck(identifier, SpecialType.EMPTY, isSpecialType);
+							return new SpecialTypeCheck(identifier, SpecialType.EMPTY, isSpecialType, node.getChangeType());
 						default:
-							return new SpecialTypeCheck(identifier, specialType, isSpecialType);
+							return new SpecialTypeCheck(identifier, specialType, isSpecialType, node.getChangeType());
 						}
                     }
                     else if(ie.getOperator() == Token.SHNE || ie.getOperator() == Token.SHEQ) {
                     	/* This is a value and type check. */
-                    	return new SpecialTypeCheck(identifier, specialType, isSpecialType);
+                    	return new SpecialTypeCheck(identifier, specialType, isSpecialType, node.getChangeType());
                     }
 
                 }
@@ -214,10 +214,10 @@ public class SpecialTypeAnalysisUtilities {
 
                 /* If the condition needs to definitely be true or false to branch, return the special type. */
                 if(branchesOn == BranchesOn.TRUE || branchesOn == BranchesOn.TRUE_AND){
-                    return new SpecialTypeCheck(identifier, SpecialType.FALSEY, false);
+                    return new SpecialTypeCheck(identifier, SpecialType.FALSEY, false, node.getChangeType());
                 }
                 else if(branchesOn == BranchesOn.FALSE || branchesOn == BranchesOn.FALSE_AND){
-                    return new SpecialTypeCheck(identifier, SpecialType.FALSEY, true);
+                    return new SpecialTypeCheck(identifier, SpecialType.FALSEY, true, node.getChangeType());
                 }
 
 			}

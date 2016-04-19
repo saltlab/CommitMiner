@@ -1,12 +1,18 @@
 package ca.ubc.ece.salt.pangor.js.classify.sth;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractState;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeAnalysisUtilities.SpecialType;
+import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeCheck;
+import ca.ubc.ece.salt.pangor.js.classify.sth.TypeLatticeElement.Change;
+import ca.ubc.ece.salt.pangor.js.classify.sth.TypeLatticeElement.Element;
 
 public class ProtectedAbstractState implements IAbstractState<ProtectedAbstractState> {
 
@@ -21,8 +27,49 @@ public class ProtectedAbstractState implements IAbstractState<ProtectedAbstractS
 
 	@Override
 	public ProtectedAbstractState transfer(CFGEdge edge) {
-		// TODO Auto-generated method stub
-		return null;
+
+		/* Make a copy of the abstract state. */
+		ProtectedAbstractState as = new ProtectedAbstractState();
+		for(Entry<LatticeElement, TypeLatticeElement> entries : this.latticeElements.entrySet()) {
+			as.latticeElements.put(entries.getKey(), entries.getValue().copy());
+		}
+
+		AstNode condition = (AstNode)edge.getCondition();
+		if(condition == null) return as;
+
+		/* Check if condition has an inserted special type check and whether
+		 * the check evaluates to true or false. */
+		ProtectedVisitor visitor = new ProtectedVisitor(condition);
+		condition.visit(visitor);
+
+		/* Add any special type checks to the lattice element. */
+		for(SpecialTypeCheck specialTypeCheck : visitor.getSpecialTypeChecks()) {
+
+			LatticeElement key = new LatticeElement(specialTypeCheck.identifier, specialTypeCheck.specialType);
+
+			TypeLatticeElement.Element element;
+			TypeLatticeElement.Change change;
+
+			switch(specialTypeCheck.changeType) {
+			case INSERTED:
+			case REMOVED:
+				change = Change.IR;
+			case UNCHANGED:
+			case MOVED:
+			case UPDATED:
+			default:
+				change = Change.U;
+			}
+
+			if(specialTypeCheck.isSpecialType) element = Element.EQ;
+			else element = Element.NE;
+
+			as.latticeElements.put(key, new TypeLatticeElement(element, change));
+
+		}
+
+		return as;
+
 	}
 
 	@Override
