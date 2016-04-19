@@ -449,6 +449,7 @@ public class SpecialTypeAnalysisUtilities {
 	 */
 	public enum SpecialType {
 		FALSEY, // undefined, null, NaN, blank or zero
+		TRUTHY, // object or function
 		NO_VALUE, // undefined or null
 		EMPTY, // blank, zero or empty array
 		UNDEFINED,
@@ -458,8 +459,11 @@ public class SpecialTypeAnalysisUtilities {
 		ZERO,
 		EMPTY_ARRAY,
 		FUNCTION,
+		STRING,
+		NUMBER,
 		OBJECT,
-		UNKNOWN
+		UNKNOWN,
+		BOTTOM
 	}
 
 }
