@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.pangor.cfg;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractState;
 
 /**
  * A labeled, directed edge to another node.
@@ -27,8 +28,12 @@ public class CFGEdge {
 	/** The change operation applied to the edge from source to destination. **/
 	public ChangeType changeType;
 
-	/** Does this edge traverse a path that loops? */
-	public boolean loopEdge;
+	/**
+	 * The lattice element at this point in the program. The LE has not yet
+	 * been transfered over the edge. The element will be converted to a fact
+	 * about this point in the program once the analysis has finished.
+	 */
+	private IAbstractState as;
 
 	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to) {
 		this.condition = condition;
@@ -36,7 +41,6 @@ public class CFGEdge {
 		this.from = from;
 		this.changeType = ChangeType.UNKNOWN;
 		this.id = CFGEdge.getUniqueId();
-		this.loopEdge = false;
 	}
 
 	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to, boolean loopEdge) {
@@ -45,14 +49,28 @@ public class CFGEdge {
 		this.from = from;
 		this.changeType = ChangeType.UNKNOWN;
 		this.id = CFGEdge.getUniqueId();
-		this.loopEdge = loopEdge;
+	}
+
+	/**
+	 * Set the abstract state at this point in the program.
+	 * @param as The abstract state.
+	 */
+	public void setLE(IAbstractState as) {
+		this.as = as;
+	}
+
+	/**
+	 * @return the lattice element at this point in the program.
+	 */
+	public IAbstractState getLE() {
+		return this.as;
 	}
 
 	/**
 	 * @return a shallow copy of the edge.
 	 */
 	public CFGEdge copy() {
-		return new CFGEdge(this.condition, this.from, this.to, this.loopEdge);
+		return new CFGEdge(this.condition, this.from, this.to);
 	}
 
 	/**

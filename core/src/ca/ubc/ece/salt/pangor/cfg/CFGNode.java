@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
+import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractState;
 
 /**
  * A control flow graph node. Thread safe.
@@ -29,10 +30,12 @@ public class CFGNode {
 	/** The corresponding source or destination CFGNode. */
 	private CFGNode mappedNode;
 
-	/** A semaphore for counting the edges in and visits. */
-	private int edgesIn;
-
 	/**
+	 * The abstract state at this point in the program. The AS has not yet
+	 * been transfered over the node. The element will be converted to a fact
+	 * about this point in the program once the analysis has finished.
+	 */
+	private IAbstractState as;
 
 	/**
 	 * @param statement The statement that is executed when this node is
@@ -44,7 +47,7 @@ public class CFGNode {
 		this.id = CFGNode.getUniqueId();
 		this.name = null;
 		this.setMappedNode(null);
-		this.edgesIn = 0;
+		this.as = null;
 	}
 
 	/**
@@ -57,23 +60,22 @@ public class CFGNode {
 		this.statement = statement;
 		this.id = CFGNode.getUniqueId();
 		this.name = name;
-		this.edgesIn = 0;
+		this.as = null;
 	}
 
 	/**
-	 * Add one to the number of edges going into the node.
+	 * Set the lattice element at this point in the program.
+	 * @param as The abstract state.
 	 */
-	public void incrementEdges() {
-		this.edgesIn++;
+	public void setLE(IAbstractState as) {
+		this.as = as;
 	}
 
 	/**
-	 * Subtract one from the number of edges going into the node.
-	 * @return true if the decrement reaches 0.
+	 * @return the abstract state at this point in the program.
 	 */
-	public boolean decrementEdges() {
-		this.edgesIn--;
-		return this.edgesIn == 0;
+	public IAbstractState getLE() {
+		return this.as;
 	}
 
 	/**

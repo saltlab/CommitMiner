@@ -30,15 +30,15 @@ public class TypeLatticeElement {
 	/**
 	 * Transfer over an edge.
 	 */
-	public void transfer(CFGEdge edge) {
-
+	public TypeLatticeElement transfer(CFGEdge edge) {
+		return null;
 	}
 
 	/**
 	 * Transfer over a node.
 	 */
-	public void transfer(CFGNode node) {
-
+	public TypeLatticeElement transfer(CFGNode node) {
+		return null;
 	}
 
 	/**
@@ -49,6 +49,12 @@ public class TypeLatticeElement {
 										  TypeLatticeElement right) throws Exception {
 
 		if(left.type != right.type) throw new Exception("Types do not match.");
+
+		if(left.element == Element.BOTTOM)
+			return new TypeLatticeElement(right.type, right.element, right.change);
+
+		if(right.element == Element.BOTTOM)
+			return new TypeLatticeElement(left.type, left.element, left.change);
 
 		if(left.element.equals(right.element))
 			return new TypeLatticeElement(left.type, left.element, left.change);

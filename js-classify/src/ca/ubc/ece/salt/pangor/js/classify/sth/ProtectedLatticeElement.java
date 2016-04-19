@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.AbstractLatticeElement;
+import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractState;
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeAnalysisUtilities.SpecialType;
 
 /**
@@ -13,7 +13,7 @@ import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeAnalysisUtilities
  *
  * Tracks identifier types.
  */
-public class ProtectedLatticeElement extends AbstractLatticeElement{
+public class ProtectedLatticeElement extends IAbstractState{
 
 	/**
 	 * Keeps track of identifiers that are special types on the path.
