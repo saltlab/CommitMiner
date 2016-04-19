@@ -33,7 +33,7 @@ public class CFGEdge {
 	 * been transfered over the edge. The element will be converted to a fact
 	 * about this point in the program once the analysis has finished.
 	 */
-	private IAbstractState as;
+	private IAbstractState<?> as;
 
 	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to) {
 		this.condition = condition;
@@ -55,14 +55,14 @@ public class CFGEdge {
 	 * Set the abstract state at this point in the program.
 	 * @param as The abstract state.
 	 */
-	public void setLE(IAbstractState as) {
+	public void setLE(IAbstractState<?> as) {
 		this.as = as;
 	}
 
 	/**
 	 * @return the lattice element at this point in the program.
 	 */
-	public IAbstractState getLE() {
+	public IAbstractState<?> getLE() {
 		return this.as;
 	}
 

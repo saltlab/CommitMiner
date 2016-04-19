@@ -2,12 +2,8 @@ package ca.ubc.ece.salt.pangor.js.classify.sth;
 
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
-import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeAnalysisUtilities.SpecialType;
 
 public class TypeLatticeElement {
-
-	/** The type this lattice element stores knowledge about. **/
-	private SpecialType type;
 
 	/** The knowledge we have about the type equivalence. **/
 	private Element element;
@@ -15,14 +11,12 @@ public class TypeLatticeElement {
 	/** The knowledge we have about the change in type equivalence. **/
 	private Change change;
 
-	public TypeLatticeElement(SpecialType type) {
-		this.type = type;
+	public TypeLatticeElement() {
 		this.element = Element.BOTTOM;
 		this.change = Change.NA;
 	}
 
-	public TypeLatticeElement(SpecialType type, Element element, Change change) {
-		this.type = type;
+	public TypeLatticeElement(Element element, Change change) {
 		this.element = element;
 		this.change = change;
 	}
@@ -46,23 +40,21 @@ public class TypeLatticeElement {
 	 * @return The joined lattice element.
 	 */
 	public static TypeLatticeElement join(TypeLatticeElement left,
-										  TypeLatticeElement right) throws Exception {
-
-		if(left.type != right.type) throw new Exception("Types do not match.");
+										  TypeLatticeElement right) {
 
 		if(left.element == Element.BOTTOM)
-			return new TypeLatticeElement(right.type, right.element, right.change);
+			return new TypeLatticeElement(right.element, right.change);
 
 		if(right.element == Element.BOTTOM)
-			return new TypeLatticeElement(left.type, left.element, left.change);
+			return new TypeLatticeElement(left.element, left.change);
 
 		if(left.element.equals(right.element))
-			return new TypeLatticeElement(left.type, left.element, left.change);
+			return new TypeLatticeElement(left.element, left.change);
 
 		if(left.element != right.element)
-			return new TypeLatticeElement(left.type, Element.UNKNOWN, Change.NA);
+			return new TypeLatticeElement(Element.UNKNOWN, Change.NA);
 
-		return new TypeLatticeElement(left.type, left.element, Change.IR_U);
+		return new TypeLatticeElement(left.element, Change.IR_U);
 
 	}
 
@@ -70,8 +62,7 @@ public class TypeLatticeElement {
 	public boolean equals(Object o) {
 		if(o instanceof TypeLatticeElement) {
 			TypeLatticeElement tle = (TypeLatticeElement) o;
-			if(this.type == tle.type
-					&& this.element == tle.element
+			if(this.element == tle.element
 					&& this.change == tle.change) return true;
 		}
 		return false;

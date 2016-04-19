@@ -8,22 +8,22 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
  * program. This could be a lattice element, or it could store many lattice
  * elements (e.g., one for each variable in a dataflow analysis).
  */
-public interface IAbstractState {
+public interface IAbstractState<AS> {
 
 	/**
 	 * Transfer over an edge.
 	 */
-	public<AS extends IAbstractState> AS transfer(CFGEdge edge);
+	public AS transfer(CFGEdge edge);
 
 	/**
 	 * Transfer over a node.
 	 */
-	public<AS extends IAbstractState> AS transfer(CFGNode node);
+	public AS transfer(CFGNode node);
 
 	/**
 	 * Joins two {@code AbstractLatticeElement}s with LUB
 	 * @return The joined lattice element.
 	 */
-	public<AS extends IAbstractState> AS join(AS as);
+	public AS join(AS as);
 
 }
