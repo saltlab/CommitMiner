@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.classify.sth;
+package ca.ubc.ece.salt.pangor.js.classify.protect;
 
 import org.mozilla.javascript.ast.ScriptNode;
 

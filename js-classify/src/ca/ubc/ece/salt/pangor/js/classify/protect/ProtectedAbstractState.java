@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.classify.sth;
+package ca.ubc.ece.salt.pangor.js.classify.protect;
 
 import java.util.List;
 import java.util.Map;
@@ -15,8 +15,8 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeAnalysisUtilities;
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeAnalysisUtilities.SpecialType;
 import ca.ubc.ece.salt.pangor.js.analysis.utilities.SpecialTypeCheck;
-import ca.ubc.ece.salt.pangor.js.classify.sth.ProtectedLatticeElement.Change;
-import ca.ubc.ece.salt.pangor.js.classify.sth.ProtectedLatticeElement.Element;
+import ca.ubc.ece.salt.pangor.js.classify.protect.ProtectedLatticeElement.Change;
+import ca.ubc.ece.salt.pangor.js.classify.protect.ProtectedLatticeElement.Element;
 
 public class ProtectedAbstractState implements IAbstractState {
 

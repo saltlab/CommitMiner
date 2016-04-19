@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.classify.sth;
+package ca.ubc.ece.salt.pangor.js.classify.type;
 
 import java.util.Arrays;
 import java.util.Set;
