@@ -1,9 +1,9 @@
 package ca.ubc.ece.salt.pangor.js.classify.protect;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
@@ -26,7 +26,7 @@ public class ProtectedAbstractState implements IAbstractState {
 	public Map<LatticeElement, ProtectedLatticeElement> latticeElements;
 
 	public ProtectedAbstractState() {
-		this.latticeElements = new TreeMap<LatticeElement, ProtectedLatticeElement>();
+		this.latticeElements = new HashMap<LatticeElement, ProtectedLatticeElement>();
 	}
 
 	@Override

@@ -52,9 +52,9 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 
 		/* Initialize the stack for a depth-first traversal. */
 		Stack<PathState> stack = new Stack<PathState>();
+		IAbstractState initialState = this.entryValue((ScriptNode)cfg.getEntryNode().getStatement());
 		for(CFGEdge edge : cfg.getEntryNode().getEdges()) {
-			stack.add(new PathState(edge, new HashSet<CFGEdge>(),
-					this.entryValue((ScriptNode)cfg.getEntryNode().getStatement())));
+			stack.add(new PathState(edge, new HashSet<CFGEdge>(), initialState));
 		}
 
 		/* Break when the analysis time reaches some limit. */

@@ -59,8 +59,9 @@ public class ProtectedFlowAnalysis extends FlowAnalysis {
 				if(!visited.contains(edge.getTo())) {
 
 					/* Register facts from the edge. */
-					registerFacts((AstNode)edge.getCondition(), node.getAS(), facts,
-								  sourceCodeFileChange);
+					if(edge.getCondition() != null)
+						registerFacts((AstNode)edge.getCondition(), node.getAS(), facts,
+									  sourceCodeFileChange);
 
 					stack.push(edge.getTo());
 
@@ -78,6 +79,13 @@ public class ProtectedFlowAnalysis extends FlowAnalysis {
 	private void registerFacts(AstNode statement, IAbstractState ias,
 							   Map<IPredicate, IRelation> facts,
 							   SourceCodeFileChange sourceCodeFileChange) {
+
+		/* The entry node will not have facts associated with it. */
+		if(ias == null) return;
+
+		/* Some statements (i.e. empty statements) are created by the CFG
+		 * builder and are not relevant. */
+		if(statement.getVersion() == null || statement.getID() == null) return;
 
 		if(!(ias instanceof ProtectedAbstractState)) throw new IllegalArgumentException("Requires ProtectedAbstractState");
 
