@@ -58,6 +58,7 @@ public class ProtectedAbstractState implements IAbstractState {
 			case INSERTED:
 			case REMOVED:
 				change = Change.IR;
+				break;
 			case UNCHANGED:
 			case MOVED:
 			case UPDATED:
