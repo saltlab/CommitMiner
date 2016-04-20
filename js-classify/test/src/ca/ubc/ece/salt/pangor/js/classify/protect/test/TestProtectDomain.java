@@ -78,17 +78,7 @@ public class TestProtectDomain {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-//		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/learning/falsey_new.js", "MethodNA", "3", "TST", "USE", "UNCHANGED_process"));
-//		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/learning/falsey_new.js", "MethodNA", "3", "TST", "USE", "UNCHANGED_process.argv"));
-//		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/learning/falsey_new.js", "MethodNA", "4", "TST", "USE", "MOVED_console"));
-//		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/learning/falsey_new.js", "MethodNA", "4", "TST", "USE", "MOVED_console.log"));
-//		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/learning/falsey_new.js", "MethodNA", "4", "TST", "USE", "MOVED_x"));
-//
-//		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "3", "TST", "USE", "UNCHANGED_process"));
-//		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "3", "TST", "USE", "UNCHANGED_process.argv"));
-//		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "USE", "MOVED_console"));
-//		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "USE", "MOVED_console.log"));
-//		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "USE", "MOVED_x"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "PROTECT", "x_FALSEY_NE_IR"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
