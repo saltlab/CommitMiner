@@ -22,6 +22,7 @@ public interface IAbstractState {
 
 	/**
 	 * Joins two {@code AbstractLatticeElement}s with LUB
+	 * @param The abstract state. May be null.
 	 * @return The joined lattice element.
 	 */
 	public IAbstractState join(IAbstractState as);

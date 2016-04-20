@@ -65,7 +65,7 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 
 			/* Join the lattice elements from the current edge and 'from'
 			 * node. */
-			IAbstractState as = state.edge.getAS().join(state.le);
+			IAbstractState as = state.le.join(state.edge.getAS());
 			state.edge.setAS(as);
 
 			/* Transfer the abstract state over the edge. */
@@ -73,7 +73,7 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 
 			/* Join the abstract states from the 'to' node and current
 			 * edge. */
-			as = state.edge.getTo().getAS().join(as);
+			as = as.join(state.edge.getTo().getAS());
 			state.edge.getTo().setAS(as);
 
 			/* Add all unvisited edges to the stack.

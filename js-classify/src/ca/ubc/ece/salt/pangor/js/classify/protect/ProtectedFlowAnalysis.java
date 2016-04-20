@@ -86,7 +86,7 @@ public class ProtectedFlowAnalysis extends FlowAnalysis {
 		for(LatticeElement le : as.latticeElements.keySet()) {
 			ProtectedLatticeElement ple = as.latticeElements.get(le);
 
-			IPredicate predicate = Factory.BASIC.createPredicate("SpecialType", 4);
+			IPredicate predicate = Factory.BASIC.createPredicate("SpecialType", 8);
 			IRelation relation = facts.get(predicate);
 			if(relation == null) {
 				IRelationFactory relationFactory = new SimpleRelationFactory();

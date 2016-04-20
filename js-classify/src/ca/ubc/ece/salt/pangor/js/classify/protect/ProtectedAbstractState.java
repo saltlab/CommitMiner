@@ -112,6 +112,8 @@ public class ProtectedAbstractState implements IAbstractState {
 	@Override
 	public ProtectedAbstractState join(IAbstractState ias) {
 
+		if(ias == null) ias = new ProtectedAbstractState(); // le = BOTTOM if null
+
 		if(!(ias instanceof ProtectedAbstractState)) throw new IllegalArgumentException("Need a ProtectedAbstractState.");
 
 		ProtectedAbstractState as = (ProtectedAbstractState)ias;
