@@ -13,7 +13,7 @@ public class ProtectedLatticeElement {
 
 	public ProtectedLatticeElement() {
 		this.element = Element.BOTTOM;
-		this.change = Change.NA;
+		this.change = Change.BOTTOM;
 	}
 
 	public ProtectedLatticeElement(Element element, Change change) {
@@ -42,19 +42,43 @@ public class ProtectedLatticeElement {
 	public static ProtectedLatticeElement join(ProtectedLatticeElement left,
 										  ProtectedLatticeElement right) {
 
-		if(left.element == Element.BOTTOM)
-			return new ProtectedLatticeElement(right.element, right.change);
+		/* Join the type lattice and the change lattice. */
+		return new ProtectedLatticeElement(join(left.element, right.element), join(left.change, right.change));
 
-		if(right.element == Element.BOTTOM)
-			return new ProtectedLatticeElement(left.element, left.change);
+	}
 
-		if(left.element.equals(right.element))
-			return new ProtectedLatticeElement(left.element, left.change);
+	/**
+	 * Joins to elements from the type lattice.
+	 */
+	private static Element join(Element left, Element right) {
 
-		if(left.element != right.element)
-			return new ProtectedLatticeElement(Element.UNKNOWN, Change.NA);
+		if(left == Element.BOTTOM)
+			return right;
 
-		return new ProtectedLatticeElement(left.element, Change.IR_U);
+		if(right == Element.BOTTOM)
+			return left;
+
+		if(left.equals(right))
+			return left;
+
+		return Element.UNKNOWN;
+	}
+
+	/**
+	 * Joins to elements from the change lattice.
+	 */
+	private static Change join(Change left, Change right) {
+
+		if(left == Change.BOTTOM)
+			return right;
+
+		if(right == Change.BOTTOM)
+			return left;
+
+		if(left.equals(right))
+			return left;
+
+		return Change.IR_U;
 
 	}
 
@@ -84,10 +108,10 @@ public class ProtectedLatticeElement {
 	}
 
 	public enum Change {
-		NA,				// Type status unknown, so change information irrelevant.
 		IR,				// Inserted or Removed (depending on src or dst file analysis).
 		U,				// Unchanged.
-		IR_U			// Prior paths include changed and unchanged information.
+		IR_U,			// Prior paths include changed and unchanged information.
+		BOTTOM
 	}
 
 }
