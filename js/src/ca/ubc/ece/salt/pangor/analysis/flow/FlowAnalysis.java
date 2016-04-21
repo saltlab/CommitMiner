@@ -76,6 +76,9 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 			as = as.join(state.edge.getTo().getAS());
 			state.edge.getTo().setAS(as);
 
+			/* Transfer the abstract state over the node. */
+			as = as.transfer(state.edge.getTo());
+
 			/* Add all unvisited edges to the stack.
 			 * We currently only execute loops once. */
 			for(CFGEdge edge : state.edge.getTo().getEdges()) {

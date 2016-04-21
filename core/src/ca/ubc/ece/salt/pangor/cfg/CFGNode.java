@@ -79,18 +79,29 @@ public class CFGNode {
 	}
 
 	/**
+	 * @return true if this node already contains an edge with this condition.
+	 */
+	private CFGEdge getEdge(ClassifiedASTNode condition) {
+		for(CFGEdge existing : this.edges) {
+			if(condition == existing.getCondition()) return existing;
+		}
+		return null;
+	}
+
+	/**
 	 * Add an edge to this node. If an edge with the same condition already
 	 * exists, that edge will be overwritten.
 	 * @param condition The condition for which we traverse the edge.
 	 * @param node The node at the other end of this edge.
 	 */
 	public void addEdge(ClassifiedASTNode condition, CFGNode node) {
-		CFGEdge edge = new CFGEdge(condition, this, node);
-		int index = this.edges.indexOf(edge);
-		if(index >= 0) {
-			this.edges.get(index).setTo(node);
+		CFGEdge edge = this.getEdge(condition);
+
+		if(edge != null)  {
+			edge.setTo(node);
 		}
 		else {
+			edge = new CFGEdge(condition, this, node);
             this.edges.add(new CFGEdge(condition, this, node));
 		}
 	}
@@ -102,12 +113,13 @@ public class CFGNode {
 	 * @param node The node at the other end of this edge.
 	 */
 	public void addEdge(ClassifiedASTNode condition, CFGNode node, boolean loopEdge) {
-		CFGEdge edge = new CFGEdge(condition, this, node, loopEdge);
-		int index = this.edges.indexOf(edge);
-		if(index >= 0) {
-			this.edges.get(index).setTo(node);
+		CFGEdge edge = this.getEdge(condition);
+
+		if(edge != null)  {
+			edge.setTo(node);
 		}
 		else {
+			edge = new CFGEdge(condition, this, node);
             this.edges.add(new CFGEdge(condition, this, node, loopEdge));
 		}
 	}
@@ -118,9 +130,10 @@ public class CFGNode {
 	 * @param edge The edge to add.
 	 */
 	public void addEdge(CFGEdge edge) {
-		int index = this.edges.indexOf(edge);
-		if(index >= 0) {
-			this.edges.get(index).setTo(edge.getTo());
+		CFGEdge existing = this.getEdge(edge.getCondition());
+
+		if(existing != null)  {
+			existing.setTo(edge.getTo());
 		}
 		else {
             this.edges.add(edge);

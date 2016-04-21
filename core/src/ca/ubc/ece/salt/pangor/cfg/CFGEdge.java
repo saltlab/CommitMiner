@@ -138,19 +138,18 @@ public class CFGEdge {
 		CFGEdge.idGen = 0;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if(o instanceof CFGEdge) {
-			return ((CFGEdge)o).condition == this.condition;
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		assert false : "hashCode not designed";
-		return 42; // any arbitrary constant will do
-	}
+//	@Override
+//	public boolean equals(Object o) {
+//		if(o instanceof CFGEdge) {
+//			return ((CFGEdge)o).condition == this.condition;
+//		}
+//		return false;
+//	}
+//
+//	@Override
+//	public int hashCode() {
+//		return new Long(this.id).hashCode();
+//	}
 
 	@Override
 	public String toString() {
