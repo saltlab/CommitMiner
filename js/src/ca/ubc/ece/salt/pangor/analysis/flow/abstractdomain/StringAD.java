@@ -43,7 +43,11 @@ public class StringAD implements IAbstractDomain{
 
 	private LatticeElement le;
 
-	public StringAD(LatticeElement le) {
+	public StringAD() {
+		this.le = this.TOP;
+	}
+
+	private StringAD(LatticeElement le) {
 		this.le = le;
 	}
 

@@ -18,7 +18,11 @@ public class NumberAD implements IAbstractDomain{
 
 	private LatticeElement le;
 
-	public NumberAD(LatticeElement le) {
+	public NumberAD() {
+		this.le = LatticeElement.TOP;
+	}
+
+	private NumberAD(LatticeElement le) {
 		this.le = le;
 	}
 

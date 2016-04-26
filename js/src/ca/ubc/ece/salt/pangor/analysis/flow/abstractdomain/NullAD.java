@@ -18,7 +18,11 @@ public class NullAD implements IAbstractDomain{
 
 	private LatticeElement le;
 
-	public NullAD(LatticeElement le) {
+	public NullAD() {
+		this.le = LatticeElement.TOP;
+	}
+
+	private NullAD(LatticeElement le) {
 		this.le = le;
 	}
 

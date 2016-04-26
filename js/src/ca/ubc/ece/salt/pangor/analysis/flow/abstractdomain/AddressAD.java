@@ -16,24 +16,28 @@ public class AddressAD implements IAbstractDomain {
 	/** The possible addresses this points to. **/
 	Set<Address> addresses;
 
-	public AddressAD(Set<Address> addresses) {
+	public AddressAD() {
+		this.addresses = new HashSet<Address>();
+	}
+
+	private AddressAD(Set<Address> addresses) {
 		this.addresses = addresses;
 	}
 
 	@Override
-	public IAbstractDomain transfer(CFGEdge edge) {
+	public AddressAD transfer(CFGEdge edge) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public IAbstractDomain transfer(CFGNode node) {
+	public AddressAD transfer(CFGNode node) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public IAbstractDomain join(IAbstractDomain istate) {
+	public AddressAD join(IAbstractDomain istate) {
 		if(!(istate instanceof AddressAD)) throw new IllegalArgumentException("Attempted to join " + istate.getClass().getName() + " with " + AddressAD.class.getName());
 		AddressAD state = (AddressAD) istate;
 

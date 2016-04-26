@@ -18,7 +18,11 @@ public class BooleanAD implements IAbstractDomain{
 
 	private LatticeElement le;
 
-	public BooleanAD(LatticeElement le) {
+	public BooleanAD() {
+		this.le = LatticeElement.TOP;
+	}
+
+	private BooleanAD(LatticeElement le) {
 		this.le = le;
 	}
 

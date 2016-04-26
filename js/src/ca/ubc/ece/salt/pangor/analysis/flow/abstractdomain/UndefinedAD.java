@@ -18,7 +18,11 @@ public class UndefinedAD implements IAbstractDomain{
 
 	private LatticeElement le;
 
-	public UndefinedAD(LatticeElement le) {
+	public UndefinedAD() {
+		this.le = LatticeElement.TOP;
+	}
+
+	private UndefinedAD(LatticeElement le) {
 		this.le = le;
 	}
 
