@@ -134,9 +134,9 @@ public class ClassifierFeatureVector extends FeatureVector {
 			ClassifierFeatureVector sa = (ClassifierFeatureVector)o;
 			if(this.commit.equals(sa.commit)
 					&& this.version.equals(sa.version)
-					&& this.method.equals(sa.method)
 					&& this.klass.equals(sa.klass)
 					&& this.method.equals(sa.method)
+					&& this.line.equals(sa.line)
 					&& this.type.equals(sa.type)
 					&& this.subtype.equals(sa.subtype)
 					&& this.description.equals(sa.description)) return true;

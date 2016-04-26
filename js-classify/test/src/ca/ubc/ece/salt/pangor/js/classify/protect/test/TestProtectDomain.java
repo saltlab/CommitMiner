@@ -97,9 +97,9 @@ public class TestProtectDomain {
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
 		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "7", "TST", "PROTECT", "a_FALSEY_NE_IR"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "9", "TST", "PROTECT", "a_FALSEY_NE_IR"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "10", "TST", "PROTECT", "a_FALSEY_NE_IR"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "11", "TST", "PROTECT", "a_FALSEY_NE_IR"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "9", "TST", "PROTECT", "a_FALSEY_UNKNOWN_IR"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "10", "TST", "PROTECT", "a_FALSEY_UNKNOWN_IR"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "11", "TST", "PROTECT", "a_FALSEY_UNKNOWN_IR"));
 		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "10", "TST", "PROTECT", "b_FALSEY_NE_IR"));
 		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "10", "TST", "PROTECT", "c_FALSEY_NE_IR"));
 		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "11", "TST", "PROTECT", "b_FALSEY_NE_IR"));
