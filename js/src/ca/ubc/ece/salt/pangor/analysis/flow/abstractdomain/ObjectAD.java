@@ -18,7 +18,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 public class ObjectAD implements IAbstractDomain {
 
 	/** Programmer-visible object properties. **/
-	private Map<String, BaseValue> externalProperties;
+	private Map<String, BValue> externalProperties;
 
 	/** Interpreter-only properties which are invisible to the programmer. **/
 	private InternalObjectProperties internalProperties;
@@ -37,7 +37,7 @@ public class ObjectAD implements IAbstractDomain {
 	 * @param definitelyPresentProperties Properties which are definitely
 	 * 									  present in the object.
 	 */
-	public ObjectAD(Map<String, BaseValue> externalProperties,
+	public ObjectAD(Map<String, BValue> externalProperties,
 					InternalObjectProperties internalProperties,
 					Set<String> definitelyPresentProperties) {
 		this.externalProperties = externalProperties;
@@ -71,13 +71,13 @@ public class ObjectAD implements IAbstractDomain {
 		 * constructor or the prototype of Object (if defined as an object
 		 * literal).
 		 */
-		public AddressAD prototype;
+		public Address prototype;
 
 		/** The type of object. This is the "based on the constructor
 		 * function's object address" [notJS Concrete Semantics]. **/
 		public Class klass;
 
-		public InternalObjectProperties(AddressAD prototype, Class klass) {
+		public InternalObjectProperties(Address prototype, Class klass) {
 			this.prototype = prototype;
 			this.klass = klass;
 		}
@@ -100,7 +100,7 @@ public class ObjectAD implements IAbstractDomain {
 		/** The environments in the closure. **/
 		public Stack<Environment> closures;
 
-		public InternalFunctionProperties(AddressAD prototype, CFG cfg, Stack<Environment> closures) {
+		public InternalFunctionProperties(Address prototype, CFG cfg, Stack<Environment> closures) {
 			super(prototype, Class.FUNCTION);
 			this.cfg = cfg;
 			this.closures = closures;

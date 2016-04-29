@@ -24,7 +24,7 @@ import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
  *
  * Loops are executed once.
  *
- * NOTE: This class only works with the Mozilla Rhino IAbstractDomainT.
+ * NOTE: This class only works with the Mozilla Rhino IAbstractDomain.
  *
  * @param <IAbstractDomain> The abstract state that stores the analysis information.
  */
@@ -60,32 +60,32 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 		/* Break when the analysis time reaches some limit. */
 		while(!stack.isEmpty() && edgesVisited < 100000) {
 
-			PathState state = stack.pop();
+			PathState pathState = stack.pop();
 			edgesVisited++;
 
 			/* Join the lattice elements from the current edge and 'from'
 			 * node. */
-			IAbstractDomain as = state.le.join(state.edge.getState());
-			state.edge.setState(as);
+			IAbstractDomain state = pathState.state.join(pathState.edge.getState());
+			pathState.edge.setState(state);
 
 			/* Transfer the abstract state over the edge. */
-			as = as.transfer(state.edge);
+			state = state.transfer(pathState.edge);
 
 			/* Join the abstract states from the 'to' node and current
 			 * edge. */
-			as = as.join(state.edge.getTo().getState());
-			state.edge.getTo().setState(as);
+			state = state.join(pathState.edge.getTo().getState());
+			pathState.edge.getTo().setState(state);
 
 			/* Transfer the abstract state over the node. */
-			as = as.transfer(state.edge.getTo());
+			state = state.transfer(pathState.edge.getTo());
 
 			/* Add all unvisited edges to the stack.
 			 * We currently only execute loops once. */
-			for(CFGEdge edge : state.edge.getTo().getEdges()) {
-				if(!state.visited.contains(edge)) {
-					Set<CFGEdge> newVisited = new HashSet<CFGEdge>(state.visited);
+			for(CFGEdge edge : pathState.edge.getTo().getEdges()) {
+				if(!pathState.visited.contains(edge)) {
+					Set<CFGEdge> newVisited = new HashSet<CFGEdge>(pathState.visited);
 					newVisited.add(edge);
-					PathState newState = new PathState(edge, newVisited, as);
+					PathState newState = new PathState(edge, newVisited, state);
 					stack.push(newState);
 				}
 			}
@@ -104,12 +104,12 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 
 		public CFGEdge edge;
 		public Set<CFGEdge> visited;
-		public IAbstractDomain le;
+		public IAbstractDomain state;
 
-		public PathState (CFGEdge edge, Set<CFGEdge> visited, IAbstractDomain le) {
+		public PathState (CFGEdge edge, Set<CFGEdge> visited, IAbstractDomain state) {
 			this.edge = edge;
 			this.visited = visited;
-			this.le = le;
+			this.state = state;
 		}
 
 	}

@@ -53,4 +53,18 @@ public class NumberAD implements IAbstractDomain{
 		BOTTOM
 	}
 
+	/**
+	 * @return the top lattice element
+	 */
+	public static NumberAD top() {
+		return new NumberAD(LatticeElement.TOP);
+	}
+
+	/**
+	 * @return the bottom lattice element
+	 */
+	public static NumberAD bottom() {
+		return new NumberAD(LatticeElement.BOTTOM);
+	}
+
 }

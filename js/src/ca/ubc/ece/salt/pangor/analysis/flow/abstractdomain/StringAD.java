@@ -48,6 +48,10 @@ public class StringAD implements IAbstractDomain{
 		this.le = this.TOP;
 	}
 
+	private StringAD(LatticeElementType let, String value) {
+		this.le = new LatticeElement(let, value);
+	}
+
 	private StringAD(LatticeElement le) {
 		this.le = le;
 	}
@@ -153,6 +157,20 @@ public class StringAD implements IAbstractDomain{
 		SNOTNUMNORSPL,
 		SSPL,
 		BOTTOM
+	}
+
+	/**
+	 * @return the top lattice element
+	 */
+	public static StringAD top() {
+		return new StringAD(LatticeElementType.TOP, null);
+	}
+
+	/**
+	 * @return the bottom lattice element
+	 */
+	public static StringAD bottom() {
+		return new StringAD(LatticeElementType.BOTTOM, null);
 	}
 
 }

@@ -37,19 +37,19 @@ public class Environment implements IAbstractDomain {
 	}
 
 	@Override
-	public IAbstractDomain transfer(CFGEdge edge) {
+	public Environment transfer(CFGEdge edge) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public IAbstractDomain transfer(CFGNode node) {
+	public Environment transfer(CFGNode node) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public IAbstractDomain join(IAbstractDomain ad) {
+	public Environment join(IAbstractDomain ad) {
 		// TODO Auto-generated method stub
 		return null;
 	}

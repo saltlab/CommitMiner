@@ -16,6 +16,10 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
  * Domains" and might have implications for making some context-sensitivities
  * tractable. For our specialized purpose (our analysis is constrained to one
  * file), this is probably not needed.
+ *
+ * For function calls, what we can do is create a new variable in the
+ * environment of the caller for the return value. The address of the return
+ * value in the store and the continuation node will be passed to the callee.
  */
 public class Continuation implements IAbstractDomain {
 

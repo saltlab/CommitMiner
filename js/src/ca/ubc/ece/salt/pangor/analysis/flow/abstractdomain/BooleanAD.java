@@ -53,4 +53,18 @@ public class BooleanAD implements IAbstractDomain{
 		BOTTOM
 	}
 
+	/**
+	 * @return the top lattice element
+	 */
+	public static BooleanAD top() {
+		return new BooleanAD(LatticeElement.TOP);
+	}
+
+	/**
+	 * @return the bottom lattice element
+	 */
+	public static BooleanAD bottom() {
+		return new BooleanAD(LatticeElement.BOTTOM);
+	}
+
 }

@@ -53,4 +53,18 @@ public class NullAD implements IAbstractDomain{
 		BOTTOM
 	}
 
+	/**
+	 * @return the top lattice element
+	 */
+	public static NullAD top() {
+		return new NullAD(LatticeElement.TOP);
+	}
+
+	/**
+	 * @return the bottom lattice element
+	 */
+	public static NullAD bottom() {
+		return new NullAD(LatticeElement.BOTTOM);
+	}
+
 }

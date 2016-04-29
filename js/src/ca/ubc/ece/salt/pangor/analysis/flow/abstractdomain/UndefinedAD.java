@@ -53,4 +53,18 @@ public class UndefinedAD implements IAbstractDomain{
 		BOTTOM
 	}
 
+	/**
+	 * @return the top lattice element
+	 */
+	public static UndefinedAD top() {
+		return new UndefinedAD(LatticeElement.TOP);
+	}
+
+	/**
+	 * @return the bottom lattice element
+	 */
+	public static UndefinedAD bottom() {
+		return new UndefinedAD(LatticeElement.BOTTOM);
+	}
+
 }
