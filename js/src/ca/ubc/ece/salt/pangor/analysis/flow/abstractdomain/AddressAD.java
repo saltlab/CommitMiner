@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.Address;
+import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 

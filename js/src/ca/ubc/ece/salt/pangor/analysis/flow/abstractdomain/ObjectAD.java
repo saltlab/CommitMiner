@@ -1,38 +1,49 @@
-package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.object;
+package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.AddressAD;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BaseValue;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.IAbstractDomain;
+import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 
 /**
  * The abstract domain for objects. An object is represented as
- * 	(1) a mapping of properties to values
- * 	(2) a list of properties that definitely exist
- * 	(3) a mapping of properties to class-specific values. The mapping is
- * 		String->(BValue# + Class + P(Closure)). For example, a function
- * 		mapping looks like:
- * 		[funct name]->([address] + function + {list of closures})
+ * 	(1) a map of programmer-accessible properties
+ * 	(2) a set of interpreter-only properties
+ * 	(3) a list of properties that are definitely present.
  */
 public class ObjectAD implements IAbstractDomain {
 
 	/** Programmer-visible object properties. **/
 	private Map<String, BaseValue> externalProperties;
 
-	/**
-	 * Programmer-invisible object properties which are used by the
-	 * interpreter */
+	/** Interpreter-only properties which are invisible to the programmer. **/
 	private InternalObjectProperties internalProperties;
 
 	/** Tracks properties that definitely exist in the object. **/
 	private Set<String> definitelyPresentProperties;
+
+	/**
+	 * Initialize the object. The initial store will contain a number of
+	 * build-in objects which will be initialized from a template. The
+	 * remainder of objects will be defined by the program and instantiated
+	 * during the analysis.
+	 * @param externalProperties Programmer-visible object properties.
+	 * @param internalProperties Interpreter-only properties which are
+	 * 							 invisible to the programmer.
+	 * @param definitelyPresentProperties Properties which are definitely
+	 * 									  present in the object.
+	 */
+	public ObjectAD(Map<String, BaseValue> externalProperties,
+					InternalObjectProperties internalProperties,
+					Set<String> definitelyPresentProperties) {
+		this.externalProperties = externalProperties;
+		this.internalProperties = internalProperties;
+		this.definitelyPresentProperties = definitelyPresentProperties;
+	}
 
 	@Override
 	public IAbstractDomain transfer(CFGEdge edge) {

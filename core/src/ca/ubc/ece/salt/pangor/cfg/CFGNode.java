@@ -4,10 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractState;
+import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
 
 /**
- * A control flow graph node. Thread safe.
+ * A control flow graph node and abstract state for flow analysis.
  */
 public class CFGNode {
 
@@ -31,11 +31,11 @@ public class CFGNode {
 	private CFGNode mappedNode;
 
 	/**
-	 * The abstract state at this point in the program. The AS has not yet
-	 * been transfered over the node. The element will be converted to a fact
-	 * about this point in the program once the analysis has finished.
+	 * The state of the environment and store. Note that at this point the
+	 * state has not yet been transfered over the term (statement) in this
+	 * node. The state is language dependent.
 	 */
-	private IAbstractState as;
+	private IAbstractDomain state;
 
 	/**
 	 * @param statement The statement that is executed when this node is
@@ -47,7 +47,7 @@ public class CFGNode {
 		this.id = CFGNode.getUniqueId();
 		this.name = null;
 		this.setMappedNode(null);
-		this.as = null;
+		this.state = null;
 	}
 
 	/**
@@ -60,22 +60,22 @@ public class CFGNode {
 		this.statement = statement;
 		this.id = CFGNode.getUniqueId();
 		this.name = name;
-		this.as = null;
+		this.state = null;
 	}
 
 	/**
 	 * Set the lattice element at this point in the program.
 	 * @param as The abstract state.
 	 */
-	public void setAS(IAbstractState as) {
-		this.as = as;
+	public void setState(IAbstractDomain state) {
+		this.state = state;
 	}
 
 	/**
 	 * @return the abstract state at this point in the program.
 	 */
-	public IAbstractState getAS() {
-		return this.as;
+	public IAbstractDomain getState() {
+		return this.state;
 	}
 
 	/**

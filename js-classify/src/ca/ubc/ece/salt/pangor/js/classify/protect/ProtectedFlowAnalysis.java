@@ -52,7 +52,7 @@ public class ProtectedFlowAnalysis extends FlowAnalysis {
 			CFGNode node = stack.pop();
 
 			/* Register facts from the node. */
-			registerFacts((AstNode)node.getStatement(), node.getAS(), facts,
+			registerFacts((AstNode)node.getStatement(), node.getState(), facts,
 						  sourceCodeFileChange);
 
 			for(CFGEdge edge : node.getEdges()) {
@@ -60,7 +60,7 @@ public class ProtectedFlowAnalysis extends FlowAnalysis {
 
 					/* Register facts from the edge. */
 					if(edge.getCondition() != null)
-						registerFacts((AstNode)edge.getCondition(), node.getAS(), facts,
+						registerFacts((AstNode)edge.getCondition(), node.getState(), facts,
 									  sourceCodeFileChange);
 
 					stack.push(edge.getTo());

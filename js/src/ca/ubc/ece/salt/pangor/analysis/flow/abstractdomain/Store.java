@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.Address;
+import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
 
 /**
  * The abstract domain for the program's store (memory).

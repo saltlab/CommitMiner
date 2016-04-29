@@ -6,6 +6,7 @@ import java.util.Map;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.Address;
+import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 

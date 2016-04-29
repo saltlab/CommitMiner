@@ -24,9 +24,9 @@ import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
  *
  * Loops are executed once.
  *
- * NOTE: This class only works with the Mozilla Rhino IAbstractStateT.
+ * NOTE: This class only works with the Mozilla Rhino IAbstractDomainT.
  *
- * @param <IAbstractState> The abstract state that stores the analysis information.
+ * @param <IAbstractDomain> The abstract state that stores the analysis information.
  */
 public abstract class FlowAnalysis extends FunctionAnalysis {
 
@@ -34,7 +34,7 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 	 * @param function The function under analysis.
 	 * @return an initialized lattice element for the function.
 	 */
-	public abstract IAbstractState entryValue(ScriptNode function);
+	public abstract IAbstractDomain entryValue(ScriptNode function);
 
 	public abstract void createFacts(SourceCodeFileChange sourceCodeFileChange,
 			Map<IPredicate, IRelation> facts,
@@ -52,7 +52,7 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 
 		/* Initialize the stack for a depth-first traversal. */
 		Stack<PathState> stack = new Stack<PathState>();
-		IAbstractState initialState = this.entryValue((ScriptNode)cfg.getEntryNode().getStatement());
+		IAbstractDomain initialState = this.entryValue((ScriptNode)cfg.getEntryNode().getStatement());
 		for(CFGEdge edge : cfg.getEntryNode().getEdges()) {
 			stack.add(new PathState(edge, new HashSet<CFGEdge>(), initialState));
 		}
@@ -65,16 +65,16 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 
 			/* Join the lattice elements from the current edge and 'from'
 			 * node. */
-			IAbstractState as = state.le.join(state.edge.getAS());
-			state.edge.setAS(as);
+			IAbstractDomain as = state.le.join(state.edge.getState());
+			state.edge.setState(as);
 
 			/* Transfer the abstract state over the edge. */
 			as = as.transfer(state.edge);
 
 			/* Join the abstract states from the 'to' node and current
 			 * edge. */
-			as = as.join(state.edge.getTo().getAS());
-			state.edge.getTo().setAS(as);
+			as = as.join(state.edge.getTo().getState());
+			state.edge.getTo().setState(as);
 
 			/* Transfer the abstract state over the node. */
 			as = as.transfer(state.edge.getTo());
@@ -104,9 +104,9 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 
 		public CFGEdge edge;
 		public Set<CFGEdge> visited;
-		public IAbstractState le;
+		public IAbstractDomain le;
 
-		public PathState (CFGEdge edge, Set<CFGEdge> visited, IAbstractState le) {
+		public PathState (CFGEdge edge, Set<CFGEdge> visited, IAbstractDomain le) {
 			this.edge = edge;
 			this.visited = visited;
 			this.le = le;

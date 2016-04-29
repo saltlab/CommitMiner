@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
+package ca.ubc.ece.salt.pangor.analysis.flow;
 
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
