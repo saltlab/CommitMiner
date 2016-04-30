@@ -1,8 +1,5 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
-import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
-import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 
 /**
  * Stores the state for the null type abstract domain.
@@ -15,7 +12,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
  *
  * TODO: Add change information to the lattice element.
  */
-public class NullAD implements IAbstractDomain{
+public class NullAD {
 
 	private LatticeElement le;
 
@@ -27,30 +24,28 @@ public class NullAD implements IAbstractDomain{
 		this.le = le;
 	}
 
-	@Override
-	public NullAD transfer(CFGEdge edge) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public NullAD transfer(CFGNode node) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public NullAD join(IAbstractDomain istate) {
-		if(!(istate instanceof NullAD)) throw new IllegalArgumentException("Attempted to join " + istate.getClass().getName() + " with " + NullAD.class.getName());
-		NullAD state = (NullAD) istate;
+	/**
+	 * Joins this null with another null.
+	 * @param state The null to join with.
+	 * @return A new null that is the join of the two nulls.
+	 */
+	public NullAD join(NullAD state) {
 		if(this.le == state.le) return new NullAD(this.le);
 		return new NullAD(LatticeElement.BOTTOM);
 	}
 
-	/** The lattice elements for the abstract domain. **/
-	public enum LatticeElement {
-		TOP,
-		BOTTOM
+	/**
+	 * @param nll The null lattice element to inject.
+	 * @return The base value tuple with injected null.
+	 */
+	public BValue inject(NullAD nll) {
+		return new BValue(
+				StringAD.bottom(),
+				NumberAD.bottom(),
+				BooleanAD.bottom(),
+				nll,
+				UndefinedAD.bottom(),
+				Addresses.bottom());
 	}
 
 	/**
@@ -65,6 +60,12 @@ public class NullAD implements IAbstractDomain{
 	 */
 	public static NullAD bottom() {
 		return new NullAD(LatticeElement.BOTTOM);
+	}
+
+	/** The lattice elements for the abstract domain. **/
+	public enum LatticeElement {
+		TOP,
+		BOTTOM
 	}
 
 }

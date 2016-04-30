@@ -1,8 +1,5 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
-import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
-import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 
 /**
  * Stores the state for the undefined type abstract domain.
@@ -15,7 +12,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
  *
  * TODO: Add change information to the lattice element.
  */
-public class UndefinedAD implements IAbstractDomain{
+public class UndefinedAD {
 
 	private LatticeElement le;
 
@@ -27,30 +24,28 @@ public class UndefinedAD implements IAbstractDomain{
 		this.le = le;
 	}
 
-	@Override
-	public UndefinedAD transfer(CFGEdge edge) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public UndefinedAD transfer(CFGNode node) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public UndefinedAD join(IAbstractDomain istate) {
-		if(!(istate instanceof UndefinedAD)) throw new IllegalArgumentException("Attempted to join " + istate.getClass().getName() + " with " + UndefinedAD.class.getName());
-		UndefinedAD state = (UndefinedAD) istate;
+	/**
+	 * Joins this undefined with another undefined.
+	 * @param state The undefined to join with.
+	 * @return A new undefined that is the join of the two addresses.
+	 */
+	public UndefinedAD join(UndefinedAD state) {
 		if(this.le == state.le) return new UndefinedAD(this.le);
 		return new UndefinedAD(LatticeElement.BOTTOM);
 	}
 
-	/** The lattice elements for the abstract domain. **/
-	public enum LatticeElement {
-		TOP,
-		BOTTOM
+	/**
+	 * @param undefined The undefined lattice element to inject.
+	 * @return The base value tuple with injected undefined.
+	 */
+	public BValue inject(UndefinedAD undefined) {
+		return new BValue(
+				StringAD.bottom(),
+				NumberAD.bottom(),
+				BooleanAD.bottom(),
+				NullAD.bottom(),
+				undefined,
+				Addresses.bottom());
 	}
 
 	/**
@@ -65,6 +60,12 @@ public class UndefinedAD implements IAbstractDomain{
 	 */
 	public static UndefinedAD bottom() {
 		return new UndefinedAD(LatticeElement.BOTTOM);
+	}
+
+	/** The lattice elements for the abstract domain. **/
+	public enum LatticeElement {
+		TOP,
+		BOTTOM
 	}
 
 }

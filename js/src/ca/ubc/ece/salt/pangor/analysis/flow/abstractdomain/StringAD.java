@@ -4,10 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
-import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
-import ca.ubc.ece.salt.pangor.cfg.CFGNode;
-
 /**
  * Stores the state for the number type abstract domain.
  * Lattice element is:
@@ -25,7 +21,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
  *
  * TODO: Add change information to the lattice element.
  */
-public class StringAD implements IAbstractDomain{
+public class StringAD {
 
 	/** The lattice (for LUB). **/
 	public final LatticeElement TOP = new LatticeElement(LatticeElementType.TOP, null);
@@ -44,10 +40,6 @@ public class StringAD implements IAbstractDomain{
 
 	private LatticeElement le;
 
-	public StringAD() {
-		this.le = this.TOP;
-	}
-
 	private StringAD(LatticeElementType let, String value) {
 		this.le = new LatticeElement(let, value);
 	}
@@ -56,22 +48,12 @@ public class StringAD implements IAbstractDomain{
 		this.le = le;
 	}
 
-	@Override
-	public StringAD transfer(CFGEdge edge) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringAD transfer(CFGNode node) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringAD join(IAbstractDomain istate) {
-		if(!(istate instanceof StringAD)) throw new IllegalArgumentException("Attempted to join " + istate.getClass().getName() + " with " + StringAD.class.getName());
-		StringAD state = (StringAD) istate;
+	/**
+	 * Joins this string with another string.
+	 * @param state The string to join with.
+	 * @return A new string that is the join of the two strings.
+	 */
+	public StringAD join(StringAD state) {
 
 		/* We need to handle three special cases because we don't store lattice
 		 * elements for every possible string. */
@@ -81,7 +63,37 @@ public class StringAD implements IAbstractDomain{
 
 		/* Compute LUB. */
 		return new StringAD(lub(this.le, state.le));
+
 	}
+
+	/**
+	 * @param string The string lattice element to inject.
+	 * @return The base value tuple with injected string.
+	 */
+	public BValue inject(StringAD string) {
+		return new BValue(
+				string,
+				NumberAD.bottom(),
+				BooleanAD.bottom(),
+				NullAD.bottom(),
+				UndefinedAD.bottom(),
+				Addresses.bottom());
+	}
+
+	/**
+	 * @return the top lattice element
+	 */
+	public static StringAD top() {
+		return new StringAD(LatticeElementType.TOP, null);
+	}
+
+	/**
+	 * @return the bottom lattice element
+	 */
+	public static StringAD bottom() {
+		return new StringAD(LatticeElementType.BOTTOM, null);
+	}
+
 
 	/**
 	 * @return the least upper bound for the two lattice elements.
@@ -157,20 +169,6 @@ public class StringAD implements IAbstractDomain{
 		SNOTNUMNORSPL,
 		SSPL,
 		BOTTOM
-	}
-
-	/**
-	 * @return the top lattice element
-	 */
-	public static StringAD top() {
-		return new StringAD(LatticeElementType.TOP, null);
-	}
-
-	/**
-	 * @return the bottom lattice element
-	 */
-	public static StringAD bottom() {
-		return new StringAD(LatticeElementType.BOTTOM, null);
 	}
 
 }

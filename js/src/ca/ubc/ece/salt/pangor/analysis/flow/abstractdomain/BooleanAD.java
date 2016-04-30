@@ -1,8 +1,5 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
-import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
-import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 
 /**
  * Stores the state for the boolean type abstract domain.
@@ -15,7 +12,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
  *
  * TODO: Add change information to the lattice element.
  */
-public class BooleanAD implements IAbstractDomain{
+public class BooleanAD {
 
 	private LatticeElement le;
 
@@ -27,30 +24,28 @@ public class BooleanAD implements IAbstractDomain{
 		this.le = le;
 	}
 
-	@Override
-	public BooleanAD transfer(CFGEdge edge) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public BooleanAD transfer(CFGNode node) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public BooleanAD join(IAbstractDomain istate) {
-		if(!(istate instanceof BooleanAD)) throw new IllegalArgumentException("Attempted to join " + istate.getClass().getName() + " with " + BooleanAD.class.getName());
-		BooleanAD state = (BooleanAD) istate;
+	/**
+	 * Joins this boolean with another boolean.
+	 * @param state The boolean to join with.
+	 * @return A new boolean that is the join of two booleans.
+	 */
+	public BooleanAD join(BooleanAD state) {
 		if(this.le == state.le) return new BooleanAD(this.le);
 		return new BooleanAD(LatticeElement.BOTTOM);
 	}
 
-	/** The lattice elements for the abstract domain. **/
-	public enum LatticeElement {
-		TOP,
-		BOTTOM
+	/**
+	 * @param bool The boolean lattice element to inject.
+	 * @return The base value tuple with injected boolean.
+	 */
+	public BValue inject(BooleanAD bool) {
+		return new BValue(
+				StringAD.bottom(),
+				NumberAD.bottom(),
+				bool,
+				NullAD.bottom(),
+				UndefinedAD.bottom(),
+				Addresses.bottom());
 	}
 
 	/**
@@ -66,5 +61,12 @@ public class BooleanAD implements IAbstractDomain{
 	public static BooleanAD bottom() {
 		return new BooleanAD(LatticeElement.BOTTOM);
 	}
+
+	/** The lattice elements for the abstract domain. **/
+	public enum LatticeElement {
+		TOP,
+		BOTTOM
+	}
+
 
 }

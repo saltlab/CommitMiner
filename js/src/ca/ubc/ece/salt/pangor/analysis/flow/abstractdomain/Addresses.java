@@ -60,8 +60,8 @@ public class Addresses {
 	}
 
 	/**
-	 * @param addresses The address abstract domain to inject.
-	 * @return The precise base value tuple.
+	 * @param addresses The address lattice element to inject.
+	 * @return The base value tuple with injected addresses.
 	 */
 	public BValue inject(Addresses addresses) {
 		return new BValue(
