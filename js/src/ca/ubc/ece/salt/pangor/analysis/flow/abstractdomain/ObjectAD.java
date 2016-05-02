@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -15,7 +14,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
  * 	(2) a set of interpreter-only properties
  * 	(3) a list of properties that are definitely present.
  */
-public class ObjectAD implements IAbstractDomain {
+public class ObjectAD {
 
 	/** Programmer-visible object properties. **/
 	private Map<String, BValue> externalProperties;
@@ -45,20 +44,17 @@ public class ObjectAD implements IAbstractDomain {
 		this.definitelyPresentProperties = definitelyPresentProperties;
 	}
 
-	@Override
-	public IAbstractDomain transfer(CFGEdge edge) {
+	public ObjectAD transfer(CFGEdge edge) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public IAbstractDomain transfer(CFGNode node) {
+	public ObjectAD transfer(CFGNode node) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public IAbstractDomain join(IAbstractDomain ad) {
+	public ObjectAD join(ObjectAD ad) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -11,7 +11,7 @@ public class Address {
 	/** The address. **/
 	private Long address;
 
-	private Address() {
+	public Address() {
 		this.address = Address.getUniqueAddress();
 	}
 

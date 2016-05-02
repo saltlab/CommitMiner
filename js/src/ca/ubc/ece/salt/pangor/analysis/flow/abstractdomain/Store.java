@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.Address;
-import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
 
 /**
  * The abstract domain for the program's store (memory).
@@ -12,8 +11,11 @@ import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
  */
 public class Store {
 
-	/** The data structures at each address. **/
-	private Map<Address, IAbstractDomain> store;
+	/** The store for {@code BValue}s. **/
+	private Map<Address, BValue> bValueStore;
+
+	/** The store for {@code Object}s. **/
+	private Map<Address, ObjectAD> objectStore;
 
 	/**
 	 * Create the initial state for the store. The initial state is an empty
@@ -29,11 +31,13 @@ public class Store {
 	public Store() {
 		/* Right now we only have an empty store. Future work is to initialize
 		 * the store with built-in objects. */
-		this.store = new HashMap<Address, IAbstractDomain>();
+		this.bValueStore = new HashMap<Address, BValue>();
 	}
 
-	private Store(Map<Address, IAbstractDomain> store) {
-		this.store = store;
+	private Store(Map<Address, BValue> bValueStore,
+				  Map<Address, ObjectAD> objectStore) {
+		this.bValueStore = bValueStore;
+		this.objectStore = objectStore;
 	}
 
 	/**
@@ -43,20 +47,30 @@ public class Store {
 
 		/* Just copy the values into a new hash map. The values are essentially
 		 * immutable since any transfer or join will produce a new value. */
-		Map<Address, IAbstractDomain> joined = new HashMap<Address, IAbstractDomain>(this.store);
+		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>(this.bValueStore);
+		Map<Address, ObjectAD> objectStore = new HashMap<Address, ObjectAD>(this.objectStore);
 
 		/* Join the new abstract domain with the new map. New lattice elements
 		 * are created for each join. */
-		for(Address address : state.store.keySet()) {
-			if(joined.containsKey(address)) {
-				joined.put(address, joined.get(address).join(state.store.get(address)));
+		for(Address address : state.bValueStore.keySet()) {
+			if(bValueStore.containsKey(address)) {
+				bValueStore.put(address, bValueStore.get(address).join(state.bValueStore.get(address)));
 			}
 			else {
-				joined.put(address, joined.get(address).join(new BValue()));
+				bValueStore.put(address, bValueStore.get(address));
 			}
 		}
 
-		return new Store(joined);
+		for(Address address : state.objectStore.keySet()) {
+			if(objectStore.containsKey(address)) {
+				objectStore.put(address, objectStore.get(address).join(state.objectStore.get(address)));
+			}
+			else {
+				objectStore.put(address, objectStore.get(address));
+			}
+		}
+
+		return new Store(bValueStore, objectStore);
 
 	}
 
@@ -66,7 +80,12 @@ public class Store {
 	 * @return The address of the value in the store.
 	 */
 	public Address alloc(BValue value) {
-		// TODO: Template
+
+		/* Allocate a new address. */
+		Address address = new Address();
+
+		this.bValueStore.put(address, value);
+
 		return null;
 	}
 
