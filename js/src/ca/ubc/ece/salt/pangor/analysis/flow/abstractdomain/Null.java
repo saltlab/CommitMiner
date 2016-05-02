@@ -12,15 +12,15 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
  *
  * TODO: Add change information to the lattice element.
  */
-public class NullAD {
+public class Null {
 
 	private LatticeElement le;
 
-	public NullAD() {
+	public Null() {
 		this.le = LatticeElement.TOP;
 	}
 
-	private NullAD(LatticeElement le) {
+	private Null(LatticeElement le) {
 		this.le = le;
 	}
 
@@ -29,37 +29,37 @@ public class NullAD {
 	 * @param state The null to join with.
 	 * @return A new null that is the join of the two nulls.
 	 */
-	public NullAD join(NullAD state) {
-		if(this.le == state.le) return new NullAD(this.le);
-		return new NullAD(LatticeElement.BOTTOM);
+	public Null join(Null state) {
+		if(this.le == state.le) return new Null(this.le);
+		return new Null(LatticeElement.BOTTOM);
 	}
 
 	/**
 	 * @param nll The null lattice element to inject.
 	 * @return The base value tuple with injected null.
 	 */
-	public BValue inject(NullAD nll) {
+	public BValue inject(Null nll) {
 		return new BValue(
-				StringAD.bottom(),
-				NumberAD.bottom(),
-				BooleanAD.bottom(),
+				Str.bottom(),
+				Number.bottom(),
+				Bool.bottom(),
 				nll,
-				UndefinedAD.bottom(),
+				Undefined.bottom(),
 				Addresses.bottom());
 	}
 
 	/**
 	 * @return the top lattice element
 	 */
-	public static NullAD top() {
-		return new NullAD(LatticeElement.TOP);
+	public static Null top() {
+		return new Null(LatticeElement.TOP);
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static NullAD bottom() {
-		return new NullAD(LatticeElement.BOTTOM);
+	public static Null bottom() {
+		return new Null(LatticeElement.BOTTOM);
 	}
 
 	/** The lattice elements for the abstract domain. **/

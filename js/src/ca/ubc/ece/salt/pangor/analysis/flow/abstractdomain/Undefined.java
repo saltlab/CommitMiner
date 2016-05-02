@@ -12,15 +12,15 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
  *
  * TODO: Add change information to the lattice element.
  */
-public class UndefinedAD {
+public class Undefined {
 
 	private LatticeElement le;
 
-	public UndefinedAD() {
+	public Undefined() {
 		this.le = LatticeElement.TOP;
 	}
 
-	private UndefinedAD(LatticeElement le) {
+	private Undefined(LatticeElement le) {
 		this.le = le;
 	}
 
@@ -29,21 +29,21 @@ public class UndefinedAD {
 	 * @param state The undefined to join with.
 	 * @return A new undefined that is the join of the two addresses.
 	 */
-	public UndefinedAD join(UndefinedAD state) {
-		if(this.le == state.le) return new UndefinedAD(this.le);
-		return new UndefinedAD(LatticeElement.BOTTOM);
+	public Undefined join(Undefined state) {
+		if(this.le == state.le) return new Undefined(this.le);
+		return new Undefined(LatticeElement.BOTTOM);
 	}
 
 	/**
 	 * @param undefined The undefined lattice element to inject.
 	 * @return The base value tuple with injected undefined.
 	 */
-	public BValue inject(UndefinedAD undefined) {
+	public BValue inject(Undefined undefined) {
 		return new BValue(
-				StringAD.bottom(),
-				NumberAD.bottom(),
-				BooleanAD.bottom(),
-				NullAD.bottom(),
+				Str.bottom(),
+				Number.bottom(),
+				Bool.bottom(),
+				Null.bottom(),
 				undefined,
 				Addresses.bottom());
 	}
@@ -51,15 +51,15 @@ public class UndefinedAD {
 	/**
 	 * @return the top lattice element
 	 */
-	public static UndefinedAD top() {
-		return new UndefinedAD(LatticeElement.TOP);
+	public static Undefined top() {
+		return new Undefined(LatticeElement.TOP);
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static UndefinedAD bottom() {
-		return new UndefinedAD(LatticeElement.BOTTOM);
+	public static Undefined bottom() {
+		return new Undefined(LatticeElement.BOTTOM);
 	}
 
 	/** The lattice elements for the abstract domain. **/

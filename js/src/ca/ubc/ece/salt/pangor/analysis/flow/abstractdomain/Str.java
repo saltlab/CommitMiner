@@ -21,7 +21,7 @@ import java.util.TreeSet;
  *
  * TODO: Add change information to the lattice element.
  */
-public class StringAD {
+public class Str {
 
 	/** The lattice (for LUB). **/
 	public final LatticeElement TOP = new LatticeElement(LatticeElementType.TOP, null);
@@ -40,11 +40,11 @@ public class StringAD {
 
 	private LatticeElement le;
 
-	private StringAD(LatticeElementType let, String value) {
+	private Str(LatticeElementType let, String value) {
 		this.le = new LatticeElement(let, value);
 	}
 
-	private StringAD(LatticeElement le) {
+	private Str(LatticeElement le) {
 		this.le = le;
 	}
 
@@ -53,16 +53,16 @@ public class StringAD {
 	 * @param state The string to join with.
 	 * @return A new string that is the join of the two strings.
 	 */
-	public StringAD join(StringAD state) {
+	public Str join(Str state) {
 
 		/* We need to handle three special cases because we don't store lattice
 		 * elements for every possible string. */
-		if(this.le == state.le) return new StringAD(this.le);
-		if(this.le.type == LatticeElementType.BOTTOM) return new StringAD(state.le);
-		if(state.le.type == LatticeElementType.BOTTOM) return new StringAD(this.le);
+		if(this.le == state.le) return new Str(this.le);
+		if(this.le.type == LatticeElementType.BOTTOM) return new Str(state.le);
+		if(state.le.type == LatticeElementType.BOTTOM) return new Str(this.le);
 
 		/* Compute LUB. */
-		return new StringAD(lub(this.le, state.le));
+		return new Str(lub(this.le, state.le));
 
 	}
 
@@ -70,28 +70,28 @@ public class StringAD {
 	 * @param string The string lattice element to inject.
 	 * @return The base value tuple with injected string.
 	 */
-	public BValue inject(StringAD string) {
+	public BValue inject(Str string) {
 		return new BValue(
 				string,
-				NumberAD.bottom(),
-				BooleanAD.bottom(),
-				NullAD.bottom(),
-				UndefinedAD.bottom(),
+				Number.bottom(),
+				Bool.bottom(),
+				Null.bottom(),
+				Undefined.bottom(),
 				Addresses.bottom());
 	}
 
 	/**
 	 * @return the top lattice element
 	 */
-	public static StringAD top() {
-		return new StringAD(LatticeElementType.TOP, null);
+	public static Str top() {
+		return new Str(LatticeElementType.TOP, null);
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static StringAD bottom() {
-		return new StringAD(LatticeElementType.BOTTOM, null);
+	public static Str bottom() {
+		return new Str(LatticeElementType.BOTTOM, null);
 	}
 
 

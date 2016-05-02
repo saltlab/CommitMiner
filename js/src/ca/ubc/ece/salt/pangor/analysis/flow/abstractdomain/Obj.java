@@ -14,7 +14,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
  * 	(2) a set of interpreter-only properties
  * 	(3) a list of properties that are definitely present.
  */
-public class ObjectAD {
+public class Obj {
 
 	/** Programmer-visible object properties. **/
 	private Map<String, BValue> externalProperties;
@@ -36,7 +36,7 @@ public class ObjectAD {
 	 * @param definitelyPresentProperties Properties which are definitely
 	 * 									  present in the object.
 	 */
-	public ObjectAD(Map<String, BValue> externalProperties,
+	public Obj(Map<String, BValue> externalProperties,
 					InternalObjectProperties internalProperties,
 					Set<String> definitelyPresentProperties) {
 		this.externalProperties = externalProperties;
@@ -44,17 +44,17 @@ public class ObjectAD {
 		this.definitelyPresentProperties = definitelyPresentProperties;
 	}
 
-	public ObjectAD transfer(CFGEdge edge) {
+	public Obj transfer(CFGEdge edge) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public ObjectAD transfer(CFGNode node) {
+	public Obj transfer(CFGNode node) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public ObjectAD join(ObjectAD ad) {
+	public Obj join(Obj ad) {
 		// TODO Auto-generated method stub
 		return null;
 	}

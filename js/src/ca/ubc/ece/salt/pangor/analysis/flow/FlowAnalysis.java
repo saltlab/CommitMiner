@@ -11,6 +11,7 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.js.analysis.FunctionAnalysis;
@@ -52,7 +53,8 @@ public abstract class FlowAnalysis extends FunctionAnalysis {
 
 		/* Initialize the stack for a depth-first traversal. */
 		Stack<PathState> stack = new Stack<PathState>();
-		IAbstractDomain initialState = this.entryValue((ScriptNode)cfg.getEntryNode().getStatement());
+		//IAbstractDomain initialState = this.entryValue((ScriptNode)cfg.getEntryNode().getStatement());
+		IAbstractDomain initialState = new State((ScriptNode)cfg.getEntryNode().getStatement());
 		for(CFGEdge edge : cfg.getEntryNode().getEdges()) {
 			stack.add(new PathState(edge, new HashSet<CFGEdge>(), initialState));
 		}

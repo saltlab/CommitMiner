@@ -9,26 +9,26 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 public class BValue {
 
 	/** The abstract domain for strings. **/
-	StringAD stringAD;
+	Str stringAD;
 
 	/** The abstract domain for numbers. **/
-	NumberAD numberAD;
+	Number numberAD;
 
 	/** The abstract domain for booleans. **/
-	BooleanAD booleanAD;
+	Bool booleanAD;
 
 	/** The abstract domain for null. **/
-	NullAD nullAD;
+	Null nullAD;
 
 	/** The abstract domain for undefined. **/
-	UndefinedAD undefinedAD;
+	Undefined undefinedAD;
 
 	/** The abstract domain for memory addresses. **/
 	Addresses addressAD;
 
-	public BValue(StringAD stringAD, NumberAD numberAD,
-					  BooleanAD booleanAD, NullAD nullAD,
-					  UndefinedAD undefinedAD, Addresses addressAD) {
+	public BValue(Str stringAD, Number numberAD,
+					  Bool booleanAD, Null nullAD,
+					  Undefined undefinedAD, Addresses addressAD) {
 		this.stringAD = stringAD;
 		this.numberAD = numberAD;
 		this.booleanAD = booleanAD;
@@ -54,11 +54,11 @@ public class BValue {
 	 */
 	public static BValue top() {
 		return new BValue(
-				StringAD.top(),
-				NumberAD.top(),
-				BooleanAD.top(),
-				NullAD.top(),
-				UndefinedAD.top(),
+				Str.top(),
+				Number.top(),
+				Bool.top(),
+				Null.top(),
+				Undefined.top(),
 				Addresses.top());
 	}
 
@@ -67,11 +67,11 @@ public class BValue {
 	 */
 	public static BValue bottom() {
 		return new BValue(
-				StringAD.bottom(),
-				NumberAD.bottom(),
-				BooleanAD.bottom(),
-				NullAD.bottom(),
-				UndefinedAD.bottom(),
+				Str.bottom(),
+				Number.bottom(),
+				Bool.bottom(),
+				Null.bottom(),
+				Undefined.bottom(),
 				Addresses.bottom());
 	}
 

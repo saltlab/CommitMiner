@@ -15,7 +15,7 @@ public class Store {
 	private Map<Address, BValue> bValueStore;
 
 	/** The store for {@code Object}s. **/
-	private Map<Address, ObjectAD> objectStore;
+	private Map<Address, Obj> objectStore;
 
 	/**
 	 * Create the initial state for the store. The initial state is an empty
@@ -35,7 +35,7 @@ public class Store {
 	}
 
 	private Store(Map<Address, BValue> bValueStore,
-				  Map<Address, ObjectAD> objectStore) {
+				  Map<Address, Obj> objectStore) {
 		this.bValueStore = bValueStore;
 		this.objectStore = objectStore;
 	}
@@ -48,7 +48,7 @@ public class Store {
 		/* Just copy the values into a new hash map. The values are essentially
 		 * immutable since any transfer or join will produce a new value. */
 		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>(this.bValueStore);
-		Map<Address, ObjectAD> objectStore = new HashMap<Address, ObjectAD>(this.objectStore);
+		Map<Address, Obj> objectStore = new HashMap<Address, Obj>(this.objectStore);
 
 		/* Join the new abstract domain with the new map. New lattice elements
 		 * are created for each join. */

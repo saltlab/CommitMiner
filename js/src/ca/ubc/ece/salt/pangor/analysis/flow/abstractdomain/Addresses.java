@@ -65,11 +65,11 @@ public class Addresses {
 	 */
 	public BValue inject(Addresses addresses) {
 		return new BValue(
-				StringAD.bottom(),
-				NumberAD.bottom(),
-				BooleanAD.bottom(),
-				NullAD.bottom(),
-				UndefinedAD.bottom(),
+				Str.bottom(),
+				Number.bottom(),
+				Bool.bottom(),
+				Null.bottom(),
+				Undefined.bottom(),
 				addresses);
 	}
 

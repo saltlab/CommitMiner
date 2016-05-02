@@ -12,15 +12,15 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
  *
  * TODO: Add change information to the lattice element.
  */
-public class NumberAD {
+public class Number {
 
 	private LatticeElement le;
 
-	public NumberAD() {
+	public Number() {
 		this.le = LatticeElement.TOP;
 	}
 
-	private NumberAD(LatticeElement le) {
+	private Number(LatticeElement le) {
 		this.le = le;
 	}
 
@@ -28,28 +28,28 @@ public class NumberAD {
 	 * @param number The number lattice element to inject.
 	 * @return The base value tuple with injected number.
 	 */
-	public BValue inject(NumberAD number) {
+	public BValue inject(Number number) {
 		return new BValue(
-				StringAD.bottom(),
+				Str.bottom(),
 				number,
-				BooleanAD.bottom(),
-				NullAD.bottom(),
-				UndefinedAD.bottom(),
+				Bool.bottom(),
+				Null.bottom(),
+				Undefined.bottom(),
 				Addresses.bottom());
 	}
 
 	/**
 	 * @return the top lattice element
 	 */
-	public static NumberAD top() {
-		return new NumberAD(LatticeElement.TOP);
+	public static Number top() {
+		return new Number(LatticeElement.TOP);
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static NumberAD bottom() {
-		return new NumberAD(LatticeElement.BOTTOM);
+	public static Number bottom() {
+		return new Number(LatticeElement.BOTTOM);
 	}
 
 	/**
@@ -57,9 +57,9 @@ public class NumberAD {
 	 * @param state The number to join with.
 	 * @return A new number that is the join of the two numbers.
 	 */
-	public NumberAD join(NumberAD state) {
-		if(this.le == state.le) return new NumberAD(this.le);
-		return new NumberAD(LatticeElement.BOTTOM);
+	public Number join(Number state) {
+		if(this.le == state.le) return new Number(this.le);
+		return new Number(LatticeElement.BOTTOM);
 	}
 
 	/** The lattice elements for the abstract domain. **/

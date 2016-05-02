@@ -12,15 +12,15 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
  *
  * TODO: Add change information to the lattice element.
  */
-public class BooleanAD {
+public class Bool {
 
 	private LatticeElement le;
 
-	public BooleanAD() {
+	public Bool() {
 		this.le = LatticeElement.TOP;
 	}
 
-	private BooleanAD(LatticeElement le) {
+	private Bool(LatticeElement le) {
 		this.le = le;
 	}
 
@@ -29,37 +29,37 @@ public class BooleanAD {
 	 * @param state The boolean to join with.
 	 * @return A new boolean that is the join of two booleans.
 	 */
-	public BooleanAD join(BooleanAD state) {
-		if(this.le == state.le) return new BooleanAD(this.le);
-		return new BooleanAD(LatticeElement.BOTTOM);
+	public Bool join(Bool state) {
+		if(this.le == state.le) return new Bool(this.le);
+		return new Bool(LatticeElement.BOTTOM);
 	}
 
 	/**
 	 * @param bool The boolean lattice element to inject.
 	 * @return The base value tuple with injected boolean.
 	 */
-	public BValue inject(BooleanAD bool) {
+	public BValue inject(Bool bool) {
 		return new BValue(
-				StringAD.bottom(),
-				NumberAD.bottom(),
+				Str.bottom(),
+				Number.bottom(),
 				bool,
-				NullAD.bottom(),
-				UndefinedAD.bottom(),
+				Null.bottom(),
+				Undefined.bottom(),
 				Addresses.bottom());
 	}
 
 	/**
 	 * @return the top lattice element
 	 */
-	public static BooleanAD top() {
-		return new BooleanAD(LatticeElement.TOP);
+	public static Bool top() {
+		return new Bool(LatticeElement.TOP);
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static BooleanAD bottom() {
-		return new BooleanAD(LatticeElement.BOTTOM);
+	public static Bool bottom() {
+		return new Bool(LatticeElement.BOTTOM);
 	}
 
 	/** The lattice elements for the abstract domain. **/
