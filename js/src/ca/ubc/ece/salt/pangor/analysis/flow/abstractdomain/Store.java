@@ -1,9 +1,13 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.Address;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.Klass;
+import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
  * The abstract domain for the program's store (memory).
@@ -17,6 +21,9 @@ public class Store {
 	/** The store for {@code Object}s. **/
 	private Map<Address, Obj> objectStore;
 
+	/** The addresses of the builtin objects. **/
+	public Map<Klass, Address> builtins;
+
 	/**
 	 * Create the initial state for the store. The initial state is an empty
 	 * store. However, the environment may initialize the store with the
@@ -29,15 +36,29 @@ public class Store {
 	 * Changes to the store are driven by changes to the environment.
 	 */
 	public Store() {
-		/* Right now we only have an empty store. Future work is to initialize
-		 * the store with built-in objects. */
+		/* Right now we only have an empty store.
+		 * TODO: initialize the store with built-in objects. */
 		this.bValueStore = new HashMap<Address, BValue>();
+
+		/* Initialize Object. */
+		Map<String, BValue> externalProperties = new HashMap<String, BValue>();
+		InternalObjectProperties internalProperties = new InternalObjectProperties(null, Klass.OBJECT);
+		Set<String> definitelyPresent = new HashSet<String>();
+		Obj object = new Obj(externalProperties, internalProperties, definitelyPresent);
+		Address address = new Address();
+		this.objectStore.put(address, object);
+
+		/* Initialize the builtins. */
+		this.builtins = new HashMap<Klass, Address>();
+		this.builtins.put(Klass.OBJECT, address);
 	}
 
 	private Store(Map<Address, BValue> bValueStore,
-				  Map<Address, Obj> objectStore) {
+				  Map<Address, Obj> objectStore,
+				  Map<Klass, Address> builtins) {
 		this.bValueStore = bValueStore;
 		this.objectStore = objectStore;
+		this.builtins = builtins;
 	}
 
 	/**
@@ -70,7 +91,7 @@ public class Store {
 			}
 		}
 
-		return new Store(bValueStore, objectStore);
+		return new Store(bValueStore, objectStore, this.builtins);
 
 	}
 
@@ -80,24 +101,32 @@ public class Store {
 	 * @return The address of the value in the store.
 	 */
 	public Address alloc(BValue value) {
-
-		/* Allocate a new address. */
 		Address address = new Address();
-
 		this.bValueStore.put(address, value);
-
-		return null;
+		return address;
 	}
 
 	/**
 	 * Allocates space in the store for a {@code Closure} (function).
-	 * @param closure The function to allocate.
+	 * @param protoAddress The address of the function prototype.
 	 * @param value The address of the function prototype?
 	 * @return The address of the function in the store.
 	 */
-	public Address allocFun(Closure closure, BValue value) {
-		// TODO: Template
-		return null;
+	public Address allocFun(CFG cfg, Stack<Environment> closures) {
+
+		/* Create the function object. */
+		Address protoAddress = this.builtins.get(Klass.OBJECT);
+		Map<String, BValue> externalProperties = new HashMap<String, BValue>();
+		InternalFunctionProperties internalProperties = new InternalFunctionProperties(protoAddress, cfg, closures);
+		Set<String> definitelyPresentProperties = new HashSet<String>();
+		Obj function = new Obj(externalProperties, internalProperties, definitelyPresentProperties);
+
+		/* Allocate the function to the store. */
+		Address address = new Address();
+		this.objectStore.put(address, function);
+
+		return address;
+
 	}
 
 	/**
