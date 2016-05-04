@@ -3,8 +3,6 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 import java.util.HashSet;
 import java.util.Set;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.Address;
-
 /**
  * The abstract domain for the possible addresses pointed to by a BValue.
  */
@@ -18,17 +16,17 @@ public class Addresses {
 	/**
 	 * Create the bottom lattice element.
 	 */
-	private Addresses(LatticeElement le) {
+	public Addresses(LatticeElement le) {
 		this.addresses = new HashSet<Address>();
 		this.le = le;
 	}
 
-	private Addresses(Set<Address> addresses) {
+	public Addresses(Set<Address> addresses) {
 		this.addresses = addresses;
 		this.le = LatticeElement.SET;
 	}
 
-	private Addresses(LatticeElement le, Set<Address> addresses) {
+	public Addresses(LatticeElement le, Set<Address> addresses) {
 		this.addresses = new HashSet<Address>();
 		this.le = le;
 	}
@@ -66,7 +64,7 @@ public class Addresses {
 	public BValue inject(Addresses addresses) {
 		return new BValue(
 				Str.bottom(),
-				Number.bottom(),
+				Num.bottom(),
 				Bool.bottom(),
 				Null.bottom(),
 				Undefined.bottom(),

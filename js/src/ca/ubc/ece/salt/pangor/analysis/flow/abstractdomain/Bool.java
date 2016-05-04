@@ -41,7 +41,7 @@ public class Bool {
 	public BValue inject(Bool bool) {
 		return new BValue(
 				Str.bottom(),
-				Number.bottom(),
+				Num.bottom(),
 				bool,
 				Null.bottom(),
 				Undefined.bottom(),

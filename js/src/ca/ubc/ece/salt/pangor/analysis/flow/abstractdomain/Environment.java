@@ -5,18 +5,13 @@ import java.util.Map;
 
 import org.mozilla.javascript.ast.ScriptNode;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.Address;
-import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
-import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
-import ca.ubc.ece.salt.pangor.cfg.CFGNode;
-
 /**
  * The abstract domain for storing mappings from identifiers to addresses.
  * i.e. Environment# := String#->P(BValue# | Address#)
  *
  * Identifiers may be
  */
-public class Environment implements IAbstractDomain {
+public class Environment extends SmartHash {
 
 	/** The possible memory address for each identifier. **/
 	private Map<String, List<Address>> environment;
@@ -36,20 +31,7 @@ public class Environment implements IAbstractDomain {
 		//		 and variables declared within the function.
 	}
 
-	@Override
-	public Environment transfer(CFGEdge edge) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Environment transfer(CFGNode node) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Environment join(IAbstractDomain ad) {
+	public Environment join(Environment environment) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -25,23 +25,41 @@ public class Null {
 	}
 
 	/**
+	 * Performs a strong update on this lattice element.
+	 * @param le The new lattice element.
+	 * @return The updated state for this domain.
+	 */
+	public Null strongUpdate(LatticeElement le) {
+		return new Null(le);
+	}
+
+	/**
+	 * Performs a weak update on this lattice element.
+	 * @param le The lattice element to merge with.
+	 * @return The updated state for this domain.
+	 */
+	public Null weakUpdate(LatticeElement le) {
+		if(this.le == le) return new Null(this.le);
+		return new Null(LatticeElement.BOTTOM);
+	}
+
+	/**
 	 * Joins this null with another null.
 	 * @param state The null to join with.
 	 * @return A new null that is the join of the two nulls.
 	 */
 	public Null join(Null state) {
-		if(this.le == state.le) return new Null(this.le);
-		return new Null(LatticeElement.BOTTOM);
+		return this.weakUpdate(state.le);
 	}
 
 	/**
 	 * @param nll The null lattice element to inject.
 	 * @return The base value tuple with injected null.
 	 */
-	public BValue inject(Null nll) {
+	public static BValue inject(Null nll) {
 		return new BValue(
 				Str.bottom(),
-				Number.bottom(),
+				Num.bottom(),
 				Bool.bottom(),
 				nll,
 				Undefined.bottom(),

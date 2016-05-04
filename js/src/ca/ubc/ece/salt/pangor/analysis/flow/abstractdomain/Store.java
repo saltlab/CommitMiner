@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.Klass;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.JSClass;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
@@ -21,8 +21,12 @@ public class Store {
 	/** The store for {@code Object}s. **/
 	private Map<Address, Obj> objectStore;
 
+	// TODO: Add the continuation stacks to the store.
+	///** The continuation stacks functions. **/
+	//private Map<Address, Stack<CFGNode>>;
+
 	/** The addresses of the builtin objects. **/
-	public Map<Klass, Address> builtins;
+	public Map<JSClass, Address> builtins;
 
 	/**
 	 * Create the initial state for the store. The initial state is an empty
@@ -42,23 +46,21 @@ public class Store {
 
 		/* Initialize Object. */
 		Map<String, BValue> externalProperties = new HashMap<String, BValue>();
-		InternalObjectProperties internalProperties = new InternalObjectProperties(null, Klass.OBJECT);
+		InternalObjectProperties internalProperties = new InternalObjectProperties(null, JSClass.CObject_Obj);
 		Set<String> definitelyPresent = new HashSet<String>();
 		Obj object = new Obj(externalProperties, internalProperties, definitelyPresent);
 		Address address = new Address();
 		this.objectStore.put(address, object);
 
 		/* Initialize the builtins. */
-		this.builtins = new HashMap<Klass, Address>();
-		this.builtins.put(Klass.OBJECT, address);
+		this.builtins = new HashMap<JSClass, Address>();
+		this.builtins.put(JSClass.CObject_Obj, address);
 	}
 
-	private Store(Map<Address, BValue> bValueStore,
-				  Map<Address, Obj> objectStore,
-				  Map<Klass, Address> builtins) {
+	public Store(Map<Address, BValue> bValueStore,
+				  Map<Address, Obj> objectStore) {
 		this.bValueStore = bValueStore;
 		this.objectStore = objectStore;
-		this.builtins = builtins;
 	}
 
 	/**
@@ -91,7 +93,7 @@ public class Store {
 			}
 		}
 
-		return new Store(bValueStore, objectStore, this.builtins);
+		return new Store(bValueStore, objectStore);
 
 	}
 
@@ -112,12 +114,12 @@ public class Store {
 	 * @param value The address of the function prototype?
 	 * @return The address of the function in the store.
 	 */
-	public Address allocFun(CFG cfg, Stack<Environment> closures) {
+	public Address allocFun(CFG cfg, Stack<Closure> closures) {
 
 		/* Create the function object. */
-		Address protoAddress = this.builtins.get(Klass.OBJECT);
+		Address protoAddress = this.builtins.get(JSClass.CObject_Obj);
 		Map<String, BValue> externalProperties = new HashMap<String, BValue>();
-		InternalFunctionProperties internalProperties = new InternalFunctionProperties(protoAddress, cfg, closures);
+		InternalFunctionProperties internalProperties = new InternalFunctionProperties(protoAddress, closures);
 		Set<String> definitelyPresentProperties = new HashSet<String>();
 		Obj function = new Obj(externalProperties, internalProperties, definitelyPresentProperties);
 
@@ -131,13 +133,43 @@ public class Store {
 
 	/**
 	 * Allocates space in the store for an object.
-	 * @param constructor The address of the object's constructor.
-	 * @return The address of the object in the store.
+	 * @param constructorAddresses The possible addresses of the object's constructor.
+	 * @return The addresses of the objects in the store.
 	 */
-	public Address allocObj(BValue constructor) {
-		// TODO: Template
+	public Addresses allocObj(Addresses constructorAddresses) {
+
+		Set<Address> objectAddresses = new HashSet<Address>();
+
+		for(Address constructorAddress : constructorAddresses.addresses) {
+
+			/* Look up the object's constructor. */
+			Obj constructor = this.objectStore.get(constructorAddress);
+
+			if(constructor == null || constructor.internalProperties.klass != JSClass.FUNCTION) {
+				constructorAddress = this.builtins.get(JSClass.CObject_Obj);
+				constructor = this.objectStore.get(constructorAddress);
+			}
+
+			/* Create the object. */
+			Map<String, BValue> externalProperties = new HashMap<String, BValue>();
+			InternalObjectProperties internalProperties = new InternalObjectProperties(constructorAddress, JSClass.OTHER);
+			Set<String> definitelyPresentProperties = new HashSet<String>();
+
+		}
+
+
+		/* Create the object. */
 		return null;
 	}
+
+//	TODO
+//	/**
+//	 * Allocates space in the store for a continuation stack. This is always
+//	 * a weak update.
+//	 * @param continuationStack The continuation stack.
+//	 * @return The address of the continuation stack in the store.
+//	 */
+//	public Address allocKont(Stack<CFGNode> continuationStack) { }
 
 
 }

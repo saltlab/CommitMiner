@@ -73,7 +73,7 @@ public class Str {
 	public BValue inject(Str string) {
 		return new BValue(
 				string,
-				Number.bottom(),
+				Num.bottom(),
 				Bool.bottom(),
 				Null.bottom(),
 				Undefined.bottom(),

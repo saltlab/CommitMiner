@@ -41,7 +41,7 @@ public class Undefined {
 	public BValue inject(Undefined undefined) {
 		return new BValue(
 				Str.bottom(),
-				Number.bottom(),
+				Num.bottom(),
 				Bool.bottom(),
 				Null.bottom(),
 				undefined,

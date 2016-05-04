@@ -1,6 +1,8 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.Klass;
+import java.util.Stack;
+
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.JSClass;
 
 /** Internal properties for an abstract (non-function) object. **/
 public class InternalObjectProperties {
@@ -10,15 +12,22 @@ public class InternalObjectProperties {
 	 * constructor or the prototype of Object (if defined as an object
 	 * literal).
 	 */
-	public Address prototype;
+	public BValue prototype;
 
 	/** The type of object. This is the "based on the constructor
 	 * function's object address" [notJS Concrete Semantics]. **/
-	public Klass klass;
+	public JSClass klass;
 
-	public InternalObjectProperties(Address prototype, Klass klass) {
+	public InternalObjectProperties(BValue prototype, JSClass klass) {
 		this.prototype = prototype;
 		this.klass = klass;
+	}
+
+	/**
+	 * @return The set of closures. Empty if this object is not a function.
+	 */
+	public Stack<Closure> getCode() {
+		return new Stack<Closure>();
 	}
 
 }

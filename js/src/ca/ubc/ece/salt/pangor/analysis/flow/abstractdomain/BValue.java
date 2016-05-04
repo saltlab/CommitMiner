@@ -12,7 +12,7 @@ public class BValue {
 	Str stringAD;
 
 	/** The abstract domain for numbers. **/
-	Number numberAD;
+	Num numberAD;
 
 	/** The abstract domain for booleans. **/
 	Bool booleanAD;
@@ -26,7 +26,7 @@ public class BValue {
 	/** The abstract domain for memory addresses. **/
 	Addresses addressAD;
 
-	public BValue(Str stringAD, Number numberAD,
+	public BValue(Str stringAD, Num numberAD,
 					  Bool booleanAD, Null nullAD,
 					  Undefined undefinedAD, Addresses addressAD) {
 		this.stringAD = stringAD;
@@ -55,7 +55,7 @@ public class BValue {
 	public static BValue top() {
 		return new BValue(
 				Str.top(),
-				Number.top(),
+				Num.top(),
 				Bool.top(),
 				Null.top(),
 				Undefined.top(),
@@ -68,7 +68,7 @@ public class BValue {
 	public static BValue bottom() {
 		return new BValue(
 				Str.bottom(),
-				Number.bottom(),
+				Num.bottom(),
 				Bool.bottom(),
 				Null.bottom(),
 				Undefined.bottom(),

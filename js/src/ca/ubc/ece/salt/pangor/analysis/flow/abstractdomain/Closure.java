@@ -1,19 +1,22 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-import ca.ubc.ece.salt.pangor.cfg.CFG;
-
 /**
- * The abstract domain for function closures.
+ * A native (builtin) function. The abstract interpretation of the function is
+ * specified in Java, usually as a lambda expression.
  */
-public class Closure {
-
-	/** The control flow graph for the function. **/
-	public CFG cfg;
+public abstract class Closure extends SmartHash {
 
 	/**
-	 * The environment for the function (i.e., the parameters and local
-	 * variables).
+	 * @param selfAddr The address of the 'this' object.
+	 * @param argArrayAddr The address of the argument array object.
+	 * @param x The variable for the return value.
+	 * @param environment The environment (JS closure).
+	 * @param store Main memory.
+	 * @param scratchpad Scratchpad memory.
+	 * @return The new state after executing the function.
 	 */
-	public Environment environment;
+	public abstract State run(BValue selfAddr, BValue argArrayAddr, String x,
+			  				  Environment environment, Store store,
+			  				  Scratchpad scratchpad);
 
 }
