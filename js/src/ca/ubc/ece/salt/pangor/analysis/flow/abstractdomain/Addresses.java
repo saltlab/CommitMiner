@@ -6,7 +6,9 @@ import java.util.Set;
 /**
  * The abstract domain for the possible addresses pointed to by a BValue.
  */
-public class Addresses {
+public class Addresses extends SmartHash {
+
+	private static final int MAX_SIZE = 3;
 
 	public LatticeElement le;
 
@@ -26,9 +28,31 @@ public class Addresses {
 		this.le = LatticeElement.SET;
 	}
 
+	public Addresses(Address address) {
+		this.addresses = new HashSet<Address>();
+		this.addresses.add(address);
+	}
+
 	public Addresses(LatticeElement le, Set<Address> addresses) {
 		this.addresses = new HashSet<Address>();
 		this.le = le;
+	}
+
+
+	/**
+	 * Performs a weak update on the set of addresses.
+	 */
+	public Addresses weakUpdate(Set<Address> addresses) {
+		return this.join(new Addresses(addresses));
+	}
+
+	/**
+	 * Performs a strong update on the set of addresses.
+	 */
+	public Addresses strongUpdate(Set<Address> addresses) {
+		if(addresses.size() > MAX_SIZE)
+			return new Addresses(LatticeElement.TOP, null);
+		return new Addresses(addresses);
 	}
 
 	/**

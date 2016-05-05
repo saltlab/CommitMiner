@@ -1,13 +1,7 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.JSClass;
-import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
  * The abstract domain for the program's store (memory).
@@ -20,13 +14,6 @@ public class Store {
 
 	/** The store for {@code Object}s. **/
 	private Map<Address, Obj> objectStore;
-
-	// TODO: Add the continuation stacks to the store.
-	///** The continuation stacks functions. **/
-	//private Map<Address, Stack<CFGNode>>;
-
-	/** The addresses of the builtin objects. **/
-	public Map<JSClass, Address> builtins;
 
 	/**
 	 * Create the initial state for the store. The initial state is an empty
@@ -43,20 +30,13 @@ public class Store {
 		/* Right now we only have an empty store.
 		 * TODO: initialize the store with built-in objects. */
 		this.bValueStore = new HashMap<Address, BValue>();
-
-		/* Initialize Object. */
-		Map<String, BValue> externalProperties = new HashMap<String, BValue>();
-		InternalObjectProperties internalProperties = new InternalObjectProperties(null, JSClass.CObject_Obj);
-		Set<String> definitelyPresent = new HashSet<String>();
-		Obj object = new Obj(externalProperties, internalProperties, definitelyPresent);
-		Address address = new Address();
-		this.objectStore.put(address, object);
-
-		/* Initialize the builtins. */
-		this.builtins = new HashMap<JSClass, Address>();
-		this.builtins.put(JSClass.CObject_Obj, address);
 	}
 
+	/**
+	 * Create a new store from an existing store.
+	 * @param bValueStore
+	 * @param objectStore
+	 */
 	public Store(Map<Address, BValue> bValueStore,
 				  Map<Address, Obj> objectStore) {
 		this.bValueStore = bValueStore;
@@ -64,33 +44,36 @@ public class Store {
 	}
 
 	/**
+	 * Computes σ1 u σ2.
 	 * @return a new Store which is this Store joined with the store parameter.
 	 */
 	public Store join(Store state) {
 
 		/* Just copy the values into a new hash map. The values are essentially
 		 * immutable since any transfer or join will produce a new value. */
+
 		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>(this.bValueStore);
 		Map<Address, Obj> objectStore = new HashMap<Address, Obj>(this.objectStore);
 
 		/* Join the new abstract domain with the new map. New lattice elements
 		 * are created for each join. */
-		for(Address address : state.bValueStore.keySet()) {
-			if(bValueStore.containsKey(address)) {
-				bValueStore.put(address, bValueStore.get(address).join(state.bValueStore.get(address)));
-			}
-			else {
-				bValueStore.put(address, bValueStore.get(address));
-			}
+
+		for(Map.Entry<Address, BValue>entries : state.bValueStore.entrySet()) {
+			Address address = entries.getKey();
+			BValue right = entries.getValue();
+			BValue left = bValueStore.get(entries.getKey());
+
+			if(left == null) bValueStore.put(address, right);
+			else bValueStore.put(address, left.join(right));
 		}
 
-		for(Address address : state.objectStore.keySet()) {
-			if(objectStore.containsKey(address)) {
-				objectStore.put(address, objectStore.get(address).join(state.objectStore.get(address)));
-			}
-			else {
-				objectStore.put(address, objectStore.get(address));
-			}
+		for(Map.Entry<Address, Obj>entries : state.objectStore.entrySet()) {
+			Address address = entries.getKey();
+			Obj right = entries.getValue();
+			Obj left = objectStore.get(entries.getKey());
+
+			if(left == null) objectStore.put(address, right);
+			else objectStore.put(address, left.join(right));
 		}
 
 		return new Store(bValueStore, objectStore);
@@ -98,78 +81,33 @@ public class Store {
 	}
 
 	/**
-	 * Allocates space in the store for a {@code BValue}.
+	 * Allocates a primitive value on the store. If the address already has a
+	 * value, performs a weak update.
+	 * @param address The address to allocate, generated in {@code Trace}.
 	 * @param value The value to place in the store.
-	 * @return The address of the value in the store.
+	 * @return The Store after allocation.
 	 */
-	public Address alloc(BValue value) {
-		Address address = new Address();
-		this.bValueStore.put(address, value);
-		return address;
+	public Store alloc(Address address, BValue value) {
+		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>(this.bValueStore);
+		BValue left = bValueStore.get(address);
+		if(left == null) this.bValueStore.put(address, value);
+		else this.bValueStore.put(address, left.join(value));
+		return new Store(bValueStore, this.objectStore);
 	}
 
 	/**
-	 * Allocates space in the store for a {@code Closure} (function).
-	 * @param protoAddress The address of the function prototype.
-	 * @param value The address of the function prototype?
-	 * @return The address of the function in the store.
+	 * Allocates an object on the store. If the address already has a value,
+	 * performs a weak update.
+	 * @param address The address to allocate, generated in {@code Trace}.
+	 * @param object The object to place in the store.
+	 * @return The Store after allocation.
 	 */
-	public Address allocFun(CFG cfg, Stack<Closure> closures) {
-
-		/* Create the function object. */
-		Address protoAddress = this.builtins.get(JSClass.CObject_Obj);
-		Map<String, BValue> externalProperties = new HashMap<String, BValue>();
-		InternalFunctionProperties internalProperties = new InternalFunctionProperties(protoAddress, closures);
-		Set<String> definitelyPresentProperties = new HashSet<String>();
-		Obj function = new Obj(externalProperties, internalProperties, definitelyPresentProperties);
-
-		/* Allocate the function to the store. */
-		Address address = new Address();
-		this.objectStore.put(address, function);
-
-		return address;
-
+	public Store alloc(Address address, Obj object) {
+		Map<Address, Obj> objectStore = new HashMap<Address, Obj>(this.objectStore);
+		Obj left = objectStore.get(address);
+		if(left == null) this.objectStore.put(address, object);
+		else this.objectStore.put(address,  left.join(object));
+		return new Store(this.bValueStore, objectStore);
 	}
-
-	/**
-	 * Allocates space in the store for an object.
-	 * @param constructorAddresses The possible addresses of the object's constructor.
-	 * @return The addresses of the objects in the store.
-	 */
-	public Addresses allocObj(Addresses constructorAddresses) {
-
-		Set<Address> objectAddresses = new HashSet<Address>();
-
-		for(Address constructorAddress : constructorAddresses.addresses) {
-
-			/* Look up the object's constructor. */
-			Obj constructor = this.objectStore.get(constructorAddress);
-
-			if(constructor == null || constructor.internalProperties.klass != JSClass.FUNCTION) {
-				constructorAddress = this.builtins.get(JSClass.CObject_Obj);
-				constructor = this.objectStore.get(constructorAddress);
-			}
-
-			/* Create the object. */
-			Map<String, BValue> externalProperties = new HashMap<String, BValue>();
-			InternalObjectProperties internalProperties = new InternalObjectProperties(constructorAddress, JSClass.OTHER);
-			Set<String> definitelyPresentProperties = new HashSet<String>();
-
-		}
-
-
-		/* Create the object. */
-		return null;
-	}
-
-//	TODO
-//	/**
-//	 * Allocates space in the store for a continuation stack. This is always
-//	 * a weak update.
-//	 * @param continuationStack The continuation stack.
-//	 * @return The address of the continuation stack in the store.
-//	 */
-//	public Address allocKont(Stack<CFGNode> continuationStack) { }
-
 
 }

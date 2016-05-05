@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * The abstract domain for an address.
  */
-public class Address {
+public class Address extends SmartHash {
 
 	private static Long uniqueAddress = new Long(0);
 

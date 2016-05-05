@@ -5,10 +5,12 @@ import java.util.Map;
 import java.util.Stack;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Addresses;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.NativeClosure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Num;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj;
@@ -39,47 +41,77 @@ public class ObjFactory {
 		external.put("preventExtensions", Address.inject(StoreFactory.Object_preventExtensions_Addr));
 		external.put("seal", Address.inject(StoreFactory.Object_seal_Addr));
 
-//		InternalObjectProperties internal = null;
-
-		Object_Obj = createInitFunctionObj(
-			new NativeClosure() {
+		NativeClosure closure = new NativeClosure() {
 				@Override
 				public State run(BValue selfAddr, BValue argArrayAddr, String x,
 								 Environment environment, Store store,
 								 Scratchpad scratchpad) {
+					// TODO: Update the state
 					return null;
 				}
-			},
-			external,
-//			internal,
-			JSClass.CObject_Obj
-			);
-	}
-
-	/**
-	 * Instantiates builtin objects.
-	 * @param clo The native closure.
-	 * @param external The external properties.
-	 * @param jsclass The object type.
-	 * @return An instance of the new object.
-	 */
-	public static Obj createInitFunctionObj(NativeClosure clo,
-											Map<String, BValue> external,
-//											InternalObjectProperties internal,
-											JSClass jsclass) {
+			};
 
 		Stack<Closure> closures = new Stack<Closure>();
-		closures.add(clo);
+		closures.push(closure);
 
-		InternalFunctionProperties internal = new InternalFunctionProperties(
-				Address.inject(StoreFactory.Function_proto_Addr),
-				closures,
-				jsclass);
+		InternalObjectProperties internal = new InternalFunctionProperties(closures, JSClass.CObject_Obj);
 
-		// JSAI separates numeric and string fields through the string domain.
-//		createInitObjectCore(external, internal);
+		Object_Obj = new Obj(external, internal, external.keySet());
+	}
+
+	public static final Obj Object_proto_Obj;
+	static {
+		Map<String, BValue> external = new HashMap<String, BValue>();
+		external.put("constructor", Address.inject(StoreFactory.Object_Addr));
+		external.put("toString", Address.inject(StoreFactory.Object_proto_toString_Addr));
+		external.put("toLocaleString", Address.inject(StoreFactory.Object_proto_toLocaleString_Addr));
+		external.put("valueOf", Address.inject(StoreFactory.Object_proto_valueOf_Addr));
+		external.put("hasOwnPrpoerty", Address.inject(StoreFactory.Object_proto_hasOwnProperty_Addr));
+		external.put("isPrototypeOf", Address.inject(StoreFactory.Object_proto_isPrototypeOf_Addr));
+		external.put("propertyIsEnumerable", Address.inject(StoreFactory.Object_proto_propertyIsEnumerable_Addr));
+
+		InternalObjectProperties internal = new InternalObjectProperties();
+
+		Object_proto_Obj = new Obj(external, internal, external.keySet());
+	}
+
+	public static final Obj Object_proto_toString_Obj = constFunctionObj();
+	public static final Obj Object_proto_toLocaleString_Obj = constFunctionObj();
+	public static final Obj Object_proto_hasOwnProperty_Obj = constFunctionObj();
+
+	/**
+	 * Approximate a function which is not modeled.
+	 * @return A function which has no side effects that that returns the
+	 * 		   BValue lattice element top.
+	 */
+	private static Obj constFunctionObj() {
+
+		Map<String, BValue> external = new HashMap<String, BValue>();
+
+		Closure closure = new NativeClosure() {
+				@Override
+				public State run(BValue selfAddr, BValue argArrayAddr, String x,
+								 Environment environment, Store store,
+								 Scratchpad scratchpad) {
+					BValue retVal = BValue.top();
+					Address address = new Address();
+
+					store = store.alloc(address, retVal);
+					environment = environment.strongUpdate(x, new Addresses(address));
+
+					return new State(store, environment);
+				}
+			};
+
+		Stack<Closure> closures = new Stack<Closure>();
+		closures.push(closure);
+
+		InternalObjectProperties internal = new InternalFunctionProperties(closures, JSClass.CObject_Obj);
 
 		return new Obj(external, internal, external.keySet());
+
 	}
+
+
 
 }

@@ -25,7 +25,7 @@ public class State implements IAbstractDomain {
 
 		/* Initialize the default abstract domains. */
 		this.store = new Store();
-		this.environment = new Environment(function, store);
+		this.environment = new Environment(function);
 
 	}
 
@@ -34,7 +34,7 @@ public class State implements IAbstractDomain {
 	 * @param store The abstract store of the new state.
 	 * @param environment The abstract environment of the new state.
 	 */
-	private State(Store store, Environment environment) {
+	public State(Store store, Environment environment) {
 		this.store = store;
 		this.environment = environment;
 	}

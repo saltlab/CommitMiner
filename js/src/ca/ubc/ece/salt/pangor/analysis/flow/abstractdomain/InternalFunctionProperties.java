@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 import java.util.Stack;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.JSClass;
+import ca.ubc.ece.salt.pangor.analysis.flow.builtins.StoreFactory;
 
 /**
  * Internal properties for an abstract Function object.
@@ -20,10 +21,20 @@ public class InternalFunctionProperties extends InternalObjectProperties {
 	/**
 	 * @param prototype The address of the function prototype.
 	 * @param closure The control flow graph and environment stack.
+	 * @param jsclass The type of object being created.
 	 */
 	public InternalFunctionProperties(BValue prototype, Stack<Closure> closures, JSClass jsclass) {
 		super(prototype, jsclass);
 		this.closures = closures;
+	}
+
+	/**
+	 * Prototype defaults to Function_proto_Addr.
+	 * @param closure The control flow graph and environment stack.
+	 * @param jsclass The type of object being created.
+	 */
+	public InternalFunctionProperties(Stack<Closure> closures, JSClass jsclass) {
+		super(Address.inject(StoreFactory.Function_proto_Addr), jsclass);
 	}
 
 	@Override
