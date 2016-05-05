@@ -85,7 +85,7 @@ public class Addresses extends SmartHash {
 	 * @param addresses The address lattice element to inject.
 	 * @return The base value tuple with injected addresses.
 	 */
-	public BValue inject(Addresses addresses) {
+	public static BValue inject(Addresses addresses) {
 		return new BValue(
 				Str.bottom(),
 				Num.bottom(),

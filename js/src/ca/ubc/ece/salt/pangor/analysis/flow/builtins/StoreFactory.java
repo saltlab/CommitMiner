@@ -55,6 +55,9 @@ public class StoreFactory {
 	/* Needed for internal functions. */
 	public static final Address Dummy_Arguments_Addr = newAbstractAddr();
 
+	/* Used to pass the arguments object. */
+	public static final Address Dummy_Addr = newAbstractAddr();
+
 	/**
 	 * @return An initial store with builtin objects.
 	 */
@@ -63,6 +66,30 @@ public class StoreFactory {
 		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
 
 		objectStore.put(Object_Addr, ObjFactory.Object_Obj);
+		objectStore.put(Object_create_Addr, ObjFactory.Object_create_Obj);
+		objectStore.put(Object_defineProperties_Addr, ObjFactory.Object_defineProperties_Obj);
+		objectStore.put(Object_defineProperty_Addr, ObjFactory.Object_defineProperty_Obj);
+		objectStore.put(Object_freeze_Addr, ObjFactory.Object_freeze_Obj);
+		objectStore.put(Object_getOwnPropertyDescriptor_Addr, ObjFactory.Object_getOwnPropertyDescriptor_Obj);
+		objectStore.put(Object_getOwnPropertyNames_Addr, ObjFactory.Object_getOwnPropertyNames_Obj);
+		objectStore.put(Object_getPrototypeOf_Addr, ObjFactory.Object_getPrototypeOf_Obj);
+		objectStore.put(Object_isExtensible_Addr, ObjFactory.Object_isExtensible_Obj);
+		objectStore.put(Object_isFrozen_Addr, ObjFactory.Object_isFrozen_Obj);
+		objectStore.put(Object_isSealed_Addr, ObjFactory.Object_isSealed_Obj);
+		objectStore.put(Object_keys_Addr, ObjFactory.Object_keys_Obj);
+		objectStore.put(Object_preventExtensions_Addr, ObjFactory.Object_preventExtensions_Obj);
+		objectStore.put(Object_seal_Addr, ObjFactory.Object_seal_Obj);
+		objectStore.put(Object_proto_Addr, ObjFactory.Object_proto_Obj);
+		objectStore.put(Object_proto_toString_Addr, ObjFactory.Object_proto_toString_Obj);
+		objectStore.put(Object_proto_toLocaleString_Addr, ObjFactory.Object_proto_toLocaleString_Obj);
+		objectStore.put(Object_proto_hasOwnProperty_Addr, ObjFactory.Object_proto_hasOwnProperty_Obj);
+		objectStore.put(Object_proto_isPrototypeOf_Addr, ObjFactory.Object_proto_isPrototypeOf_Obj);
+		objectStore.put(Object_proto_propertyIsEnumerable_Addr, ObjFactory.Object_proto_propertyIsEnumerable_Obj);
+		objectStore.put(Object_proto_valueOf_Addr, ObjFactory.Object_proto_valueOf_Obj);
+//		objectStore.put(Dummy_Arguments_Addr, ObjFactory.Dummy_Arguments_Obj); TODO
+//		objectStore.put(Dummy_Addr, ObjFactory.Dummy_Obj); TODO
+
+		return new Store(bValueStore, objectStore);
 	}
 
 	/**

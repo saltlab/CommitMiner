@@ -7,6 +7,7 @@ import java.util.Stack;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Addresses;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Bool;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
@@ -18,6 +19,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.JSClass;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Str;
 
 
 public class ObjFactory {
@@ -59,6 +61,21 @@ public class ObjFactory {
 		Object_Obj = new Obj(external, internal, external.keySet());
 	}
 
+	// TODO: We can be more precise with these.
+	public static final Obj Object_create_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_defineProperties_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_defineProperty_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_freeze_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_getOwnPropertyDescriptor_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_getOwnPropertyNames_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_getPrototypeOf_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_isExtensible_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_isFrozen_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_isSealed_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_keys_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_preventExtensions_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_seal_Obj = constFunctionObj(BValue.top());
+
 	public static final Obj Object_proto_Obj;
 	static {
 		Map<String, BValue> external = new HashMap<String, BValue>();
@@ -75,16 +92,19 @@ public class ObjFactory {
 		Object_proto_Obj = new Obj(external, internal, external.keySet());
 	}
 
-	public static final Obj Object_proto_toString_Obj = constFunctionObj();
-	public static final Obj Object_proto_toLocaleString_Obj = constFunctionObj();
-	public static final Obj Object_proto_hasOwnProperty_Obj = constFunctionObj();
+	public static final Obj Object_proto_toString_Obj = constFunctionObj(Str.inject(Str.top()));
+	public static final Obj Object_proto_toLocaleString_Obj = constFunctionObj(Str.inject(Str.top()));
+	public static final Obj Object_proto_hasOwnProperty_Obj = constFunctionObj(Bool.inject(Bool.top()));
+	public static final Obj Object_proto_isPrototypeOf_Obj = constFunctionObj(Bool.inject(Bool.top()));
+	public static final Obj Object_proto_propertyIsEnumerable_Obj = constFunctionObj(Bool.inject(Bool.top()));
+	public static final Obj Object_proto_valueOf_Obj = constFunctionObj(BValue.primitive());
 
 	/**
 	 * Approximate a function which is not modeled.
 	 * @return A function which has no side effects that that returns the
 	 * 		   BValue lattice element top.
 	 */
-	private static Obj constFunctionObj() {
+	private static Obj constFunctionObj(BValue value) {
 
 		Map<String, BValue> external = new HashMap<String, BValue>();
 
@@ -93,7 +113,7 @@ public class ObjFactory {
 				public State run(BValue selfAddr, BValue argArrayAddr, String x,
 								 Environment environment, Store store,
 								 Scratchpad scratchpad) {
-					BValue retVal = BValue.top();
+					BValue retVal = value;
 					Address address = new Address();
 
 					store = store.alloc(address, retVal);
@@ -106,7 +126,7 @@ public class ObjFactory {
 		Stack<Closure> closures = new Stack<Closure>();
 		closures.push(closure);
 
-		InternalObjectProperties internal = new InternalFunctionProperties(closures, JSClass.CObject_Obj);
+		InternalObjectProperties internal = new InternalFunctionProperties(closures, JSClass.CFunction);
 
 		return new Obj(external, internal, external.keySet());
 

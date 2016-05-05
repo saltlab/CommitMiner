@@ -75,4 +75,17 @@ public class BValue {
 				Addresses.bottom());
 	}
 
+	/**
+	 * @return a primitive value (not an address).
+	 */
+	public static BValue primitive() {
+		return new BValue(
+				Str.top(),
+				Num.top(),
+				Bool.top(),
+				Null.top(),
+				Undefined.top(),
+				Addresses.bottom());
+	}
+
 }

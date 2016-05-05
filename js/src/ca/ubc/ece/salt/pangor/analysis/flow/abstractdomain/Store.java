@@ -47,7 +47,7 @@ public class Store {
 	 * Computes σ1 u σ2.
 	 * @return a new Store which is this Store joined with the store parameter.
 	 */
-	public Store join(Store state) {
+	public Store join(Store store) {
 
 		/* Just copy the values into a new hash map. The values are essentially
 		 * immutable since any transfer or join will produce a new value. */
@@ -58,7 +58,7 @@ public class Store {
 		/* Join the new abstract domain with the new map. New lattice elements
 		 * are created for each join. */
 
-		for(Map.Entry<Address, BValue>entries : state.bValueStore.entrySet()) {
+		for(Map.Entry<Address, BValue>entries : store.bValueStore.entrySet()) {
 			Address address = entries.getKey();
 			BValue right = entries.getValue();
 			BValue left = bValueStore.get(entries.getKey());
@@ -67,7 +67,7 @@ public class Store {
 			else bValueStore.put(address, left.join(right));
 		}
 
-		for(Map.Entry<Address, Obj>entries : state.objectStore.entrySet()) {
+		for(Map.Entry<Address, Obj>entries : store.objectStore.entrySet()) {
 			Address address = entries.getKey();
 			Obj right = entries.getValue();
 			Obj left = objectStore.get(entries.getKey());

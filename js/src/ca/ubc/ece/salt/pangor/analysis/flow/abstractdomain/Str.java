@@ -70,7 +70,7 @@ public class Str {
 	 * @param string The string lattice element to inject.
 	 * @return The base value tuple with injected string.
 	 */
-	public BValue inject(Str string) {
+	public static BValue inject(Str string) {
 		return new BValue(
 				string,
 				Num.bottom(),

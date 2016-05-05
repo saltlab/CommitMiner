@@ -38,7 +38,7 @@ public class Bool {
 	 * @param bool The boolean lattice element to inject.
 	 * @return The base value tuple with injected boolean.
 	 */
-	public BValue inject(Bool bool) {
+	public static BValue inject(Bool bool) {
 		return new BValue(
 				Str.bottom(),
 				Num.bottom(),

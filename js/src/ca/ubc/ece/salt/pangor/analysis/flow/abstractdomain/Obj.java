@@ -20,12 +20,6 @@ public class Obj extends SmartHash {
 	/** Tracks properties that definitely exist in the object. **/
 	public Set<String> definitelyPresentProperties;
 
-	/** The type of class. **/
-	public JSClass jsClass;
-
-	/** This class' prototype. **/
-	public BValue protoAddr;
-
 	/**
 	 * Initialize the object. The initial store will contain a number of
 	 * build-in objects which will be initialized from a template. The
@@ -76,7 +70,7 @@ public class Obj extends SmartHash {
 	}
 
 	/**
-	 * NOTE: Not complete semantics. Must also go up this object's pototype
+	 * NOTE: Not complete semantics. Must also go up this object's prototype
 	 * 		 chain if the property is not found.
 	 * @param property The name of the property to retrieve.
 	 * @return A property or null if it does not exist.
@@ -99,9 +93,13 @@ public class Obj extends SmartHash {
 	 */
 	public Obj weakUpdate(Map<String, BValue> eps) { return null; }
 
-
-	public Obj join(Obj ad) {
-		if(this.jsClass != ad.jsClass) throw new Error("Cannot join classes of different types.");
+	/**
+	 * Computes ο u ο.
+	 * @return A new Obj with this Obj joined with the Obj parameter.
+	 */
+	public Obj join(Obj object) {
+		if(this.internalProperties.klass != object.internalProperties.klass)
+			throw new Error("Cannot join classes of different types.");
 		// TODO Auto-generated method stub
 		return null;
 	}
