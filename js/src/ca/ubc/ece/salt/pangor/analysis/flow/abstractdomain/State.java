@@ -1,7 +1,5 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-import org.mozilla.javascript.ast.ScriptNode;
-
 import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -16,18 +14,6 @@ public class State implements IAbstractDomain {
 
 	public Store store;
 	public Environment environment;
-
-	/**
-	 * Create the initial state for a script or function.
-	 * @param function The script of function we are analyzing.
-	 */
-	public State(ScriptNode function) {
-
-		/* Initialize the default abstract domains. */
-		this.store = new Store();
-		this.environment = new Environment(function);
-
-	}
 
 	/**
 	 * Create a new state after a transfer or join.

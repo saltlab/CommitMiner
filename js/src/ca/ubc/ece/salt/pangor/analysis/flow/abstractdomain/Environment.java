@@ -3,8 +3,6 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mozilla.javascript.ast.ScriptNode;
-
 /**
  * The abstract domain for storing mappings from identifiers to addresses.
  * i.e. Environment# := String#->P(BValue# | Address#)
@@ -17,54 +15,51 @@ public class Environment extends SmartHash {
 	public Map<String, Addresses> environment;
 
 	/**
-	 * Create the initial state for the environment. The initial sate includes
-	 * variables and functions that are declared within the function and
-	 * therefore raised before the function is executed.
-	 * @param function The script of function we are analyzing.
+	 * Creates an empty environment.
 	 */
-	public Environment(ScriptNode function) {
-		// TODO: Visit all the statements in the function and raise functions
-		//		 and variables declared within the function.
+	public Environment() {
+		this.environment = new HashMap<String, Addresses>();
 	}
 
 	/**
-	 * Create the initial state for the environment. The initial sate includes
-	 * variables and functions that are declared within the function and
-	 * therefore raised before the function is executed.
-	 * @param function The script of function we are analyzing.
+	 * Creates an environment from an existing set of addresses.
+	 * @param env The environment to replicate.
 	 */
-	private Environment(Map<String, Addresses> environment) {
-		this.environment = environment;
+	private Environment(Map<String, Addresses> env) {
+		this.environment = env;
+	}
+
+	/**
+	 * Retrieve a variable's addresses.
+	 * @param x The variable.
+	 * @return The set of possible addresses.
+	 */
+	public Addresses apply(String x) {
+		return this.environment.get(x);
 	}
 
 	/**
 	 * Performs a weak update on a variable in the environment.
 	 * @param variable The variable to update.
 	 * @param addresses The addresses for the variable.
-	 * @return The new environment.
 	 */
-	public Environment weakUpdate(String variable, Addresses addresses) {
-		Map<String, Addresses> environment = new HashMap<String, Addresses>(this.environment);
-		Addresses left = environment.get(variable);
-		if(left == null) environment.put(variable, addresses);
-		else environment.put(variable, left.weakUpdate(addresses.addresses));
-		return new Environment(environment);
+	public void weakUpdate(String variable, Addresses addresses) {
+		Addresses left = this.environment.get(variable);
+		if(left == null) this.environment.put(variable, addresses);
+		else this.environment.put(variable, left.weakUpdate(addresses.addresses));
 	}
 
 	/**
 	 * Performs a strong update on a variable in the environment.
 	 * @param variable The variable to update.
-	 * @param addresses The addresses for the variable.
-	 * @return The new environment.
+	 * @param address The address for the variable.
 	 */
-	public Environment strongUpdate(String variable, Addresses addresses) {
-		Map<String, Addresses> environment = new HashMap<String, Addresses>(this.environment);
+	public void strongUpdate(String variable, Addresses addresses) {
 		environment.put(variable, addresses);
-		return new Environment(environment);
 	}
 
 	/**
-	 * Joins two addresses.
+	 * Computes ρ ∪ ρ
 	 * @param environment The environment to join with this environment.
 	 * @return The joined environments as a new environment.
 	 */

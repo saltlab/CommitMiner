@@ -9,19 +9,16 @@ import java.util.Set;
  */
 public class Address extends SmartHash {
 
-	private static Long uniqueAddress = new Long(0);
+	/** A unique address for builtins. **/
+	private static long builtinAddress = -1;
 
 	/** The address. **/
-	private Long address;
-
-	public Address() {
-		this.address = Address.getUniqueAddress();
-	}
+	private long address;
 
 	/**
 	 * @param addr The abstract address.
 	 */
-	public Address(Long addr) {
+	public Address(long addr) {
 		this.address = addr;
 	}
 
@@ -50,9 +47,12 @@ public class Address extends SmartHash {
 				new Addresses(addresses));
 	}
 
-	private static synchronized Long getUniqueAddress() {
-		Long address = Address.uniqueAddress;
-		Address.uniqueAddress = Address.uniqueAddress + 1;
+	/**
+	 * Builtin abstract addresses get negative values Same as in JSAI.
+	 */
+	public static synchronized Address createBuiltinAddr() {
+		Address address = new Address(builtinAddress);
+		builtinAddress--;
 		return address;
 	}
 

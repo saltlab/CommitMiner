@@ -1,10 +1,11 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Stack;
+import java.util.Set;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.JSClass;
-import ca.ubc.ece.salt.pangor.analysis.flow.builtins.StoreFactory;
+import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 
 /** Internal properties for an abstract (non-function) object. **/
 public class InternalObjectProperties {
@@ -66,8 +67,8 @@ public class InternalObjectProperties {
 	/**
 	 * @return The set of closures. Empty if this object is not a function.
 	 */
-	public Stack<Closure> getCode() {
-		return new Stack<Closure>();
+	public Set<Closure> getCode() {
+		return new HashSet<Closure>();
 	}
 
 }

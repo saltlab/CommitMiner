@@ -38,7 +38,7 @@ public class Undefined {
 	 * @param undefined The undefined lattice element to inject.
 	 * @return The base value tuple with injected undefined.
 	 */
-	public BValue inject(Undefined undefined) {
+	public static BValue inject(Undefined undefined) {
 		return new BValue(
 				Str.bottom(),
 				Num.bottom(),

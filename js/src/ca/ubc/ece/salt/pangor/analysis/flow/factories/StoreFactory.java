@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.analysis.flow.builtins;
+package ca.ubc.ece.salt.pangor.analysis.flow.factories;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,6 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 
 /**
  * Initializes the store with builtins.
- * Similar to init/init.scala in JSAI
  *
  * TODO: Add the rest of the builtins (ie., Array, Number, String, etc.)
  */
@@ -86,6 +85,10 @@ public class StoreFactory {
 		objectStore.put(Object_proto_isPrototypeOf_Addr, ObjFactory.Object_proto_isPrototypeOf_Obj);
 		objectStore.put(Object_proto_propertyIsEnumerable_Addr, ObjFactory.Object_proto_propertyIsEnumerable_Obj);
 		objectStore.put(Object_proto_valueOf_Addr, ObjFactory.Object_proto_valueOf_Obj);
+		objectStore.put(Function_proto_Addr, FunctionFactory.Function_proto_Obj);
+		objectStore.put(Function_proto_toString_Addr, FunctionFactory.Function_proto_toString_Obj);
+		objectStore.put(Function_proto_apply_Addr, FunctionFactory.Function_proto_apply_Obj);
+		objectStore.put(Function_proto_call_Addr, FunctionFactory.Function_proto_call_Obj);
 //		objectStore.put(Dummy_Arguments_Addr, ObjFactory.Dummy_Arguments_Obj); TODO
 //		objectStore.put(Dummy_Addr, ObjFactory.Dummy_Obj); TODO
 

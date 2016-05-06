@@ -1,9 +1,10 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+import java.util.Set;
 import java.util.Stack;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.JSClass;
-import ca.ubc.ece.salt.pangor.analysis.flow.builtins.StoreFactory;
+import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 
 /**
  * Internal properties for an abstract Function object.
@@ -16,14 +17,14 @@ import ca.ubc.ece.salt.pangor.analysis.flow.builtins.StoreFactory;
 public class InternalFunctionProperties extends InternalObjectProperties {
 
 	/** The function's code and environment. **/
-	private Stack<Closure> closures;
+	private Set<Closure> closures;
 
 	/**
 	 * @param prototype The address of the function prototype.
 	 * @param closure The control flow graph and environment stack.
 	 * @param jsclass The type of object being created.
 	 */
-	public InternalFunctionProperties(BValue prototype, Stack<Closure> closures, JSClass jsclass) {
+	public InternalFunctionProperties(BValue prototype, Set<Closure> closures, JSClass jsclass) {
 		super(prototype, jsclass);
 		this.closures = closures;
 	}
@@ -38,7 +39,7 @@ public class InternalFunctionProperties extends InternalObjectProperties {
 	}
 
 	@Override
-	public Stack<Closure> getCode() {
+	public Set<Closure> getCode() {
 		return this.closures;
 	}
 

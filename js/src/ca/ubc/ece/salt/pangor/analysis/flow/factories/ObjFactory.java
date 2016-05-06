@@ -1,11 +1,10 @@
-package ca.ubc.ece.salt.pangor.analysis.flow.builtins;
+package ca.ubc.ece.salt.pangor.analysis.flow.factories;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Addresses;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Bool;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
@@ -62,19 +61,19 @@ public class ObjFactory {
 	}
 
 	// TODO: We can be more precise with these.
-	public static final Obj Object_create_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_defineProperties_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_defineProperty_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_freeze_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_getOwnPropertyDescriptor_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_getOwnPropertyNames_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_getPrototypeOf_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_isExtensible_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_isFrozen_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_isSealed_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_keys_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_preventExtensions_Obj = constFunctionObj(BValue.top());
-	public static final Obj Object_seal_Obj = constFunctionObj(BValue.top());
+	public static final Obj Object_create_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_defineProperties_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_defineProperty_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_freeze_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_getOwnPropertyDescriptor_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_getOwnPropertyNames_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_getPrototypeOf_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_isExtensible_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_isFrozen_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_isSealed_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_keys_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_preventExtensions_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public static final Obj Object_seal_Obj = FunctionFactory.constFunctionObj(BValue.top());
 
 	public static final Obj Object_proto_Obj;
 	static {
@@ -92,46 +91,12 @@ public class ObjFactory {
 		Object_proto_Obj = new Obj(external, internal, external.keySet());
 	}
 
-	public static final Obj Object_proto_toString_Obj = constFunctionObj(Str.inject(Str.top()));
-	public static final Obj Object_proto_toLocaleString_Obj = constFunctionObj(Str.inject(Str.top()));
-	public static final Obj Object_proto_hasOwnProperty_Obj = constFunctionObj(Bool.inject(Bool.top()));
-	public static final Obj Object_proto_isPrototypeOf_Obj = constFunctionObj(Bool.inject(Bool.top()));
-	public static final Obj Object_proto_propertyIsEnumerable_Obj = constFunctionObj(Bool.inject(Bool.top()));
-	public static final Obj Object_proto_valueOf_Obj = constFunctionObj(BValue.primitive());
-
-	/**
-	 * Approximate a function which is not modeled.
-	 * @return A function which has no side effects that that returns the
-	 * 		   BValue lattice element top.
-	 */
-	private static Obj constFunctionObj(BValue value) {
-
-		Map<String, BValue> external = new HashMap<String, BValue>();
-
-		Closure closure = new NativeClosure() {
-				@Override
-				public State run(BValue selfAddr, BValue argArrayAddr, String x,
-								 Environment environment, Store store,
-								 Scratchpad scratchpad) {
-					BValue retVal = value;
-					Address address = new Address();
-
-					store = store.alloc(address, retVal);
-					environment = environment.strongUpdate(x, new Addresses(address));
-
-					return new State(store, environment);
-				}
-			};
-
-		Stack<Closure> closures = new Stack<Closure>();
-		closures.push(closure);
-
-		InternalObjectProperties internal = new InternalFunctionProperties(closures, JSClass.CFunction);
-
-		return new Obj(external, internal, external.keySet());
-
-	}
-
+	public static final Obj Object_proto_toString_Obj = FunctionFactory.constFunctionObj(Str.inject(Str.top()));
+	public static final Obj Object_proto_toLocaleString_Obj = FunctionFactory.constFunctionObj(Str.inject(Str.top()));
+	public static final Obj Object_proto_hasOwnProperty_Obj = FunctionFactory.constFunctionObj(Bool.inject(Bool.top()));
+	public static final Obj Object_proto_isPrototypeOf_Obj = FunctionFactory.constFunctionObj(Bool.inject(Bool.top()));
+	public static final Obj Object_proto_propertyIsEnumerable_Obj = FunctionFactory.constFunctionObj(Bool.inject(Bool.top()));
+	public static final Obj Object_proto_valueOf_Obj = FunctionFactory.constFunctionObj(BValue.primitive());
 
 
 }
