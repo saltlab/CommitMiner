@@ -51,17 +51,14 @@ public class EnvironmentFactory {
 										 Map<AstNode, CFG> cfgs) {
 
 		/* Create the environment for this function. */
-
-		// TODO: Does this work?
-		String[] variableNames = function.getParamAndVarNames();
+		List<String> variableNames = VariableLiftVisitor.getVariableDeclarations(function);
 		List<Address> variableAddresses = new LinkedList<Address>();
 		for(String variableName : variableNames) {
 			Address address = null; // TODO: How do we create a new address?
 			env.strongUpdate(variableName, new Addresses(address));
 		}
 
-		// TODO: Does this work? Does it return only statically declared functions?
-		List<FunctionNode> children = function.getFunctions();
+		List<FunctionNode> children = FunctionLiftVisitor.getFunctionDeclarations(function);
 		List<Pair<FunctionNode, Address>> functionAddresses = new LinkedList<Pair<FunctionNode, Address>>();
 		for(FunctionNode child : children) {
 			if(child.getName().isEmpty()) continue; // Not accessible.
