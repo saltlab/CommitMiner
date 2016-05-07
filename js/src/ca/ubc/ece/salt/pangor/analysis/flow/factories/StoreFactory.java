@@ -15,47 +15,45 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
  */
 public class StoreFactory {
 
-	public static long uniqueAddress;
-
 	/* Object abstract addresses. */
-	public static final Address Object_Addr = newAbstractAddr();
-	public static final Address Object_create_Addr = newAbstractAddr();
-	public static final Address Object_defineProperties_Addr = newAbstractAddr();
-	public static final Address Object_defineProperty_Addr = newAbstractAddr();
-	public static final Address Object_freeze_Addr = newAbstractAddr();
-	public static final Address Object_getOwnPropertyDescriptor_Addr = newAbstractAddr();
-	public static final Address Object_getOwnPropertyNames_Addr = newAbstractAddr();
-	public static final Address Object_getPrototypeOf_Addr = newAbstractAddr();
-	public static final Address Object_isExtensible_Addr = newAbstractAddr();
-	public static final Address Object_isFrozen_Addr = newAbstractAddr();
-	public static final Address Object_isSealed_Addr = newAbstractAddr();
-	public static final Address Object_keys_Addr = newAbstractAddr();
-	public static final Address Object_preventExtensions_Addr = newAbstractAddr();
-	public static final Address Object_seal_Addr = newAbstractAddr();
+	public static final Address Object_Addr = Address.createBuiltinAddr();
+	public static final Address Object_create_Addr = Address.createBuiltinAddr();
+	public static final Address Object_defineProperties_Addr = Address.createBuiltinAddr();
+	public static final Address Object_defineProperty_Addr = Address.createBuiltinAddr();
+	public static final Address Object_freeze_Addr = Address.createBuiltinAddr();
+	public static final Address Object_getOwnPropertyDescriptor_Addr = Address.createBuiltinAddr();
+	public static final Address Object_getOwnPropertyNames_Addr = Address.createBuiltinAddr();
+	public static final Address Object_getPrototypeOf_Addr = Address.createBuiltinAddr();
+	public static final Address Object_isExtensible_Addr = Address.createBuiltinAddr();
+	public static final Address Object_isFrozen_Addr = Address.createBuiltinAddr();
+	public static final Address Object_isSealed_Addr = Address.createBuiltinAddr();
+	public static final Address Object_keys_Addr = Address.createBuiltinAddr();
+	public static final Address Object_preventExtensions_Addr = Address.createBuiltinAddr();
+	public static final Address Object_seal_Addr = Address.createBuiltinAddr();
 
 	/* Object.prototype abstract addresses. */
-	public static final Address Object_proto_Addr = newAbstractAddr();
-	public static final Address Object_proto_valueOf_Addr = newAbstractAddr();
-	public static final Address Object_proto_toString_Addr = newAbstractAddr();
-	public static final Address Object_proto_isPrototypeOf_Addr = newAbstractAddr();
-	public static final Address Object_proto_propertyIsEnumerable_Addr = newAbstractAddr();
-	public static final Address Object_proto_hasOwnProperty_Addr = newAbstractAddr();
-	public static final Address Object_proto_toLocaleString_Addr = newAbstractAddr();
+	public static final Address Object_proto_Addr = Address.createBuiltinAddr();
+	public static final Address Object_proto_valueOf_Addr = Address.createBuiltinAddr();
+	public static final Address Object_proto_toString_Addr = Address.createBuiltinAddr();
+	public static final Address Object_proto_isPrototypeOf_Addr = Address.createBuiltinAddr();
+	public static final Address Object_proto_propertyIsEnumerable_Addr = Address.createBuiltinAddr();
+	public static final Address Object_proto_hasOwnProperty_Addr = Address.createBuiltinAddr();
+	public static final Address Object_proto_toLocaleString_Addr = Address.createBuiltinAddr();
 
 	/* Function abstract addresses. */
-	public static final Address Function_Addr = newAbstractAddr();
+	public static final Address Function_Addr = Address.createBuiltinAddr();
 
 	/* Function.prototype abstract addresses. */
-	public static final Address Function_proto_Addr = newAbstractAddr();
-	public static final Address Function_proto_toString_Addr = newAbstractAddr();
-	public static final Address Function_proto_apply_Addr = newAbstractAddr();
-	public static final Address Function_proto_call_Addr = newAbstractAddr();
+	public static final Address Function_proto_Addr = Address.createBuiltinAddr();
+	public static final Address Function_proto_toString_Addr = Address.createBuiltinAddr();
+	public static final Address Function_proto_apply_Addr = Address.createBuiltinAddr();
+	public static final Address Function_proto_call_Addr = Address.createBuiltinAddr();
 
 	/* Needed for internal functions. */
-	public static final Address Dummy_Arguments_Addr = newAbstractAddr();
+	public static final Address Dummy_Arguments_Addr = Address.createBuiltinAddr();
 
 	/* Used to pass the arguments object. */
-	public static final Address Dummy_Addr = newAbstractAddr();
+	public static final Address Dummy_Addr = Address.createBuiltinAddr();
 
 	/**
 	 * @return An initial store with builtin objects.
@@ -95,12 +93,4 @@ public class StoreFactory {
 		return new Store(bValueStore, objectStore);
 	}
 
-	/**
-	 * Initial abstract addresses get negative values Same as in JSAI.
-	 */
-	private static Address newAbstractAddr() {
-		Address address = new Address(uniqueAddress);
-		uniqueAddress--;
-		return address;
-	}
 }

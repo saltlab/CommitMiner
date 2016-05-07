@@ -104,17 +104,4 @@ public class Obj extends SmartHash {
 		return null;
 	}
 
-	/** JavaScript object classes **/
-	public enum JSClass {
-		/* User instantiated object classes. */
-		CObject,					// new Object | {}
-		CFunction,					// function() {...}
-
-		/* Special classes that only exist in the init state. */
-		CObject_Obj,				// Object
-		CObject_prototype_Obj,		// Object.prototype
-		CFunction_Obj,				// Function
-		CFunction_prototype_Obj		// Function.prototype
-	}
-
 }

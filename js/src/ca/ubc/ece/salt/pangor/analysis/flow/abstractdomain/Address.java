@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,23 +11,23 @@ import java.util.Set;
 public class Address extends SmartHash {
 
 	/** A unique address for builtins. **/
-	private static long builtinAddress = -1;
+	private static BigInteger builtinAddress = BigInteger.valueOf(-1);
 
 	/** The address. **/
-	private long address;
+	public BigInteger addr;
 
 	/**
-	 * @param addr The abstract address.
+	 * @param bigInteger The abstract address.
 	 */
-	public Address(long addr) {
-		this.address = addr;
+	public Address(BigInteger bigInteger) {
+		this.addr = bigInteger;
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof Address) {
 			Address a = (Address)o;
-			if(this.address == a.address) return true;
+			if(this.addr == a.addr) return true;
 		}
 		return false;
 	}
@@ -52,7 +53,7 @@ public class Address extends SmartHash {
 	 */
 	public static synchronized Address createBuiltinAddr() {
 		Address address = new Address(builtinAddress);
-		builtinAddress--;
+		builtinAddress.subtract(BigInteger.valueOf(-1));
 		return address;
 	}
 

@@ -3,7 +3,6 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 import java.util.Set;
 import java.util.Stack;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.JSClass;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 
 /**

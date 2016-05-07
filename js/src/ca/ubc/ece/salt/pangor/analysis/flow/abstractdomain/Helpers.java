@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj.JSClass;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 
 public class Helpers {
