@@ -27,6 +27,7 @@ public class StackCFA extends Trace {
 	private Stack<Integer> tr;
 
 	public StackCFA(int k, int h, int pp, Stack<Integer> tr) {
+		if(h > k) throw new Error("heap sensitivity must be <= stack sensitivity");
 		this.k = k;
 		this.h = h;
 		this.pp = pp;
