@@ -63,7 +63,7 @@ public class EnvironmentFactory {
 		List<Name> localVars = VariableLiftVisitor.getVariableDeclarations(function);
 		for(Name localVar : localVars) {
 			Address address = trace.makeAddr(localVar.getID());
-			env = env.strongUpdate(localVar.toString(), new Addresses(address));
+			env = env.strongUpdate(localVar.toSource(), new Addresses(address));
 			store = store.alloc(address, Undefined.inject(Undefined.top()));
 		}
 
