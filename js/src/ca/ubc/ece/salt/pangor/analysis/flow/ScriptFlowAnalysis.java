@@ -12,6 +12,7 @@ import org.mozilla.javascript.ast.ScriptNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Helpers;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StateFactory;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
@@ -34,13 +35,21 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		}
 
 		/* Create the initial state. */
-		@SuppressWarnings("unused")
 		State state = StateFactory.createInitialState((ScriptNode) root, cfgMap);
 
 		/* Perform the initial analysis and get the publicly accessible methods. */
+		state = Helpers.run(cfgMap.get(root), state);
+
+		// TODO
+		/* Analyze the publicly accessible methods that weren't analyzed in
+		 * the main analysis. */
+
+		// TODO
+		/* Generate facts from the results of the analysis. */
+
 		state = null;
-		// TODO after testing
 
 	}
+
 
 }

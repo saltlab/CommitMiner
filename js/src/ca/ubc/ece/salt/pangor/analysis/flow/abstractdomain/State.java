@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+import ca.ubc.ece.salt.pangor.analysis.flow.IState;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -7,13 +8,14 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 /**
  * Stores the state of the function analysis at a point in the CFG.
  */
-public class State {
+public class State implements IState {
 
 	/* The abstract domains that make up the program state. The abstract
 	 * domains have access to each other. */
 
 	public Environment environment;
 	public Store store;
+	public Scratchpad scratchpad;
 	public Trace trace;
 
 	/**
@@ -21,20 +23,21 @@ public class State {
 	 * @param store The abstract store of the new state.
 	 * @param environment The abstract environment of the new state.
 	 */
-	public State(Store store, Environment environment, Trace trace) {
+	public State(Store store, Environment environment, Scratchpad scratchpad, Trace trace) {
 		this.store = store;
 		this.environment = environment;
+		this.scratchpad = scratchpad;
 		this.trace = trace;
 	}
 
 	public State transfer(CFGEdge edge) {
-		//this.environment = (Environment) this.environment.transfer(edge);
-		return null;
+		// TODO Auto-generated method stub
+		return this;
 	}
 
 	public State transfer(CFGNode node) {
 		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	/**
@@ -44,11 +47,13 @@ public class State {
 	 */
 	public State join(State state) {
 
+		if(state == null) return this;
 		if(this.trace != state.trace) throw new Error("Cannot join states with different traces.");
 
 		State joined = new State(
 				this.store.join(state.store),
 				this.environment.join(state.environment),
+				this.scratchpad.join(state.scratchpad),
 				this.trace);
 
 		return joined;

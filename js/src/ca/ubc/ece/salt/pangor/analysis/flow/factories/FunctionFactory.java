@@ -64,7 +64,7 @@ public class FunctionFactory {
 					store = store.alloc(address, retVal);
 					environment.strongUpdate(x, new Addresses(address));
 
-					return new State(store, environment, trace);
+					return new State(store, environment, scratchpad, trace);
 				}
 			};
 

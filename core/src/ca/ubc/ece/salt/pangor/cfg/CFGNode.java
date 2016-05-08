@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
+import ca.ubc.ece.salt.pangor.analysis.flow.IState;
 
 /**
  * A control flow graph node and abstract state for flow analysis.
@@ -35,7 +35,7 @@ public class CFGNode {
 	 * state has not yet been transfered over the term (statement) in this
 	 * node. The state is language dependent.
 	 */
-	private IAbstractDomain state;
+	private IState state;
 
 	/**
 	 * @param statement The statement that is executed when this node is
@@ -67,14 +67,14 @@ public class CFGNode {
 	 * Set the lattice element at this point in the program.
 	 * @param as The abstract state.
 	 */
-	public void setState(IAbstractDomain state) {
+	public void setState(IState state) {
 		this.state = state;
 	}
 
 	/**
 	 * @return the abstract state at this point in the program.
 	 */
-	public IAbstractDomain getState() {
+	public IState getState() {
 		return this.state;
 	}
 

@@ -2,7 +2,7 @@ package ca.ubc.ece.salt.pangor.cfg;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.flow.IAbstractDomain;
+import ca.ubc.ece.salt.pangor.analysis.flow.IState;
 
 /**
  * A labeled, directed edge to another node.
@@ -33,7 +33,7 @@ public class CFGEdge {
 	 * state has not yet been transfered over the term (statement) in this
 	 * node. The state is language dependent.
 	 */
-	private IAbstractDomain state;
+	private IState state;
 
 	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to) {
 		this.condition = condition;
@@ -55,14 +55,14 @@ public class CFGEdge {
 	 * Set the abstract state at this point in the program.
 	 * @param as The abstract state.
 	 */
-	public void setState(IAbstractDomain state) {
+	public void setState(IState state) {
 		this.state = state;
 	}
 
 	/**
 	 * @return the lattice element at this point in the program.
 	 */
-	public IAbstractDomain getState() {
+	public IState getState() {
 		return this.state;
 	}
 

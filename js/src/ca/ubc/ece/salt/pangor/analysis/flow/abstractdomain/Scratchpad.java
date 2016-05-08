@@ -11,7 +11,11 @@ import java.util.Map;
 public class Scratchpad extends SmartHash {
 
 	/** The values in this memory. **/
-	Map<String, BValue> values;
+	private Map<String, BValue> values;
+
+	public Scratchpad() {
+		this.values = new HashMap<String, BValue>();
+	}
 
 	/**
 	 * @param values The values in scratchpad memory.

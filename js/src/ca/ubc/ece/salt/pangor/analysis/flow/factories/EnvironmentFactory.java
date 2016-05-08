@@ -14,6 +14,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.FunctionClosure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Helpers;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Undefined;
@@ -82,7 +83,7 @@ public class EnvironmentFactory {
 			store = store.alloc(address, Address.inject(address));
 		}
 
-		return new State(store, env, trace);
+		return new State(store, env, new Scratchpad(), trace);
 
 	}
 
