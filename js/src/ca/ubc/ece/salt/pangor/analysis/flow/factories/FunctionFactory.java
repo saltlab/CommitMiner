@@ -19,6 +19,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Str;
+import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 
 public class FunctionFactory {
 
@@ -56,14 +57,14 @@ public class FunctionFactory {
 				@Override
 				public State run(BValue selfAddr, BValue argArrayAddr, String x,
 								 Environment environment, Store store,
-								 Scratchpad scratchpad) {
+								 Scratchpad scratchpad, Trace trace) {
 					BValue retVal = value;
 					Address address = Address.createBuiltinAddr();
 
 					store = store.alloc(address, retVal);
 					environment.strongUpdate(x, new Addresses(address));
 
-					return new State(store, environment);
+					return new State(store, environment, trace);
 				}
 			};
 

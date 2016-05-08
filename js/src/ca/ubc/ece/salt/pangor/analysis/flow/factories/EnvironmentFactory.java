@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
@@ -16,6 +17,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Helpers;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Undefined;
+import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
@@ -32,13 +34,14 @@ public class EnvironmentFactory {
 	 * computed. Variables that point to functions are initialized recursively
 	 * so that their closure can be properly computed.
 	 * @param script The root of the AST for the file under analysis.
-	 * @param σ The initial store, variable values and functions will be
+	 * @param store The initial store, variable values and functions will be
 	 * 			initialized here.
+	 * @param trace The trace, which should be empty initially.
 	 * @return The initial ρ ∈ Environment
 	 */
-	public static State createInitialEnvironment(ScriptNode script, Store store, Map<AstNode, CFG> cfgs) {
+	public static State createInitialEnvironment(ScriptNode script, Store store, Map<AstNode, CFG> cfgs, Trace trace) {
 		Environment env = createBaseEnvironment();
-		return createEnvironment(env, store, script, cfgs);
+		return createEnvironment(env, store, script, cfgs, trace);
 	}
 
 	/**
@@ -49,17 +52,18 @@ public class EnvironmentFactory {
 	 * @param function The code we are analyzing.
 	 * @param cfgs The control flow graphs for the file. Needed for
 	 * 			   initializing lifted functions.
-	 *
+	 * @param trace The program trace including the call site of this function.
 	 */
 	public static State createEnvironment(Environment env, Store store,
-															 ScriptNode function,
-															 Map<AstNode, CFG> cfgs) {
+										  ScriptNode function,
+										  Map<AstNode, CFG> cfgs,
+										  Trace trace ) {
 
 		/* Lift variables into the function's environment and initialize to undefined. */
-		List<String> variableNames = VariableLiftVisitor.getVariableDeclarations(function);
-		for(String variableName : variableNames) {
-			Address address = null; // TODO: How do we create a new address?
-			env = env.strongUpdate(variableName, new Addresses(address));
+		List<Name> localVars = VariableLiftVisitor.getVariableDeclarations(function);
+		for(Name localVar : localVars) {
+			Address address = trace.makeAddr(localVar.getID());
+			env = env.strongUpdate(localVar.toString(), new Addresses(address));
 			store = store.alloc(address, Undefined.inject(Undefined.top()));
 		}
 
@@ -67,19 +71,18 @@ public class EnvironmentFactory {
 		List<FunctionNode> children = FunctionLiftVisitor.getFunctionDeclarations(function);
 		for(FunctionNode child : children) {
 			if(child.getName().isEmpty()) continue; // Not accessible.
-			Address address = null; // TODO: How do we create a new address?
+			Address address = trace.makeAddr(child.getID());
 			env = env.strongUpdate(child.getName(),  new Addresses(address));
 
 			/* Create a function object. */
-			Address functionAddress = null; // TODO: How do we create a new address?
 			Closure closure = new FunctionClosure(cfgs.get(child), env);
-			store = store.alloc(functionAddress, Helpers.createFunctionObj(closure));
+			store = store.alloc(address, Helpers.createFunctionObj(closure));
 
 			/* The function name variable points to out new function. */
-			store = store.alloc(address, Address.inject(functionAddress));
+			store = store.alloc(address, Address.inject(address));
 		}
 
-		return new State(store, env);
+		return new State(store, env, trace);
 
 	}
 

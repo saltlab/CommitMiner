@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
@@ -20,7 +21,8 @@ public class FunctionClosure extends Closure {
 
 	@Override
 	public State run(BValue selfAddr, BValue argArrayAddr, String x,
-			Environment environment, Store store, Scratchpad scratchpad) {
+			Environment environment, Store store, Scratchpad scratchpad,
+			Trace trace) {
 		// TODO Auto-generated method stub
 		return null;
 	}

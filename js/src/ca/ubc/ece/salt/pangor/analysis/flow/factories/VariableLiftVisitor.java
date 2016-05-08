@@ -21,7 +21,7 @@ public class VariableLiftVisitor implements NodeVisitor {
 	 * @return The list of parameters and variables declared in the script or
 	 * 		   function.
 	 */
-	public static List<String> getVariableDeclarations(ScriptNode script) {
+	public static List<Name> getVariableDeclarations(ScriptNode script) {
 		VariableLiftVisitor visitor = new VariableLiftVisitor(script);
 		script.visit(visitor);
 		return visitor.variableDeclarations;
@@ -31,23 +31,23 @@ public class VariableLiftVisitor implements NodeVisitor {
 	private ScriptNode script;
 
 	/** The list of variables to be lifted. **/
-	private List<String> variableDeclarations;
+	private List<Name> variableDeclarations;
 
 	private VariableLiftVisitor(ScriptNode script) {
 
 		this.script = script;
-		this.variableDeclarations = new LinkedList<String>();
+		this.variableDeclarations = new LinkedList<Name>();
 
 		/* Get the parameters if this is a function. */
 		if(script instanceof FunctionNode) {
 			FunctionNode function = (FunctionNode) script;
 			for(AstNode param : function.getParams()) {
-				if(param instanceof Name){
-					this.variableDeclarations.add(param.toSource());
-				}
+				if(param instanceof Name)
+					this.variableDeclarations.add((Name)param);
 				else if(param instanceof InfixExpression) {
 					InfixExpression ie = (InfixExpression) param;
-					this.variableDeclarations.add(ie.getLeft().toSource());
+					if(ie.getLeft() instanceof Name)
+						this.variableDeclarations.add((Name)ie.getLeft());
 				}
 			}
 		}
@@ -66,7 +66,7 @@ public class VariableLiftVisitor implements NodeVisitor {
 			VariableDeclaration vd = (VariableDeclaration)node;
 			for(VariableInitializer vi : vd.getVariables()) {
 				if(vi.getTarget() instanceof Name)
-					this.variableDeclarations.add(vi.getTarget().toSource());
+					this.variableDeclarations.add((Name)vi.getTarget());
 			}
 		}
 
