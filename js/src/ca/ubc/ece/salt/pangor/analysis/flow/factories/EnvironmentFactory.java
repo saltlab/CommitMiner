@@ -1,6 +1,5 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.factories;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,54 +43,44 @@ public class EnvironmentFactory {
 	}
 
 	/**
-	 * Completes the environment for the function or script.
+	 * Completes the environment for the function or script by lifting
+	 * variables and function definitions.
+	 * @param env The environment (or closure) in which the function executes.
+	 * @param store The current store.
+	 * @param function The code we are analyzing.
+	 * @param cfgs The control flow graphs for the file. Needed for
+	 * 			   initializing lifted functions.
+	 *
 	 */
-	public static void createEnvironment(Environment env, Store store,
-										 ScriptNode function,
-										 Map<AstNode, CFG> cfgs) {
+	public static Pair<Environment, Store> createEnvironment(Environment env, Store store,
+															 ScriptNode function,
+															 Map<AstNode, CFG> cfgs) {
 
-		/* Create the environment for this function. */
+		/* Lift variables into the function's environment and initialize to undefined. */
 		List<String> variableNames = VariableLiftVisitor.getVariableDeclarations(function);
-		List<Address> variableAddresses = new LinkedList<Address>();
 		for(String variableName : variableNames) {
 			Address address = null; // TODO: How do we create a new address?
-			env.strongUpdate(variableName, new Addresses(address));
+			env = env.strongUpdate(variableName, new Addresses(address));
+			store = store.alloc(address, Undefined.inject(Undefined.top()));
 		}
 
+		/* Get a list of function declarations to lift into the function's environment. */
 		List<FunctionNode> children = FunctionLiftVisitor.getFunctionDeclarations(function);
-		List<Pair<FunctionNode, Address>> functionAddresses = new LinkedList<Pair<FunctionNode, Address>>();
 		for(FunctionNode child : children) {
 			if(child.getName().isEmpty()) continue; // Not accessible.
 			Address address = null; // TODO: How do we create a new address?
-			env.strongUpdate(child.getName(),  new Addresses(address));
+			env = env.strongUpdate(child.getName(),  new Addresses(address));
+
+			/* Create a function object. */
+			Address functionAddress = null; // TODO: How do we create a new address?
+			Closure closure = new FunctionClosure(cfgs.get(child), env);
+			store = store.alloc(functionAddress, Helpers.createFunctionObj(closure));
+
+			/* The function name variable points to out new function. */
+			store = store.alloc(address, Address.inject(functionAddress));
 		}
 
-		/* All variables point to undefined in the store. */
-		for(Address variableAddress : variableAddresses) {
-			store.alloc(variableAddress, Undefined.inject(Undefined.top()));
-		}
-
-		/* Functions point to function objects in the store. */
-		for(Pair<FunctionNode, Address> functionAddress : functionAddresses) {
-
-			/* Create the environment for this function. */
-			Environment functionEnvironment = new Environment();
-			createEnvironment(functionEnvironment, store, functionAddress.getLeft(), cfgs);
-
-			/* Merge this functions environment with the child's environment
-			 * (JS closure). */
-			for(String var : env.environment.keySet()) {
-				if(!functionEnvironment.environment.containsKey(var)) {
-					functionEnvironment.environment.put(var, env.environment.get(var));
-				}
-			}
-
-			/* Create the new closure. */
-			Closure closure = new FunctionClosure(cfgs.get(functionAddress.getLeft()), functionEnvironment);
-
-			/* Allocate the object on the store. */
-			store.alloc(functionAddress.getRight(), Helpers.createFunctionObj(closure));
-		}
+		return Pair.of(env, store);
 
 	}
 

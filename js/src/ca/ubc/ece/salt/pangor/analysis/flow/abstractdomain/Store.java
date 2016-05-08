@@ -27,8 +27,7 @@ public class Store {
 	 * Changes to the store are driven by changes to the environment.
 	 */
 	public Store() {
-		/* Right now we only have an empty store.
-		 * TODO: initialize the store with built-in objects. */
+		/* Right now we only have an empty store. */
 		this.bValueStore = new HashMap<Address, BValue>();
 	}
 

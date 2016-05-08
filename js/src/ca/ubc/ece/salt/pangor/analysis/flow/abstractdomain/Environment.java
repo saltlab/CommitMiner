@@ -42,20 +42,26 @@ public class Environment extends SmartHash {
 	 * Performs a weak update on a variable in the environment.
 	 * @param variable The variable to update.
 	 * @param addresses The addresses for the variable.
+	 * @return The updated environment.
 	 */
-	public void weakUpdate(String variable, Addresses addresses) {
-		Addresses left = this.environment.get(variable);
-		if(left == null) this.environment.put(variable, addresses);
-		else this.environment.put(variable, left.weakUpdate(addresses.addresses));
+	public Environment weakUpdate(String variable, Addresses addresses) {
+		Map<String, Addresses> map = new HashMap<String, Addresses>(this.environment);
+		Addresses left = map.get(variable);
+		if(left == null) map.put(variable, addresses);
+		else map.put(variable, left.weakUpdate(addresses.addresses));
+		return new Environment(map);
 	}
 
 	/**
 	 * Performs a strong update on a variable in the environment.
 	 * @param variable The variable to update.
 	 * @param address The address for the variable.
+	 * @return The updated environment.
 	 */
-	public void strongUpdate(String variable, Addresses addresses) {
-		environment.put(variable, addresses);
+	public Environment strongUpdate(String variable, Addresses addresses) {
+		Map<String, Addresses> map = new HashMap<String, Addresses>(this.environment);
+		map.put(variable, addresses);
+		return new Environment(map);
 	}
 
 	/**
