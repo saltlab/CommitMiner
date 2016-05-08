@@ -3,7 +3,6 @@ package ca.ubc.ece.salt.pangor.analysis.flow.factories;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.ScriptNode;
@@ -14,6 +13,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.FunctionClosure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Helpers;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Undefined;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
@@ -36,10 +36,9 @@ public class EnvironmentFactory {
 	 * 			initialized here.
 	 * @return The initial ρ ∈ Environment
 	 */
-	public static Environment createInitialEnvironment(ScriptNode script, Store store, Map<AstNode, CFG> cfgs) {
+	public static State createInitialEnvironment(ScriptNode script, Store store, Map<AstNode, CFG> cfgs) {
 		Environment env = createBaseEnvironment();
-		createEnvironment(env, store, script, cfgs);
-		return env;
+		return createEnvironment(env, store, script, cfgs);
 	}
 
 	/**
@@ -52,7 +51,7 @@ public class EnvironmentFactory {
 	 * 			   initializing lifted functions.
 	 *
 	 */
-	public static Pair<Environment, Store> createEnvironment(Environment env, Store store,
+	public static State createEnvironment(Environment env, Store store,
 															 ScriptNode function,
 															 Map<AstNode, CFG> cfgs) {
 
@@ -80,7 +79,7 @@ public class EnvironmentFactory {
 			store = store.alloc(address, Address.inject(functionAddress));
 		}
 
-		return Pair.of(env, store);
+		return new State(store, env);
 
 	}
 
