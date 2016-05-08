@@ -37,7 +37,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		@SuppressWarnings("unused")
 		State state = StateFactory.createInitialState((ScriptNode) root, cfgMap);
 
-		/* Perform the initial analysis and get the publically accessible methods. */
+		/* Perform the initial analysis and get the publicly accessible methods. */
 		state = null;
 		// TODO after testing
 

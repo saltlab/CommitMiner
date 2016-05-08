@@ -89,8 +89,8 @@ public class Store {
 	public Store alloc(Address address, BValue value) {
 		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>(this.bValueStore);
 		BValue left = bValueStore.get(address);
-		if(left == null) this.bValueStore.put(address, value);
-		else this.bValueStore.put(address, left.join(value));
+		if(left == null) bValueStore.put(address, value);
+		else bValueStore.put(address, left.join(value));
 		return new Store(bValueStore, this.objectStore);
 	}
 
@@ -104,8 +104,8 @@ public class Store {
 	public Store alloc(Address address, Obj object) {
 		Map<Address, Obj> objectStore = new HashMap<Address, Obj>(this.objectStore);
 		Obj left = objectStore.get(address);
-		if(left == null) this.objectStore.put(address, object);
-		else this.objectStore.put(address,  left.join(object));
+		if(left == null) objectStore.put(address, object);
+		else objectStore.put(address,  left.join(object));
 		return new Store(this.bValueStore, objectStore);
 	}
 
