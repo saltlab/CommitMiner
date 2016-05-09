@@ -1,8 +1,6 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 
@@ -66,8 +64,8 @@ public class InternalObjectProperties {
 	/**
 	 * @return The set of closures. Empty if this object is not a function.
 	 */
-	public Set<Closure> getCode() {
-		return new HashSet<Closure>();
+	public Closure getCode() {
+		return null;
 	}
 
 }

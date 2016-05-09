@@ -2,11 +2,20 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.ast.Name;
+import org.mozilla.javascript.ast.ScriptNode;
+
+import ca.ubc.ece.salt.pangor.analysis.flow.factories.FunctionLiftVisitor;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
+import ca.ubc.ece.salt.pangor.analysis.flow.factories.VariableLiftVisitor;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
@@ -21,15 +30,12 @@ public class Helpers {
 	 */
 	public static Obj createFunctionObj(Closure closure) {
 
-		Set<Closure> closures = new HashSet<Closure>();
-		closures.add(closure);
-
 		Map<String, BValue> external = new HashMap<String, BValue>();
 		external.put("length", Num.inject(Num.top()));
 
 		InternalFunctionProperties internal = new InternalFunctionProperties(
 				Address.inject(StoreFactory.Function_proto_Addr),
-				closures,
+				closure,
 				JSClass.CFunction);
 
 		return new Obj(external, internal, external.keySet());
@@ -97,21 +103,91 @@ public class Helpers {
 
 	}
 
+	/**
+	 *
+	 * @param fun The address(es) of the function object to execute.
+	 * @param self The value of 'this' when executing the function.
+	 * @param args The address of the arguments object.
+	 * @param x The variable to store the return value.
+	 * @param env The environment of the caller.
+	 * @param store The store at the caller.
+	 * @param sp Scratchpad memory.
+	 * @param trace The trace at the caller.
+	 * @return
+	 */
 	public State applyClosure(BValue fun, BValue self, BValue args,
 							  String x, Environment env, Store store,
 							  Scratchpad sp, Trace trace) {
 
-		/* Lift variables and function declarations into the environment. */
+		State state = null;
 
-		/* 'this' should point to 'self' in the environment. */
+		/* Get the results for each possible function. */
+		for(Address address : fun.addressAD.addresses) {
 
-		/* Match parameters to arguments and update the environment. */
+			/* Get the function object to execute. */
+			Obj functObj = store.getObj(address);
 
-		/* Create the return value x in the scratchpad. */
+			/* Ignore addresses that don't resolve to objects. */
+			if(functObj == null || !(functObj.internalProperties
+									 instanceof InternalFunctionProperties)) {
+				continue;
+			}
+			InternalFunctionProperties ifp =
+					(InternalFunctionProperties)functObj.internalProperties;
 
-		/* Run the function. */
+			/* Run the function. */
+			State endState = ifp.closure.run(self, args, x, env, store, sp, trace);
 
-		return null;
+			/* Join the states. */
+			if(state == null) state = endState;
+			else state = state.join(endState);
+
+		}
+
+		return state;
+
+	}
+
+	/**
+	 * Lifts local variables and function definitions into the environment.
+	 * @param env The environment (or closure) in which the function executes.
+	 * @param store The current store.
+	 * @param function The code we are analyzing.
+	 * @param cfgs The control flow graphs for the file. Needed for
+	 * 			   initializing lifted functions.
+	 * @param trace The program trace including the call site of this function.
+	 */
+	public static Pair<Environment, Store> lift(Environment env,
+										  Store store,
+										  ScriptNode function,
+										  Map<AstNode, CFG> cfgs,
+										  Trace trace ) {
+	
+		/* Lift variables into the function's environment and initialize to undefined. */
+		List<Name> localVars = VariableLiftVisitor.getVariableDeclarations(function);
+		for(Name localVar : localVars) {
+			Address address = trace.makeAddr(localVar.getID());
+			env = env.strongUpdate(localVar.toSource(), new Addresses(address));
+			store = store.alloc(address, Undefined.inject(Undefined.top()));
+		}
+	
+		/* Get a list of function declarations to lift into the function's environment. */
+		List<FunctionNode> children = FunctionLiftVisitor.getFunctionDeclarations(function);
+		for(FunctionNode child : children) {
+			if(child.getName().isEmpty()) continue; // Not accessible.
+			Address address = trace.makeAddr(child.getID());
+			env = env.strongUpdate(child.getName(),  new Addresses(address));
+	
+			/* Create a function object. */
+			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
+			store = store.alloc(address, createFunctionObj(closure));
+	
+			/* The function name variable points to out new function. */
+			store = store.alloc(address, Address.inject(address));
+		}
+	
+		return Pair.of(env, store);
+	
 	}
 
 }

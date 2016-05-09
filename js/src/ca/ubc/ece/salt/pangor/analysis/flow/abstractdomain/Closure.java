@@ -19,7 +19,7 @@ public abstract class Closure extends SmartHash {
 	 * @return The new state after executing the function.
 	 */
 	public abstract State run(BValue selfAddr, BValue argArrayAddr, String x,
-			  				  Environment environment, Store store,
+			  				  Environment env, Store store,
 			  				  Scratchpad scratchpad, Trace trace);
 
 }

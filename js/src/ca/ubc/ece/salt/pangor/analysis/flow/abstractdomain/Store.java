@@ -109,4 +109,35 @@ public class Store {
 		return new Store(this.bValueStore, objectStore);
 	}
 
+	/**
+	 * @param address The address of the base value to retrieve.
+	 * @return The BValue at the address or null if the BValue does not exist.
+	 */
+	public BValue apply(Address address) {
+		return this.bValueStore.get(address);
+	}
+
+	/**
+	 * @param addresses The possible addresses of the base value to retrieve.
+	 * @return The join of all BValues or null if no BValue exists.
+	 */
+	public BValue apply(Addresses addresses) {
+		BValue bvalue = null;
+		for(Address address : addresses.addresses) {
+			if(bvalue == null)
+				bvalue = this.bValueStore.get(address);
+			else if (this.bValueStore.containsKey(address))
+				bvalue = bvalue.join(this.bValueStore.get(address));
+		}
+		return bvalue;
+	}
+
+	/**
+	 * @param address The address of the object to retrieve.
+	 * @return The object at the address or null if the object does not exist.
+	 */
+	public Obj getObj(Address address) {
+		return this.objectStore.get(address);
+	}
+
 }
