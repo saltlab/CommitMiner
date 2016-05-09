@@ -1,47 +1,40 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Scratchpad memory. This framework differs from JSAI in that it uses variable
- * names directly because there is not intermediate representation. Therefore,
- * unlike JSAI, we will use a map here because we have string identifiers.
+ * Scratchpad memory. Unlike JSAI, we define a fixed set of values that we
+ * store.
  */
 public class Scratchpad extends SmartHash {
 
-	/** The values in this memory. **/
-	private Map<String, BValue> values;
+	/** The scratch memory. **/
+	private BValue[] scratchMem;
 
 	public Scratchpad() {
-		this.values = new HashMap<String, BValue>();
+		this.scratchMem = new BValue[Scratch.values().length];
+	}
+
+	public Scratchpad(BValue[] scratchMem) {
+		this.scratchMem = scratchMem;
 	}
 
 	/**
-	 * @param values The values in scratchpad memory.
+	 * @return The value at the location is scratchpad memory.
 	 */
-	public Scratchpad(Map<String, BValue> values) {
-		this.values = values;
-	}
-
-	/**
-	 * @param scratchVar The variable to look up.
-	 * @return The value in scratchpad memory.
-	 */
-	public BValue apply(String scratchVar) {
-		return this.values.get(scratchVar);
+	public BValue apply(Scratch loc) {
+		return this.scratchMem[loc.val];
 	}
 
 	/**
 	 * Performs a strong update.
-	 * @param scratchVar The variable identifier.
+	 * @param loc The location in scratchpad memory.
 	 * @param value The value to update.
 	 * @return The updated scratchpad.
 	 */
-	public Scratchpad strongUpdate(String scratchVar, BValue value) {
-		Map<String, BValue> values = new HashMap<String, BValue>(this.values);
-		values.put(scratchVar, value);
-		return new Scratchpad(values);
+	public Scratchpad strongUpdate(Scratch loc, BValue retVal) {
+		BValue[] scratchMem = this.scratchMem.clone();
+		scratchMem[loc.val] = retVal;
+		return new Scratchpad(scratchMem);
 	}
 
 	/**
@@ -51,17 +44,29 @@ public class Scratchpad extends SmartHash {
 	 */
 	public Scratchpad join(Scratchpad pad) {
 
-		if(this.values.size() != pad.values.size()) throw new Error("Pad lengths do not match.");
-		if(this == pad) return new Scratchpad(new HashMap<String, BValue>(this.values));
+		BValue[] scratchMem = new BValue[Scratch.values().length];
 
-		Map<String, BValue> values = new HashMap<String, BValue>();
-		for(String scratchVar : this.values.keySet()) {
-			BValue left = this.values.get(scratchVar);
-			BValue right = pad.values.get(scratchVar);
-			values.put(scratchVar, left.join(right));
+		for(int i = 0; i < this.scratchMem.length; i++) {
+			if(this.scratchMem[i] == null) scratchMem[i] = pad.scratchMem[i];
+			else if(pad.scratchMem[i] == null) scratchMem[i] = this.scratchMem[i];
+			else scratchMem[i] = this.scratchMem[i].join(pad.scratchMem[i]);
 		}
-		return new Scratchpad(values);
 
+		return new Scratchpad(scratchMem);
+
+	}
+
+	/**
+	 * The types of values we can store in scratch memory and their locations.
+	 */
+	private enum Scratch {
+		RETVAL(0); 					// A return valu
+
+		private int val;
+
+		private Scratch(int val) {
+			this.val = val;
+		}
 	}
 
 }
