@@ -15,6 +15,10 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
  */
 public class StoreFactory {
 
+	/* Global. */
+	public static final Address global_binding_Addr = Address.createBuiltinAddr();
+	public static final Address global_Addr = Address.createBuiltinAddr();
+
 	/* Object abstract addresses. */
 	public static final Address Object_Addr = Address.createBuiltinAddr();
 	public static final Address Object_create_Addr = Address.createBuiltinAddr();
@@ -60,8 +64,10 @@ public class StoreFactory {
 	 */
 	public static Store createInitialStore() {
 		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>();
-		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
+		bValueStore.put(global_binding_Addr, Address.inject(global_Addr));
 
+		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
+		objectStore.put(global_Addr, GlobalFactory.Global_Obj);
 		objectStore.put(Object_Addr, ObjFactory.Object_Obj);
 		objectStore.put(Object_create_Addr, ObjFactory.Object_create_Obj);
 		objectStore.put(Object_defineProperties_Addr, ObjFactory.Object_defineProperties_Obj);
