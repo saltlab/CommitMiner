@@ -59,7 +59,7 @@ public class Scratchpad extends SmartHash {
 	/**
 	 * The types of values we can store in scratch memory and their locations.
 	 */
-	private enum Scratch {
+	public enum Scratch {
 		RETVAL(0); 					// A return valu
 
 		private int val;

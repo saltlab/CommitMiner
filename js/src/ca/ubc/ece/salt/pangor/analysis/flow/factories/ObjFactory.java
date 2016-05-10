@@ -8,7 +8,6 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Bool;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.JSClass;
@@ -45,9 +44,9 @@ public class ObjFactory {
 
 		NativeClosure closure = new NativeClosure() {
 				@Override
-				public State run(BValue selfAddr, BValue argArrayAddr, String x,
-								 Environment environment, Store store,
-								 Scratchpad scratchpad, Trace trace) {
+				public State run(BValue selfAddr, BValue argArrayAddr,
+								 Store store, Scratchpad scratchpad,
+								 Trace trace) {
 					// TODO: Update the state
 					return null;
 				}

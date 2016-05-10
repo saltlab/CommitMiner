@@ -29,14 +29,13 @@ public class FunctionClosure extends Closure {
 	}
 
 	@Override
-	public State run(BValue selfAddr, BValue argArrayAddr, String x,
-			Environment env, Store store, Scratchpad scratchpad,
-			Trace trace) {
+	public State run(BValue selfAddr, BValue argArrayAddr, Store store,
+			Scratchpad scratchpad, Trace trace) {
 
 		/* Lift local variables and function declarations into the environment. */
-		Pair<Environment, Store> pair = Helpers.lift(env,
+		Pair<Environment, Store> pair = Helpers.lift(this.environment,
 				store, (ScriptNode)cfg.getEntryNode().getStatement(), cfgs, trace);
-		env = pair.getLeft();
+		Environment env = pair.getLeft();
 		store = pair.getRight();
 
 		/* Add 'this' to environment (points to caller's object or new object). */

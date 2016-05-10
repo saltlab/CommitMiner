@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Addresses;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
@@ -16,6 +15,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.NativeClosure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Num;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Str;
@@ -55,16 +55,16 @@ public class FunctionFactory {
 
 		Closure closure = new NativeClosure() {
 				@Override
-				public State run(BValue selfAddr, BValue argArrayAddr, String x,
-								 Environment environment, Store store,
-								 Scratchpad scratchpad, Trace trace) {
+				public State run(BValue selfAddr, BValue argArrayAddr,
+								 Store store, Scratchpad scratchpad,
+								 Trace trace) {
 					BValue retVal = value;
 					Address address = Address.createBuiltinAddr();
 
 					store = store.alloc(address, retVal);
-					environment.strongUpdate(x, new Addresses(address));
+					scratchpad.strongUpdate(Scratch.RETVAL, Address.inject(address));
 
-					return new State(store, environment, scratchpad, trace);
+					return new State(store, new Environment(), scratchpad, trace);
 				}
 			};
 

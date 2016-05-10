@@ -10,6 +10,7 @@ import java.util.Stack;
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
@@ -104,20 +105,16 @@ public class Helpers {
 	}
 
 	/**
-	 *
 	 * @param fun The address(es) of the function object to execute.
 	 * @param self The value of 'this' when executing the function.
 	 * @param args The address of the arguments object.
-	 * @param x The variable to store the return value.
-	 * @param env The environment of the caller.
 	 * @param store The store at the caller.
 	 * @param sp Scratchpad memory.
 	 * @param trace The trace at the caller.
-	 * @return
+	 * @return The final state of the closure.
 	 */
-	public State applyClosure(BValue fun, BValue self, BValue args,
-							  String x, Environment env, Store store,
-							  Scratchpad sp, Trace trace) {
+	public static State applyClosure(BValue fun, BValue self, BValue args,
+							  Store store, Scratchpad sp, Trace trace) {
 
 		State state = null;
 
@@ -136,7 +133,7 @@ public class Helpers {
 					(InternalFunctionProperties)functObj.internalProperties;
 
 			/* Run the function. */
-			State endState = ifp.closure.run(self, args, x, env, store, sp, trace);
+			State endState = ifp.closure.run(self, args, store, sp, trace);
 
 			/* Join the states. */
 			if(state == null) state = endState;
@@ -162,7 +159,7 @@ public class Helpers {
 										  ScriptNode function,
 										  Map<AstNode, CFG> cfgs,
 										  Trace trace ) {
-	
+
 		/* Lift variables into the function's environment and initialize to undefined. */
 		List<Name> localVars = VariableLiftVisitor.getVariableDeclarations(function);
 		for(Name localVar : localVars) {
@@ -170,24 +167,56 @@ public class Helpers {
 			env = env.strongUpdate(localVar.toSource(), new Addresses(address));
 			store = store.alloc(address, Undefined.inject(Undefined.top()));
 		}
-	
+
 		/* Get a list of function declarations to lift into the function's environment. */
 		List<FunctionNode> children = FunctionLiftVisitor.getFunctionDeclarations(function);
 		for(FunctionNode child : children) {
 			if(child.getName().isEmpty()) continue; // Not accessible.
 			Address address = trace.makeAddr(child.getID());
 			env = env.strongUpdate(child.getName(),  new Addresses(address));
-	
+
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
 			store = store.alloc(address, createFunctionObj(closure));
-	
+
 			/* The function name variable points to out new function. */
 			store = store.alloc(address, Address.inject(address));
 		}
-	
+
 		return Pair.of(env, store);
-	
+
+	}
+
+	/**
+	 * Resolves a variable to its BValue in the store. Follows fields and
+	 * function calls as best it can.
+	 * @return The BValue of the name.
+	 */
+	public static BValue resolve(Environment env, Store store, AstNode node) {
+		BValue result = null;
+		if(node instanceof Name) {
+			/* Base case, we have a simple name. */
+			Addresses addresses = env.apply(node.toString());
+			if(addresses == null) return BValue.top();
+			return store.apply(addresses);
+		}
+		else if(node instanceof InfixExpression) {
+			/* We have a qualified name. Recursively find the addresses. */
+			InfixExpression ie = (InfixExpression) node;
+			BValue lhs = resolve(env, store, ie.getLeft());
+			for(Address address : lhs.addressAD.addresses) {
+				Obj object = store.getObj(address);
+				BValue field = object.externalProperties.get(ie.getRight().toSource());
+				if(field == null) return BValue.top();
+				else if(result == null ) result = field;
+				else result = result.join(field);
+			}
+			return result;
+		}
+		else {
+			/* Ignore everything else (e.g., method calls) for now. */
+			return BValue.top();
+		}
 	}
 
 }
