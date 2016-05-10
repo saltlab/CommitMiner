@@ -38,8 +38,8 @@ public class FunctionLiftVisitor implements NodeVisitor {
 	public boolean visit(AstNode node) {
 
 		/* Ignore if this is the function we are analyzing. */
-		if(node instanceof ScriptNode) {
-			if(node == this.script) return true;
+		if(node instanceof ScriptNode && node == this.script) {
+			return true;
 		}
 		/* Capture function statements. */
 		else if(node instanceof FunctionNode) {

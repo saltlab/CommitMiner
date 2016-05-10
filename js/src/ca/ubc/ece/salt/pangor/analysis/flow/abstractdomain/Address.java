@@ -53,7 +53,7 @@ public class Address extends SmartHash {
 	 */
 	public static synchronized Address createBuiltinAddr() {
 		Address address = new Address(builtinAddress);
-		builtinAddress.subtract(BigInteger.valueOf(-1));
+		builtinAddress = builtinAddress.subtract(BigInteger.valueOf(1));
 		return address;
 	}
 

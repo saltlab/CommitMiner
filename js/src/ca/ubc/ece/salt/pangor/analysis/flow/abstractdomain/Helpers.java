@@ -174,14 +174,15 @@ public class Helpers {
 		for(FunctionNode child : children) {
 			if(child.getName().isEmpty()) continue; // Not accessible.
 			Address address = trace.makeAddr(child.getID());
+
+			/* The function name variable points to out new function. */
+			store = store.alloc(address, Address.inject(address));
 			env = env.strongUpdate(child.getName(),  new Addresses(address));
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
 			store = store.alloc(address, createFunctionObj(closure));
 
-			/* The function name variable points to out new function. */
-			store = store.alloc(address, Address.inject(address));
 		}
 
 		return Pair.of(env, store);
