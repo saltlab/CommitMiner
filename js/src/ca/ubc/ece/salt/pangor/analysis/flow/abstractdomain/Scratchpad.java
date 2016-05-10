@@ -14,8 +14,13 @@ public class Scratchpad extends SmartHash {
 		this.scratchMem = new BValue[Scratch.values().length];
 	}
 
-	public Scratchpad(BValue[] scratchMem) {
+	private Scratchpad(BValue[] scratchMem) {
 		this.scratchMem = scratchMem;
+	}
+
+	public Scratchpad(Scratch loc, BValue retVal) {
+		this.scratchMem = new BValue[Scratch.values().length];
+		this.scratchMem[loc.val] = retVal;
 	}
 
 	/**

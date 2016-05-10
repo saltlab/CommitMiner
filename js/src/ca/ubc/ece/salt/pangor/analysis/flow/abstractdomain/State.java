@@ -5,6 +5,7 @@ import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionCall;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.IState;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -57,9 +58,17 @@ public class State implements IState {
 
 				if(obj == null) obj = self;
 
-				/* Call the function and get a join of the new states. */
-				return Helpers.applyClosure(fun, obj, null/*TODO:args*/, this.store,
-											this.scratchpad, this.trace);
+				if(fun.addressAD.le == Addresses.LatticeElement.TOP) {
+					/* If the function was not resolved, we assume the (local)
+					 * state is unchanged, but add BValue.TOP as the return value. */
+					Scratchpad scratchpad = new Scratchpad(Scratch.RETVAL, BValue.top());
+					return new State(this.store, this.environment, scratchpad, this.trace);
+				}
+				else {
+					/* Call the function and get a join of the new states. */
+					return Helpers.applyClosure(fun, obj, null/*TODO:args*/, this.store,
+												this.scratchpad, this.trace);
+				}
 			}
 
 		}

@@ -66,7 +66,6 @@ public class StoreFactory {
 	public static Store createInitialStore() {
 		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>();
 		bValueStore.put(global_binding_Addr, Address.inject(global_Addr));
-		bValueStore.put(Object_binding_Addr, Address.inject(Object_Addr));
 
 		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
 		objectStore.put(global_Addr, GlobalFactory.Global_Obj);

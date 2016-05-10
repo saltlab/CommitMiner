@@ -198,7 +198,7 @@ public class Helpers {
 		BValue result = null;
 		if(node instanceof Name) {
 			/* Base case, we have a simple name. */
-			Addresses addresses = env.apply(node.toString());
+			Addresses addresses = env.apply(node.toSource());
 			if(addresses == null) return BValue.top();
 			return store.apply(addresses);
 		}
