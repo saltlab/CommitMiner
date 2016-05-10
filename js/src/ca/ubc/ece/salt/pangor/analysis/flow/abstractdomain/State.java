@@ -58,7 +58,7 @@ public class State implements IState {
 
 				if(obj == null) obj = self;
 
-				if(fun.addressAD.le == Addresses.LatticeElement.TOP) {
+				if(fun == null) {
 					/* If the function was not resolved, we assume the (local)
 					 * state is unchanged, but add BValue.TOP as the return value. */
 					Scratchpad scratchpad = new Scratchpad(Scratch.RETVAL, BValue.top());
@@ -66,7 +66,8 @@ public class State implements IState {
 				}
 				else {
 					/* Call the function and get a join of the new states. */
-					return Helpers.applyClosure(fun, obj, null/*TODO:args*/, this.store,
+					// TODO args (3rd argument)
+					return Helpers.applyClosure(fun, obj, null, this.store,
 												this.scratchpad, this.trace);
 				}
 			}

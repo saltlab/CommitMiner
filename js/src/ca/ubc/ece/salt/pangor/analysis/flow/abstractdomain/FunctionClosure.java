@@ -26,6 +26,7 @@ public class FunctionClosure extends Closure {
 	public FunctionClosure(CFG cfg, Environment environment, Map<AstNode, CFG> cfgs) {
 		this.cfg = cfg;
 		this.environment = environment;
+		this.cfgs = cfgs;
 	}
 
 	@Override

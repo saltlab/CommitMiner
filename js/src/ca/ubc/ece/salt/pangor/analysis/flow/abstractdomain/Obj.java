@@ -50,7 +50,9 @@ public class Obj extends SmartHash {
 	public Obj(Map<String, BValue> externalProperties,
 				InternalFunctionProperties internalProperties,
 				Set<String> definitelyPresentProperties) {
-
+		this.externalProperties = externalProperties;
+		this.internalProperties = internalProperties;
+		this.definitelyPresentProperties = definitelyPresentProperties;
 	}
 
 	/**
