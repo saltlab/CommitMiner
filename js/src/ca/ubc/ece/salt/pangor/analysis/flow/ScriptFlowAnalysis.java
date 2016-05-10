@@ -15,6 +15,7 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Helpers;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StateFactory;
+import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
@@ -38,7 +39,8 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		State state = StateFactory.createInitialState((ScriptNode) root, cfgMap);
 
 		/* Perform the initial analysis and get the publicly accessible methods. */
-		state = Helpers.run(cfgMap.get(root), state, /*TODO: Global object*/);
+		state = Helpers.run(cfgMap.get(root), state,
+				state.store.apply(StoreFactory.global_Addr));
 
 		// TODO
 		/* Analyze the publicly accessible methods that weren't analyzed in
