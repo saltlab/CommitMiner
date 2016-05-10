@@ -50,7 +50,7 @@ public class FunctionClosure extends Closure {
 		State state = new State(store, env, scratchpad, trace);
 
 		/* Run the analysis on the CFG. */
-		return Helpers.run(cfg, state);
+		return Helpers.run(cfg, state, selfAddr);
 
 	}
 

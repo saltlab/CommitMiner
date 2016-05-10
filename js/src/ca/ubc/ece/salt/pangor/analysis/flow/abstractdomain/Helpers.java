@@ -47,9 +47,10 @@ public class Helpers {
 	 * Runs a script or function.
 	 * @param cfg
 	 * @param state
+	 * @param self The binding of 'this' for the call.
 	 * @return The state after the script has finished.
 	 */
-	public static State run(CFG cfg, State state) {
+	public static State run(CFG cfg, State state, BValue self) {
 
 		/* For terminating a long running analysis. */
 		long edgesVisited = 0;
@@ -72,7 +73,7 @@ public class Helpers {
 			pathState.edge.setState(state);
 
 			/* Transfer the abstract state over the edge. */
-			state = state.transfer(pathState.edge);
+			state = state.transfer(pathState.edge, self);
 
 			/* Join the abstract states from the 'to' node and the current
 			 * edge. */
@@ -80,7 +81,7 @@ public class Helpers {
 			pathState.edge.getTo().setState(state);
 
 			/* Transfer the abstract state over the node. */
-			state = state.transfer(pathState.edge.getTo());
+			state = state.transfer(pathState.edge.getTo(), self);
 
 			/* Add all unvisited edges to the stack.
 			 * We currently only execute loops once. */
@@ -190,7 +191,7 @@ public class Helpers {
 	/**
 	 * Resolves a variable to its BValue in the store. Follows fields and
 	 * function calls as best it can.
-	 * @return The BValue of the name.
+	 * @return The BValue for the variable, function or field.
 	 */
 	public static BValue resolve(Environment env, Store store, AstNode node) {
 		BValue result = null;
@@ -212,6 +213,26 @@ public class Helpers {
 				else result = result.join(field);
 			}
 			return result;
+		}
+		else {
+			/* Ignore everything else (e.g., method calls) for now. */
+			return BValue.top();
+		}
+	}
+
+	/**
+	 * Resolves a function's parent object.
+	 * @return The parent object (this) and the function object.
+	 */
+	public static BValue resolveSelf(Environment env, Store store, AstNode node) {
+		if(node instanceof Name) {
+			/* This is a variable name, not a field. */
+			return null;
+		}
+		else if(node instanceof InfixExpression) {
+			/* We have a qualified name. Recursively find the addresses. */
+			InfixExpression ie = (InfixExpression) node;
+			return resolve(env, store, ie.getLeft());
 		}
 		else {
 			/* Ignore everything else (e.g., method calls) for now. */

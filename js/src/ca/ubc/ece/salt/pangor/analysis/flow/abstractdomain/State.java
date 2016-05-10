@@ -34,12 +34,12 @@ public class State implements IState {
 		this.trace = trace;
 	}
 
-	public State transfer(CFGEdge edge) {
+	public State transfer(CFGEdge edge, BValue self) {
 		// TODO Auto-generated method stub
 		return this;
 	}
 
-	public State transfer(CFGNode node) {
+	public State transfer(CFGNode node, BValue self) {
 
 		AstNode statement = (AstNode)node.getStatement();
 
@@ -51,12 +51,15 @@ public class State implements IState {
 			if(ex instanceof FunctionCall) {
 				FunctionCall fc = (FunctionCall) ex;
 
-				/* Attempt to resolve the function. */
+				/* Attempt to resolve the function and it's parent object. */
 				BValue fun = Helpers.resolve(this.environment, this.store, fc.getTarget());
+				BValue obj = Helpers.resolveSelf(this.environment, this.store, fc.getTarget());
+
+				if(obj == null) obj = self;
 
 				/* Call the function and get a join of the new states. */
-				State state = Helpers.applyClosure(fun, self, null/*TODO:args*/, this.store,
-												   this.scratchpad, this.trace);
+				return Helpers.applyClosure(fun, obj, null/*TODO:args*/, this.store,
+											this.scratchpad, this.trace);
 			}
 
 		}
