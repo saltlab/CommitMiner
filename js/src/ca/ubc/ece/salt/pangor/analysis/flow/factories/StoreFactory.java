@@ -19,6 +19,9 @@ public class StoreFactory {
 	public static final Address global_binding_Addr = Address.createBuiltinAddr();
 	public static final Address global_Addr = Address.createBuiltinAddr();
 
+	/* Arguments. */
+	public static final Address Arguments_Addr = Address.createBuiltinAddr();
+
 	/* Object abstract addresses. */
 	public static final Address Object_binding_Addr = Address.createBuiltinAddr();
 	public static final Address Object_Addr = Address.createBuiltinAddr();
@@ -69,6 +72,7 @@ public class StoreFactory {
 
 		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
 		objectStore.put(global_Addr, GlobalFactory.Global_Obj);
+		objectStore.put(Arguments_Addr, ArgumentsFactory.Arguments_Obj);
 		objectStore.put(Object_Addr, ObjFactory.Object_Obj);
 		objectStore.put(Object_create_Addr, ObjFactory.Object_create_Obj);
 		objectStore.put(Object_defineProperties_Addr, ObjFactory.Object_defineProperties_Obj);

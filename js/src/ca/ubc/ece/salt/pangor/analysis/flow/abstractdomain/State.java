@@ -1,11 +1,15 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionCall;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.IState;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
+import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -36,13 +40,23 @@ public class State implements IState {
 	}
 
 	public State transfer(CFGEdge edge, BValue self) {
-		// TODO Auto-generated method stub
+
+		/* The condition to transfer over. */
+		AstNode condition = (AstNode)edge.getCondition();
+
+		/* Update the trace to the current condition. */
+		this.trace = this.trace.update(condition);
+
 		return this;
 	}
 
 	public State transfer(CFGNode node, BValue self) {
 
+		/* The statement to transfer over. */
 		AstNode statement = (AstNode)node.getStatement();
+
+		/* Update the trace to the current statement. */
+		this.trace = this.trace.update(statement);
 
 		/* Test out a function call. */
 		if(statement instanceof ExpressionStatement) {
@@ -51,6 +65,21 @@ public class State implements IState {
 
 			if(ex instanceof FunctionCall) {
 				FunctionCall fc = (FunctionCall) ex;
+
+				/* Create the argument object. */
+				Map<String, BValue> external = new HashMap<String, BValue>();
+				int i = 0;
+				for(AstNode arg : fc.getArguments()) {
+					BValue val = Helpers.resolve(this.environment, this.store, arg);
+					external.put(String.valueOf(i), val);
+					i++;
+				}
+				InternalObjectProperties internal = new InternalObjectProperties(
+						Address.inject(StoreFactory.Arguments_Addr), JSClass.CFunction);
+				Obj argObj = new Obj(external, internal, external.keySet());
+				Address argAddr = this.trace.makeAddr(ex.getID());
+				this.store = this.store.alloc(argAddr, argObj);
+				BValue args = Address.inject(argAddr);
 
 				/* Attempt to resolve the function and it's parent object. */
 				BValue fun = Helpers.resolve(this.environment, this.store, fc.getTarget());
@@ -66,8 +95,7 @@ public class State implements IState {
 				}
 				else {
 					/* Call the function and get a join of the new states. */
-					// TODO args (3rd argument)
-					return Helpers.applyClosure(fun, obj, null, this.store,
+					return Helpers.applyClosure(fun, args, null, this.store,
 												this.scratchpad, this.trace);
 				}
 			}

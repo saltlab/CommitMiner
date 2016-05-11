@@ -6,6 +6,7 @@ public enum JSClass {
 	/* User instantiated object classes. */
 	CObject(0),					// new Object | {}
 	CFunction(1),					// function() {...}
+	CArguments(3),
 
 	/* Special classes that only exist in the init state. */
 	CObject_Obj(2),				// Object
