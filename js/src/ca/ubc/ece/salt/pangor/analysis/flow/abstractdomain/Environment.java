@@ -12,44 +12,30 @@ import java.util.Map;
 public class Environment extends SmartHash {
 
 	/** The possible memory address for each identifier. **/
-	public Map<String, Addresses> environment;
+	public Map<String, Address> environment;
 
 	/**
 	 * Creates an empty environment.
 	 */
 	public Environment() {
-		this.environment = new HashMap<String, Addresses>();
+		this.environment = new HashMap<String, Address>();
 	}
 
 	/**
 	 * Creates an environment from an existing set of addresses.
 	 * @param env The environment to replicate.
 	 */
-	private Environment(Map<String, Addresses> env) {
+	private Environment(Map<String, Address> env) {
 		this.environment = env;
 	}
 
 	/**
-	 * Retrieve a variable's addresses.
+	 * Retrieve a variable's address.
 	 * @param x The variable.
-	 * @return The set of possible addresses.
+	 * @return The store address of the var.
 	 */
-	public Addresses apply(String x) {
+	public Address apply(String x) {
 		return this.environment.get(x);
-	}
-
-	/**
-	 * Performs a weak update on a variable in the environment.
-	 * @param variable The variable to update.
-	 * @param addresses The addresses for the variable.
-	 * @return The updated environment.
-	 */
-	public Environment weakUpdate(String variable, Addresses addresses) {
-		Map<String, Addresses> map = new HashMap<String, Addresses>(this.environment);
-		Addresses left = map.get(variable);
-		if(left == null) map.put(variable, addresses);
-		else map.put(variable, left.weakUpdate(addresses.addresses));
-		return new Environment(map);
 	}
 
 	/**
@@ -58,9 +44,9 @@ public class Environment extends SmartHash {
 	 * @param address The address for the variable.
 	 * @return The updated environment.
 	 */
-	public Environment strongUpdate(String variable, Addresses addresses) {
-		Map<String, Addresses> map = new HashMap<String, Addresses>(this.environment);
-		map.put(variable, addresses);
+	public Environment strongUpdate(String variable, Address address) {
+		Map<String, Address> map = new HashMap<String, Address>(this.environment);
+		map.put(variable, address);
 		return new Environment(map);
 	}
 
@@ -71,8 +57,19 @@ public class Environment extends SmartHash {
 	 */
 	public Environment join(Environment environment) {
 		Environment joined = new Environment(this.environment);
-		for(Map.Entry<String, Addresses> entry : environment.environment.entrySet()) {
-			joined.weakUpdate(entry.getKey(), entry.getValue());
+
+		/* Because we are only using one address per variable, environments
+		 * should be the same when joined.
+		 *
+		 * If we want to dynamically store unexpected variables (ie. those
+		 * in the global scope from the included JS files), we can merge
+		 * variables by merging the BValue they point. */
+
+		for(Map.Entry<String, Address> entry : environment.environment.entrySet()) {
+			if(!this.environment.containsKey(entry.getKey())
+					|| this.environment.get(entry.getKey()) != entry.getValue()) {
+				throw new Error("environments should be the same");
+			}
 		}
 		return joined;
 	}

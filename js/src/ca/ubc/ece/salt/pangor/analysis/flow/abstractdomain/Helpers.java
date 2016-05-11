@@ -165,7 +165,7 @@ public class Helpers {
 		List<Name> localVars = VariableLiftVisitor.getVariableDeclarations(function);
 		for(Name localVar : localVars) {
 			Address address = trace.makeAddr(localVar.getID());
-			env = env.strongUpdate(localVar.toSource(), new Addresses(address));
+			env = env.strongUpdate(localVar.toSource(), address);
 			store = store.alloc(address, Undefined.inject(Undefined.top()));
 		}
 
@@ -177,7 +177,7 @@ public class Helpers {
 
 			/* The function name variable points to out new function. */
 			store = store.alloc(address, Address.inject(address));
-			env = env.strongUpdate(child.getName(),  new Addresses(address));
+			env = env.strongUpdate(child.getName(), address);
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
@@ -198,9 +198,9 @@ public class Helpers {
 		BValue result = null;
 		if(node instanceof Name) {
 			/* Base case, we have a simple name. */
-			Addresses addresses = env.apply(node.toSource());
-			if(addresses == null) return BValue.top();
-			return store.apply(addresses);
+			Address address = env.apply(node.toSource());
+			if(address == null) return BValue.top();
+			return store.apply(address);
 		}
 		else if(node instanceof InfixExpression) {
 			/* We have a qualified name. Recursively find the addresses. */

@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
@@ -39,10 +41,29 @@ public class FunctionClosure extends Closure {
 		Environment env = pair.getLeft();
 		store = pair.getRight();
 
+		/* Match parameters with arguments. */
+		Obj argObj;
+		for(Address addr : argArrayAddr.addressAD.addresses) {
+			Obj tmp = store.getObj(addr);
+			argObj = argObj == null ? tmp : tmp != null ? argObj.join(tmp) : null;
+		}
+		if(this.cfg.getEntryNode().getStatement() instanceof FunctionNode) {
+			FunctionNode function = (FunctionNode)this.cfg.getEntryNode().getStatement();
+			int i = 0;
+			for(AstNode arg : function.getParams()) {
+				if(arg instanceof Name) {
+					Name name = (Name) arg;
+					BValue argInStore = store.apply(argObj.externalProperties.get(String.valueOf(i)).addressAD);
+					store.alloc(env.apply(name.toSource()), argInStore); // TODO: This should be a strong update.
+				}
+				i++;
+			}
+		}
+
 		/* Add 'this' to environment (points to caller's object or new object). */
 		Address address = trace.makeAddr((int)this.cfg.getEntryNode().getId());
 		store = store.alloc(address, selfAddr);
-		env = env.strongUpdate("this", new Addresses(address));
+		env = env.strongUpdate("this", address);
 
 		/* Match parameter names with arguments. */
 		// TODO
