@@ -114,7 +114,6 @@ public class State implements IState {
 	public State join(State state) {
 
 		if(state == null) return this;
-		if(this.trace != state.trace) throw new Error("Cannot join states with different traces.");
 
 		State joined = new State(
 				this.store.join(state.store),
