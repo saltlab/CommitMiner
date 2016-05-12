@@ -24,9 +24,9 @@ public class FSCI extends Trace {
 	}
 
 	@Override
-	public Trace update(AstNode statement) {
+	public Trace update(int pp) {
 		// Flow sensitive
-		return new FSCI(statement.getID());
+		return new FSCI(pp);
 	}
 
 	@Override

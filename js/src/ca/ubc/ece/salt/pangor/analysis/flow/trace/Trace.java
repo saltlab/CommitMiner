@@ -29,7 +29,7 @@ public abstract class Trace extends SmartHash {
 	}
 
 	/** Update on intraprocedural step. **/
-	public abstract Trace update(AstNode statement);
+	public abstract Trace update(int pp);
 
 	/** Update for function call. **/
 	public abstract Trace update(Environment env, Store store, BValue self,

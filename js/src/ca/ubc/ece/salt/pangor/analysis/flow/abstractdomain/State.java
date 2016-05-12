@@ -41,22 +41,20 @@ public class State implements IState {
 
 	public State transfer(CFGEdge edge, BValue self) {
 
-		/* The condition to transfer over. */
-		AstNode condition = (AstNode)edge.getCondition();
-
 		/* Update the trace to the current condition. */
-		if(condition != null) this.trace = this.trace.update(condition);
+		this.trace = this.trace.update(edge.getId());
 
 		return this;
+
 	}
 
 	public State transfer(CFGNode node, BValue self) {
 
+		/* Update the trace to the current statement. */
+		this.trace = this.trace.update(node.getId());
+
 		/* The statement to transfer over. */
 		AstNode statement = (AstNode)node.getStatement();
-
-		/* Update the trace to the current statement. */
-		if(statement.getID() != null) this.trace = this.trace.update(statement);
 
 		/* Test out a function call. */
 		if(statement instanceof ExpressionStatement) {

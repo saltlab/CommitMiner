@@ -36,9 +36,9 @@ public class StackCFA extends Trace {
 	}
 
 	@Override
-	public Trace update(AstNode statement) {
+	public Trace update(int pp) {
 		// Flow-sensitive
-		return new StackCFA(k, h, statement.getID(), tr);
+		return new StackCFA(k, h, pp, tr);
 	}
 
 	@Override
