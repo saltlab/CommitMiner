@@ -21,19 +21,22 @@ import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 
 public class ArgumentsFactory {
 
-	public static final Obj Arguments_Obj;
-	static {
-		Map<String, BValue> external = new HashMap<String, BValue>();
-		external.put("prototype", Address.inject(StoreFactory.Object_proto_Addr));
-		external.put("length", Num.inject(Num.top()));
+	Store store;
+
+	public ArgumentsFactory(Store store) {
+		this.store = store;
+	}
+
+	public Obj Arguments_Obj() {
+		Map<String, Address> ext = new HashMap<String, Address>();
+		Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr), ext, store);
+		Helpers.addProp("length", Num.inject(Num.top()), ext, store);
 
 		NativeClosure closure = new NativeClosure() {
 				@Override
-				public State run(BValue selfAddr, BValue argArrayAddr,
-//								 String x, // The address to store selfAddr. Why do we have to do this here?
+				public State run(BValue selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace) {
-					/* Add self to the store. */
 					return new State(store, null, scratchpad, trace);
 				}
 			};
@@ -43,7 +46,7 @@ public class ArgumentsFactory {
 
 		InternalObjectProperties internal = new InternalFunctionProperties(closures, JSClass.CArguments);
 
-		Arguments_Obj = new Obj(external, internal, external.keySet());
+		return new Obj(ext, internal, ext.keySet());
 	}
 
 }

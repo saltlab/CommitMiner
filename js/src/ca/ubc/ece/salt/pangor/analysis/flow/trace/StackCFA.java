@@ -52,13 +52,13 @@ public class StackCFA extends Trace {
 	}
 
 	@Override
-	public Address toAddr() {
+	public Address toAddr(String prop) {
 		Stack<Integer> trp = new Stack<Integer>();
 
 		if(tr.size() <= h) trp.addAll(tr);
 		else trp.addAll(tr.subList(0, k-1));
 
-		return new Address(intsToBigInteger(trp, pp));
+		return new Address(intsToBigInteger(trp, pp), prop);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class StackCFA extends Trace {
 		if(tr.size() <= k) trp.addAll(tr);
 		else trp.addAll(tr.subList(0, k-1));
 
-		return new Address(intsToBigInteger(trp, varID));
+		return new Address(intsToBigInteger(trp, varID), "");
 	}
 
 }

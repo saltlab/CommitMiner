@@ -13,23 +13,32 @@ public class Address extends SmartHash {
 	/** A unique address for builtins. **/
 	private static BigInteger builtinAddress = BigInteger.valueOf(-1);
 
-	/** The address. **/
+	/** The hash-able address. **/
 	public BigInteger addr;
+
+	/** The variable or property being declared. */
+	public String prop;
 
 	/**
 	 * @param bigInteger The abstract address.
 	 */
-	public Address(BigInteger bigInteger) {
+	public Address(BigInteger bigInteger, String prop) {
 		this.addr = bigInteger;
+		this.prop = prop;
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if(o instanceof Address) {
 			Address a = (Address)o;
-			if(this.addr == a.addr) return true;
+			if(this.prop.equals(a.prop) && this.addr == a.addr) return true;
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.addr.hashCode();
 	}
 
 	/**
@@ -52,7 +61,16 @@ public class Address extends SmartHash {
 	 * Builtin abstract addresses get negative values Same as in JSAI.
 	 */
 	public static synchronized Address createBuiltinAddr() {
-		Address address = new Address(builtinAddress);
+		Address address = new Address(builtinAddress, "");
+		builtinAddress = builtinAddress.subtract(BigInteger.valueOf(1));
+		return address;
+	}
+
+	/**
+	 * Builtin abstract addresses get negative values Same as in JSAI.
+	 */
+	public static synchronized Address createBuiltinAddr(String prop) {
+		Address address = new Address(builtinAddress, prop);
 		builtinAddress = builtinAddress.subtract(BigInteger.valueOf(1));
 		return address;
 	}

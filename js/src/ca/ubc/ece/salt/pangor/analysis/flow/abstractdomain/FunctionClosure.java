@@ -32,7 +32,7 @@ public class FunctionClosure extends Closure {
 	}
 
 	@Override
-	public State run(BValue selfAddr, BValue argArrayAddr, Store store,
+	public State run(BValue selfAddr, Address argArrayAddr, Store store,
 			Scratchpad scratchpad, Trace trace) {
 
 		/* Lift local variables and function declarations into the environment. */
@@ -42,19 +42,15 @@ public class FunctionClosure extends Closure {
 		store = pair.getRight();
 
 		/* Match parameters with arguments. */
-		Obj argObj;
-		for(Address addr : argArrayAddr.addressAD.addresses) {
-			Obj tmp = store.getObj(addr);
-			argObj = argObj == null ? tmp : tmp != null ? argObj.join(tmp) : null;
-		}
+		Obj argObj = store.getObj(argArrayAddr);
 		if(this.cfg.getEntryNode().getStatement() instanceof FunctionNode) {
 			FunctionNode function = (FunctionNode)this.cfg.getEntryNode().getStatement();
 			int i = 0;
-			for(AstNode arg : function.getParams()) {
-				if(arg instanceof Name) {
-					Name name = (Name) arg;
-					BValue argInStore = store.apply(argObj.externalProperties.get(String.valueOf(i)).addressAD);
-					store.alloc(env.apply(name.toSource()), argInStore); // TODO: This should be a strong update.
+			for(AstNode param : function.getParams()) {
+				if(param instanceof Name) {
+					Name paramName = (Name) param;
+					Address argAddr = argObj.externalProperties.get(String.valueOf(i));
+					env.strongUpdate(paramName.toSource(), argAddr);
 				}
 				i++;
 			}

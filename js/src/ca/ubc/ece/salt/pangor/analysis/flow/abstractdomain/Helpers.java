@@ -25,14 +25,37 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 public class Helpers {
 
 	/**
+	 * Adds a property to the object and allocates the property's value on the
+	 * store.
+	 * @param prop The name of the property to add to the object.
+	 */
+	public static void addProp(String prop, BValue propVal, Map<String, Address> ext, Store store, Trace trace) {
+		Address propAddr = trace.toAddr(prop);
+		store.alloc(propAddr, propVal);
+		ext.put(prop, propAddr);
+	}
+
+	/**
+	 * Adds a property to the object and allocates the property's value on the
+	 * store.
+	 * @param propID The node id of the property being added to the object.
+	 * @param propVal The value of the property.
+	 */
+	public static void addProp(int propID, String prop, BValue propVal, Map<String, Address> ext, Store store, Trace trace) {
+		Address propAddr = trace.makeAddr(propID);
+		store.alloc(propAddr, propVal);
+		ext.put(prop, propAddr);
+	}
+
+	/**
 	 * Creates a regular function from a closure stack.
-	 * @param closures The stack of closures (code and environments).
+	 * @param closures The closure for the function.
 	 * @return The function object.
 	 */
-	public static Obj createFunctionObj(Closure closure) {
+	public static Obj createFunctionObj(Closure closure, Store store, Trace trace) {
 
-		Map<String, BValue> external = new HashMap<String, BValue>();
-		external.put("length", Num.inject(Num.top()));
+		Map<String, Address> external = new HashMap<String, Address>();
+		addProp("length", Num.inject(Num.top()), external, store, trace);
 
 		InternalFunctionProperties internal = new InternalFunctionProperties(
 				Address.inject(StoreFactory.Function_proto_Addr),
@@ -114,7 +137,7 @@ public class Helpers {
 	 * @param trace The trace at the caller.
 	 * @return The final state of the closure.
 	 */
-	public static State applyClosure(BValue fun, BValue self, BValue args,
+	public static State applyClosure(BValue fun, BValue self, Address args,
 							  Store store, Scratchpad sp, Trace trace) {
 
 		State state = null;
@@ -181,7 +204,7 @@ public class Helpers {
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
-			store = store.alloc(address, createFunctionObj(closure));
+			store = store.alloc(address, createFunctionObj(closure, store, trace));
 
 		}
 
@@ -208,10 +231,11 @@ public class Helpers {
 			BValue lhs = resolve(env, store, ie.getLeft());
 			for(Address address : lhs.addressAD.addresses) {
 				Obj object = store.getObj(address);
-				BValue field = object.externalProperties.get(ie.getRight().toSource());
-				if(field == null) return BValue.top();
-				else if(result == null ) result = field;
-				else result = result.join(field);
+				Address propAddr = object.externalProperties.get(ie.getRight().toSource());
+				BValue propVal = store.apply(propAddr);
+				if(propVal == null) return BValue.top();
+				else if(result == null ) result = propVal;
+				else result = result.join(propVal);
 			}
 			return result;
 		}

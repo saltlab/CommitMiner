@@ -23,47 +23,47 @@ import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 
 public class FunctionFactory {
 
-	public static final Obj Function_proto_Obj;
-	static {
-		Map<String, BValue> external = new HashMap<String, BValue>();
-		external.put("external", Num.inject(Num.top()));
-		external.put("apply", Address.inject(StoreFactory.Function_proto_apply_Addr));
-		external.put("call", Address.inject(StoreFactory.Function_proto_call_Addr));
-		external.put("toString", Address.inject(StoreFactory.Function_proto_toString_Addr));
+	private Store store;
+
+	public FunctionFactory(Store store) {
+		this.store = store;
+	}
+
+	public Obj Function_proto_Obj() {
+		Map<String, Address> ext = new HashMap<String, Address>();
+		Helpers.addProp("external", Num.inject(Num.top()), ext, store);
+		Helpers.addProp("apply", Address.inject(StoreFactory.Function_proto_apply_Addr), ext, store);
+		Helpers.addProp("call", Address.inject(StoreFactory.Function_proto_call_Addr), ext, store);
+		Helpers.addProp("toString", Address.inject(StoreFactory.Function_proto_toString_Addr), ext, store);
 
 		InternalObjectProperties internal = new InternalObjectProperties(
 				Address.inject(StoreFactory.Function_proto_Addr),
 				JSClass.CFunction_prototype_Obj);
 
-		Function_proto_Obj = new Obj(external, internal, external.keySet());
+		return new Obj(ext, internal, ext.keySet());
 	}
 
-	// TODO: apply and call need native closures becuase their behaviour
+	// TODO: apply and call need native closures because their behaviour
 	//		 affects the analysis.
-	public static final Obj Function_proto_toString_Obj = FunctionFactory.constFunctionObj(Str.inject(Str.top()));
-	public static final Obj Function_proto_apply_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Function_proto_call_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public Obj Function_proto_toString_Obj() { return constFunctionObj(Str.inject(Str.top())); }
+	public Obj Function_proto_apply_Obj() { return constFunctionObj(BValue.top()); }
+	public Obj Function_proto_call_Obj() { return constFunctionObj(BValue.top()); }
 
 	/**
 	 * Approximate a function which is not modeled.
 	 * @return A function which has no side effects that that returns the
 	 * 		   BValue lattice element top.
 	 */
-	public static Obj constFunctionObj(BValue value) {
+	public static Obj constFunctionObj(BValue retVal) {
 
-		Map<String, BValue> external = new HashMap<String, BValue>();
+		Map<String, Address> external = new HashMap<String, Address>();
 
 		Closure closure = new NativeClosure() {
 				@Override
-				public State run(BValue selfAddr, BValue argArrayAddr,
+				public State run(BValue selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace) {
-					BValue retVal = value;
-					Address address = Address.createBuiltinAddr();
-
-					store = store.alloc(address, retVal);
-					scratchpad.strongUpdate(Scratch.RETVAL, Address.inject(address));
-
+					scratchpad.strongUpdate(Scratch.RETVAL, retVal);
 					return new State(store, new Environment(), scratchpad, trace);
 				}
 			};

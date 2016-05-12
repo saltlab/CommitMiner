@@ -67,19 +67,22 @@ public class State implements IState {
 				FunctionCall fc = (FunctionCall) ex;
 
 				/* Create the argument object. */
-				Map<String, BValue> external = new HashMap<String, BValue>();
+				Map<String, Address> ext = new HashMap<String, Address>();
 				int i = 0;
 				for(AstNode arg : fc.getArguments()) {
-					BValue val = Helpers.resolve(this.environment, this.store, arg);
-					external.put(String.valueOf(i), val);
+					BValue argVal = Helpers.resolve(this.environment, this.store, arg);
+					Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
+									ext, store, trace);
 					i++;
 				}
+
 				InternalObjectProperties internal = new InternalObjectProperties(
 						Address.inject(StoreFactory.Arguments_Addr), JSClass.CFunction);
-				Obj argObj = new Obj(external, internal, external.keySet());
+				Obj argObj = new Obj(ext, internal, ext.keySet());
+
+				/* Add the argument object to the store. */
 				Address argAddr = this.trace.makeAddr(ex.getID());
 				this.store = this.store.alloc(argAddr, argObj);
-				BValue args = Address.inject(argAddr);
 
 				/* Attempt to resolve the function and it's parent object. */
 				BValue fun = Helpers.resolve(this.environment, this.store, fc.getTarget());
@@ -95,7 +98,7 @@ public class State implements IState {
 				}
 				else {
 					/* Call the function and get a join of the new states. */
-					return Helpers.applyClosure(fun, args, null, this.store,
+					return Helpers.applyClosure(fun, self, argAddr, this.store,
 												this.scratchpad, this.trace);
 				}
 			}

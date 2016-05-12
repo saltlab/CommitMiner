@@ -12,7 +12,7 @@ import java.util.Set;
 public class Obj extends SmartHash {
 
 	/** Programmer-visible object properties. **/
-	public Map<String, BValue> externalProperties;
+	public Map<String, Address> externalProperties;
 
 	/** Interpreter-only properties which are invisible to the programmer. **/
 	public InternalObjectProperties internalProperties;
@@ -31,7 +31,7 @@ public class Obj extends SmartHash {
 	 * @param definitelyPresentProperties Properties which are definitely
 	 * 									  present in the object.
 	 */
-	public Obj(Map<String, BValue> externalProperties,
+	public Obj(Map<String, Address> externalProperties,
 					InternalObjectProperties internalProperties,
 					Set<String> definitelyPresentProperties) {
 		this.externalProperties = externalProperties;
@@ -47,7 +47,7 @@ public class Obj extends SmartHash {
 	 * @param definitelyPresentProperties Properties which are definitely
 	 * 									  present in the object.
 	 */
-	public Obj(Map<String, BValue> externalProperties,
+	public Obj(Map<String, Address> externalProperties,
 				InternalFunctionProperties internalProperties,
 				Set<String> definitelyPresentProperties) {
 		this.externalProperties = externalProperties;
@@ -77,11 +77,9 @@ public class Obj extends SmartHash {
 	 * @param property The name of the property to retrieve.
 	 * @return A property or null if it does not exist.
 	 */
-	public BValue apply(String property) {
+	public Address apply(String property) {
 		return this.externalProperties.get(property);
 	}
-
-	public Obj inject() { return null; }
 
 	/**
 	 * Performs a strong update of the object's external properties.

@@ -67,39 +67,48 @@ public class StoreFactory {
 	 * @return An initial store with builtin objects.
 	 */
 	public static Store createInitialStore() {
+
 		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>();
+		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
+
+		Store store = new Store(bValueStore, objectStore);
+
+		ArgumentsFactory af = new ArgumentsFactory(store);
+		ObjFactory of = new ObjFactory(store);
+		FunctionFactory ff = new FunctionFactory(store);
+		GlobalFactory gf = new GlobalFactory(store);
+
 		bValueStore.put(global_binding_Addr, Address.inject(global_Addr));
 
-		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
-		objectStore.put(global_Addr, GlobalFactory.Global_Obj);
-		objectStore.put(Arguments_Addr, ArgumentsFactory.Arguments_Obj);
-		objectStore.put(Object_Addr, ObjFactory.Object_Obj);
-		objectStore.put(Object_create_Addr, ObjFactory.Object_create_Obj);
-		objectStore.put(Object_defineProperties_Addr, ObjFactory.Object_defineProperties_Obj);
-		objectStore.put(Object_defineProperty_Addr, ObjFactory.Object_defineProperty_Obj);
-		objectStore.put(Object_freeze_Addr, ObjFactory.Object_freeze_Obj);
-		objectStore.put(Object_getOwnPropertyDescriptor_Addr, ObjFactory.Object_getOwnPropertyDescriptor_Obj);
-		objectStore.put(Object_getOwnPropertyNames_Addr, ObjFactory.Object_getOwnPropertyNames_Obj);
-		objectStore.put(Object_getPrototypeOf_Addr, ObjFactory.Object_getPrototypeOf_Obj);
-		objectStore.put(Object_isExtensible_Addr, ObjFactory.Object_isExtensible_Obj);
-		objectStore.put(Object_isFrozen_Addr, ObjFactory.Object_isFrozen_Obj);
-		objectStore.put(Object_isSealed_Addr, ObjFactory.Object_isSealed_Obj);
-		objectStore.put(Object_keys_Addr, ObjFactory.Object_keys_Obj);
-		objectStore.put(Object_preventExtensions_Addr, ObjFactory.Object_preventExtensions_Obj);
-		objectStore.put(Object_seal_Addr, ObjFactory.Object_seal_Obj);
-		objectStore.put(Object_proto_Addr, ObjFactory.Object_proto_Obj);
-		objectStore.put(Object_proto_toString_Addr, ObjFactory.Object_proto_toString_Obj);
-		objectStore.put(Object_proto_toLocaleString_Addr, ObjFactory.Object_proto_toLocaleString_Obj);
-		objectStore.put(Object_proto_hasOwnProperty_Addr, ObjFactory.Object_proto_hasOwnProperty_Obj);
-		objectStore.put(Object_proto_isPrototypeOf_Addr, ObjFactory.Object_proto_isPrototypeOf_Obj);
-		objectStore.put(Object_proto_propertyIsEnumerable_Addr, ObjFactory.Object_proto_propertyIsEnumerable_Obj);
-		objectStore.put(Object_proto_valueOf_Addr, ObjFactory.Object_proto_valueOf_Obj);
-		objectStore.put(Function_proto_Addr, FunctionFactory.Function_proto_Obj);
-		objectStore.put(Function_proto_toString_Addr, FunctionFactory.Function_proto_toString_Obj);
-		objectStore.put(Function_proto_apply_Addr, FunctionFactory.Function_proto_apply_Obj);
-		objectStore.put(Function_proto_call_Addr, FunctionFactory.Function_proto_call_Obj);
-//		objectStore.put(Dummy_Arguments_Addr, ObjFactory.Dummy_Arguments_Obj); TODO
-//		objectStore.put(Dummy_Addr, ObjFactory.Dummy_Obj); TODO
+		objectStore.put(global_Addr, gf.Global_Obj());
+		objectStore.put(Arguments_Addr, af.Arguments_Obj());
+		objectStore.put(Object_Addr, of.Object_Obj());
+		objectStore.put(Object_create_Addr, of.Object_create_Obj());
+		objectStore.put(Object_defineProperties_Addr, of.Object_defineProperties_Obj());
+		objectStore.put(Object_defineProperty_Addr, of.Object_defineProperty_Obj());
+		objectStore.put(Object_freeze_Addr, of.Object_freeze_Obj());
+		objectStore.put(Object_getOwnPropertyDescriptor_Addr, of.Object_getOwnPropertyDescriptor_Obj());
+		objectStore.put(Object_getOwnPropertyNames_Addr, of.Object_getOwnPropertyNames_Obj());
+		objectStore.put(Object_getPrototypeOf_Addr, of.Object_getPrototypeOf_Obj());
+		objectStore.put(Object_isExtensible_Addr, of.Object_isExtensible_Obj());
+		objectStore.put(Object_isFrozen_Addr, of.Object_isFrozen_Obj());
+		objectStore.put(Object_isSealed_Addr, of.Object_isSealed_Obj());
+		objectStore.put(Object_keys_Addr, of.Object_keys_Obj());
+		objectStore.put(Object_preventExtensions_Addr, of.Object_preventExtensions_Obj());
+		objectStore.put(Object_seal_Addr, of.Object_seal_Obj());
+		objectStore.put(Object_proto_Addr, of.Object_proto_Obj());
+		objectStore.put(Object_proto_toString_Addr, of.Object_proto_toString_Obj());
+		objectStore.put(Object_proto_toLocaleString_Addr, of.Object_proto_toLocaleString_Obj());
+		objectStore.put(Object_proto_hasOwnProperty_Addr, of.Object_proto_hasOwnProperty_Obj());
+		objectStore.put(Object_proto_isPrototypeOf_Addr, of.Object_proto_isPrototypeOf_Obj());
+		objectStore.put(Object_proto_propertyIsEnumerable_Addr, of.Object_proto_propertyIsEnumerable_Obj());
+		objectStore.put(Object_proto_valueOf_Addr, of.Object_proto_valueOf_Obj());
+		objectStore.put(Function_proto_Addr, ff.Function_proto_Obj());
+		objectStore.put(Function_proto_toString_Addr, ff.Function_proto_toString_Obj());
+		objectStore.put(Function_proto_apply_Addr, ff.Function_proto_apply_Obj());
+		objectStore.put(Function_proto_call_Addr, ff.Function_proto_call_Obj());
+//		objectStore.put(Dummy_Arguments_Addr, of.Dummy_Arguments_Obj); TODO
+//		objectStore.put(Dummy_Addr, of.Dummy_Obj); TODO
 
 		return new Store(bValueStore, objectStore);
 	}

@@ -16,7 +16,7 @@ public abstract class Closure extends SmartHash {
 	 * @param trace The execution trace.
 	 * @return The new state after executing the function.
 	 */
-	public abstract State run(BValue selfAddr, BValue argArrayAddr,
+	public abstract State run(BValue selfAddr, Address argArrayAddr,
 							  Store store, Scratchpad scratchpad,
 							  Trace trace);
 

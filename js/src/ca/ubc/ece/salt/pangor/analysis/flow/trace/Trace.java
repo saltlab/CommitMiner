@@ -41,9 +41,9 @@ public abstract class Trace extends SmartHash {
 	}
 
 	/** Convert the trace directly to an address. **/
-	public abstract Address toAddr();
+	public abstract Address toAddr(String prop);
 
-	/** Make a new address. **/
+	/** Make a new address with a node id instead of a string. **/
 	public abstract Address makeAddr(int varID);
 
 	/** Modify an address to account for an object's class. **/
@@ -51,7 +51,7 @@ public abstract class Trace extends SmartHash {
 		/* We can add an offset directly because our ASTNodes are offset by
 		 * multiples of 16 (so we can have up to 15 classes). */
 		if(traceTypes.contains(c))
-			return new Address(a.addr.add(BigInteger.valueOf(c.getValue())));
+			return new Address(a.addr.add(BigInteger.valueOf(c.getValue())), a.prop);
 		return a;
 	}
 

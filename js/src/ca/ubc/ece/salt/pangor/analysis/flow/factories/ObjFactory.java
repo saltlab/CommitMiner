@@ -20,31 +20,35 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Str;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 
-
 public class ObjFactory {
 
-	public static final Obj Object_Obj;
-	static {
-		Map<String, BValue> external = new HashMap<String, BValue>();
-		external.put("prototype", Address.inject(StoreFactory.Object_proto_Addr));
-		external.put("number", Num.inject(Num.top()));
-		external.put("create", Address.inject(StoreFactory.Object_create_Addr));
-		external.put("defineProperties", Address.inject(StoreFactory.Object_defineProperties_Addr));
-		external.put("defineProperty", Address.inject(StoreFactory.Object_defineProperty_Addr));
-		external.put("freeze", Address.inject(StoreFactory.Object_freeze_Addr));
-		external.put("getOwnPropertyDescriptor", Address.inject(StoreFactory.Object_getOwnPropertyDescriptor_Addr));
-		external.put("getOwnPropertyNames", Address.inject(StoreFactory.Object_getOwnPropertyNames_Addr));
-		external.put("getPrototypeOf", Address.inject(StoreFactory.Object_getPrototypeOf_Addr));
-		external.put("isExtensible", Address.inject(StoreFactory.Object_isExtensible_Addr));
-		external.put("isFrozen", Address.inject(StoreFactory.Object_isFrozen_Addr));
-		external.put("isSealed", Address.inject(StoreFactory.Object_isSealed_Addr));
-		external.put("keys", Address.inject(StoreFactory.Object_keys_Addr));
-		external.put("preventExtensions", Address.inject(StoreFactory.Object_preventExtensions_Addr));
-		external.put("seal", Address.inject(StoreFactory.Object_seal_Addr));
+	private Store store;
+
+	public ObjFactory(Store store) {
+		this.store = store;
+	}
+
+	public Obj Object_Obj() {
+		Map<String, Address> ext = new HashMap<String, Address>();
+		Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr), ext, store);
+		Helpers.addProp("number", Num.inject(Num.top()), ext, store);
+		Helpers.addProp("create", Address.inject(StoreFactory.Object_create_Addr), ext, store);
+		Helpers.addProp("defineProperties", Address.inject(StoreFactory.Object_defineProperties_Addr), ext, store);
+		Helpers.addProp("defineProperty", Address.inject(StoreFactory.Object_defineProperty_Addr), ext, store);
+		Helpers.addProp("freeze", Address.inject(StoreFactory.Object_freeze_Addr), ext, store);
+		Helpers.addProp("getOwnPropertyDescriptor", Address.inject(StoreFactory.Object_getOwnPropertyDescriptor_Addr), ext, store);
+		Helpers.addProp("getOwnPropertyNames", Address.inject(StoreFactory.Object_getOwnPropertyNames_Addr), ext, store);
+		Helpers.addProp("getPrototypeOf", Address.inject(StoreFactory.Object_getPrototypeOf_Addr), ext, store);
+		Helpers.addProp("isExtensible", Address.inject(StoreFactory.Object_isExtensible_Addr), ext, store);
+		Helpers.addProp("isFrozen", Address.inject(StoreFactory.Object_isFrozen_Addr), ext, store);
+		Helpers.addProp("isSealed", Address.inject(StoreFactory.Object_isSealed_Addr), ext, store);
+		Helpers.addProp("keys", Address.inject(StoreFactory.Object_keys_Addr), ext, store);
+		Helpers.addProp("preventExtensions", Address.inject(StoreFactory.Object_preventExtensions_Addr), ext, store);
+		Helpers.addProp("seal", Address.inject(StoreFactory.Object_seal_Addr), ext, store);
 
 		NativeClosure closure = new NativeClosure() {
 				@Override
-				public State run(BValue selfAddr, BValue argArrayAddr,
+				public State run(BValue selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace) {
 					// TODO: Update the state
@@ -57,46 +61,45 @@ public class ObjFactory {
 
 		InternalObjectProperties internal = new InternalFunctionProperties(closures, JSClass.CObject_Obj);
 
-		Object_Obj = new Obj(external, internal, external.keySet());
+		return new Obj(ext, internal, ext.keySet());
 	}
 
 	// TODO: We can be more precise with these.
-	public static final Obj Object_create_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_defineProperties_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_defineProperty_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_freeze_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_getOwnPropertyDescriptor_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_getOwnPropertyNames_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_getPrototypeOf_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_isExtensible_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_isFrozen_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_isSealed_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_keys_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_preventExtensions_Obj = FunctionFactory.constFunctionObj(BValue.top());
-	public static final Obj Object_seal_Obj = FunctionFactory.constFunctionObj(BValue.top());
+	public Obj Object_create_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_defineProperties_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_defineProperty_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_freeze_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_getOwnPropertyDescriptor_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_getOwnPropertyNames_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_getPrototypeOf_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_isExtensible_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_isFrozen_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_isSealed_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_keys_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_preventExtensions_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_seal_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
 
-	public static final Obj Object_proto_Obj;
-	static {
-		Map<String, BValue> external = new HashMap<String, BValue>();
-		external.put("constructor", Address.inject(StoreFactory.Object_Addr));
-		external.put("toString", Address.inject(StoreFactory.Object_proto_toString_Addr));
-		external.put("toLocaleString", Address.inject(StoreFactory.Object_proto_toLocaleString_Addr));
-		external.put("valueOf", Address.inject(StoreFactory.Object_proto_valueOf_Addr));
-		external.put("hasOwnPrpoerty", Address.inject(StoreFactory.Object_proto_hasOwnProperty_Addr));
-		external.put("isPrototypeOf", Address.inject(StoreFactory.Object_proto_isPrototypeOf_Addr));
-		external.put("propertyIsEnumerable", Address.inject(StoreFactory.Object_proto_propertyIsEnumerable_Addr));
+	public Obj Object_proto_Obj() {
+		Map<String, Address> ext = new HashMap<String, Address>();
+		Helpers.addProp("constructor", Address.inject(StoreFactory.Object_Addr), ext, store);
+		Helpers.addProp("toString", Address.inject(StoreFactory.Object_proto_toString_Addr), ext, store);
+		Helpers.addProp("toLocaleString", Address.inject(StoreFactory.Object_proto_toLocaleString_Addr), ext, store);
+		Helpers.addProp("valueOf", Address.inject(StoreFactory.Object_proto_valueOf_Addr), ext, store);
+		Helpers.addProp("hasOwnPrpoerty", Address.inject(StoreFactory.Object_proto_hasOwnProperty_Addr), ext, store);
+		Helpers.addProp("isPrototypeOf", Address.inject(StoreFactory.Object_proto_isPrototypeOf_Addr), ext, store);
+		Helpers.addProp("propertyIsEnumerable", Address.inject(StoreFactory.Object_proto_propertyIsEnumerable_Addr), ext, store);
 
 		InternalObjectProperties internal = new InternalObjectProperties();
 
-		Object_proto_Obj = new Obj(external, internal, external.keySet());
+		return new Obj(ext, internal, ext.keySet());
 	}
 
-	public static final Obj Object_proto_toString_Obj = FunctionFactory.constFunctionObj(Str.inject(Str.top()));
-	public static final Obj Object_proto_toLocaleString_Obj = FunctionFactory.constFunctionObj(Str.inject(Str.top()));
-	public static final Obj Object_proto_hasOwnProperty_Obj = FunctionFactory.constFunctionObj(Bool.inject(Bool.top()));
-	public static final Obj Object_proto_isPrototypeOf_Obj = FunctionFactory.constFunctionObj(Bool.inject(Bool.top()));
-	public static final Obj Object_proto_propertyIsEnumerable_Obj = FunctionFactory.constFunctionObj(Bool.inject(Bool.top()));
-	public static final Obj Object_proto_valueOf_Obj = FunctionFactory.constFunctionObj(BValue.primitive());
+	public Obj Object_proto_toString_Obj() { return FunctionFactory.constFunctionObj(Str.inject(Str.top())); }
+	public Obj Object_proto_toLocaleString_Obj() { return FunctionFactory.constFunctionObj(Str.inject(Str.top())); }
+	public Obj Object_proto_hasOwnProperty_Obj() { return FunctionFactory.constFunctionObj(Bool.inject(Bool.top())); }
+	public Obj Object_proto_isPrototypeOf_Obj() { return FunctionFactory.constFunctionObj(Bool.inject(Bool.top())); }
+	public Obj Object_proto_propertyIsEnumerable_Obj() { return FunctionFactory.constFunctionObj(Bool.inject(Bool.top())); }
+	public Obj Object_proto_valueOf_Obj() { return FunctionFactory.constFunctionObj(BValue.primitive()); }
 
 
 }

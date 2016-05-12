@@ -37,13 +37,13 @@ public class FSCI extends Trace {
 	}
 
 	@Override
-	public Address toAddr() {
-		return new Address(BigInteger.valueOf(pp));
+	public Address toAddr(String prop) {
+		return new Address(BigInteger.valueOf(pp), prop);
 	}
 
 	@Override
 	public Address makeAddr(int varID) {
-		return new Address(BigInteger.valueOf(varID));
+		return new Address(BigInteger.valueOf(varID), "");
 	}
 
 }
