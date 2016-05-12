@@ -11,11 +11,8 @@ import ca.ubc.ece.salt.pangor.analysis.flow.IState;
  */
 public class CFGNode {
 
-	/** Unique IDs for nodes. **/
-	private static long idGen = 0;
-
 	/** The unique id for this node. **/
-	private long id;
+	private int id;
 
 	/** Optional name for this node. **/
 	private String name;
@@ -41,10 +38,10 @@ public class CFGNode {
 	 * @param statement The statement that is executed when this node is
 	 * 		  			reached.
 	 */
-	public CFGNode(ClassifiedASTNode statement) {
+	public CFGNode(ClassifiedASTNode statement, int id) {
 		this.edges = new LinkedList<CFGEdge>();
 		this.statement = statement;
-		this.id = CFGNode.getUniqueId();
+		this.id = id;
 		this.name = null;
 		this.setMappedNode(null);
 		this.state = null;
@@ -55,10 +52,10 @@ public class CFGNode {
 	 * 		  			reached.
 	 * @param name The name for this node (nice for printing and debugging).
 	 */
-	public CFGNode(ClassifiedASTNode statement, String name) {
+	public CFGNode(ClassifiedASTNode statement, String name, int id) {
 		this.edges = new LinkedList<CFGEdge>();
 		this.statement = statement;
-		this.id = CFGNode.getUniqueId();
+		this.id = id;
 		this.name = name;
 		this.state = null;
 	}
@@ -94,15 +91,15 @@ public class CFGNode {
 	 * @param condition The condition for which we traverse the edge.
 	 * @param node The node at the other end of this edge.
 	 */
-	public void addEdge(ClassifiedASTNode condition, CFGNode node) {
+	public void addEdge(ClassifiedASTNode condition, CFGNode node, int id) {
 		CFGEdge edge = this.getEdge(condition);
 
 		if(edge != null)  {
 			edge.setTo(node);
 		}
 		else {
-			edge = new CFGEdge(condition, this, node);
-            this.edges.add(new CFGEdge(condition, this, node));
+			edge = new CFGEdge(condition, this, node, id);
+            this.edges.add(new CFGEdge(condition, this, node, id));
 		}
 	}
 
@@ -112,15 +109,15 @@ public class CFGNode {
 	 * @param condition The condition for which we traverse the edge.
 	 * @param node The node at the other end of this edge.
 	 */
-	public void addEdge(ClassifiedASTNode condition, CFGNode node, boolean loopEdge) {
+	public void addEdge(ClassifiedASTNode condition, CFGNode node, boolean loopEdge, int id) {
 		CFGEdge edge = this.getEdge(condition);
 
 		if(edge != null)  {
 			edge.setTo(node);
 		}
 		else {
-			edge = new CFGEdge(condition, this, node);
-            this.edges.add(new CFGEdge(condition, this, node, loopEdge));
+			edge = new CFGEdge(condition, this, node, id);
+            this.edges.add(new CFGEdge(condition, this, node, loopEdge, id));
 		}
 	}
 
@@ -172,7 +169,7 @@ public class CFGNode {
 	/**
 	 * @return The unique ID for this node.
 	 */
-	public long getId() {
+	public int getId() {
 		return id;
 	}
 
@@ -205,25 +202,9 @@ public class CFGNode {
 	 * 		   be the same as the original.
 	 */
 	public static CFGNode copy(CFGNode node) {
-        CFGNode newNode = new CFGNode(node.getStatement());
-        for(CFGEdge edge : node.getEdges()) newNode.addEdge(edge.getCondition(), edge.getTo());
+        CFGNode newNode = new CFGNode(node.getStatement(), node.getId());
+        for(CFGEdge edge : node.getEdges()) newNode.addEdge(edge.getCondition(), edge.getTo(), edge.getId());
         return newNode;
-	}
-
-	/**
-	 * @return A unique ID for a new node
-	 */
-	private static synchronized long getUniqueId() {
-		long id = CFGNode.idGen;
-		CFGNode.idGen++;
-		return id;
-	}
-
-	/**
-	 * Reset the ID generator value. Needed in between test cases.
-	 */
-	public static synchronized void resetIdGen() {
-		CFGNode.idGen = 0;
 	}
 
 	@Override

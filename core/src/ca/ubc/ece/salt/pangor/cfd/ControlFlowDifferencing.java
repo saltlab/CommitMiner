@@ -243,6 +243,7 @@ public class ControlFlowDifferencing {
 	 * @param src The source GumTree (AST).
 	 * @param dst The destination GumTree (AST).
 	 * @param matcher The data structure containing GumTree node mappings.
+	 * @return The ASTClassifier so the CFGFactory can assign IDs to any new nodes it creates.
 	 * @throws InvalidClassException If GumTree Tree nodes are generated from a parser other than Mozilla Rhino.
 	 */
 	public static void classifyTreeNodes(Tree src, Tree dst, Matcher matcher) throws InvalidClassException {

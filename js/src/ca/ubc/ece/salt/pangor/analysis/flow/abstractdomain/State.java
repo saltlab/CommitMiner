@@ -45,7 +45,7 @@ public class State implements IState {
 		AstNode condition = (AstNode)edge.getCondition();
 
 		/* Update the trace to the current condition. */
-		this.trace = this.trace.update(condition);
+		if(condition != null) this.trace = this.trace.update(condition);
 
 		return this;
 	}
@@ -56,7 +56,7 @@ public class State implements IState {
 		AstNode statement = (AstNode)node.getStatement();
 
 		/* Update the trace to the current statement. */
-		this.trace = this.trace.update(statement);
+		if(statement.getID() != null) this.trace = this.trace.update(statement);
 
 		/* Test out a function call. */
 		if(statement instanceof ExpressionStatement) {

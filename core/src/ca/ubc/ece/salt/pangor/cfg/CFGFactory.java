@@ -16,6 +16,7 @@ public interface CFGFactory {
 	/**
 	 * Builds intra-procedural control flow graphs for the given artifact.
 	 * @param root The class or script to build CFGs for.
+	 * @param astClassifier Generates unique IDs for AST nodes.
 	 * @return One CFG for each function in the class or script.
 	 */
 	List<CFG> createCFGs(ClassifiedASTNode root);

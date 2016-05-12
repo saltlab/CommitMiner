@@ -10,7 +10,6 @@ import org.junit.Test;
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
-import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.cfg.CFGPrinter;
 import ca.ubc.ece.salt.pangor.cfg.CFGPrinter.Output;
 import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
@@ -72,9 +71,6 @@ public class TestCFGDiff extends TestCase {
 	 */
 	@SuppressWarnings("unused")
 	private void getCFGs(List<CFG> cfgs, Output output) {
-
-		/* Reset the CFGNode id generator value (needed for consistent test cases). */
-		CFGNode.resetIdGen();
 
 		/* Get the serialized CFGs. */
 		List<String> actualCFGs = new LinkedList<String>();

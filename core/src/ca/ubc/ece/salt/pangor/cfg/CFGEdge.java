@@ -9,11 +9,8 @@ import ca.ubc.ece.salt.pangor.analysis.flow.IState;
  */
 public class CFGEdge {
 
-	/** Unique IDs for nodes. **/
-	private static long idGen = 0;
-
 	/** The unique id for this node. **/
-	private long id;
+	private int id;
 
 	/** The condition in which this edge is traversed. If null then the edge
 	 * is always traversed. **/
@@ -35,20 +32,20 @@ public class CFGEdge {
 	 */
 	private IState state;
 
-	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to) {
+	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to, int id) {
 		this.condition = condition;
 		this.to = to;
 		this.from = from;
 		this.changeType = ChangeType.UNKNOWN;
-		this.id = CFGEdge.getUniqueId();
+		this.id = id;
 	}
 
-	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to, boolean loopEdge) {
+	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to, boolean loopEdge, int id) {
 		this.condition = condition;
 		this.to = to;
 		this.from = from;
 		this.changeType = ChangeType.UNKNOWN;
-		this.id = CFGEdge.getUniqueId();
+		this.id = id;
 	}
 
 	/**
@@ -70,7 +67,7 @@ public class CFGEdge {
 	 * @return a shallow copy of the edge.
 	 */
 	public CFGEdge copy() {
-		return new CFGEdge(this.condition, this.from, this.to);
+		return new CFGEdge(this.condition, this.from, this.to, this.id);
 	}
 
 	/**
@@ -118,24 +115,8 @@ public class CFGEdge {
 	/**
 	 * @return the unique ID for the edge.
 	 */
-	public long getId() {
+	public int getId() {
 		return id;
-	}
-
-	/**
-	 * @return A unique ID for a new edge
-	 */
-	private static synchronized long getUniqueId() {
-		long id = CFGEdge.idGen;
-		CFGEdge.idGen++;
-		return id;
-	}
-
-	/**
-	 * Reset the ID generator value. Needed in between test cases.
-	 */
-	public static synchronized void resetIdGen() {
-		CFGEdge.idGen = 0;
 	}
 
 //	@Override

@@ -13,7 +13,6 @@ import org.mozilla.javascript.Parser;
 import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.pangor.cfg.CFG;
-import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.cfg.CFGPrinter;
 import ca.ubc.ece.salt.pangor.cfg.CFGPrinter.Output;
 import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
@@ -29,9 +28,6 @@ public class TestCFG extends TestCase {
 
 		/* Create the CFG. */
 		List<CFG> cfgs = new JavaScriptCFGFactory().createCFGs(root);
-
-		/* Reset the CFGNode id generator value (needed for consistent test cases). */
-		CFGNode.resetIdGen();
 
 		/* Get the serialized CFGs. */
 		List<String> actualCFGs = new LinkedList<String>();
