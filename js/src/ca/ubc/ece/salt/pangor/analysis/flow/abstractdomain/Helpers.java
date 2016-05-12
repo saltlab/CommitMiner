@@ -52,10 +52,10 @@ public class Helpers {
 	 * @param closures The closure for the function.
 	 * @return The function object.
 	 */
-	public static Obj createFunctionObj(Closure closure, Store store, Trace trace) {
+	public static Obj createFunctionObj(Closure closure, Store store, Trace trace, int id) {
 
 		Map<String, Address> external = new HashMap<String, Address>();
-		addProp("length", Num.inject(Num.top()), external, store, trace);
+		addProp(id, "length", Num.inject(Num.top()), external, store, trace);
 
 		InternalFunctionProperties internal = new InternalFunctionProperties(
 				Address.inject(StoreFactory.Function_proto_Addr),
@@ -204,7 +204,7 @@ public class Helpers {
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
-			store = store.alloc(address, createFunctionObj(closure, store, trace));
+			store = store.alloc(address, createFunctionObj(closure, store, trace, child.getID()));
 
 		}
 
