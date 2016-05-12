@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.trace;
 
-import java.util.Stack;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.mozilla.javascript.ast.AstNode;
 
@@ -24,9 +25,9 @@ public class StackCFA extends Trace {
 	private int pp;
 
 	/** Trace (partial call stack). **/
-	private Stack<Integer> tr;
+	private Queue<Integer> tr;
 
-	public StackCFA(int k, int h, int pp, Stack<Integer> tr) {
+	public StackCFA(int k, int h, int pp, Queue<Integer> tr) {
 		if(h > k) throw new Error("heap sensitivity must be <= stack sensitivity");
 		this.k = k;
 		this.h = h;
@@ -42,33 +43,21 @@ public class StackCFA extends Trace {
 
 	@Override
 	public Trace update(Environment env, Store store, BValue self, BValue args,
-			AstNode statement) {
-		Stack<Integer> trp = new Stack<Integer>();
-
-		if(tr.size() <= k) trp.addAll(tr);
-		else trp.addAll(tr.subList(0, k-1));
-
-		return new StackCFA(k, h, statement.getID(), trp);
+			AstNode call) {
+		Queue<Integer> trp = new LinkedList<Integer>(this.tr);
+		trp.add(call.getID());
+		if(trp.size() > k) trp.remove();
+		return new StackCFA(k, h, call.getID(), trp);
 	}
 
 	@Override
 	public Address toAddr(String prop) {
-		Stack<Integer> trp = new Stack<Integer>();
-
-		if(tr.size() <= h) trp.addAll(tr);
-		else trp.addAll(tr.subList(0, k-1));
-
-		return new Address(intsToBigInteger(trp, pp), prop);
+		return new Address(intsToBigInteger(tr, pp), prop);
 	}
 
 	@Override
 	public Address makeAddr(int varID) {
-		Stack<Integer> trp = new Stack<Integer>();
-
-		if(tr.size() <= k) trp.addAll(tr);
-		else trp.addAll(tr.subList(0, k-1));
-
-		return new Address(intsToBigInteger(trp, varID), "");
+		return new Address(intsToBigInteger(tr, varID), "");
 	}
 
 }

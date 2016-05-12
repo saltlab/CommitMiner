@@ -3,8 +3,8 @@ package ca.ubc.ece.salt.pangor.analysis.flow.trace;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 
 import org.mozilla.javascript.ast.AstNode;
 
@@ -70,7 +70,7 @@ public abstract class Trace extends SmartHash {
 	 * @param pp The program point.
 	 * @return An address for the trace and program point.
 	 */
-	protected static BigInteger intsToBigInteger(Stack<Integer> tr, int pp) {
+	protected static BigInteger intsToBigInteger(Queue<Integer> tr, int pp) {
 		BigInteger id = BigInteger.ZERO;
 		for(Integer call : tr) {
 			id.add(BigInteger.valueOf((call))).shiftLeft(32);

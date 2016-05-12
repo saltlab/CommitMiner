@@ -61,9 +61,6 @@ public class FunctionClosure extends Closure {
 		store = store.alloc(address, selfAddr);
 		env = env.strongUpdate("this", address);
 
-		/* Match parameter names with arguments. */
-		// TODO
-
 		/* Create the initial state for the function call. */
 		State state = new State(store, env, scratchpad, trace);
 
