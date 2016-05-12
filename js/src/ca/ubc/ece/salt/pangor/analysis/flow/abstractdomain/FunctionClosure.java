@@ -35,6 +35,10 @@ public class FunctionClosure extends Closure {
 	public State run(BValue selfAddr, Address argArrayAddr, Store store,
 			Scratchpad scratchpad, Trace trace) {
 
+		/* Advance the trace. */
+		trace = trace.update(environment, store, selfAddr, argArrayAddr,
+							 (ScriptNode)cfg.getEntryNode().getStatement());
+
 		/* Lift local variables and function declarations into the environment. */
 		Pair<Environment, Store> pair = Helpers.lift(this.environment,
 				store, (ScriptNode)cfg.getEntryNode().getStatement(), cfgs, trace);

@@ -33,7 +33,7 @@ public abstract class Trace extends SmartHash {
 
 	/** Update for function call. **/
 	public abstract Trace update(Environment env, Store store, BValue self,
-								 BValue args, AstNode statement);
+								 Address args, AstNode statement);
 
 	/** Update for function return. Default implementation is stack-based. **/
 	public Trace update(Trace trace) {

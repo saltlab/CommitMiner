@@ -42,7 +42,7 @@ public class StackCFA extends Trace {
 	}
 
 	@Override
-	public Trace update(Environment env, Store store, BValue self, BValue args,
+	public Trace update(Environment env, Store store, BValue self, Address args,
 			AstNode call) {
 		Queue<Integer> trp = new LinkedList<Integer>(this.tr);
 		trp.add(call.getID());

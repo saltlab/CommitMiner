@@ -30,7 +30,7 @@ public class FSCI extends Trace {
 	}
 
 	@Override
-	public Trace update(Environment env, Store store, BValue self, BValue args,
+	public Trace update(Environment env, Store store, BValue self, Address args,
 			AstNode call) {
 		// Context insensitive
 		return new FSCI(call.getID());
