@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.analysis.flow.factories;
+package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.LinkedList;
 import java.util.List;

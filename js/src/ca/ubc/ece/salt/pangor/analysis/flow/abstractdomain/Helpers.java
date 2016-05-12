@@ -14,7 +14,6 @@ import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
-import ca.ubc.ece.salt.pangor.analysis.flow.factories.FunctionLiftVisitor;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.VariableLiftVisitor;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
