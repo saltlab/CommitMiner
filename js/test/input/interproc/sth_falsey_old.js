@@ -1,7 +1,8 @@
 /* Special Type Handling: Falsey
  * Output: None */
-var a = "Hello World!";
-function A() {
-	console.log(a);
+var a = "Hello";
+var b = "Jax";
+function A(x) {
+	console.log(a + " " + x + "!");
 }
-A();
+A(b);

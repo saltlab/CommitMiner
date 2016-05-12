@@ -86,8 +86,11 @@ public class Helpers {
 		/* Break when the analysis time reaches some limit. */
 		while(!stack.isEmpty() && edgesVisited < 100000) {
 
+
 			PathState pathState = stack.pop();
 			edgesVisited++;
+
+			System.out.println(pathState.edge.toString());
 
 			/* Join the lattice elements from the current edge and 'from'
 			 * node. */

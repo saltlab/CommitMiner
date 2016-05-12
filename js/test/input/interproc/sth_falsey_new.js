@@ -2,10 +2,11 @@
  * Output: STH_TYPE_ERROR_FALSEY (a)
  *         STH_TYPE_ERROR_FALSEY (b)
  *         STH_TYPE_ERROR_FALSEY (c) */
-var a = "Hello World!";
-function A() {
+var a = "Hello";
+var b = "Jax";
+function A(x) {
 	if(a) {
-		console.log(a);
+		console.log(a + " " + x + "!");
 	}
 }
-A();
+A(b);

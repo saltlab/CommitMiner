@@ -1,15 +1,8 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.ExpressionStatement;
-import org.mozilla.javascript.ast.FunctionCall;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.IState;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
-import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -56,52 +49,8 @@ public class State implements IState {
 		/* The statement to transfer over. */
 		AstNode statement = (AstNode)node.getStatement();
 
-		/* Test out a function call. */
-		if(statement instanceof ExpressionStatement) {
-			ExpressionStatement exs = (ExpressionStatement) statement;
-			AstNode ex = exs.getExpression();
-
-			if(ex instanceof FunctionCall) {
-				FunctionCall fc = (FunctionCall) ex;
-
-				/* Create the argument object. */
-				Map<String, Address> ext = new HashMap<String, Address>();
-				int i = 0;
-				for(AstNode arg : fc.getArguments()) {
-					BValue argVal = Helpers.resolve(this.environment, this.store, arg);
-					Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
-									ext, store, trace);
-					i++;
-				}
-
-				InternalObjectProperties internal = new InternalObjectProperties(
-						Address.inject(StoreFactory.Arguments_Addr), JSClass.CFunction);
-				Obj argObj = new Obj(ext, internal, ext.keySet());
-
-				/* Add the argument object to the store. */
-				Address argAddr = this.trace.makeAddr(ex.getID());
-				this.store = this.store.alloc(argAddr, argObj);
-
-				/* Attempt to resolve the function and it's parent object. */
-				BValue fun = Helpers.resolve(this.environment, this.store, fc.getTarget());
-				BValue obj = Helpers.resolveSelf(this.environment, this.store, fc.getTarget());
-
-				if(obj == null) obj = self;
-
-				if(fun == null) {
-					/* If the function was not resolved, we assume the (local)
-					 * state is unchanged, but add BValue.TOP as the return value. */
-					Scratchpad scratchpad = new Scratchpad(Scratch.RETVAL, BValue.top());
-					return new State(this.store, this.environment, scratchpad, this.trace);
-				}
-				else {
-					/* Call the function and get a join of the new states. */
-					return Helpers.applyClosure(fun, self, argAddr, this.store,
-												this.scratchpad, this.trace);
-				}
-			}
-
-		}
+		/* Evaluate depending on statement type. */
+		ExpEval.eval(environment, store, scratchpad, trace, statement, self);
 
 		return this;
 	}
