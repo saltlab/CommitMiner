@@ -13,10 +13,11 @@ public class Helpers {
 	 * store.
 	 * @param prop The name of the property to add to the object.
 	 */
-	public static void addProp(String prop, BValue propVal, Map<String, Address> ext, Store store) {
+	public static Store addProp(String prop, BValue propVal, Map<String, Address> ext, Store store) {
 		Address propAddr = Address.createBuiltinAddr(prop);
-		store.alloc(propAddr, propVal);
+		store = store.alloc(propAddr, propVal);
 		ext.put(prop, propAddr);
+		return store;
 	}
 
 }

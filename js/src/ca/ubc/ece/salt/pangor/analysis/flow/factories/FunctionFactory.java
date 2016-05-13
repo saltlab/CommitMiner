@@ -23,7 +23,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 
 public class FunctionFactory {
 
-	private Store store;
+	public Store store;
 
 	public FunctionFactory(Store store) {
 		this.store = store;
@@ -31,10 +31,10 @@ public class FunctionFactory {
 
 	public Obj Function_proto_Obj() {
 		Map<String, Address> ext = new HashMap<String, Address>();
-		Helpers.addProp("external", Num.inject(Num.top()), ext, store);
-		Helpers.addProp("apply", Address.inject(StoreFactory.Function_proto_apply_Addr), ext, store);
-		Helpers.addProp("call", Address.inject(StoreFactory.Function_proto_call_Addr), ext, store);
-		Helpers.addProp("toString", Address.inject(StoreFactory.Function_proto_toString_Addr), ext, store);
+		store = Helpers.addProp("external", Num.inject(Num.top()), ext, store);
+		store = Helpers.addProp("apply", Address.inject(StoreFactory.Function_proto_apply_Addr), ext, store);
+		store = Helpers.addProp("call", Address.inject(StoreFactory.Function_proto_call_Addr), ext, store);
+		store = Helpers.addProp("toString", Address.inject(StoreFactory.Function_proto_toString_Addr), ext, store);
 
 		InternalObjectProperties internal = new InternalObjectProperties(
 				Address.inject(StoreFactory.Function_proto_Addr),

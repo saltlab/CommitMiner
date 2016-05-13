@@ -1,6 +1,8 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -82,26 +84,47 @@ public class Obj extends SmartHash {
 	}
 
 	/**
-	 * Performs a strong update of the object's external properties.
-	 * @return the new object after the update.
-	 */
-	public Obj strongUpdate(Map<String, BValue> eps) { return null; }
-
-	/**
-	 * Performs a weak update of the object's external properties.
-	 * @return the new object after the update.
-	 */
-	public Obj weakUpdate(Map<String, BValue> eps) { return null; }
-
-	/**
 	 * Computes ο u ο.
+	 * @param right The object to merge with.
+	 * @param bValueMap The BValue map from the store.
 	 * @return A new Obj with this Obj joined with the Obj parameter.
 	 */
-	public Obj join(Obj object) {
-		if(this.internalProperties.klass != object.internalProperties.klass)
+	public Obj join(Obj right, Map<Address, BValue> bValueMap) {
+		if(this.internalProperties.klass != right.internalProperties.klass)
 			throw new Error("Cannot join classes of different types.");
-		// TODO Auto-generated method stub
-		return null;
+
+		Map<String, Address> ext = new HashMap<String, Address>(this.externalProperties);
+
+		for(Entry<String, Address> entry : right.externalProperties.entrySet()) {
+			if(!ext.containsKey(entry.getKey()))
+				ext.put(entry.getKey(), entry.getValue());
+			else {
+				Address lAddr = ext.get(entry.getKey());
+				Address rAddr = entry.getValue();
+
+				BValue bvl = bValueMap.get(lAddr);
+				BValue bvr = bValueMap.get(rAddr);
+
+				if(bvl == null) System.out.println("Not Found (" + entry.getKey() + ": " + lAddr.addr + ")");
+				else System.out.println("OK (" + entry.getKey() + ": " + lAddr.addr + ")");
+				if(bvr == null) System.out.println("Not Found (" + entry.getKey() + ": " + rAddr.addr + ")");
+				else System.out.println("OK (" + entry.getKey() + ": " + rAddr.addr + ")");
+
+				if(!lAddr.equals(rAddr)) {
+
+					/* Uh oh... we have two addresses for the same property.
+					 * We need to merge the properties in the store. This is only
+					 * ok if we only execute loops once. A better solution would be
+					 * to refactor to store a set of addresses. */
+
+					bValueMap.put(lAddr, bvl.join(bvr));
+
+				}
+			}
+		}
+
+		return new Obj(ext, this.internalProperties, ext.keySet());
+
 	}
 
 }

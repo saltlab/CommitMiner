@@ -22,8 +22,8 @@ public class GlobalFactory {
 
 	public Obj Global_Obj() {
 		Map<String, Address> ext = new HashMap<String, Address>();
-		Helpers.addProp("Object", Address.inject(StoreFactory.Object_Addr), ext, store);
-		Helpers.addProp("undefined", Undefined.inject(Undefined.top()), ext, store);
+		store = Helpers.addProp("Object", Address.inject(StoreFactory.Object_Addr), ext, store);
+		store = Helpers.addProp("undefined", Undefined.inject(Undefined.top()), ext, store);
 
 		InternalObjectProperties internal = new InternalObjectProperties();
 		return new Obj(ext, internal, ext.keySet());

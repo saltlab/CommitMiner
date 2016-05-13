@@ -22,7 +22,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 
 public class ObjFactory {
 
-	private Store store;
+	public Store store;
 
 	public ObjFactory(Store store) {
 		this.store = store;
@@ -30,21 +30,21 @@ public class ObjFactory {
 
 	public Obj Object_Obj() {
 		Map<String, Address> ext = new HashMap<String, Address>();
-		Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr), ext, store);
-		Helpers.addProp("number", Num.inject(Num.top()), ext, store);
-		Helpers.addProp("create", Address.inject(StoreFactory.Object_create_Addr), ext, store);
-		Helpers.addProp("defineProperties", Address.inject(StoreFactory.Object_defineProperties_Addr), ext, store);
-		Helpers.addProp("defineProperty", Address.inject(StoreFactory.Object_defineProperty_Addr), ext, store);
-		Helpers.addProp("freeze", Address.inject(StoreFactory.Object_freeze_Addr), ext, store);
-		Helpers.addProp("getOwnPropertyDescriptor", Address.inject(StoreFactory.Object_getOwnPropertyDescriptor_Addr), ext, store);
-		Helpers.addProp("getOwnPropertyNames", Address.inject(StoreFactory.Object_getOwnPropertyNames_Addr), ext, store);
-		Helpers.addProp("getPrototypeOf", Address.inject(StoreFactory.Object_getPrototypeOf_Addr), ext, store);
-		Helpers.addProp("isExtensible", Address.inject(StoreFactory.Object_isExtensible_Addr), ext, store);
-		Helpers.addProp("isFrozen", Address.inject(StoreFactory.Object_isFrozen_Addr), ext, store);
-		Helpers.addProp("isSealed", Address.inject(StoreFactory.Object_isSealed_Addr), ext, store);
-		Helpers.addProp("keys", Address.inject(StoreFactory.Object_keys_Addr), ext, store);
-		Helpers.addProp("preventExtensions", Address.inject(StoreFactory.Object_preventExtensions_Addr), ext, store);
-		Helpers.addProp("seal", Address.inject(StoreFactory.Object_seal_Addr), ext, store);
+		store = Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr), ext, store);
+		store = Helpers.addProp("number", Num.inject(Num.top()), ext, store);
+		store = Helpers.addProp("create", Address.inject(StoreFactory.Object_create_Addr), ext, store);
+		store = Helpers.addProp("defineProperties", Address.inject(StoreFactory.Object_defineProperties_Addr), ext, store);
+		store = Helpers.addProp("defineProperty", Address.inject(StoreFactory.Object_defineProperty_Addr), ext, store);
+		store = Helpers.addProp("freeze", Address.inject(StoreFactory.Object_freeze_Addr), ext, store);
+		store = Helpers.addProp("getOwnPropertyDescriptor", Address.inject(StoreFactory.Object_getOwnPropertyDescriptor_Addr), ext, store);
+		store = Helpers.addProp("getOwnPropertyNames", Address.inject(StoreFactory.Object_getOwnPropertyNames_Addr), ext, store);
+		store = Helpers.addProp("getPrototypeOf", Address.inject(StoreFactory.Object_getPrototypeOf_Addr), ext, store);
+		store = Helpers.addProp("isExtensible", Address.inject(StoreFactory.Object_isExtensible_Addr), ext, store);
+		store = Helpers.addProp("isFrozen", Address.inject(StoreFactory.Object_isFrozen_Addr), ext, store);
+		store = Helpers.addProp("isSealed", Address.inject(StoreFactory.Object_isSealed_Addr), ext, store);
+		store = Helpers.addProp("keys", Address.inject(StoreFactory.Object_keys_Addr), ext, store);
+		store = Helpers.addProp("preventExtensions", Address.inject(StoreFactory.Object_preventExtensions_Addr), ext, store);
+		store = Helpers.addProp("seal", Address.inject(StoreFactory.Object_seal_Addr), ext, store);
 
 		NativeClosure closure = new NativeClosure() {
 				@Override
@@ -81,13 +81,13 @@ public class ObjFactory {
 
 	public Obj Object_proto_Obj() {
 		Map<String, Address> ext = new HashMap<String, Address>();
-		Helpers.addProp("constructor", Address.inject(StoreFactory.Object_Addr), ext, store);
-		Helpers.addProp("toString", Address.inject(StoreFactory.Object_proto_toString_Addr), ext, store);
-		Helpers.addProp("toLocaleString", Address.inject(StoreFactory.Object_proto_toLocaleString_Addr), ext, store);
-		Helpers.addProp("valueOf", Address.inject(StoreFactory.Object_proto_valueOf_Addr), ext, store);
-		Helpers.addProp("hasOwnPrpoerty", Address.inject(StoreFactory.Object_proto_hasOwnProperty_Addr), ext, store);
-		Helpers.addProp("isPrototypeOf", Address.inject(StoreFactory.Object_proto_isPrototypeOf_Addr), ext, store);
-		Helpers.addProp("propertyIsEnumerable", Address.inject(StoreFactory.Object_proto_propertyIsEnumerable_Addr), ext, store);
+		store = Helpers.addProp("constructor", Address.inject(StoreFactory.Object_Addr), ext, store);
+		store = Helpers.addProp("toString", Address.inject(StoreFactory.Object_proto_toString_Addr), ext, store);
+		store = Helpers.addProp("toLocaleString", Address.inject(StoreFactory.Object_proto_toLocaleString_Addr), ext, store);
+		store = Helpers.addProp("valueOf", Address.inject(StoreFactory.Object_proto_valueOf_Addr), ext, store);
+		store = Helpers.addProp("hasOwnPrpoerty", Address.inject(StoreFactory.Object_proto_hasOwnProperty_Addr), ext, store);
+		store = Helpers.addProp("isPrototypeOf", Address.inject(StoreFactory.Object_proto_isPrototypeOf_Addr), ext, store);
+		store = Helpers.addProp("propertyIsEnumerable", Address.inject(StoreFactory.Object_proto_propertyIsEnumerable_Addr), ext, store);
 
 		InternalObjectProperties internal = new InternalObjectProperties();
 

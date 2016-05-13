@@ -2,22 +2,16 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.mozilla.javascript.Token;
-import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.EmptyStatement;
-import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.StringLiteral;
-import org.mozilla.javascript.ast.VariableDeclaration;
-import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Str.LatticeElementType;
@@ -37,26 +31,11 @@ public class ExpEval {
 	public static BValue eval(Environment env, Store store, Scratchpad scratch,
 							  Trace trace, AstNode node, Address selfAddr) {
 
-		if(node instanceof EmptyStatement) {
-			return BValue.bottom();
+		if(node instanceof Name) {
+			return evalName(env, store, scratch, trace, (Name)node, selfAddr);
 		}
-		else if(node instanceof ExpressionStatement) {
-			ExpressionStatement es = (ExpressionStatement)node;
-			return eval(env, store, scratch, trace, es.getExpression(), selfAddr);
-		}
-		else if(node instanceof VariableDeclaration) {
-			evalVariableDeclaration(env, store, scratch, trace, (VariableDeclaration)node, selfAddr);
-			return BValue.bottom();
-		}
-		else if(node instanceof Name) {
-			return store.apply(env.apply(node.toSource()));
-		}
-		else if(node instanceof FunctionCall) {
-			return evalFunctionCall(env, store, scratch, trace, (FunctionCall)node, selfAddr);
-		}
-		else if(node instanceof Assignment) {
-			evalAssignment(env, store, scratch, trace, (Assignment)node, selfAddr);
-			return BValue.bottom();
+		else if(node instanceof InfixExpression) {
+			return evalInfixExpression(env, store, scratch, trace, (InfixExpression)node, selfAddr);
 		}
 		else if(node instanceof KeywordLiteral) {
 			return evalKeywordLiteral(env, store, scratch, trace, (KeywordLiteral)node, selfAddr);
@@ -67,30 +46,10 @@ public class ExpEval {
 		else if(node instanceof NumberLiteral) {
 			return evalNumberLiteral(env, store, scratch, trace, (NumberLiteral)node, selfAddr);
 		}
-		else if(node instanceof Name) {
-			return evalName(env, store, scratch, trace, (Name)node, selfAddr);
-		}
-		else if(node instanceof InfixExpression) {
-			return evalInfixExpression(env, store, scratch, trace, (InfixExpression)node, selfAddr);
-		}
 
 		/* We could not evaluate the expression. Return top. */
 		return BValue.top();
 
-	}
-
-	/**
-	 * Updates the store based on abstract interpretation of assignments.
-	 * @param vd The variable declaration. Variables have already been
-	 * lifted into the environment.
-	 */
-	public static void evalVariableDeclaration(Environment env, Store store, Scratchpad scratch,
-												 Trace trace, VariableDeclaration vd, Address selfAddr) {
-		for(VariableInitializer vi : vd.getVariables()) {
-			if(vi.getInitializer() != null) {
-				assignInterp(env, store, scratch, trace, selfAddr, vi.getTarget(), vi.getInitializer());
-			}
-		}
 	}
 
 	/**
@@ -167,43 +126,11 @@ public class ExpEval {
 	}
 
 	/**
-	 * Updates the store based on abstract interpretation of assignments.
-	 * @param a The assignment.
-	 */
-	public static void evalAssignment(Environment env, Store store, Scratchpad scratch,
-									  Trace trace, Assignment a, Address selfAddr) {
-		assignInterp(env, store, scratch, trace, selfAddr, a.getLeft(), a.getRight());
-	}
-
-	/**
-	 * Helper function since variable initializers and assignments do the same thing.
-	 */
-	private static void assignInterp(Environment env, Store store, Scratchpad scratch,
-								Trace trace, Address selfAddr, AstNode lhs,
-								AstNode rhs) {
-
-		/* Resolve the left hand side to a set of addresses. */
-		Set<Address> addrs = Helpers.resolve(env, store, lhs);
-
-		/* Resolve the right hand side to a value. */
-		BValue val = eval(env, store, scratch, trace, rhs, selfAddr);
-
-		/* Update the values in the store. */
-		// TODO: Is this correct? We should probably only do a strong update if
-		//		 there is only one address. Otherwise we don't know which one
-		//		 to update.
-		for(Address addr : addrs) {
-			store = store.strongUpdate(addr, val);
-		}
-
-	}
-
-	/**
 	 * Evaluate a function call expression to a BValue.
 	 * @param fc The function call.
 	 * @return The return value of the function call.
 	 */
-	public static BValue evalFunctionCall(Environment env, Store store, Scratchpad scratch,
+	public static State evalFunctionCall(Environment env, Store store, Scratchpad scratch,
 										  Trace trace, FunctionCall fc, Address selfAddr) {
 
 			/* Create the argument object. */
@@ -221,7 +148,7 @@ public class ExpEval {
 			Obj argObj = new Obj(ext, internal, ext.keySet());
 
 			/* Add the argument object to the store. */
-			Address argAddr = trace.makeAddr(fc.getID());
+			Address argAddr = trace.makeAddr(fc.getID(), "");
 			store = store.alloc(argAddr, argObj);
 
 			/* Attempt to resolve the function and it's parent object. */
@@ -237,13 +164,13 @@ public class ExpEval {
 			if(funVal == null) {
 				/* If the function was not resolved, we assume the (local)
 				 * state is unchanged, but add BValue.TOP as the return value. */
-				return BValue.top();
+				scratch = scratch.strongUpdate(Scratch.RETVAL, BValue.top());
+				return new State(store, env, scratch, trace);
 			}
 			else {
 				/* Call the function and get a join of the new states. */
-				State retState = Helpers.applyClosure(funVal, objAddr, argAddr, store,
+				return Helpers.applyClosure(funVal, objAddr, argAddr, store,
 													  scratch, trace);
-				return retState.scratchpad.apply(Scratch.RETVAL);
 			}
 
 	}

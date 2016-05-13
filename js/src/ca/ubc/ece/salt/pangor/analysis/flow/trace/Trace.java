@@ -43,7 +43,7 @@ public abstract class Trace extends SmartHash {
 	public abstract Address toAddr(String prop);
 
 	/** Make a new address with a node id instead of a string. **/
-	public abstract Address makeAddr(int varID);
+	public abstract Address makeAddr(int varID, String prop);
 
 	/** Modify an address to account for an object's class. **/
 	public Address modAddr(Address a, JSClass c) {

@@ -73,15 +73,17 @@ public class StoreFactory {
 
 		Store store = new Store(bValueStore, objectStore);
 
-		ArgumentsFactory af = new ArgumentsFactory(store);
-		ObjFactory of = new ObjFactory(store);
-		FunctionFactory ff = new FunctionFactory(store);
-		GlobalFactory gf = new GlobalFactory(store);
-
 		bValueStore.put(global_binding_Addr, Address.inject(global_Addr));
 
+		GlobalFactory gf = new GlobalFactory(store);
 		objectStore.put(global_Addr, gf.Global_Obj());
+		store = gf.store;
+
+		ArgumentsFactory af = new ArgumentsFactory(store);
 		objectStore.put(Arguments_Addr, af.Arguments_Obj());
+		store = af.store;
+
+		ObjFactory of = new ObjFactory(store);
 		objectStore.put(Object_Addr, of.Object_Obj());
 		objectStore.put(Object_create_Addr, of.Object_create_Obj());
 		objectStore.put(Object_defineProperties_Addr, of.Object_defineProperties_Obj());
@@ -103,14 +105,19 @@ public class StoreFactory {
 		objectStore.put(Object_proto_isPrototypeOf_Addr, of.Object_proto_isPrototypeOf_Obj());
 		objectStore.put(Object_proto_propertyIsEnumerable_Addr, of.Object_proto_propertyIsEnumerable_Obj());
 		objectStore.put(Object_proto_valueOf_Addr, of.Object_proto_valueOf_Obj());
+		store = of.store;
+
+		FunctionFactory ff = new FunctionFactory(store);
 		objectStore.put(Function_proto_Addr, ff.Function_proto_Obj());
 		objectStore.put(Function_proto_toString_Addr, ff.Function_proto_toString_Obj());
 		objectStore.put(Function_proto_apply_Addr, ff.Function_proto_apply_Obj());
 		objectStore.put(Function_proto_call_Addr, ff.Function_proto_call_Obj());
+		store = ff.store;
+
 //		objectStore.put(Dummy_Arguments_Addr, of.Dummy_Arguments_Obj); TODO
 //		objectStore.put(Dummy_Addr, of.Dummy_Obj); TODO
 
-		return new Store(bValueStore, objectStore);
+		return store;
 	}
 
 }

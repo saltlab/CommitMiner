@@ -55,8 +55,8 @@ public class StackCFA extends Trace {
 	}
 
 	@Override
-	public Address makeAddr(int varID) {
-		return new Address(intsToBigInteger(tr, varID), "");
+	public Address makeAddr(int varID, String prop) {
+		return new Address(intsToBigInteger(tr, varID), prop);
 	}
 
 }

@@ -67,12 +67,11 @@ public class Store {
 		}
 
 		for(Map.Entry<Address, Obj>entries : store.objectStore.entrySet()) {
-			Address address = entries.getKey();
 			Obj right = entries.getValue();
 			Obj left = objectStore.get(entries.getKey());
 
-			if(left == null) objectStore.put(address, right);
-			else objectStore.put(address, left.join(right));
+			if(left == null) objectStore.put(entries.getKey(), right);
+			else objectStore.put(entries.getKey(), left.join(right, bValueStore));
 		}
 
 		return new Store(bValueStore, objectStore);
@@ -102,11 +101,12 @@ public class Store {
 	 * @return The Store after allocation.
 	 */
 	public Store alloc(Address address, Obj object) {
+		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>(this.bValueStore);
 		Map<Address, Obj> objectStore = new HashMap<Address, Obj>(this.objectStore);
 		Obj left = objectStore.get(address);
 		if(left == null) objectStore.put(address, object);
-		else objectStore.put(address,  left.join(object));
-		return new Store(this.bValueStore, objectStore);
+		else objectStore.put(address,  left.join(object, bValueStore));
+		return new Store(bValueStore, objectStore);
 	}
 
 	/**

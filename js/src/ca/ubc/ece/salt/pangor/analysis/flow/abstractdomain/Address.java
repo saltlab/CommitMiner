@@ -31,7 +31,7 @@ public class Address extends SmartHash {
 	public boolean equals(Object o) {
 		if(o instanceof Address) {
 			Address a = (Address)o;
-			if(this.prop.equals(a.prop) && this.addr == a.addr) return true;
+			if(this.prop.equals(a.prop) && this.addr.equals(a.addr)) return true;
 		}
 		return false;
 	}

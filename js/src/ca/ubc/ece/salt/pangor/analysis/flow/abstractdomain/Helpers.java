@@ -28,10 +28,11 @@ public class Helpers {
 	 * store.
 	 * @param prop The name of the property to add to the object.
 	 */
-	public static void addProp(String prop, BValue propVal, Map<String, Address> ext, Store store, Trace trace) {
+	public static Store addProp(String prop, BValue propVal, Map<String, Address> ext, Store store, Trace trace) {
 		Address propAddr = trace.toAddr(prop);
-		store.alloc(propAddr, propVal);
+		store = store.alloc(propAddr, propVal);
 		ext.put(prop, propAddr);
+		return store;
 	}
 
 	/**
@@ -40,28 +41,31 @@ public class Helpers {
 	 * @param propID The node id of the property being added to the object.
 	 * @param propVal The value of the property.
 	 */
-	public static void addProp(int propID, String prop, BValue propVal, Map<String, Address> ext, Store store, Trace trace) {
-		Address propAddr = trace.makeAddr(propID);
-		store.alloc(propAddr, propVal);
+	public static Store addProp(int propID, String prop, BValue propVal, Map<String, Address> ext, Store store, Trace trace) {
+		Address propAddr = trace.makeAddr(propID, prop);
+		store = store.alloc(propAddr, propVal);
 		ext.put(prop, propAddr);
+		return store;
 	}
 
 	/**
-	 * Creates a regular function from a closure stack.
+	 * Creates and allocates a regular function from a closure stack.
 	 * @param closures The closure for the function.
 	 * @return The function object.
 	 */
-	public static Obj createFunctionObj(Closure closure, Store store, Trace trace, int id) {
+	public static Store createFunctionObj(Closure closure, Store store, Trace trace, Address address, int id) {
 
 		Map<String, Address> external = new HashMap<String, Address>();
-		addProp(id, "length", Num.inject(Num.top()), external, store, trace);
+		store = addProp(id, "length", Num.inject(Num.top()), external, store, trace);
 
 		InternalFunctionProperties internal = new InternalFunctionProperties(
 				Address.inject(StoreFactory.Function_proto_Addr),
 				closure,
 				JSClass.CFunction);
 
-		return new Obj(external, internal, external.keySet());
+		store = store.alloc(address, new Obj(external, internal, external.keySet()));
+
+		return store;
 
 	}
 
@@ -189,7 +193,7 @@ public class Helpers {
 		/* Lift variables into the function's environment and initialize to undefined. */
 		List<Name> localVars = VariableLiftVisitor.getVariableDeclarations(function);
 		for(Name localVar : localVars) {
-			Address address = trace.makeAddr(localVar.getID());
+			Address address = trace.makeAddr(localVar.getID(), "");
 			env = env.strongUpdate(localVar.toSource(), address);
 			store = store.alloc(address, Undefined.inject(Undefined.top()));
 		}
@@ -198,15 +202,15 @@ public class Helpers {
 		List<FunctionNode> children = FunctionLiftVisitor.getFunctionDeclarations(function);
 		for(FunctionNode child : children) {
 			if(child.getName().isEmpty()) continue; // Not accessible.
-			Address address = trace.makeAddr(child.getID());
+			Address address = trace.makeAddr(child.getID(), "");
 
-			/* The function name variable points to out new function. */
-			store = store.alloc(address, Address.inject(address));
+			/* The function name variable points to our new function. */
 			env = env.strongUpdate(child.getName(), address);
+			store = store.alloc(address, Address.inject(address));
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
-			store = store.alloc(address, createFunctionObj(closure, store, trace, child.getID()));
+			store = createFunctionObj(closure, store, trace, address, child.getID());
 
 		}
 
