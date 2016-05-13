@@ -227,7 +227,7 @@ public class Helpers {
 		if(node instanceof Name) {
 
 			/* Base case, we have a simple name. */
-			return Address.inject(env.apply(node.toSource()));
+			return store.apply(env.apply(node.toSource()));
 
 		}
 		else if(node instanceof InfixExpression) {
@@ -243,6 +243,8 @@ public class Helpers {
 			/* Lookup the current property at each of these addresses. Ignore
 			 * type errors and auto-boxing for now. */
 			for(Address address : lhs.addressAD.addresses) {
+
+				/* Get the Obj from the store.
 
 				/* Get the BValue from the store. This is the value of the var/property. */
 				BValue propVal = store.apply(address);
