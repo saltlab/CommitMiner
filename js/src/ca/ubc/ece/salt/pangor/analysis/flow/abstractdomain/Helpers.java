@@ -131,7 +131,7 @@ public class Helpers {
 	}
 
 	/**
-	 * @param fun The address(es) of the function object to execute.
+	 * @param funVal The address(es) of the function object to execute.
 	 * @param selfAddr The value of the 'this' identifier (a set of objects).
 	 * @param args The address of the arguments object.
 	 * @param store The store at the caller.
@@ -139,13 +139,13 @@ public class Helpers {
 	 * @param trace The trace at the caller.
 	 * @return The final state of the closure.
 	 */
-	public static State applyClosure(Set<Address> funAddrs, Address selfAddr, Address args,
+	public static State applyClosure(BValue funVal, Address selfAddr, Address args,
 							  Store store, Scratchpad sp, Trace trace) {
 
 		State state = null;
 
 		/* Get the results for each possible function. */
-		for(Address address : funAddrs) {
+		for(Address address : funVal.addressAD.addresses) {
 
 			/* Get the function object to execute. */
 			Obj functObj = store.getObj(address);
@@ -217,18 +217,17 @@ public class Helpers {
 	/**
 	 * Resolves a variable to its Address in the store. Follows fields and
 	 * function calls as best it can.
-	 * @return The Address for the variable, function or field, or null if it
+	 * @return The value of the variable, function or field, or null if it
 	 * 		   cannot be resolved.
 	 */
-	public static Set<Address> resolve(Environment env, Store store, AstNode node) {
+	public static BValue resolve(Environment env, Store store, AstNode node) {
 
-		Set<Address> result = new HashSet<Address>(2);
+		BValue result = null;
 
 		if(node instanceof Name) {
 
 			/* Base case, we have a simple name. */
-			result.add(env.apply(node.toSource()));
-			return result;
+			return Address.inject(env.apply(node.toSource()));
 
 		}
 		else if(node instanceof InfixExpression) {
@@ -236,20 +235,21 @@ public class Helpers {
 			/* We have a qualified name. Recursively find all the addresses
 			 * that lhs can resolve to. */
 			InfixExpression ie = (InfixExpression) node;
-			Set<Address> lhs = resolve(env, store, ie.getLeft());
+			BValue lhs = resolve(env, store, ie.getLeft());
 
 			/* We may not have been able to resolve the name. */
 			if(lhs == null) return null;
 
 			/* Lookup the current property at each of these addresses. Ignore
 			 * type errors and auto-boxing for now. */
-			for(Address address : lhs) {
+			for(Address address : lhs.addressAD.addresses) {
 
 				/* Get the BValue from the store. This is the value of the var/property. */
 				BValue propVal = store.apply(address);
 
-				/* Add the set of addresses in this BValue. */
-				result.addAll(propVal.addressAD.addresses);
+				/* Join this property value with the rest of the properties. */
+				if(result == null) result = propVal;
+				else result = result.join(propVal);
 
 			}
 
@@ -275,7 +275,7 @@ public class Helpers {
 		else if(node instanceof InfixExpression) {
 			/* We have a qualified name. Recursively find the addresses. */
 			InfixExpression ie = (InfixExpression) node;
-			return Addresses.inject(new Addresses(resolve(env, store, ie.getLeft())));
+			return resolve(env, store, ie.getLeft());
 		}
 		else {
 			/* Ignore everything else (e.g., method calls) for now. */

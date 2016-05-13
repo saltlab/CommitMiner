@@ -2,7 +2,6 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
@@ -61,7 +60,7 @@ public class ExpEval {
 		AstNode rhs = a.getRight();
 
 		/* Resolve the left hand side to a set of addresses (. */
-		Set<Address> val = Helpers.resolve(env, store, lhs);
+		BValue val = Helpers.resolve(env, store, lhs);
 
 	}
 
@@ -92,7 +91,7 @@ public class ExpEval {
 			store = store.alloc(argAddr, argObj);
 
 			/* Attempt to resolve the function and it's parent object. */
-			Set<Address> funAddrs = Helpers.resolve(env, store, fc.getTarget());
+			BValue funVal = Helpers.resolve(env, store, fc.getTarget());
 			BValue objVal = Helpers.resolveSelf(env, store, fc.getTarget());
 
 			/* If the function is not a member variable, it is local and we
@@ -101,14 +100,14 @@ public class ExpEval {
 			if(objVal == null) objAddr = selfAddr;
 			else store = store.alloc(objAddr, objVal);
 
-			if(funAddrs == null) {
+			if(funVal == null) {
 				/* If the function was not resolved, we assume the (local)
 				 * state is unchanged, but add BValue.TOP as the return value. */
 				return BValue.top();
 			}
 			else {
 				/* Call the function and get a join of the new states. */
-				State retState = Helpers.applyClosure(funAddrs, objAddr, argAddr, store,
+				State retState = Helpers.applyClosure(funVal, objAddr, argAddr, store,
 													  scratch, trace);
 				return retState.scratchpad.apply(Scratch.RETVAL);
 			}
