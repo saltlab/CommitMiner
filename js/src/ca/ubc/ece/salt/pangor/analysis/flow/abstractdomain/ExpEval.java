@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
@@ -59,8 +60,8 @@ public class ExpEval {
 		AstNode lhs = a.getLeft();
 		AstNode rhs = a.getRight();
 
-		/* Resolve the left hand side to a set of addresses (. */
-		BValue val = Helpers.resolve(env, store, lhs);
+		/* Resolve the left hand side to a set of addresses. */
+		Set<Address> addrs = Helpers.resolve(env, store, lhs);
 
 	}
 
@@ -91,7 +92,7 @@ public class ExpEval {
 			store = store.alloc(argAddr, argObj);
 
 			/* Attempt to resolve the function and it's parent object. */
-			BValue funVal = Helpers.resolve(env, store, fc.getTarget());
+			BValue funVal = Helpers.resolveValue(env, store, fc.getTarget());
 			BValue objVal = Helpers.resolveSelf(env, store, fc.getTarget());
 
 			/* If the function is not a member variable, it is local and we
