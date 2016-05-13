@@ -260,15 +260,22 @@ public class Helpers {
 
 			/* Lookup the current property at each of these addresses. Ignore
 			 * type errors and auto-boxing for now. */
-			for(Address address : lhs) {
+			for(Address valAddr : lhs) {
 
-				/* Get the Obj from the store. */
-				Obj obj = store.getObj(address);
+				/* Get the value at the address. */
+				BValue val = store.apply(valAddr);
 
-				/* Look up the property. We do not handle the case when the
-				 * rhs is an expression. */
-				Address propAddr = obj.externalProperties.get(ie.getRight().toSource());
-				result.add(propAddr);
+				for(Address objAddr : val.addressAD.addresses) {
+
+					/* Get the Obj from the store. */
+					Obj obj = store.getObj(objAddr);
+
+					/* Look up the property. We do not handle the case when the
+					 * rhs is an expression. */
+					Address propAddr = obj.externalProperties.get(ie.getRight().toSource());
+					result.add(propAddr);
+
+				}
 
 			}
 
