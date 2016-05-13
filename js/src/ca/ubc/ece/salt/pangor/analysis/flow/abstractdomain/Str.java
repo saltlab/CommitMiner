@@ -40,11 +40,11 @@ public class Str {
 
 	private LatticeElement le;
 
-	private Str(LatticeElementType let, String value) {
+	public Str(LatticeElementType let, String value) {
 		this.le = new LatticeElement(let, value);
 	}
 
-	private Str(LatticeElement le) {
+	public Str(LatticeElement le) {
 		this.le = le;
 	}
 

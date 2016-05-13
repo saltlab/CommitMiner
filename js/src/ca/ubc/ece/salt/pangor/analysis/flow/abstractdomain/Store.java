@@ -110,6 +110,16 @@ public class Store {
 	}
 
 	/**
+	 * Replaces an value using a strong update.
+	 * @return The Store after the strong update.
+	 */
+	public Store strongUpdate(Address addr, BValue val) {
+		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>(this.bValueStore);
+		bValueStore.put(addr, val);
+		return new Store(bValueStore, this.objectStore);
+	}
+
+	/**
 	 * @param address The address of the base value to retrieve.
 	 * @return The BValue at the address or null if the BValue does not exist.
 	 */
