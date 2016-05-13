@@ -32,7 +32,7 @@ public class State implements IState {
 		this.trace = trace;
 	}
 
-	public State transfer(CFGEdge edge, BValue self) {
+	public State transfer(CFGEdge edge, Address selfAddr) {
 
 		/* Update the trace to the current condition. */
 		this.trace = this.trace.update(edge.getId());
@@ -41,7 +41,7 @@ public class State implements IState {
 
 	}
 
-	public State transfer(CFGNode node, BValue self) {
+	public State transfer(CFGNode node, Address selfAddr) {
 
 		/* Update the trace to the current statement. */
 		this.trace = this.trace.update(node.getId());
@@ -49,10 +49,11 @@ public class State implements IState {
 		/* The statement to transfer over. */
 		AstNode statement = (AstNode)node.getStatement();
 
-		/* Evaluate depending on statement type. */
-		ExpEval.eval(environment, store, scratchpad, trace, statement, self);
+		/* Evaluate the expression and update the abstract domains. */
+		ExpEval.eval(environment, store, scratchpad, trace, statement, selfAddr);
 
 		return this;
+
 	}
 
 	/**

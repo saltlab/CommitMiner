@@ -9,14 +9,14 @@ import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 public abstract class Closure extends SmartHash {
 
 	/**
-	 * @param selfAddr The address of the 'this' object.
+	 * @param selfAddr The value of the 'this' variable (a set of objects).
 	 * @param argArrayAddr The address of the argument array object.
 	 * @param store Main memory.
 	 * @param scratchpad Scratchpad memory.
 	 * @param trace The execution trace.
 	 * @return The new state after executing the function.
 	 */
-	public abstract State run(BValue selfAddr, Address argArrayAddr,
+	public abstract State run(Address selfAddr, Address argArrayAddr,
 							  Store store, Scratchpad scratchpad,
 							  Trace trace);
 

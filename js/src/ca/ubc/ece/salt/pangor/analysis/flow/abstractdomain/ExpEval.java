@@ -2,8 +2,11 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.EmptyStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.Name;
@@ -23,17 +26,23 @@ public class ExpEval {
 	 * @return The value of the expression.
 	 */
 	public static BValue eval(Environment env, Store store, Scratchpad scratch,
-							  Trace trace, AstNode node, BValue self) {
+							  Trace trace, AstNode node, Address selfAddr) {
 
+		if(node instanceof EmptyStatement) {
+			return BValue.bottom();
+		}
 		if(node instanceof ExpressionStatement) {
 			ExpressionStatement es = (ExpressionStatement)node;
-			return eval(env, store, scratch, trace, es.getExpression(), self);
+			return eval(env, store, scratch, trace, es.getExpression(), selfAddr);
 		}
 		else if(node instanceof Name) {
 			return store.apply(env.apply(node.toSource()));
 		}
 		else if(node instanceof FunctionCall) {
-			return evalFunctionCall(env, store, scratch, trace, (FunctionCall)node, self);
+			return evalFunctionCall(env, store, scratch, trace, (FunctionCall)node, selfAddr);
+		}
+		else if(node instanceof Assignment) {
+
 		}
 
 		/* We could not evaluate the expression. Return top. */
@@ -42,17 +51,33 @@ public class ExpEval {
 	}
 
 	/**
+	 * Transfer the abstract domains over the assignment.
+	 * @param a The assignment.
+	 */
+	public static void evalAssignment(Environment env, Store store, Scratchpad scratch,
+									  Trace trace, Assignment a, Address selfAddr) {
+
+		AstNode lhs = a.getLeft();
+		AstNode rhs = a.getRight();
+
+		/* Resolve the left hand side to a set of addresses (. */
+		Set<Address> val = Helpers.resolve(env, store, lhs);
+
+	}
+
+	/**
 	 * Evaluate a function call expression to a BValue.
+	 * @param fc The function call.
 	 * @return The return value of the function call.
 	 */
 	public static BValue evalFunctionCall(Environment env, Store store, Scratchpad scratch,
-										  Trace trace, FunctionCall fc, BValue self) {
+										  Trace trace, FunctionCall fc, Address selfAddr) {
 
 			/* Create the argument object. */
 			Map<String, Address> ext = new HashMap<String, Address>();
 			int i = 0;
 			for(AstNode arg : fc.getArguments()) {
-				BValue argVal = eval(env, store, scratch, trace, arg, self);
+				BValue argVal = eval(env, store, scratch, trace, arg, selfAddr);
 				Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
 								ext, store, trace);
 				i++;
@@ -67,19 +92,23 @@ public class ExpEval {
 			store = store.alloc(argAddr, argObj);
 
 			/* Attempt to resolve the function and it's parent object. */
-			BValue fun = Helpers.resolve(env, store, fc.getTarget());
-			BValue obj = Helpers.resolveSelf(env, store, fc.getTarget());
+			Set<Address> funAddrs = Helpers.resolve(env, store, fc.getTarget());
+			BValue objVal = Helpers.resolveSelf(env, store, fc.getTarget());
 
-			if(obj == null) obj = self;
+			/* If the function is not a member variable, it is local and we
+			 * use the object of the currently executing function as self. */
+			Address objAddr = trace.toAddr("this");
+			if(objVal == null) objAddr = selfAddr;
+			else store = store.alloc(objAddr, objVal);
 
-			if(fun == null) {
+			if(funAddrs == null) {
 				/* If the function was not resolved, we assume the (local)
 				 * state is unchanged, but add BValue.TOP as the return value. */
 				return BValue.top();
 			}
 			else {
 				/* Call the function and get a join of the new states. */
-				State retState = Helpers.applyClosure(fun, self, argAddr, store,
+				State retState = Helpers.applyClosure(funAddrs, objAddr, argAddr, store,
 													  scratch, trace);
 				return retState.scratchpad.apply(Scratch.RETVAL);
 			}

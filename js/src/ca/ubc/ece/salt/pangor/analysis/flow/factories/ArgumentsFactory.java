@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
@@ -34,7 +33,7 @@ public class ArgumentsFactory {
 
 		NativeClosure closure = new NativeClosure() {
 				@Override
-				public State run(BValue selfAddr, Address argArrayAddr,
+				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace) {
 					return new State(store, null, scratchpad, trace);

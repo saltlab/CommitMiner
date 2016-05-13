@@ -6,7 +6,6 @@ import java.util.Queue;
 import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 
@@ -42,7 +41,7 @@ public class StackCFA extends Trace {
 	}
 
 	@Override
-	public Trace update(Environment env, Store store, BValue self, Address args,
+	public Trace update(Environment env, Store store, Address selfAddr, Address args,
 			AstNode call) {
 		Queue<Integer> trp = new LinkedList<Integer>(this.tr);
 		trp.add(call.getID());

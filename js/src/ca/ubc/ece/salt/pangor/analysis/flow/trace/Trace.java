@@ -9,7 +9,6 @@ import java.util.Set;
 import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.JSClass;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.SmartHash;
@@ -32,7 +31,7 @@ public abstract class Trace extends SmartHash {
 	public abstract Trace update(int pp);
 
 	/** Update for function call. **/
-	public abstract Trace update(Environment env, Store store, BValue self,
+	public abstract Trace update(Environment env, Store store, Address selfAddr,
 								 Address args, AstNode statement);
 
 	/** Update for function return. Default implementation is stack-based. **/

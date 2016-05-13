@@ -60,7 +60,7 @@ public class FunctionFactory {
 
 		Closure closure = new NativeClosure() {
 				@Override
-				public State run(BValue selfAddr, Address argArrayAddr,
+				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace) {
 					scratchpad.strongUpdate(Scratch.RETVAL, retVal);

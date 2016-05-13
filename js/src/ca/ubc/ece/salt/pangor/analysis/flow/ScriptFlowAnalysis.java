@@ -39,8 +39,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		State state = StateFactory.createInitialState((ScriptNode) root, cfgMap);
 
 		/* Perform the initial analysis and get the publicly accessible methods. */
-		state = Helpers.run(cfgMap.get(root), state,
-				state.store.apply(StoreFactory.global_binding_Addr));
+		state = Helpers.run(cfgMap.get(root), state, StoreFactory.global_binding_Addr);
 
 		// TODO
 		/* Analyze the publicly accessible methods that weren't analyzed in

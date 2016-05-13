@@ -48,7 +48,7 @@ public class ObjFactory {
 
 		NativeClosure closure = new NativeClosure() {
 				@Override
-				public State run(BValue selfAddr, Address argArrayAddr,
+				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace) {
 					// TODO: Update the state

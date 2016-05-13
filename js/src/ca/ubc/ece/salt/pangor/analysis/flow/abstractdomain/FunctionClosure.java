@@ -32,7 +32,7 @@ public class FunctionClosure extends Closure {
 	}
 
 	@Override
-	public State run(BValue selfAddr, Address argArrayAddr, Store store,
+	public State run(Address selfAddr, Address argArrayAddr, Store store,
 			Scratchpad scratchpad, Trace trace) {
 
 		/* Advance the trace. */
@@ -61,16 +61,13 @@ public class FunctionClosure extends Closure {
 		}
 
 		/* Add 'this' to environment (points to caller's object or new object). */
-		Address address = trace.makeAddr((int)this.cfg.getEntryNode().getId());
-		store = store.alloc(address, selfAddr);
-		env = env.strongUpdate("this", address);
+		env = env.strongUpdate("this", selfAddr);
 
 		/* Create the initial state for the function call. */
 		State state = new State(store, env, scratchpad, trace);
 
 		/* Run the analysis on the CFG. */
 		return Helpers.run(cfg, state, selfAddr);
-
 	}
 
 }
