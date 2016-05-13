@@ -105,11 +105,6 @@ public class Obj extends SmartHash {
 				BValue bvl = bValueMap.get(lAddr);
 				BValue bvr = bValueMap.get(rAddr);
 
-				if(bvl == null) System.out.println("Not Found (" + entry.getKey() + ": " + lAddr.addr + ")");
-				else System.out.println("OK (" + entry.getKey() + ": " + lAddr.addr + ")");
-				if(bvr == null) System.out.println("Not Found (" + entry.getKey() + ": " + rAddr.addr + ")");
-				else System.out.println("OK (" + entry.getKey() + ": " + rAddr.addr + ")");
-
 				if(!lAddr.equals(rAddr)) {
 
 					/* Uh oh... we have two addresses for the same property.

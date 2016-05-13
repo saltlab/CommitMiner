@@ -138,7 +138,7 @@ public class ExpEval {
 			int i = 0;
 			for(AstNode arg : fc.getArguments()) {
 				BValue argVal = eval(env, store, scratch, trace, arg, selfAddr);
-				Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
+				store = Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
 								ext, store, trace);
 				i++;
 			}
