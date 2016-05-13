@@ -244,10 +244,15 @@ public class Helpers {
 			 * type errors and auto-boxing for now. */
 			for(Address address : lhs.addressAD.addresses) {
 
-				/* Get the Obj from the store.
+				/* Get the Obj from the store. */
+				Obj obj = store.getObj(address);
 
-				/* Get the BValue from the store. This is the value of the var/property. */
-				BValue propVal = store.apply(address);
+				/* Look up the property. We do not handle the case when the
+				 * rhs is an expression. */
+				Address propAddr = obj.externalProperties.get(ie.getRight().toSource());
+
+				/* Get the BValue from the store. */
+				BValue propVal = store.apply(propAddr);
 
 				/* Join this property value with the rest of the properties. */
 				if(result == null) result = propVal;
