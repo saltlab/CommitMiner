@@ -171,4 +171,10 @@ public class Str {
 		BOTTOM
 	}
 
+	@Override
+	public String toString() {
+		if(this.le.value != null) return "Str:" + this.le.value;
+		return "Str:" + this.le.type.toString();
+	}
+
 }

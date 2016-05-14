@@ -75,4 +75,9 @@ public class Address extends SmartHash {
 		return address;
 	}
 
+	@Override
+	public String toString() {
+		return this.addr.toString() + "." + prop;
+	}
+
 }

@@ -122,4 +122,12 @@ public class Obj extends SmartHash {
 
 	}
 
+	@Override
+	public String toString() {
+		String extProp = "";
+		for(String prop : this.externalProperties.keySet())
+			extProp += prop + "|";
+		return "Obj:" + this.externalProperties.size() + "|" + extProp;
+	}
+
 }

@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * The abstract domain for the program's store (memory).
@@ -148,6 +149,19 @@ public class Store {
 	 */
 	public Obj getObj(Address address) {
 		return this.objectStore.get(address);
+	}
+
+	@Override
+	public String toString() {
+		String str = "-BValues-\n";
+		for(Entry<Address, BValue> entry : this.bValueStore.entrySet()) {
+			str += entry.getKey().toString() + ": " + entry.getValue().toString() + "\n";
+		}
+		str += "-Objects-\n";
+		for(Entry<Address, Obj> entry : this.objectStore.entrySet()) {
+			str += entry.getKey().toString() + ": " + entry.getValue().toString() + "\n";
+		}
+		return str;
 	}
 
 }

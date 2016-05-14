@@ -68,5 +68,10 @@ public class Bool {
 		BOTTOM
 	}
 
+	@Override
+	public String toString() {
+		return "Bool:" + this.le.toString();
+	}
+
 
 }

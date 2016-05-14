@@ -68,4 +68,9 @@ public class Num {
 		BOTTOM
 	}
 
+	@Override
+	public String toString() {
+		return "Num:" + this.le.toString();
+	}
+
 }

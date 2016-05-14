@@ -68,4 +68,9 @@ public class Undefined {
 		BOTTOM
 	}
 
+	@Override
+	public String toString() {
+		return "Undef:" + this.le.toString();
+	}
+
 }

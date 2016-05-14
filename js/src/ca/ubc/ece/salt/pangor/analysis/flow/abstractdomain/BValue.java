@@ -88,4 +88,9 @@ public class BValue {
 				Addresses.bottom());
 	}
 
+	@Override
+	public String toString() {
+		return this.nullAD.toString() + "|" + this.undefinedAD.toString() + "|" + this.booleanAD.toString() + "|" + this.numberAD.toString() + "|" + this.stringAD.toString() + "|" + this.addressAD.toString();
+	}
+
 }

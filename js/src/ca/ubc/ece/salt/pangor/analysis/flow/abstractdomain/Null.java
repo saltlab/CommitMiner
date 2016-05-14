@@ -86,4 +86,10 @@ public class Null {
 		BOTTOM
 	}
 
+	@Override
+	public String toString() {
+		return "Null:" + this.le.toString();
+	}
+
+
 }

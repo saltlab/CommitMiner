@@ -116,4 +116,11 @@ public class Addresses extends SmartHash {
 		BOTTOM	// Does not point to an address (empty set)
 	}
 
+	@Override
+	public String toString() {
+		if(this.le != LatticeElement.SET) return "Addr:" + this.le.toString();
+		else return "Addr:" + this.addresses.size();
+	}
+
+
 }
