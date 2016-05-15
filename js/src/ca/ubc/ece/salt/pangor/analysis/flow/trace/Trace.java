@@ -42,7 +42,7 @@ public abstract class Trace extends SmartHash {
 	/** Convert the trace directly to an address. **/
 	public abstract Address toAddr(String prop);
 
-	/** Make a new address with a node id instead of a string. **/
+	/** Make a new address with the node id of a variable/object being allocated. **/
 	public abstract Address makeAddr(int varID, String prop);
 
 	/** Modify an address to account for an object's class. **/

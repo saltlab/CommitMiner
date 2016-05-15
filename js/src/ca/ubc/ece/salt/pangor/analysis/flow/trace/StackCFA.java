@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.trace;
 
+import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -51,12 +52,12 @@ public class StackCFA extends Trace {
 
 	@Override
 	public Address toAddr(String prop) {
-		return new Address(intsToBigInteger(tr, pp), prop);
+		return new Address(intsToBigInteger(tr, pp).shiftLeft(32), prop);
 	}
 
 	@Override
 	public Address makeAddr(int varID, String prop) {
-		return new Address(intsToBigInteger(tr, varID), prop);
+		return new Address(intsToBigInteger(tr, pp).shiftLeft(32).add(BigInteger.valueOf(varID)), prop);
 	}
 
 }
