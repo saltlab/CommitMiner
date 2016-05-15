@@ -14,7 +14,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
  */
 public class Undefined {
 
-	private LatticeElement le;
+	public LatticeElement le;
 
 	public Undefined() {
 		this.le = LatticeElement.TOP;

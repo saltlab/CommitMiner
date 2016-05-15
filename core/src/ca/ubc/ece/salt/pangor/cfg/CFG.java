@@ -1,29 +1,31 @@
 package ca.ubc.ece.salt.pangor.cfg;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 /**
  * A low(er) level control flow graph or subgraph.
- * 
+ *
  * The control flow graph contains an entry node where the graph begins. It
  * also keeps track of statements that exit the CFG. These include the last
  * statements in a block that exit the graph and jump statements including
- * break, continue, throw and return. 
+ * break, continue, throw and return.
  */
 public class CFG {
-	
+
 	private CFGNode entryNode;
 	private List<CFGNode> exitNodes;
 	private List<CFGNode> breakNodes;
 	private List<CFGNode> continueNodes;
 	private List<CFGNode> throwNodes;
 	private List<CFGNode> returnNodes;
-	
-	public CFG(CFGNode entryNode) { 
+
+	public CFG(CFGNode entryNode) {
 		this.entryNode = entryNode;
 		this.exitNodes = new LinkedList<CFGNode>();
 		this.breakNodes = new LinkedList<CFGNode>();
@@ -31,18 +33,46 @@ public class CFG {
 		this.throwNodes = new LinkedList<CFGNode>();
 		this.returnNodes = new LinkedList<CFGNode>();
 	}
-	
-	/** 
+
+
+	/**
+	 * Accept a node visitor. Visit all nodes and edges in the CFG. Nodes and
+	 * edges may be visited in any order.
+	 */
+	public void accept(ICFGVisitor visitor) {
+
+		Set<CFGNode> visited = new HashSet<CFGNode>();
+		Stack<CFGNode> stack = new Stack<CFGNode>();
+
+		stack.push(this.getEntryNode());
+		visited.add(this.getEntryNode());
+
+		while(!stack.isEmpty()) {
+			CFGNode node = stack.pop();
+			node.accept(visitor);
+
+			for(CFGEdge edge : node.getEdges()) {
+				edge.accept(visitor);
+				if(!visited.contains(edge.getTo())) {
+					stack.push(edge.getTo());
+					visited.add(edge.getTo());
+				}
+			}
+		}
+
+	}
+
+	/**
 	 * @return a copy of the CFG.
 	 */
 	public CFG copy() {
 
 		CFGNode entryNodeCopy = CFGNode.copy(this.entryNode);
-		
+
 		/* Keep track of the nodes we have copied. */
 		Map<CFGNode, CFGNode> newNodes = new HashMap<CFGNode, CFGNode>();
 		newNodes.put(this.entryNode, entryNodeCopy);
-		
+
 		/* Depth first traversal. */
 		Stack<CFGNode> stack = new Stack<CFGNode>();
 		stack.push(entryNodeCopy);
@@ -53,7 +83,7 @@ public class CFG {
 
 			/* Copy the list of edges. */
 			List<CFGEdge> copiedEdges = new LinkedList<CFGEdge>(node.getEdges());
-			
+
 			/* Re-assign the 'to' part of the edge. Copy the node if it hasn't
 			 * been copied yet. */
 			for(CFGEdge copiedEdge : copiedEdges) {
@@ -65,14 +95,14 @@ public class CFG {
 				}
 				copiedEdge.setTo(nodeCopy);
 			}
-			
+
 			/* Assign the new edges to the current node. */
 			node.setEdges(copiedEdges);
 		}
-		
+
 		/* Copy the CFG and add all the jump nodes. */
 		CFG cfg = new CFG(entryNodeCopy);
-		
+
 		for(CFGNode exitNode : this.exitNodes) {
 			CFGNode node = newNodes.get(exitNode);
 			if(node != null) cfg.addExitNode(node);
@@ -97,10 +127,10 @@ public class CFG {
 			CFGNode copy = newNodes.get(node);
 			if(copy != null) cfg.addExitNode(copy);
 		}
-		
+
 		return cfg;
 	}
-	
+
 	/**
 	 * Returns the entry node for this CFG.
 	 * @return The entry Node.
@@ -108,7 +138,7 @@ public class CFG {
 	public CFGNode getEntryNode() {
 		return entryNode;
 	}
-	
+
 	/**
 	 * Add an exit node to this CFG.
 	 * @param node The last node before exiting an execution branch.
@@ -116,7 +146,7 @@ public class CFG {
 	public void addExitNode(CFGNode node) {
 		this.exitNodes.add(node);
 	}
-	
+
 	/**
 	 * Adds all the exit nodes in the list.
 	 * @param nodes
@@ -124,7 +154,7 @@ public class CFG {
 	public void addAllExitNodes(List<CFGNode> nodes) {
 		this.exitNodes.addAll(nodes);
 	}
-	
+
 	/**
 	 * Get the exit nodes for this graph.
 	 * @return The list of exit points.
@@ -140,7 +170,7 @@ public class CFG {
 	public void addBreakNode(CFGNode node) {
 		this.breakNodes.add(node);
 	}
-	
+
 	/**
 	 * Adds all the break nodes in the list.
 	 * @param nodes
@@ -148,7 +178,7 @@ public class CFG {
 	public void addAllBreakNodes(List<CFGNode> nodes) {
 		this.breakNodes.addAll(nodes);
 	}
-	
+
 	/**
 	 * Get the break nodes for this graph.
 	 * @return The list of break points.
@@ -164,7 +194,7 @@ public class CFG {
 	public void addContinueNode(CFGNode node) {
 		this.continueNodes.add(node);
 	}
-	
+
 	/**
 	 * Adds all the continue nodes in the list.
 	 * @param nodes
@@ -172,7 +202,7 @@ public class CFG {
 	public void addAllContinueNodes(List<CFGNode> nodes) {
 		this.continueNodes.addAll(nodes);
 	}
-	
+
 	/**
 	 * Get the continue nodes for this graph.
 	 * @return The list of continue points.
@@ -188,7 +218,7 @@ public class CFG {
 	public void addThrowNode(CFGNode node) {
 		this.throwNodes.add(node);
 	}
-	
+
 	/**
 	 * Adds all the throw nodes in the list.
 	 * @param nodes
@@ -196,7 +226,7 @@ public class CFG {
 	public void addAllThrowNodes(List<CFGNode> nodes) {
 		this.throwNodes.addAll(nodes);
 	}
-	
+
 	/**
 	 * Get the throw nodes for this graph.
 	 * @return The list of throw points.
@@ -212,7 +242,7 @@ public class CFG {
 	public void addReturnNode(CFGNode node) {
 		this.returnNodes.add(node);
 	}
-	
+
 	/**
 	 * Adds all the return nodes in the list.
 	 * @param nodes
@@ -220,7 +250,7 @@ public class CFG {
 	public void addAllReturnNodes(List<CFGNode> nodes) {
 		this.returnNodes.addAll(nodes);
 	}
-	
+
 	/**
 	 * Get the return nodes for this graph.
 	 * @return The list of return points.

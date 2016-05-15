@@ -45,12 +45,11 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		/* Analyze the publicly accessible methods that weren't analyzed in
 		 * the main analysis. */
 
-		// TODO
 		/* Generate facts from the results of the analysis. */
-
-		state = null;
+		for(CFG cfg : cfgs) {
+			cfg.accept(new ProtectedCFGVisitor(sourceCodeFileChange, facts));
+		}
 
 	}
-
 
 }

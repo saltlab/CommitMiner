@@ -49,6 +49,13 @@ public class CFGEdge {
 	}
 
 	/**
+	 * Accepts and runs a visitor.
+	 */
+	public void accept(ICFGVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	/**
 	 * Set the abstract state at this point in the program.
 	 * @param as The abstract state.
 	 */

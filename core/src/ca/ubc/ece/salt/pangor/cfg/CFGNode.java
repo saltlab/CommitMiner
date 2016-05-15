@@ -61,6 +61,13 @@ public class CFGNode {
 	}
 
 	/**
+	 * Accepts and runs a visitor.
+	 */
+	public void accept(ICFGVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	/**
 	 * Set the lattice element at this point in the program.
 	 * @param as The abstract state.
 	 */

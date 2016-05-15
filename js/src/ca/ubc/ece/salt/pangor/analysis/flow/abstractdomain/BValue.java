@@ -9,22 +9,22 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 public class BValue {
 
 	/** The abstract domain for strings. **/
-	Str stringAD;
+	public Str stringAD;
 
 	/** The abstract domain for numbers. **/
-	Num numberAD;
+	public Num numberAD;
 
 	/** The abstract domain for booleans. **/
-	Bool booleanAD;
+	public Bool booleanAD;
 
 	/** The abstract domain for null. **/
-	Null nullAD;
+	public Null nullAD;
 
 	/** The abstract domain for undefined. **/
-	Undefined undefinedAD;
+	public Undefined undefinedAD;
 
 	/** The abstract domain for memory addresses. **/
-	Addresses addressAD;
+	public Addresses addressAD;
 
 	public BValue(Str stringAD, Num numberAD,
 					  Bool booleanAD, Null nullAD,
