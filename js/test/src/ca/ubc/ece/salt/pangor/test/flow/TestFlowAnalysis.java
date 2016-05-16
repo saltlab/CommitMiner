@@ -105,8 +105,26 @@ public class TestFlowAnalysis {
 	public void testObjectLiteral() throws Exception {
 
 		/* The test files. */
-		String src = "./test/input/interproc/export_old.js";
-		String dst = "./test/input/interproc/export_new.js";
+		String src = "./test/input/interproc/objlit_old.js";
+		String dst = "./test/input/interproc/objlit_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "PROTECT", "x_FALSEY_NE_IR"));
+
+		this.runTest(sourceCodeFileChange, expected, true);
+	}
+
+	@Test
+	public void testPropDef() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/interproc/propdef_old.js";
+		String dst = "./test/input/interproc/propdef_new.js";
 
 		/* Read the source files. */
 		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);

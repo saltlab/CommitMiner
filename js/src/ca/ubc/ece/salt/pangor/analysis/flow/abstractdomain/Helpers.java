@@ -242,7 +242,7 @@ public class Helpers {
 	 */
 	public static Set<Address> resolve(Environment env, Store store, AstNode node) {
 
-		Set<Address> result = new HashSet<Address>(1,2);
+		Set<Address> result = new HashSet<Address>();
 
 		if(node instanceof Name) {
 
