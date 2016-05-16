@@ -34,7 +34,7 @@ public class Addresses extends SmartHash {
 	}
 
 	public Addresses(LatticeElement le, Set<Address> addresses) {
-		this.addresses = new HashSet<Address>();
+		this.addresses = addresses;
 		this.le = le;
 	}
 
