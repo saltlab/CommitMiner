@@ -81,7 +81,6 @@ public class ObjFactory {
 
 	public Obj Object_proto_Obj() {
 		Map<String, Address> ext = new HashMap<String, Address>();
-		store = Helpers.addProp("constructor", Address.inject(StoreFactory.Object_Addr), ext, store);
 		store = Helpers.addProp("toString", Address.inject(StoreFactory.Object_proto_toString_Addr), ext, store);
 		store = Helpers.addProp("toLocaleString", Address.inject(StoreFactory.Object_proto_toLocaleString_Addr), ext, store);
 		store = Helpers.addProp("valueOf", Address.inject(StoreFactory.Object_proto_valueOf_Addr), ext, store);
