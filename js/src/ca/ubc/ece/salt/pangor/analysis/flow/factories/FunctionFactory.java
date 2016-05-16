@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.mozilla.javascript.ast.AstNode;
+
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
@@ -20,13 +22,17 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Str;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
+import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 public class FunctionFactory {
 
 	public Store store;
 
-	public FunctionFactory(Store store) {
+	Map<AstNode, CFG> cfgs;
+
+	public FunctionFactory(Store store, Map<AstNode, CFG> cfgs) {
 		this.store = store;
+		this.cfgs = cfgs;
 	}
 
 	public Obj Function_proto_Obj() {
@@ -54,7 +60,7 @@ public class FunctionFactory {
 	 * @return A function which has no side effects that that returns the
 	 * 		   BValue lattice element top.
 	 */
-	public static Obj constFunctionObj(BValue retVal) {
+	public Obj constFunctionObj(BValue retVal) {
 
 		Map<String, Address> external = new HashMap<String, Address>();
 
@@ -64,7 +70,7 @@ public class FunctionFactory {
 								 Store store, Scratchpad scratchpad,
 								 Trace trace) {
 					scratchpad.strongUpdate(Scratch.RETVAL, retVal);
-					return new State(store, new Environment(), scratchpad, trace);
+					return new State(store, new Environment(), scratchpad, trace, cfgs);
 				}
 			};
 

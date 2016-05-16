@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.mozilla.javascript.ast.AstNode;
+
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Bool;
@@ -19,13 +21,18 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Str;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
+import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 public class ObjFactory {
 
 	public Store store;
+	Map<AstNode, CFG> cfgs;
+	FunctionFactory ff;
 
-	public ObjFactory(Store store) {
+	public ObjFactory(Store store, Map<AstNode, CFG> cfgs) {
 		this.store = store;
+		this.cfgs = cfgs;
+		ff = new FunctionFactory(store, cfgs);
 	}
 
 	public Obj Object_Obj() {
@@ -65,19 +72,19 @@ public class ObjFactory {
 	}
 
 	// TODO: We can be more precise with these.
-	public Obj Object_create_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_defineProperties_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_defineProperty_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_freeze_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_getOwnPropertyDescriptor_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_getOwnPropertyNames_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_getPrototypeOf_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_isExtensible_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_isFrozen_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_isSealed_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_keys_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_preventExtensions_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
-	public Obj Object_seal_Obj() { return FunctionFactory.constFunctionObj(BValue.top()); }
+	public Obj Object_create_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_defineProperties_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_defineProperty_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_freeze_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_getOwnPropertyDescriptor_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_getOwnPropertyNames_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_getPrototypeOf_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_isExtensible_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_isFrozen_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_isSealed_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_keys_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_preventExtensions_Obj() { return ff.constFunctionObj(BValue.top()); }
+	public Obj Object_seal_Obj() { return ff.constFunctionObj(BValue.top()); }
 
 	public Obj Object_proto_Obj() {
 		Map<String, Address> ext = new HashMap<String, Address>();
@@ -93,12 +100,12 @@ public class ObjFactory {
 		return new Obj(ext, internal, ext.keySet());
 	}
 
-	public Obj Object_proto_toString_Obj() { return FunctionFactory.constFunctionObj(Str.inject(Str.top())); }
-	public Obj Object_proto_toLocaleString_Obj() { return FunctionFactory.constFunctionObj(Str.inject(Str.top())); }
-	public Obj Object_proto_hasOwnProperty_Obj() { return FunctionFactory.constFunctionObj(Bool.inject(Bool.top())); }
-	public Obj Object_proto_isPrototypeOf_Obj() { return FunctionFactory.constFunctionObj(Bool.inject(Bool.top())); }
-	public Obj Object_proto_propertyIsEnumerable_Obj() { return FunctionFactory.constFunctionObj(Bool.inject(Bool.top())); }
-	public Obj Object_proto_valueOf_Obj() { return FunctionFactory.constFunctionObj(BValue.primitive()); }
+	public Obj Object_proto_toString_Obj() { return ff.constFunctionObj(Str.inject(Str.top())); }
+	public Obj Object_proto_toLocaleString_Obj() { return ff.constFunctionObj(Str.inject(Str.top())); }
+	public Obj Object_proto_hasOwnProperty_Obj() { return ff.constFunctionObj(Bool.inject(Bool.top())); }
+	public Obj Object_proto_isPrototypeOf_Obj() { return ff.constFunctionObj(Bool.inject(Bool.top())); }
+	public Obj Object_proto_propertyIsEnumerable_Obj() { return ff.constFunctionObj(Bool.inject(Bool.top())); }
+	public Obj Object_proto_valueOf_Obj() { return ff.constFunctionObj(BValue.primitive()); }
 
 
 }

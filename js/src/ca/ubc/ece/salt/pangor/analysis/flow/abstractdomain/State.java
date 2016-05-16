@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.mozilla.javascript.Token;
@@ -17,6 +18,7 @@ import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.IState;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
+import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 
@@ -33,16 +35,19 @@ public class State implements IState {
 	public Scratchpad scratch;
 	public Trace trace;
 
+	private Map<AstNode, CFG> cfgs;
+
 	/**
 	 * Create a new state after a transfer or join.
 	 * @param store The abstract store of the new state.
 	 * @param environment The abstract environment of the new state.
 	 */
-	public State(Store store, Environment environment, Scratchpad scratchpad, Trace trace) {
+	public State(Store store, Environment environment, Scratchpad scratchpad, Trace trace, Map<AstNode, CFG> cfgs) {
 		this.store = store;
 		this.env = environment;
 		this.scratch = scratchpad;
 		this.trace = trace;
+		this.cfgs = cfgs;
 	}
 
 	public State transfer(CFGEdge edge, Address selfAddr) {
@@ -83,7 +88,7 @@ public class State implements IState {
 			interpretVariableDeclaration((VariableDeclaration)node, selfAddr);
 		}
 		else if(node instanceof FunctionCall) {
-			ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr);
+			ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr, cfgs);
 			State endState = expEval.evalFunctionCall((FunctionCall) node);
 			this.store = endState.store;
 		}
@@ -124,7 +129,7 @@ public class State implements IState {
 		Set<Address> addrs = resolveOrCreate(lhs);
 
 		/* Resolve the right hand side to a value. */
-		ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr);
+		ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr, cfgs);
 		BValue val = expEval.eval(rhs);
 		store = expEval.store;
 
@@ -150,7 +155,7 @@ public class State implements IState {
 				 * nothing about it. */
 				addr = trace.makeAddr(node.getID(), "");
 				env = env.strongUpdate(node.toSource(), addr);
-				store.alloc(addr, BValue.top());
+				store = store.alloc(addr, BValue.top());
 			}
 			result.add(addr);
 		}
@@ -228,7 +233,7 @@ public class State implements IState {
 				this.store.join(state.store),
 				this.env.join(state.env),
 				this.scratch.join(state.scratch),
-				this.trace);
+				this.trace, cfgs);
 
 		return joined;
 

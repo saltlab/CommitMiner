@@ -137,6 +137,24 @@ public class TestFlowAnalysis {
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
 
+	@Test
+	public void testExports() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/interproc/exports_old.js";
+		String dst = "./test/input/interproc/exports_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "PROTECT", "x_FALSEY_NE_IR"));
+
+		this.runTest(sourceCodeFileChange, expected, true);
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */

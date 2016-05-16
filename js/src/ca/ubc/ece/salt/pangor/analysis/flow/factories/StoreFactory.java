@@ -3,10 +3,13 @@ package ca.ubc.ece.salt.pangor.analysis.flow.factories;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mozilla.javascript.ast.AstNode;
+
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
+import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
  * Initializes the store with builtins.
@@ -66,7 +69,7 @@ public class StoreFactory {
 	/**
 	 * @return An initial store with builtin objects.
 	 */
-	public static Store createInitialStore() {
+	public static Store createInitialStore(Map<AstNode, CFG> cfgs) {
 
 		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>();
 		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
@@ -79,11 +82,11 @@ public class StoreFactory {
 		objectStore.put(global_Addr, gf.Global_Obj());
 		store = gf.store;
 
-		ArgumentsFactory af = new ArgumentsFactory(store);
+		ArgumentsFactory af = new ArgumentsFactory(store, cfgs);
 		objectStore.put(Arguments_Addr, af.Arguments_Obj());
 		store = af.store;
 
-		ObjFactory of = new ObjFactory(store);
+		ObjFactory of = new ObjFactory(store, cfgs);
 		objectStore.put(Object_Addr, of.Object_Obj());
 		objectStore.put(Object_create_Addr, of.Object_create_Obj());
 		objectStore.put(Object_defineProperties_Addr, of.Object_defineProperties_Obj());
@@ -107,7 +110,7 @@ public class StoreFactory {
 		objectStore.put(Object_proto_valueOf_Addr, of.Object_proto_valueOf_Obj());
 		store = of.store;
 
-		FunctionFactory ff = new FunctionFactory(store);
+		FunctionFactory ff = new FunctionFactory(store, cfgs);
 		objectStore.put(Function_proto_Addr, ff.Function_proto_Obj());
 		objectStore.put(Function_proto_toString_Addr, ff.Function_proto_toString_Obj());
 		objectStore.put(Function_proto_apply_Addr, ff.Function_proto_apply_Obj());

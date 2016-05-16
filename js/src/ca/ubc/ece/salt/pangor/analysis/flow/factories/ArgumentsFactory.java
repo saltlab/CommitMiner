@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.mozilla.javascript.ast.AstNode;
+
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
@@ -16,14 +18,17 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
+import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 
 public class ArgumentsFactory {
 
 	Store store;
+	Map<AstNode, CFG> cfgs;
 
-	public ArgumentsFactory(Store store) {
+	public ArgumentsFactory(Store store, Map<AstNode, CFG> cfgs) {
 		this.store = store;
+		this.cfgs = cfgs;
 	}
 
 	public Obj Arguments_Obj() {
@@ -36,7 +41,7 @@ public class ArgumentsFactory {
 				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace) {
-					return new State(store, null, scratchpad, trace);
+					return new State(store, null, scratchpad, trace, cfgs);
 				}
 			};
 

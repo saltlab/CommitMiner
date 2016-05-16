@@ -25,11 +25,11 @@ public class StateFactory {
 	 */
 	public static State createInitialState(ScriptNode script, Map<AstNode, CFG> cfgs) {
 		Trace trace = new FSCI(script.getID());
-		Store store = StoreFactory.createInitialStore();
+		Store store = StoreFactory.createInitialStore(cfgs);
 		Pair<Environment, Store> lifted =
 				EnvironmentFactory.createInitialEnvironment(script, store, cfgs, trace);
 		Scratchpad scratchpad = new Scratchpad();
-		return new State(lifted.getRight(), lifted.getLeft(), scratchpad, trace);
+		return new State(lifted.getRight(), lifted.getLeft(), scratchpad, trace, cfgs);
 	}
 
 }

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionCall;
+import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
@@ -19,6 +20,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Str.LatticeElementType;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
+import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 public class ExpEval {
 
@@ -27,14 +29,16 @@ public class ExpEval {
 	public Scratchpad scratch;
 	public Trace trace;
 	public Address selfAddr;
+	public Map<AstNode, CFG> cfgs;
 
 	public ExpEval(Environment env, Store store, Scratchpad scratch,
-				   Trace trace, Address selfAddr) {
+				   Trace trace, Address selfAddr, Map<AstNode, CFG> cfgs) {
 		this.env = env;
 		this.store = store;
 		this.scratch = scratch;
 		this.trace = trace;
 		this.selfAddr = selfAddr;
+		this.cfgs = cfgs;
 	}
 
 	/**
@@ -62,10 +66,25 @@ public class ExpEval {
 		else if(node instanceof ObjectLiteral) {
 			return evalObjectLiteral((ObjectLiteral)node);
 		}
+		else if(node instanceof FunctionNode) {
+			return evalFunctionNode((FunctionNode)node);
+		}
 
 		/* We could not evaluate the expression. Return top. */
 		return BValue.top();
 
+	}
+
+	/**
+	 * Creates a new function from a function definition.
+	 * @param f The function definition.
+	 * @return A BValue that points to the new function object.
+	 */
+	public BValue evalFunctionNode(FunctionNode f){
+		Closure closure = new FunctionClosure(cfgs.get(f), env, cfgs);
+		Address addr = trace.makeAddr(f.getID(), "");
+		store = Helpers.createFunctionObj(closure, store, trace, addr, f.getID());
+		return Address.inject(addr);
 	}
 
 	/**
@@ -203,7 +222,7 @@ public class ExpEval {
 				/* If the function was not resolved, we assume the (local)
 				 * state is unchanged, but add BValue.TOP as the return value. */
 				scratch = scratch.strongUpdate(Scratch.RETVAL, BValue.top());
-				return new State(store, env, scratch, trace);
+				return new State(store, env, scratch, trace, cfgs);
 			}
 			else {
 				/* Call the function and get a join of the new states. */
