@@ -28,9 +28,9 @@ public class State implements IState {
 	/* The abstract domains that make up the program state. The abstract
 	 * domains have access to each other. */
 
-	public Environment environment;
+	public Environment env;
 	public Store store;
-	public Scratchpad scratchpad;
+	public Scratchpad scratch;
 	public Trace trace;
 
 	/**
@@ -40,8 +40,8 @@ public class State implements IState {
 	 */
 	public State(Store store, Environment environment, Scratchpad scratchpad, Trace trace) {
 		this.store = store;
-		this.environment = environment;
-		this.scratchpad = scratchpad;
+		this.env = environment;
+		this.scratch = scratchpad;
 		this.trace = trace;
 	}
 
@@ -83,7 +83,7 @@ public class State implements IState {
 			interpretVariableDeclaration((VariableDeclaration)node, selfAddr);
 		}
 		else if(node instanceof FunctionCall) {
-			ExpEval expEval = new ExpEval(environment, store, scratchpad, trace, selfAddr);
+			ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr);
 			State endState = expEval.evalFunctionCall((FunctionCall) node);
 			this.store = endState.store;
 		}
@@ -124,7 +124,7 @@ public class State implements IState {
 		Set<Address> addrs = resolveOrCreate(lhs);
 
 		/* Resolve the right hand side to a value. */
-		ExpEval expEval = new ExpEval(environment, store, scratchpad, trace, selfAddr);
+		ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr);
 		BValue val = expEval.eval(rhs);
 		store = expEval.store;
 
@@ -143,13 +143,13 @@ public class State implements IState {
 
 		/* Base Case: A simple name in the environment. */
 		if(node instanceof Name) {
-			Address addr = environment.apply(node.toSource());
+			Address addr = env.apply(node.toSource());
 			if(addr == null) {
 				/* Assume the variable exists in the environment (ie. not a TypeError)
 				 * and add it to the environment/store as BValue.TOP since we know
 				 * nothing about it. */
 				addr = trace.makeAddr(node.getID(), "");
-				environment = environment.strongUpdate(node.toSource(), addr);
+				env = env.strongUpdate(node.toSource(), addr);
 				store.alloc(addr, BValue.top());
 			}
 			result.add(addr);
@@ -226,8 +226,8 @@ public class State implements IState {
 
 		State joined = new State(
 				this.store.join(state.store),
-				this.environment.join(state.environment),
-				this.scratchpad.join(state.scratchpad),
+				this.env.join(state.env),
+				this.scratch.join(state.scratch),
 				this.trace);
 
 		return joined;

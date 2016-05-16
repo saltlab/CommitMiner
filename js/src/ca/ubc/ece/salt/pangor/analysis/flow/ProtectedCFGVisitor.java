@@ -50,7 +50,7 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 	 * identifier protection.
 	 */
 	private void visit(AstNode node, State state) {
-		getObjectFacts(node, state.environment.environment, state, null);
+		getObjectFacts(node, state.env.environment, state, null);
 	}
 
 	/**
