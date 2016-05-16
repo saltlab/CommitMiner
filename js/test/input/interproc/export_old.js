@@ -3,8 +3,8 @@ function A(x) {
 }
 
 var params = {
-  greeting: "Hello";
-	name: "Jax";
+  greeting: "Hello",
+	name: "Jax"
 };
 
 A(params);

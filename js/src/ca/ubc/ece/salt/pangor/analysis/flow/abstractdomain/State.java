@@ -80,7 +80,7 @@ public class State implements IState {
 		else if(node instanceof FunctionCall) {
 			ExpEval expEval = new ExpEval(environment, store, scratchpad, trace, selfAddr);
 			State endState = expEval.evalFunctionCall((FunctionCall) node);
-			this.store = this.store.join(endState.store);
+			this.store = endState.store;
 		}
 		else if(node instanceof Assignment) {
 			interpretAssignment(selfAddr, (Assignment)node);
@@ -120,6 +120,7 @@ public class State implements IState {
 		/* Resolve the right hand side to a value. */
 		ExpEval expEval = new ExpEval(environment, store, scratchpad, trace, selfAddr);
 		BValue val = expEval.eval(rhs);
+		store = expEval.store;
 
 		/* Update the values in the store. */
 		// TODO: Is this correct? We should probably only do a strong update if
