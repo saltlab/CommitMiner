@@ -78,7 +78,8 @@ public class State implements IState {
 			interpretVariableDeclaration((VariableDeclaration)node, selfAddr);
 		}
 		else if(node instanceof FunctionCall) {
-			State endState = ExpEval.evalFunctionCall(environment, store, scratchpad, trace, (FunctionCall) node, selfAddr);
+			ExpEval expEval = new ExpEval(environment, store, scratchpad, trace, selfAddr);
+			State endState = expEval.evalFunctionCall((FunctionCall) node);
 			this.store = this.store.join(endState.store);
 		}
 		else if(node instanceof Assignment) {
@@ -117,7 +118,8 @@ public class State implements IState {
 		Set<Address> addrs = Helpers.resolve(environment, store, lhs);
 
 		/* Resolve the right hand side to a value. */
-		BValue val = ExpEval.eval(environment, store, scratchpad, trace, rhs, selfAddr);
+		ExpEval expEval = new ExpEval(environment, store, scratchpad, trace, selfAddr);
+		BValue val = expEval.eval(rhs);
 
 		/* Update the values in the store. */
 		// TODO: Is this correct? We should probably only do a strong update if

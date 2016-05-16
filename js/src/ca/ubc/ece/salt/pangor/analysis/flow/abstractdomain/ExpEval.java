@@ -11,6 +11,8 @@ import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NumberLiteral;
+import org.mozilla.javascript.ast.ObjectLiteral;
+import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.StringLiteral;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
@@ -20,31 +22,45 @@ import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 
 public class ExpEval {
 
+	public Environment env;
+	public Store store;
+	public Scratchpad scratch;
+	public Trace trace;
+	public Address selfAddr;
+
+	public ExpEval(Environment env, Store store, Scratchpad scratch,
+				   Trace trace, Address selfAddr) {
+		this.env = env;
+		this.store = store;
+		this.scratch = scratch;
+		this.trace = trace;
+		this.selfAddr = selfAddr;
+	}
+
 	/**
 	 * Evaluate an expression to a BValue.
-	 * @param env The current environment.
-	 * @param store The current store.
-	 * @param trace The current execution trace.
 	 * @param node The expression to evaluate.
 	 * @return The value of the expression.
 	 */
-	public static BValue eval(Environment env, Store store, Scratchpad scratch,
-							  Trace trace, AstNode node, Address selfAddr) {
+	public BValue eval(AstNode node) {
 
 		if(node instanceof Name) {
-			return evalName(env, store, scratch, trace, (Name)node, selfAddr);
+			return evalName((Name)node);
 		}
 		else if(node instanceof InfixExpression) {
-			return evalInfixExpression(env, store, scratch, trace, (InfixExpression)node, selfAddr);
+			return evalInfixExpression((InfixExpression)node);
 		}
 		else if(node instanceof KeywordLiteral) {
-			return evalKeywordLiteral(env, store, scratch, trace, (KeywordLiteral)node, selfAddr);
+			return evalKeywordLiteral((KeywordLiteral)node);
 		}
 		else if(node instanceof StringLiteral) {
-			return evalStringLiteral(env, store, scratch, trace, (StringLiteral)node, selfAddr);
+			return evalStringLiteral((StringLiteral)node);
 		}
 		else if(node instanceof NumberLiteral) {
-			return evalNumberLiteral(env, store, scratch, trace, (NumberLiteral)node, selfAddr);
+			return evalNumberLiteral((NumberLiteral)node);
+		}
+		else if(node instanceof ObjectLiteral) {
+			return evalObjectLiteral((ObjectLiteral)node);
 		}
 
 		/* We could not evaluate the expression. Return top. */
@@ -53,11 +69,38 @@ public class ExpEval {
 	}
 
 	/**
+	 * Creates a new object from an object literal.
+	 * @param ol The object literal.
+	 * @return A BValue that points to the new object literal.
+	 */
+	public BValue evalObjectLiteral(ObjectLiteral ol) {
+		Map<String, Address> ext = new HashMap<String, Address>();
+		InternalObjectProperties in = new InternalObjectProperties();
+
+		for(ObjectProperty property : ol.getElements()) {
+			AstNode prop = property.getLeft();
+			String propName = null;
+			if(prop instanceof Name) propName = prop.toSource();
+			else if(prop instanceof StringLiteral) propName = ((StringLiteral)prop).getValue();
+			else if(prop instanceof NumberLiteral) propName = ((NumberLiteral)prop).getValue();
+			BValue propVal = this.eval(property.getRight());
+			Address propAddr = trace.makeAddr(property.getID(), "");
+			store = store.alloc(propAddr, propVal);
+			if(propName != null) ext.put(propName, propAddr);
+		}
+
+		Obj obj = new Obj(ext, in, ext.keySet());
+		Address objAddr = trace.makeAddr(ol.getID(), "");
+		store = store.alloc(objAddr, obj);
+
+		return Address.inject(objAddr);
+	}
+
+	/**
 	 * @param ie The infix expression.
 	 * @return the abstract interpretation of the name
 	 */
-	public static BValue evalInfixExpression(Environment env, Store store, Scratchpad scratch,
-									  	   Trace trace, InfixExpression ie, Address selfAddr) {
+	public BValue evalInfixExpression(InfixExpression ie) {
 		/* We assume this is an identifier and attempt to dereference it, since
 		 * no other operator is currently supported. */
 		BValue val = Helpers.resolveValue(env, store, ie);
@@ -69,8 +112,7 @@ public class ExpEval {
 	 * @param name
 	 * @return the abstract interpretation of the name
 	 */
-	public static BValue evalName(Environment env, Store store, Scratchpad scratch,
-									  	   Trace trace, Name name, Address selfAddr) {
+	public BValue evalName(Name name) {
 		BValue val = Helpers.resolveValue(env, store, name);
 		if(val == null) return BValue.top();
 		return val;
@@ -80,8 +122,7 @@ public class ExpEval {
 	 * @param numl
 	 * @return the abstract interpretation of the number literal
 	 */
-	public static BValue evalNumberLiteral(Environment env, Store store, Scratchpad scratch,
-									  	   Trace trace, NumberLiteral numl, Address selfAddr) {
+	public BValue evalNumberLiteral(NumberLiteral numl) {
 		return Num.inject(Num.top());
 	}
 
@@ -89,8 +130,7 @@ public class ExpEval {
 	 * @param strl The keyword literal.
 	 * @return the abstract interpretation of the string literal
 	 */
-	public static BValue evalStringLiteral(Environment env, Store store, Scratchpad scratch,
-									  	   Trace trace, StringLiteral strl, Address selfAddr) {
+	public BValue evalStringLiteral(StringLiteral strl) {
 
 		Str str = null;
 		String val = strl.getValue();
@@ -109,8 +149,7 @@ public class ExpEval {
 	 * @param kwl The keyword literal.
 	 * @return the abstract interpretation of the keyword literal.
 	 */
-	public static BValue evalKeywordLiteral(Environment env, Store store, Scratchpad scratch,
-									  	Trace trace, KeywordLiteral kwl, Address selfAddr) {
+	public BValue evalKeywordLiteral(KeywordLiteral kwl) {
 		switch(kwl.getType()) {
 		case Token.THIS:
 			return store.apply(selfAddr);
@@ -130,14 +169,13 @@ public class ExpEval {
 	 * @param fc The function call.
 	 * @return The return value of the function call.
 	 */
-	public static State evalFunctionCall(Environment env, Store store, Scratchpad scratch,
-										  Trace trace, FunctionCall fc, Address selfAddr) {
+	public State evalFunctionCall(FunctionCall fc) {
 
 			/* Create the argument object. */
 			Map<String, Address> ext = new HashMap<String, Address>();
 			int i = 0;
 			for(AstNode arg : fc.getArguments()) {
-				BValue argVal = eval(env, store, scratch, trace, arg, selfAddr);
+				BValue argVal = eval(arg);
 				store = Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
 								ext, store, trace);
 				i++;

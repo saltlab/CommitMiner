@@ -74,9 +74,7 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 				registerFact(node, identifier, "UNDEFINED", val.undefinedAD.le.toString(), "UNCHANGED");
 
 			/* Recursively check property values. */
-			System.out.println(prop + ":" + addr.toString());
 			for(Address objAddr : val.addressAD.addresses) {
-				System.out.println(" ->" + state.store.getObj(objAddr).externalProperties);
 				getObjectFacts(node, state.store.getObj(objAddr).externalProperties, state, identifier);
 			}
 
