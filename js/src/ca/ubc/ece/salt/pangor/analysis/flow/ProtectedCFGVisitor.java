@@ -45,17 +45,37 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 		visit((AstNode) edge.getCondition(), (State)edge.getState());
 	}
 
+	/**
+	 * Visit an AstNode (a statement or condition) and extract facts about
+	 * identifier protection.
+	 */
 	private void visit(AstNode node, State state) {
+		getObjectFacts(node, state.environment.environment, state);
+	}
 
-		for(String var : state.environment.environment.keySet()) {
-			Address addr = state.environment.environment.get(var);
+	/**
+	 * Recursively visits objects and extracts facts about identifier
+	 * protection.
+	 * @param node The statement or condition at the program point.
+	 * @param props The environment or object properties.
+	 */
+	private void getObjectFacts(AstNode node, Map<String, Address> props, State state) {
+		for(String prop : props.keySet()) {
+
+			Address addr = props.get(prop);
+
 			BValue val = state.store.apply(addr);
 			if(val.nullAD.le == Null.LatticeElement.BOTTOM)
-				registerFact(node, var, "NULL", val.nullAD.le.toString(), "UNCHANGED");
+				registerFact(node, prop, "NULL", val.nullAD.le.toString(), "UNCHANGED");
 			if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM)
-				registerFact(node, var, "UNDEFINED", val.undefinedAD.le.toString(), "UNCHANGED");
-		}
+				registerFact(node, prop, "UNDEFINED", val.undefinedAD.le.toString(), "UNCHANGED");
 
+			/* Recursively check property values. */
+			for(Address objAddr : val.addressAD.addresses) {
+				getObjectFacts(node, state.store.getObj(objAddr).externalProperties, state);
+			}
+
+		}
 	}
 
 	/**
