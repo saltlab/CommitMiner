@@ -67,7 +67,9 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 	 */
 	private void registerFact(AstNode statement, String identifier, String ad, String tle, String cle) {
 
-		IPredicate predicate = Factory.BASIC.createPredicate("SpecialType", 8);
+		if(statement == null || statement.getID() == null) return;
+
+		IPredicate predicate = Factory.BASIC.createPredicate("Protected", 8);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 			IRelationFactory relationFactory = new SimpleRelationFactory();

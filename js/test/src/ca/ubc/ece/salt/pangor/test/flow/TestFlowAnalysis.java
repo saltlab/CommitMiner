@@ -138,7 +138,7 @@ public class TestFlowAnalysis {
 
 		/* The query that produces the results. */
 		Parser parser = new Parser();
-		parser.parse("?- SpecialType(?Version,?File,?Line,?StatementID,?Identifier,?Type,?Element,?Change).");
+		parser.parse("?- Protected(?Version,?File,?Line,?StatementID,?Identifier,?Type,?Element,?Change).");
 		IQuery query = parser.getQueries().get(0);
 
 		/* Transforms the query results to a ClassifierFeatureVector. */

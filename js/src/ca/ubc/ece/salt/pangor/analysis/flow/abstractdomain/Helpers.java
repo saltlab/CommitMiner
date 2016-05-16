@@ -87,9 +87,11 @@ public class Helpers {
 			stack.add(new PathState(edge, new HashSet<CFGEdge>(), state));
 		}
 
+		/* Set the initial state. */
+		cfg.getEntryNode().setState(state);
+
 		/* Break when the analysis time reaches some limit. */
 		while(!stack.isEmpty() && edgesVisited < 100000) {
-
 
 			PathState pathState = stack.pop();
 			edgesVisited++;
