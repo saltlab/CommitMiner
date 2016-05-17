@@ -153,10 +153,10 @@ public class ExpEval {
 		Str str = null;
 		String val = strl.getValue();
 		if(NumberUtils.isNumber(val)) {
-			str = new Str(Str.LatticeElement.SNUM, val);
+			str = new Str(Str.LatticeElement.SNUMVAL, val);
 		}
 		else {
-			str = new Str(Str.LatticeElement.SNOTNUMNORSPL, val);
+			str = new Str(Str.LatticeElement.SNOTNUMNORSPLVAL, val);
 		}
 
 		return Str.inject(str);
