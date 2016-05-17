@@ -53,13 +53,14 @@ public class BValue {
 	 * @return the top lattice element
 	 */
 	public static BValue top() {
+		/* Set addresses to BOT to enable dynamic object creation. */
 		return new BValue(
 				Str.top(),
 				Num.top(),
 				Bool.top(),
 				Null.top(),
 				Undefined.top(),
-				Addresses.top());
+				Addresses.bottom());
 	}
 
 	/**
