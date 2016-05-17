@@ -17,7 +17,6 @@ import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.StringLiteral;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Str.LatticeElementType;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
@@ -154,10 +153,10 @@ public class ExpEval {
 		Str str = null;
 		String val = strl.getValue();
 		if(NumberUtils.isNumber(val)) {
-			str = new Str(LatticeElementType.SNUM, val);
+			str = new Str(Str.LatticeElement.SNUM, val);
 		}
 		else {
-			str = new Str(LatticeElementType.SNOTNUMNORSPL, val);
+			str = new Str(Str.LatticeElement.SNOTNUMNORSPL, val);
 		}
 
 		return Str.inject(str);
