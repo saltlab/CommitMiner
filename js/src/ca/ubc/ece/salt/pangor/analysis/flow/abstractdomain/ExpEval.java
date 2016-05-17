@@ -174,8 +174,9 @@ public class ExpEval {
 		case Token.NULL:
 			return Null.inject(Null.top());
 		case Token.TRUE:
+			return Bool.inject(new Bool(Bool.LatticeElement.TRUE));
 		case Token.FALSE:
-			return Bool.inject(Bool.top());
+			return Bool.inject(new Bool(Bool.LatticeElement.FALSE));
 		case Token.DEBUGGER:
 		default:
 			return BValue.bottom();

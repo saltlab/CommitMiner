@@ -14,6 +14,7 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Addresses.LatticeElement;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Bool;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Null;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Num;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
@@ -81,6 +82,8 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 				registerFact(node, identifier, "ZERO", val.numberAD.toString(), "UNCHANGED");
 			if(Num.notNaN(val.numberAD))
 				registerFact(node, identifier, "NAN", val.numberAD.toString(), "UNCHANGED");
+			if(Bool.notFalse(val.booleanAD))
+				registerFact(node, identifier, "FALSE", val.booleanAD.toString(), "UNCHANGED");
 
 			/* Recursively check property values. */
 			if(val.addressAD.le == LatticeElement.TOP) continue;
