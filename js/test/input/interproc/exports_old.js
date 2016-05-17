@@ -1,3 +1,4 @@
 exports.greet = function(name, greeting) {
-		console.log(greeting + " " + name + "!");
+		var punctuation = "!";
+		console.log(greeting + " " + name + punctuation);
 	}

@@ -12,6 +12,7 @@ import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Addresses.LatticeElement;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Null;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
@@ -74,6 +75,7 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 				registerFact(node, identifier, "UNDEFINED", val.undefinedAD.le.toString(), "UNCHANGED");
 
 			/* Recursively check property values. */
+			if(val.addressAD.le == LatticeElement.TOP) continue;
 			for(Address objAddr : val.addressAD.addresses) {
 				getObjectFacts(node, state.store.getObj(objAddr).externalProperties, state, identifier);
 			}

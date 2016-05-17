@@ -7,6 +7,7 @@ import java.util.Map;
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
@@ -17,6 +18,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.FunctionClosure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Helpers;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.JSClass;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
@@ -47,9 +49,10 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		/* Perform the initial analysis and get the publicly accessible methods. */
 		state = Helpers.run(cfgMap.get(root), state, StoreFactory.global_binding_Addr);
 
-		// TODO
 		/* Analyze the publicly accessible methods that weren't analyzed in
-		 * the main analysis. */
+		 * the main analysis.
+		 * NOTE: Only one level deep. Does not recursively check constructors. */
+		analyzePublic(state, state.env.environment, StoreFactory.global_binding_Addr, cfgMap);
 
 		/* Generate facts from the results of the analysis. */
 		for(CFG cfg : cfgs) {
@@ -59,67 +62,35 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 	}
 
 	/**
-	 * Recursively analyze publicly accessible functions that have not
-	 * already been analyzed.
+	 * Analyze publicly accessible functions that have not already been
+	 * analyzed. This is currently not done recursively, because we would have
+	 * to decide whether or not to run the function as a constructor.
 	 * @param state The end state of the parent function.
 	 */
-	private void analyzePublic(State state, Map<AstNode, CFG> cfgMap) {
+	private void analyzePublic(State state, Map<String, Address> props, Address selfAddr, Map<AstNode, CFG> cfgMap) {
 
-		for(String var : state.env.environment.keySet()) {
+		for(String var : props.keySet()) {
+			BValue val = state.store.apply(props.get(var));
+			System.out.println(var);
 
-			BValue val = state.store.apply(state.env.environment.get(var));
-
-			for(Address a : val.addressAD.addresses) {
-
-				Obj o = state.store.getObj(a);
-
-				/* We may need to analyze this function. */
-				if(o.internalProperties.klass == JSClass.CFunction) {
-					InternalFunctionProperties ifp = (InternalFunctionProperties)o.internalProperties;
-					FunctionClosure fc = (FunctionClosure)ifp.closure;
-					if(ifp.closure instanceof FunctionClosure &&
-							fc.cfg.getEntryNode().getState() != null) {
-						// TODO: Analyze the function
-						// TODO: Because more public functions may have been
-						//		 added to this object during its execution,
-						//		 Recursively look for un-analyzed functions in
-						//		 the new state.
-					}
-				}
-
-				/* Investigate this object. */
-				// TODO: Look for objects in properties of o (o.ext).
-				// TODO: analyzePublic(state, cfgMap
-
-
-			}
-
-		}
-
-	}
-
-	/**
-	 * Recursively analyze publicly accessible functions that have not
-	 * already been analyzed.
-	 * @param state The end state of the parent function.
-	 */
-	private void analyzePublic(State state, Map<String, Address> props, Map<AstNode, CFG> cfgMap) {
-
-		for(String var : state.env.environment.keySet()) {
-			BValue val = state.store.apply(state.env.environment.get(var));
-
-			for(Address a : val.addressAD.addresses) {
-				Obj o = state.store.getObj(a);
+			for(Address objAddr : val.addressAD.addresses) {
+				Obj obj = state.store.getObj(objAddr);
 
 				/* We may need to analyze this function. */
-				if(o.internalProperties.klass == JSClass.CFunction) {
-					InternalFunctionProperties ifp = (InternalFunctionProperties)o.internalProperties;
+				if(obj.internalProperties.klass == JSClass.CFunction) {
+
+					InternalFunctionProperties ifp = (InternalFunctionProperties)obj.internalProperties;
 					FunctionClosure fc = (FunctionClosure)ifp.closure;
+
 					if(ifp.closure instanceof FunctionClosure &&
-							fc.cfg.getEntryNode().getState() != null) {
+							fc.cfg.getEntryNode().getState() == null) {
+
+						/* Create the argument object. */
+						Address argAddr = createTopArgObject(state, (FunctionNode)fc.cfg.getEntryNode().getStatement());
 
 						/* Analyze the function. */
-						State newState = ifp.closure.run(a, argArrayAddr/* TODO */, state.store, state.scratch, state.trace);
+						@SuppressWarnings("unused")
+						State newState = ifp.closure.run(selfAddr, argAddr, state.store, state.scratch, state.trace);
 
 						/* Check the function object. */
 						// TODO: We ignore this for now. We would have to assume the function is being run as a constructor.
@@ -128,10 +99,40 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 				}
 
 				/* Recursively look for object properties that are functions. */
-				analyzePublic(state, o.externalProperties, cfgMap);
+				analyzePublic(state, obj.externalProperties, props.get(var), cfgMap);
 
 			}
 		}
+	}
+
+	/**
+	 * Creates an arg object where each argument corresponds to a parameter
+	 * and each argument value is BValue.TOP.
+	 * @param state
+	 * @param f The function
+	 * @return
+	 */
+	private Address createTopArgObject(State state, FunctionNode f) {
+
+		/* Create the argument object. */
+		Map<String, Address> ext = new HashMap<String, Address>();
+
+		for(int i = 0; i < f.getParamCount(); i++) {
+			BValue argVal = BValue.top();
+			state.store = Helpers.addProp(f.getID(), String.valueOf(i), argVal,
+										  ext, state.store, state.trace);
+		}
+
+		InternalObjectProperties internal = new InternalObjectProperties(
+				Address.inject(StoreFactory.Arguments_Addr), JSClass.CFunction);
+		Obj argObj = new Obj(ext, internal, ext.keySet());
+
+		/* Add the argument object to the store. */
+		Address argAddr = state.trace.makeAddr(f.getID(), "");
+		state.store = state.store.alloc(argAddr, argObj);
+
+		return argAddr;
+
 	}
 
 }

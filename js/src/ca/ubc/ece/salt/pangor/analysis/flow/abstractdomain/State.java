@@ -155,7 +155,7 @@ public class State implements IState {
 				 * nothing about it. */
 				addr = trace.makeAddr(node.getID(), "");
 				env = env.strongUpdate(node.toSource(), addr);
-				store = store.alloc(addr, BValue.top());
+				store = store.alloc(addr, Addresses.dummy());
 			}
 			result.add(addr);
 		}
@@ -191,7 +191,8 @@ public class State implements IState {
 					Obj dummy = new Obj(new HashMap<String, Address>(), new InternalObjectProperties(), new HashSet<String>());
 					Address addr = trace.makeAddr(node.getID(), "");
 					store = store.alloc(addr, dummy);
-					val.addressAD.addresses.add(addr);
+					val = val.join(Address.inject(addr));
+					store = store.strongUpdate(valAddr, val);
 				}
 
 				for(Address objAddr : val.addressAD.addresses) {
@@ -208,7 +209,7 @@ public class State implements IState {
 						 * undefined or was initialized somewhere outside the
 						 * analysis. Create it and give it the value BValue.TOP. */
 						propAddr = trace.makeAddr(node.getID(), ie.getRight().toSource());
-						store = store.alloc(propAddr, BValue.top());
+						store = store.alloc(propAddr, Addresses.dummy());
 						obj.externalProperties.put(ie.getRight().toSource(), propAddr);
 						result.add(propAddr);
 					}

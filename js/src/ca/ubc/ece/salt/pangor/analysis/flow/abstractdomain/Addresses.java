@@ -95,6 +95,16 @@ public class Addresses extends SmartHash {
 				addresses);
 	}
 
+	public static BValue dummy() {
+		return new BValue(
+				Str.top(),
+				Num.top(),
+				Bool.top(),
+				Null.top(),
+				Undefined.top(),
+				Addresses.bottom());
+	}
+
 	/**
 	 * @return The top lattice element.
 	 */
