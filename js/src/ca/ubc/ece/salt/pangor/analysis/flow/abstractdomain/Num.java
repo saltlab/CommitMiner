@@ -22,11 +22,14 @@ public class Num {
 	private String val;
 
 	public Num(LatticeElement le) {
+		if(le == null) throw new Error("The lattice element cannot be null.");
 		if(le == LatticeElement.NVAL) throw new Error("A value must be provided with the NVAL lattice element.");
+		this.le = le;
 		this.val = null;
 	}
 
 	public Num(LatticeElement le, String val) {
+		if(le == null) throw new Error("The lattice element cannot be null.");
 		this.le = le;
 		this.val = val;
 	}
