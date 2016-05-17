@@ -15,7 +15,9 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Addresses.LatticeElement;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Null;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Num;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Str;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Undefined;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -73,6 +75,12 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 				registerFact(node, identifier, "NULL", val.nullAD.le.toString(), "UNCHANGED");
 			if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM)
 				registerFact(node, identifier, "UNDEFINED", val.undefinedAD.le.toString(), "UNCHANGED");
+			if(Str.notBlank(val.stringAD))
+				registerFact(node, identifier, "BLANK", val.stringAD.toString(), "UNCHANGED");
+			if(Num.notZero(val.numberAD))
+				registerFact(node, identifier, "ZERO", val.numberAD.toString(), "UNCHANGED");
+			if(Num.notNaN(val.numberAD))
+				registerFact(node, identifier, "NAN", val.numberAD.toString(), "UNCHANGED");
 
 			/* Recursively check property values. */
 			if(val.addressAD.le == LatticeElement.TOP) continue;

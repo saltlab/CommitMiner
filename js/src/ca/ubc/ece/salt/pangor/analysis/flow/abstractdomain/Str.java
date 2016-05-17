@@ -18,8 +18,8 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
  */
 public class Str {
 
-	private LatticeElement le;
-	private String val;
+	public LatticeElement le;
+	public String val;
 
 	public Str(LatticeElement le, String val) {
 		this.le = le;
@@ -102,6 +102,18 @@ public class Str {
 		case TOP: return false;
 		default: return true;
 		}
+	}
+
+	/**
+	 * @return true if the string is definitely not blank.
+	 */
+	public static boolean notBlank(Str str) {
+		if(isNum(str.le)
+				|| isSpl(str.le)
+				|| str.le == LatticeElement.BOTTOM
+				|| (str.le == LatticeElement.SNOTNUMNORSPLVAL && !str.val.equals("")))
+			return true;
+		return false;
 	}
 
 	/**

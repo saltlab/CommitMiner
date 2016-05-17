@@ -141,7 +141,7 @@ public class ExpEval {
 	 * @return the abstract interpretation of the number literal
 	 */
 	public BValue evalNumberLiteral(NumberLiteral numl) {
-		return Num.inject(Num.top());
+		return Num.inject(new Num(Num.LatticeElement.NVAL, numl.getValue()));
 	}
 
 	/**
