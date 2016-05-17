@@ -71,7 +71,6 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 
 		for(String var : props.keySet()) {
 			BValue val = state.store.apply(props.get(var));
-			System.out.println(var);
 
 			for(Address objAddr : val.addressAD.addresses) {
 				Obj obj = state.store.getObj(objAddr);
