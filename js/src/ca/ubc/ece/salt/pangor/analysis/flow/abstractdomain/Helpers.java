@@ -55,10 +55,10 @@ public class Helpers {
 	public static Store createFunctionObj(Closure closure, Store store, Trace trace, Address address, int id) {
 
 		Map<String, Address> external = new HashMap<String, Address>();
-		store = addProp(id, "length", Num.inject(Num.top()), external, store, trace);
+		store = addProp(id, "length", Num.inject(Num.top(Change.u())), external, store, trace);
 
 		InternalFunctionProperties internal = new InternalFunctionProperties(
-				Address.inject(StoreFactory.Function_proto_Addr),
+				Address.inject(StoreFactory.Function_proto_Addr, Change.u()),
 				closure,
 				JSClass.CFunction);
 
@@ -194,20 +194,22 @@ public class Helpers {
 		/* Lift variables into the function's environment and initialize to undefined. */
 		List<Name> localVars = VariableLiftVisitor.getVariableDeclarations(function);
 		for(Name localVar : localVars) {
+			Change change = Change.ct2ce(localVar);
 			Address address = trace.makeAddr(localVar.getID(), "");
 			env = env.strongUpdate(localVar.toSource(), address);
-			store = store.alloc(address, Undefined.inject(Undefined.top()));
+			store = store.alloc(address, Undefined.inject(Undefined.top(change)));
 		}
 
 		/* Get a list of function declarations to lift into the function's environment. */
 		List<FunctionNode> children = FunctionLiftVisitor.getFunctionDeclarations(function);
 		for(FunctionNode child : children) {
 			if(child.getName().isEmpty()) continue; // Not accessible.
+			Change change = Change.ct2ce(child);
 			Address address = trace.makeAddr(child.getID(), "");
 
 			/* The function name variable points to our new function. */
 			env = env.strongUpdate(child.getName(), address);
-			store = store.alloc(address, Address.inject(address));
+			store = store.alloc(address, Address.inject(address, change));
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
@@ -307,8 +309,9 @@ public class Helpers {
 			/* We have a qualified name. Recursively find the addresses. */
 			InfixExpression ie = (InfixExpression) node;
 			Set<Address> addrs = resolve(env, store, ie.getLeft());
+			Change change = Change.ct2ce(node);
 			if(addrs == null) return null;
-			return Addresses.inject(new Addresses(addrs));
+			return Addresses.inject(new Addresses(addrs, change));
 		}
 		else {
 			/* Ignore everything else (e.g., method calls) for now. */

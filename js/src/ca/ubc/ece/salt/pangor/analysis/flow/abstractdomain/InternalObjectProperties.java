@@ -48,7 +48,7 @@ public class InternalObjectProperties {
 	 * @param klass The type of object being constructed.
 	 */
 	public InternalObjectProperties(JSClass klass) {
-		this.prototype = Address.inject(StoreFactory.Object_proto_Addr);
+		this.prototype = Address.inject(StoreFactory.Object_proto_Addr, Change.u());
 		this.klass = klass;
 	}
 
@@ -57,7 +57,7 @@ public class InternalObjectProperties {
 	 * Class defaults to CObject.
 	 */
 	public InternalObjectProperties() {
-		this.prototype = Address.inject(StoreFactory.Object_proto_Addr);
+		this.prototype = Address.inject(StoreFactory.Object_proto_Addr, Change.u());
 		this.klass = JSClass.CObject;
 	}
 

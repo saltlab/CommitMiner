@@ -70,7 +70,8 @@ public class ExpEval {
 		}
 
 		/* We could not evaluate the expression. Return top. */
-		return BValue.top();
+		Change change = Change.ct2ce(node);
+		return BValue.top(change);
 
 	}
 
@@ -80,10 +81,11 @@ public class ExpEval {
 	 * @return A BValue that points to the new function object.
 	 */
 	public BValue evalFunctionNode(FunctionNode f){
+		Change change = Change.ct2ce(f);
 		Closure closure = new FunctionClosure(cfgs.get(f), env, cfgs);
 		Address addr = trace.makeAddr(f.getID(), "");
 		store = Helpers.createFunctionObj(closure, store, trace, addr, f.getID());
-		return Address.inject(addr);
+		return Address.inject(addr, change);
 	}
 
 	/**
@@ -94,6 +96,7 @@ public class ExpEval {
 	public BValue evalObjectLiteral(ObjectLiteral ol) {
 		Map<String, Address> ext = new HashMap<String, Address>();
 		InternalObjectProperties in = new InternalObjectProperties();
+		Change change = Change.ct2ce(ol);
 
 		for(ObjectProperty property : ol.getElements()) {
 			AstNode prop = property.getLeft();
@@ -111,7 +114,7 @@ public class ExpEval {
 		Address objAddr = trace.makeAddr(ol.getID(), "");
 		store = store.alloc(objAddr, obj);
 
-		return Address.inject(objAddr);
+		return Address.inject(objAddr, change);
 	}
 
 	/**
@@ -121,8 +124,9 @@ public class ExpEval {
 	public BValue evalInfixExpression(InfixExpression ie) {
 		/* We assume this is an identifier and attempt to dereference it, since
 		 * no other operator is currently supported. */
+		Change change = Change.ct2ce(ie);
 		BValue val = Helpers.resolveValue(env, store, ie);
-		if(val == null) return BValue.top();
+		if(val == null) return BValue.top(change);
 		return val;
 	}
 
@@ -132,7 +136,8 @@ public class ExpEval {
 	 */
 	public BValue evalName(Name name) {
 		BValue val = Helpers.resolveValue(env, store, name);
-		if(val == null) return BValue.top();
+		Change change = Change.ct2ce(name);
+		if(val == null) return BValue.top(change);
 		return val;
 	}
 
@@ -141,7 +146,8 @@ public class ExpEval {
 	 * @return the abstract interpretation of the number literal
 	 */
 	public BValue evalNumberLiteral(NumberLiteral numl) {
-		return Num.inject(new Num(Num.LatticeElement.VAL, numl.getValue()));
+		Change change = Change.ct2ce(numl);
+		return Num.inject(new Num(Num.LatticeElement.VAL, numl.getValue(), change));
 	}
 
 	/**
@@ -152,12 +158,13 @@ public class ExpEval {
 
 		Str str = null;
 		String val = strl.getValue();
-		if(val.equals("")) str = new Str(Str.LatticeElement.SBLANK);
+		Change change = Change.ct2ce(strl);
+		if(val.equals("")) str = new Str(Str.LatticeElement.SBLANK, change);
 		else if(NumberUtils.isNumber(val)) {
-			str = new Str(Str.LatticeElement.SNUMVAL, val);
+			str = new Str(Str.LatticeElement.SNUMVAL, val, change);
 		}
 		else {
-			str = new Str(Str.LatticeElement.SNOTNUMNORSPLVAL, val);
+			str = new Str(Str.LatticeElement.SNOTNUMNORSPLVAL, val, change);
 		}
 
 		return Str.inject(str);
@@ -169,18 +176,19 @@ public class ExpEval {
 	 * @return the abstract interpretation of the keyword literal.
 	 */
 	public BValue evalKeywordLiteral(KeywordLiteral kwl) {
+		Change change = Change.ct2ce(kwl);
 		switch(kwl.getType()) {
 		case Token.THIS:
 			return store.apply(selfAddr);
 		case Token.NULL:
-			return Null.inject(Null.top());
+			return Null.inject(Null.top(change));
 		case Token.TRUE:
-			return Bool.inject(new Bool(Bool.LatticeElement.TRUE));
+			return Bool.inject(new Bool(Bool.LatticeElement.TRUE, change));
 		case Token.FALSE:
-			return Bool.inject(new Bool(Bool.LatticeElement.FALSE));
+			return Bool.inject(new Bool(Bool.LatticeElement.FALSE, change));
 		case Token.DEBUGGER:
 		default:
-			return BValue.bottom();
+			return BValue.bottom(change);
 		}
 	}
 
@@ -191,45 +199,46 @@ public class ExpEval {
 	 */
 	public State evalFunctionCall(FunctionCall fc) {
 
-			/* Create the argument object. */
-			Map<String, Address> ext = new HashMap<String, Address>();
-			int i = 0;
-			for(AstNode arg : fc.getArguments()) {
-				BValue argVal = eval(arg);
-				store = Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
-								ext, store, trace);
-				i++;
-			}
+		/* Create the argument object. */
+		Map<String, Address> ext = new HashMap<String, Address>();
+		int i = 0;
+		for(AstNode arg : fc.getArguments()) {
+			BValue argVal = eval(arg);
+			store = Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
+							ext, store, trace);
+			i++;
+		}
 
-			InternalObjectProperties internal = new InternalObjectProperties(
-					Address.inject(StoreFactory.Arguments_Addr), JSClass.CFunction);
-			Obj argObj = new Obj(ext, internal, ext.keySet());
+		Change change = Change.ct2ce(fc);
+		InternalObjectProperties internal = new InternalObjectProperties(
+				Address.inject(StoreFactory.Arguments_Addr, change), JSClass.CFunction);
+		Obj argObj = new Obj(ext, internal, ext.keySet());
 
-			/* Add the argument object to the store. */
-			Address argAddr = trace.makeAddr(fc.getID(), "");
-			store = store.alloc(argAddr, argObj);
+		/* Add the argument object to the store. */
+		Address argAddr = trace.makeAddr(fc.getID(), "");
+		store = store.alloc(argAddr, argObj);
 
-			/* Attempt to resolve the function and it's parent object. */
-			BValue funVal = Helpers.resolveValue(env, store, fc.getTarget());
-			BValue objVal = Helpers.resolveSelf(env, store, fc.getTarget());
+		/* Attempt to resolve the function and it's parent object. */
+		BValue funVal = Helpers.resolveValue(env, store, fc.getTarget());
+		BValue objVal = Helpers.resolveSelf(env, store, fc.getTarget());
 
-			/* If the function is not a member variable, it is local and we
-			 * use the object of the currently executing function as self. */
-			Address objAddr = trace.toAddr("this");
-			if(objVal == null) objAddr = selfAddr;
-			else store = store.alloc(objAddr, objVal);
+		/* If the function is not a member variable, it is local and we
+		 * use the object of the currently executing function as self. */
+		Address objAddr = trace.toAddr("this");
+		if(objVal == null) objAddr = selfAddr;
+		else store = store.alloc(objAddr, objVal);
 
-			if(funVal == null) {
-				/* If the function was not resolved, we assume the (local)
-				 * state is unchanged, but add BValue.TOP as the return value. */
-				scratch = scratch.strongUpdate(Scratch.RETVAL, BValue.top());
-				return new State(store, env, scratch, trace, cfgs);
-			}
-			else {
-				/* Call the function and get a join of the new states. */
-				return Helpers.applyClosure(funVal, objAddr, argAddr, store,
-													  scratch, trace);
-			}
+		if(funVal == null) {
+			/* If the function was not resolved, we assume the (local)
+			 * state is unchanged, but add BValue.TOP as the return value. */
+			scratch = scratch.strongUpdate(Scratch.RETVAL, BValue.top(change));
+			return new State(store, env, scratch, trace, cfgs);
+		}
+		else {
+			/* Call the function and get a join of the new states. */
+			return Helpers.applyClosure(funVal, objAddr, argAddr, store,
+												  scratch, trace);
+		}
 
 	}
 
