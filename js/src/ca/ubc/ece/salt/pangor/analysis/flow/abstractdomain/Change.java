@@ -1,5 +1,8 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+
 
 /**
  * Stores the state for the change type abstract domain.
@@ -66,6 +69,21 @@ public class Change {
 	 */
 	public static Change c() {
 		return new Change(LatticeElement.CHANGED);
+	}
+
+	/**
+	 * Converts a change type to a change lattice element.
+	 * @param node The change type will be extracted from node.
+	 * @return The change lattice element for the node.
+	 */
+	public static Change ct2ce(ClassifiedASTNode node) {
+		ChangeType ct = node.getChangeType();
+		switch(ct) {
+		case INSERTED:
+		case REMOVED:
+		case UPDATED: return c();
+		default: return u();
+		}
 	}
 
 	/** The lattice elements for the abstract domain. **/

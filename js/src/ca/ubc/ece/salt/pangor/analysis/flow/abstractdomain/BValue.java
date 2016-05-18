@@ -50,6 +50,18 @@ public class BValue {
 	}
 
 	/**
+	 * Sets the change lattice element for all sub-domains.
+	 */
+	public void setChange(Change change) {
+		this.stringAD.change = change;
+		this.numberAD.change = change;
+		this.booleanAD.change = change;
+		this.nullAD.change = change;
+		this.undefinedAD.change = change;
+		this.addressAD.change = change;
+	}
+
+	/**
 	 * @return true if the value is definitely undefined
 	 */
 	public static boolean isUndefined(BValue val) {

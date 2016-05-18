@@ -15,6 +15,7 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.FunctionClosure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Helpers;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
@@ -117,13 +118,13 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		Map<String, Address> ext = new HashMap<String, Address>();
 
 		for(int i = 0; i < f.getParamCount(); i++) {
-			BValue argVal = BValue.top();
+			BValue argVal = BValue.top(Change.ct2ce(f));
 			state.store = Helpers.addProp(f.getID(), String.valueOf(i), argVal,
 										  ext, state.store, state.trace);
 		}
 
 		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Arguments_Addr), JSClass.CFunction);
+				Address.inject(StoreFactory.Arguments_Addr, Change.ct2ce(f)), JSClass.CFunction);
 		Obj argObj = new Obj(ext, internal, ext.keySet());
 
 		/* Add the argument object to the store. */
