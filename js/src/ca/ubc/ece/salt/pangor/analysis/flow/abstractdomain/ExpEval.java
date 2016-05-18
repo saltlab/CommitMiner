@@ -141,7 +141,7 @@ public class ExpEval {
 	 * @return the abstract interpretation of the number literal
 	 */
 	public BValue evalNumberLiteral(NumberLiteral numl) {
-		return Num.inject(new Num(Num.LatticeElement.NVAL, numl.getValue()));
+		return Num.inject(new Num(Num.LatticeElement.VAL, numl.getValue()));
 	}
 
 	/**
@@ -152,7 +152,8 @@ public class ExpEval {
 
 		Str str = null;
 		String val = strl.getValue();
-		if(NumberUtils.isNumber(val)) {
+		if(val.equals("")) str = new Str(Str.LatticeElement.SBLANK);
+		else if(NumberUtils.isNumber(val)) {
 			str = new Str(Str.LatticeElement.SNUMVAL, val);
 		}
 		else {

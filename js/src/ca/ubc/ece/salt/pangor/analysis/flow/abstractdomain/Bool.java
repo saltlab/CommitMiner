@@ -14,7 +14,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
  */
 public class Bool {
 
-	private LatticeElement le;
+	public LatticeElement le;
 
 	public Bool(LatticeElement le) {
 		this.le = le;

@@ -50,6 +50,105 @@ public class BValue {
 	}
 
 	/**
+	 * @return true if the value is definitely undefined
+	 */
+	public static boolean isUndefined(BValue val) {
+		if(val.undefinedAD.le == Undefined.LatticeElement.TOP
+				&& val.nullAD.le == Null.LatticeElement.BOTTOM
+				&& val.numberAD.le == Num.LatticeElement.BOTTOM
+				&& val.stringAD.le == Str.LatticeElement.BOTTOM
+				&& val.booleanAD.le == Bool.LatticeElement.BOTTOM
+				&& val.addressAD.le == Addresses.LatticeElement.BOTTOM)
+			return true;
+		return false;
+	}
+
+	/**
+	 * @return true if the value is definitely null
+	 */
+	public static boolean isNull(BValue val) {
+		if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM
+				&& val.nullAD.le == Null.LatticeElement.TOP
+				&& val.numberAD.le == Num.LatticeElement.BOTTOM
+				&& val.stringAD.le == Str.LatticeElement.BOTTOM
+				&& val.booleanAD.le == Bool.LatticeElement.BOTTOM
+				&& val.addressAD.le == Addresses.LatticeElement.BOTTOM)
+			return true;
+		return false;
+	}
+
+	/**
+	 * @return true if the value is definitely blank
+	 */
+	public static boolean isBlank(BValue val) {
+		if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM
+				&& val.nullAD.le == Null.LatticeElement.BOTTOM
+				&& val.numberAD.le == Num.LatticeElement.BOTTOM
+				&& val.stringAD.le == Str.LatticeElement.SBLANK
+				&& val.booleanAD.le == Bool.LatticeElement.BOTTOM
+				&& val.addressAD.le == Addresses.LatticeElement.BOTTOM)
+			return true;
+		return false;
+	}
+
+	/**
+	 * @return true if the value is definitely NaN
+	 */
+	public static boolean isNaN(BValue val) {
+		if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM
+				&& val.nullAD.le == Null.LatticeElement.BOTTOM
+				&& val.numberAD.le == Num.LatticeElement.NAN
+				&& val.stringAD.le != Str.LatticeElement.BOTTOM
+				&& val.booleanAD.le == Bool.LatticeElement.BOTTOM
+				&& val.addressAD.le == Addresses.LatticeElement.BOTTOM)
+			return true;
+		return false;
+	}
+
+	/**
+	 * @return true if the value is definitely zero
+	 */
+	public static boolean isZero(BValue val) {
+		if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM
+				&& val.nullAD.le == Null.LatticeElement.BOTTOM
+				&& val.numberAD.le == Num.LatticeElement.ZERO
+				&& val.stringAD.le != Str.LatticeElement.BOTTOM
+				&& val.booleanAD.le == Bool.LatticeElement.BOTTOM
+				&& val.addressAD.le == Addresses.LatticeElement.BOTTOM)
+			return true;
+		return false;
+	}
+
+	/**
+	 * @return true if the value is definitely false
+	 */
+	public static boolean isFalse(BValue val) {
+		if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM
+				&& val.nullAD.le == Null.LatticeElement.BOTTOM
+				&& val.numberAD.le == Num.LatticeElement.BOTTOM
+				&& val.stringAD.le != Str.LatticeElement.BOTTOM
+				&& val.booleanAD.le == Bool.LatticeElement.FALSE
+				&& val.addressAD.le == Addresses.LatticeElement.BOTTOM)
+			return true;
+		return false;
+	}
+
+	/**
+	 * @return true if the value is definitely a single address
+	 */
+	public static boolean isAddress(BValue val) {
+		if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM
+				&& val.nullAD.le == Null.LatticeElement.BOTTOM
+				&& val.numberAD.le == Num.LatticeElement.BOTTOM
+				&& val.stringAD.le != Str.LatticeElement.BOTTOM
+				&& val.booleanAD.le == Bool.LatticeElement.BOTTOM
+				&& val.addressAD.le == Addresses.LatticeElement.SET
+				&& val.addressAD.addresses.size() == 1)
+			return true;
+		return false;
+	}
+
+	/**
 	 * @return the top lattice element
 	 */
 	public static BValue top() {

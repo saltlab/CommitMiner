@@ -8,11 +8,13 @@ import java.util.Set;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.EmptyExpression;
 import org.mozilla.javascript.ast.EmptyStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
+import org.mozilla.javascript.ast.ParenthesizedExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
@@ -55,8 +57,110 @@ public class State implements IState {
 		/* Update the trace to the current condition. */
 		this.trace = this.trace.update(edge.getId());
 
+		/* The condition to transfer over. */
+		AstNode condition = (AstNode)edge.getCondition();
+
+		/* Interpret the statement. */
+
 		return this;
 
+	}
+
+	/**
+	 * Performs an abstract interpretation on the condition.
+	 */
+	public void interpretCondition(AstNode condition, Address selfAddr) {
+		if(condition == null) { /* Skip. */ }
+		else if(condition instanceof EmptyExpression) { /* Skip. */ }
+		else if(condition instanceof ParenthesizedExpression) {
+			interpretConditionParenthesizedExpression((ParenthesizedExpression)condition, selfAddr);
+		}
+		else if()
+	}
+
+	private void interpretCondition(AstNode condition, Address selfAddr, boolean not) {
+		if(condition instanceof ParenthesizedExpression) {
+			interpretCondition(((ParenthesizedExpression)condition).getExpression(), selfAddr, not);
+		}
+		else if(condition instanceof Name) {
+			// TODO: condition is cast as a boolean... so update it to be truthy or falsey
+			Set<Address> addrs = resolveOrCreate(condition);
+		}
+		else if(condition instanceof InfixExpression &&
+				((InfixExpression)condition).getOperator() == Token.GETPROP) {
+			// TODO: condition is cast as a boolean... so update it to be truthy or falsey
+			Set<Address> addrs = resolveOrCreate(condition);
+		}
+		else if(condition instanceof InfixExpression) {
+			InfixExpression ie = (InfixExpression)condition;
+			Set<Address> rhsAddrs;
+			Set<Address> lhsAddrs;
+			BValue rhsVal;
+			switch(ie.getOperator()) {
+			case Token.EQ:
+				// TODO: Get the type of the RHS and update the value of the LHS
+			case Token.NE:
+				// TODO: Get the type of the RHS and update the value of the LHS
+			case Token.SHEQ:
+				// TODO: Get the type of the RHS and update the value of the LHS
+				rhsAddrs = resolveOrCreate(ie.getRight());
+				rhsVal = BValue.bottom();
+				for(Address rhsAddr : rhsAddrs) {
+					rhsVal = rhsVal.join(this.store.apply(rhsAddr));
+				}
+				lhsAddrs = resolveOrCreate(ie.getLeft());
+				for(Address lhsAddr : lhsAddrs) {
+					store.strongUpdate(lhsAddr, rhsVal);
+				}
+			case Token.SHNE:
+				// TODO: Get the type of the RHS and update the value of the LHS
+				rhsAddrs = resolveOrCreate(ie.getRight());
+				rhsVal = BValue.bottom();
+				for(Address rhsAddr : rhsAddrs) {
+					rhsVal = rhsVal.join(this.store.apply(rhsAddr));
+				}
+				lhsAddrs = resolveOrCreate(ie.getLeft());
+				if(BValue.isUndefined(rhsVal))
+					for(Address lhsAddr : lhsAddrs)
+						store.apply(lhsAddr).undefinedAD = Undefined.bottom();
+				if(BValue.isNull(rhsVal))
+					for(Address lhsAddr : lhsAddrs)
+						store.apply(lhsAddr).nullAD = Null.bottom();
+				if(BValue.isBlank(rhsVal))
+					for(Address lhsAddr : lhsAddrs)
+						store.apply(lhsAddr).stringAD = new Str(Str.LatticeElement.SNOTBLANK);
+				if(BValue.isNaN(rhsVal))
+					for(Address lhsAddr : lhsAddrs)
+						store.apply(lhsAddr).numberAD = new Num(Num.LatticeElement.NOT_NAN);
+				if(BValue.isZero(rhsVal))
+					for(Address lhsAddr : lhsAddrs)
+						store.apply(lhsAddr).numberAD = new Num(Num.LatticeElement.NOT_ZERO);
+				if(BValue.isFalse(rhsVal))
+					for(Address lhsAddr : lhsAddrs)
+						store.apply(lhsAddr).booleanAD = new Bool(Bool.LatticeElement.TRUE);
+				if(BValue.isAddress(rhsVal))
+					for(Address lhsAddr : lhsAddrs)
+						store.apply(lhsAddr).addressAD.addresses.removeAll(rhsVal.addressAD.addresses);
+			case Token.AND:
+				/* Interpret both sides of the condition if they must both be
+				 * true. */
+				if(!not) {
+					interpretCondition(ie.getLeft(), selfAddr, false);
+					interpretCondition(ie.getRight(), selfAddr, false);
+				}
+			case Token.OR:
+				/* Interpret both sides of the condition if they must both be
+				 * true. */
+				if(not) {
+					interpretCondition(ie.getLeft(), selfAddr, false);
+					interpretCondition(ie.getRight(), selfAddr, false);
+				}
+			}
+		}
+	}
+
+	private void interpretConditionParenthesizedExpression(ParenthesizedExpression pe, Address selfAddr) {
+		interpretCondition(pe.getExpression(), selfAddr);
 	}
 
 	public State transfer(CFGNode node, Address selfAddr) {
@@ -68,7 +172,7 @@ public class State implements IState {
 		AstNode statement = (AstNode)node.getStatement();
 
 		/* Interpret the statement. */
-		interpret(statement, selfAddr);
+		interpretStatement(statement, selfAddr);
 
 		return this;
 
@@ -76,13 +180,12 @@ public class State implements IState {
 
 	/**
 	 * Performs an abstract interpretation on the node.
-	 * @return The updated state.
 	 */
-	private void interpret(AstNode node, Address selfAddr) {
+	private void interpretStatement(AstNode node, Address selfAddr) {
 
 		if(node instanceof EmptyStatement) { /* Skip. */ }
 		else if(node instanceof ExpressionStatement) {
-			interpret(((ExpressionStatement)node).getExpression(), selfAddr);
+			interpretStatement(((ExpressionStatement)node).getExpression(), selfAddr);
 		}
 		else if(node instanceof VariableDeclaration) {
 			interpretVariableDeclaration((VariableDeclaration)node, selfAddr);

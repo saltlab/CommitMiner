@@ -4,14 +4,14 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 /**
  * Stores the state for the number type abstract domain.
  * Lattice element is:
- * 			  		TOP
- * 			   /	 	   \
- * 			SNotSpl 	 SNotNum
- * 		  /		    \   /		\
- * 		SNum	SNotNumNorSpl	SSpl
- * 		 |			 |			  |
- * 		"0"..      "foo"..    "valueOf"...
- * 		  \ \		 |   |		 /     /
+ * 			  			TOP
+ * 			   /	 	   \       \
+ * 			SNotSpl 	 SNotNum     \
+ * 		  /		    \   /		\	   \
+ * 		SNum	SNotNumNorSpl	SSpl     \
+ * 		 |			 |			  |		   \
+ * 		"0"..      "foo"..    "valueOf"... ""
+ * 		  \ \		 |   |		 /     /   /
  * 					BOT
  * Where TOP means the type could be any string and BOT means the type is definitely
  * not a string.
@@ -55,6 +55,8 @@ public class Str {
 
 		if(notSpl(l) && notSpl(r)) return new Str(LatticeElement.SNOTSPL);
 		if(notNum(l) && notNum(r)) return new Str(LatticeElement.SNOTNUM);
+
+		if(notBlank(l) && notBlank(r)) return new Str(LatticeElement.SNOTBLANK);
 
 		return new Str(LatticeElement.TOP);
 
@@ -104,6 +106,14 @@ public class Str {
 		}
 	}
 
+	private static boolean notBlank(LatticeElement le) {
+		switch(le) {
+		case SBLANK:
+		case TOP: return false;
+		default: return true;
+		}
+	}
+
 	/**
 	 * @return true if the string is definitely not blank.
 	 */
@@ -147,6 +157,8 @@ public class Str {
 	/** The type of a lattice element for the abstract domain. **/
 	public enum LatticeElement {
 		TOP,
+		SBLANK,
+		SNOTBLANK,
 		SNOTSPL,
 		SNOTNUM,
 		SNUM,

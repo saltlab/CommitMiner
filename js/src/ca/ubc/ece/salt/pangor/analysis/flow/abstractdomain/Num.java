@@ -3,7 +3,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 /**
  * Stores the state for the number type abstract domain.
- * Lattice element is simple:
+ * Lattice:
  * 				  TOP
  * 			   /	  \
  * 			CONST	  REAL
@@ -18,12 +18,12 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
  */
 public class Num {
 
-	private LatticeElement le;
-	private String val;
+	public LatticeElement le;
+	public String val;
 
 	public Num(LatticeElement le) {
 		if(le == null) throw new Error("The lattice element cannot be null.");
-		if(le == LatticeElement.NVAL) throw new Error("A value must be provided with the NVAL lattice element.");
+		if(le == LatticeElement.VAL) throw new Error("A value must be provided with the NVAL lattice element.");
 		this.le = le;
 		this.val = null;
 	}
@@ -48,8 +48,9 @@ public class Num {
 		if(l == LatticeElement.BOTTOM) return new Num(r, state.val);
 		if(r == LatticeElement.BOTTOM) return new Num(l, this.val);
 
-		if(isReal(l) && isReal(r)) return new Num(LatticeElement.NREAL);
-		if(isConst(l) && isConst(l)) return new Num(LatticeElement.NCONST);
+		if(isReal(l) && isReal(r)) return new Num(LatticeElement.REAL);
+		if(notNaN(l) && notNaN(r)) return new Num(LatticeElement.NOT_NAN);
+		if(notZero(l) && notZero(r)) return new Num(LatticeElement.NOT_ZERO);
 
 		return new Num(LatticeElement.TOP);
 
@@ -57,19 +58,27 @@ public class Num {
 
 	public static boolean isReal(LatticeElement le) {
 		switch(le) {
-		case NVAL:
-		case NREAL: return true;
+		case VAL:
+		case REAL: return true;
 		default: return false;
 		}
 	}
 
-	public static boolean isConst(LatticeElement le) {
+	public static boolean notNaN(LatticeElement le) {
 		switch(le) {
 		case NAN:
-		case NNI:
-		case NPI:
-		case NCONST: return true;
-		default: return false;
+		case NOT_ZERO:
+		case TOP: return false;
+		default: return true;
+		}
+	}
+
+	public static boolean notZero(LatticeElement le) {
+		switch(le) {
+		case ZERO:
+		case NOT_NAN:
+		case TOP: return false;
+		default: return true;
 		}
 	}
 
@@ -91,23 +100,14 @@ public class Num {
 	 * @return true if the number is definitely not zero.
 	 */
 	public static boolean notZero(Num num) {
-		if(isConst(num.le)
-				|| num.le == LatticeElement.BOTTOM
-				|| (num.le == LatticeElement.NVAL && Double.parseDouble(num.val) != 0.0))
-			return true;
-		return false;
+		return notZero(num.le);
 	}
 
 	/**
 	 * @return true if the number is definitely not NaN.
 	 */
 	public static boolean notNaN(Num num) {
-		if(isReal(num.le)
-				|| num.le == LatticeElement.NNI
-				|| num.le == LatticeElement.NPI
-				|| num.le == LatticeElement.BOTTOM)
-			return true;
-		return false;
+		return notNaN(num.le);
 	}
 
 	/**
@@ -127,12 +127,14 @@ public class Num {
 	/** The lattice elements for the abstract domain. **/
 	public enum LatticeElement {
 		TOP,
+		ZERO,
 		NAN,
-		NNI,
-		NPI,
-		NVAL,
-		NCONST,
-		NREAL,
+		NI,
+		PI,
+		VAL,
+		REAL,
+		NOT_NAN,
+		NOT_ZERO,
 		BOTTOM
 	}
 
