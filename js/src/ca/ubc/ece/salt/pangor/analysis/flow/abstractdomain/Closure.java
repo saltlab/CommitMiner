@@ -6,7 +6,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
  * A native (builtin) function. The abstract interpretation of the function is
  * specified in Java, usually as a lambda expression.
  */
-public abstract class Closure extends SmartHash {
+public abstract class Closure {
 
 	/**
 	 * @param selfAddr The value of the 'this' variable (a set of objects).

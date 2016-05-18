@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * The abstract domain for an address.
  */
-public class Address extends SmartHash {
+public class Address {
 
 	/** A unique address for builtins. **/
 	private static BigInteger builtinAddress = BigInteger.valueOf(-1);

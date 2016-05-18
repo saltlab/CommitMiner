@@ -9,7 +9,7 @@ import java.util.Map;
  *
  * Identifiers may be
  */
-public class Environment extends SmartHash {
+public class Environment {
 
 	/** The possible memory address for each identifier. **/
 	public Map<String, Address> environment;

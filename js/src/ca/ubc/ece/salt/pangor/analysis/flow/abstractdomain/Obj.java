@@ -11,7 +11,7 @@ import java.util.Set;
  * 	(2) a set of interpreter-only properties
  * 	(3) a list of properties that are definitely present.
  */
-public class Obj extends SmartHash {
+public class Obj {
 
 	/** Programmer-visible object properties. **/
 	public Map<String, Address> externalProperties;

@@ -11,10 +11,9 @@ import org.mozilla.javascript.ast.AstNode;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.JSClass;
-import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.SmartHash;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 
-public abstract class Trace extends SmartHash {
+public abstract class Trace {
 
 	/**
 	 * There is only one object type right now. Functions addresses

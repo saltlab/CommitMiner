@@ -5,7 +5,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
  * Scratchpad memory. Unlike JSAI, we define a fixed set of values that we
  * store.
  */
-public class Scratchpad extends SmartHash {
+public class Scratchpad {
 
 	/** The scratch memory. **/
 	private BValue[] scratchMem;

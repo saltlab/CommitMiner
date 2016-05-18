@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * The abstract domain for the possible addresses pointed to by a BValue.
  */
-public class Addresses extends SmartHash {
+public class Addresses {
 
 	private static final int MAX_SIZE = 3;
 
