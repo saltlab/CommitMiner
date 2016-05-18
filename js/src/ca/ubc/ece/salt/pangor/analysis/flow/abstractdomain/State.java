@@ -93,70 +93,192 @@ public class State implements IState {
 		}
 		else if(condition instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression)condition;
-			Set<Address> rhsAddrs;
-			Set<Address> lhsAddrs;
-			BValue rhsVal;
 			switch(ie.getOperator()) {
 			case Token.EQ:
-				// TODO: Get the type of the RHS and update the value of the LHS
+				if(not) interpretNE(ie);
+				else interpretEQ(ie);
 			case Token.NE:
-				// TODO: Get the type of the RHS and update the value of the LHS
+				if(not) interpretEQ(ie);
+				else interpretNE(ie);
 			case Token.SHEQ:
-				// TODO: Get the type of the RHS and update the value of the LHS
-				rhsAddrs = resolveOrCreate(ie.getRight());
-				rhsVal = BValue.bottom();
-				for(Address rhsAddr : rhsAddrs) {
-					rhsVal = rhsVal.join(this.store.apply(rhsAddr));
-				}
-				lhsAddrs = resolveOrCreate(ie.getLeft());
-				for(Address lhsAddr : lhsAddrs) {
-					store.strongUpdate(lhsAddr, rhsVal);
-				}
+				if(not) interpretSHNE(ie);
+				else interpretSHEQ(ie);
+				break;
 			case Token.SHNE:
-				// TODO: Get the type of the RHS and update the value of the LHS
-				rhsAddrs = resolveOrCreate(ie.getRight());
-				rhsVal = BValue.bottom();
-				for(Address rhsAddr : rhsAddrs) {
-					rhsVal = rhsVal.join(this.store.apply(rhsAddr));
-				}
-				lhsAddrs = resolveOrCreate(ie.getLeft());
-				if(BValue.isUndefined(rhsVal))
-					for(Address lhsAddr : lhsAddrs)
-						store.apply(lhsAddr).undefinedAD = Undefined.bottom();
-				if(BValue.isNull(rhsVal))
-					for(Address lhsAddr : lhsAddrs)
-						store.apply(lhsAddr).nullAD = Null.bottom();
-				if(BValue.isBlank(rhsVal))
-					for(Address lhsAddr : lhsAddrs)
-						store.apply(lhsAddr).stringAD = new Str(Str.LatticeElement.SNOTBLANK);
-				if(BValue.isNaN(rhsVal))
-					for(Address lhsAddr : lhsAddrs)
-						store.apply(lhsAddr).numberAD = new Num(Num.LatticeElement.NOT_NAN);
-				if(BValue.isZero(rhsVal))
-					for(Address lhsAddr : lhsAddrs)
-						store.apply(lhsAddr).numberAD = new Num(Num.LatticeElement.NOT_ZERO);
-				if(BValue.isFalse(rhsVal))
-					for(Address lhsAddr : lhsAddrs)
-						store.apply(lhsAddr).booleanAD = new Bool(Bool.LatticeElement.TRUE);
-				if(BValue.isAddress(rhsVal))
-					for(Address lhsAddr : lhsAddrs)
-						store.apply(lhsAddr).addressAD.addresses.removeAll(rhsVal.addressAD.addresses);
+				if(not) interpretSHEQ(ie);
+				else interpretSHNE(ie);
+				break;
 			case Token.AND:
-				/* Interpret both sides of the condition if they must both be
-				 * true. */
-				if(!not) {
-					interpretCondition(ie.getLeft(), selfAddr, false);
-					interpretCondition(ie.getRight(), selfAddr, false);
-				}
+				interpretAnd(ie, selfAddr, not);
+				break;
 			case Token.OR:
-				/* Interpret both sides of the condition if they must both be
-				 * true. */
-				if(not) {
-					interpretCondition(ie.getLeft(), selfAddr, false);
-					interpretCondition(ie.getRight(), selfAddr, false);
-				}
+				interpretOr(ie, selfAddr, not);
+				break;
 			}
 		}
+	}
+
+	private void interpretNE(InfixExpression ie) {
+
+		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
+
+		/* Get the value of the RHS. */
+		BValue rhsVal = BValue.bottom();
+		for(Address rhsAddr : rhsAddrs) {
+			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
+		}
+
+		/* Update the value(s) on the LHS. */
+		Set<Address> lhsAddrs = resolveOrCreate(ie.getLeft());
+		if(BValue.isUndefined(rhsVal) || BValue.isNull(rhsVal))
+			for(Address lhsAddr : lhsAddrs) {
+				BValue lhsVal = store.apply(lhsAddr);
+				lhsVal.undefinedAD = Undefined.bottom();
+				lhsVal.nullAD = Null.bottom();
+			}
+		if(BValue.isBlank(rhsVal) || BValue.isZero(rhsVal))
+			for(Address lhsAddr : lhsAddrs) {
+				BValue lhsVal = store.apply(lhsAddr);
+				/* Make sure we don't decrease the precision of the LE. */
+				if(!Str.notBlank(lhsVal.stringAD))
+					lhsVal.stringAD = new Str(Str.LatticeElement.SNOTBLANK);
+				if(!Num.notZero(lhsVal.numberAD))
+					lhsVal.numberAD = new Num(Num.LatticeElement.NOT_ZERO);
+			}
+		if(BValue.isNaN(rhsVal))
+			for(Address lhsAddr : lhsAddrs) {
+				BValue lhsVal = store.apply(lhsAddr);
+				if(!Num.notNaN(lhsVal.numberAD))
+					lhsVal.numberAD = new Num(Num.LatticeElement.NOT_NAN);
+			}
+		if(BValue.isFalse(rhsVal))
+			for(Address lhsAddr : lhsAddrs) {
+				BValue lhsVal = store.apply(lhsAddr);
+				lhsVal.undefinedAD = Undefined.bottom();
+				lhsVal.nullAD = Null.bottom();
+				lhsVal.stringAD = new Str(Str.LatticeElement.SNOTBLANK);
+				lhsVal.numberAD = new Num(Num.LatticeElement.NOT_ZERO_NOR_NAN);
+			}
+		if(BValue.isAddress(rhsVal))
+			for(Address lhsAddr : lhsAddrs)
+				store.apply(lhsAddr).addressAD.addresses.removeAll(rhsVal.addressAD.addresses);
+
+	}
+
+	private void interpretEQ(InfixExpression ie) {
+
+		/* Get the value of the RHS. */
+		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
+		BValue rhsVal = BValue.bottom();
+		for(Address rhsAddr : rhsAddrs) {
+			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
+		}
+
+		/* Update the value(s) on the LHS. */
+		Set<Address>lhsAddrs = resolveOrCreate(ie.getLeft());
+		if(BValue.isUndefined(rhsVal) || BValue.isNull(rhsVal))
+			for(Address lhsAddr : lhsAddrs) {
+				rhsVal = Undefined.inject(Undefined.top())
+						.join(Null.inject(Null.top()));
+				store.strongUpdate(lhsAddr, rhsVal);
+			}
+		if(BValue.isBlank(rhsVal) || BValue.isZero(rhsVal))
+			for(Address lhsAddr : lhsAddrs) {
+				rhsVal = Str.inject(new Str(Str.LatticeElement.SBLANK))
+						.join(Num.inject(new Num(Num.LatticeElement.ZERO)));
+				store.strongUpdate(lhsAddr, rhsVal);
+			}
+		if(BValue.isNaN(rhsVal))
+			for(Address lhsAddr : lhsAddrs)
+				store.strongUpdate(lhsAddr, Num.inject(new Num(Num.LatticeElement.NAN)));
+		if(BValue.isFalse(rhsVal))
+			for(Address lhsAddr : lhsAddrs) {
+				rhsVal = Undefined.inject(Undefined.top())
+						.join(Null.inject(Null.top()))
+						.join(Str.inject(new Str(Str.LatticeElement.SBLANK)))
+						.join(Num.inject(new Num(Num.LatticeElement.NAN_ZERO)))
+						.join(Bool.inject(new Bool(Bool.LatticeElement.FALSE)));
+				store.apply(lhsAddr).booleanAD = new Bool(Bool.LatticeElement.TRUE);
+			}
+		if(BValue.isAddress(rhsVal))
+			for(Address lhsAddr : lhsAddrs)
+				store.apply(lhsAddr).addressAD.addresses.retainAll(rhsVal.addressAD.addresses);
+
+	}
+
+	private void interpretSHEQ(InfixExpression ie) {
+
+		/* Get the value of the RHS. */
+		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
+		BValue rhsVal = BValue.bottom();
+		for(Address rhsAddr : rhsAddrs) {
+			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
+		}
+
+		/* Update the value(s) on the LHS. */
+		Set<Address> lhsAddrs = resolveOrCreate(ie.getLeft());
+		for(Address lhsAddr : lhsAddrs) {
+			store.strongUpdate(lhsAddr, rhsVal);
+		}
+
+	}
+
+	private void interpretSHNE(InfixExpression ie) {
+
+		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
+
+		/* Get the value of the RHS. */
+		BValue rhsVal = BValue.bottom();
+		for(Address rhsAddr : rhsAddrs) {
+			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
+		}
+
+		/* Update the value(s) on the LHS. */
+		Set<Address> lhsAddrs = resolveOrCreate(ie.getLeft());
+		if(BValue.isUndefined(rhsVal))
+			for(Address lhsAddr : lhsAddrs)
+				store.apply(lhsAddr).undefinedAD = Undefined.bottom();
+		if(BValue.isNull(rhsVal))
+			for(Address lhsAddr : lhsAddrs)
+				store.apply(lhsAddr).nullAD = Null.bottom();
+		if(BValue.isBlank(rhsVal))
+			for(Address lhsAddr : lhsAddrs)
+				store.apply(lhsAddr).stringAD = new Str(Str.LatticeElement.SNOTBLANK);
+		if(BValue.isNaN(rhsVal))
+			for(Address lhsAddr : lhsAddrs)
+				store.apply(lhsAddr).numberAD = new Num(Num.LatticeElement.NOT_NAN);
+		if(BValue.isZero(rhsVal))
+			for(Address lhsAddr : lhsAddrs)
+				store.apply(lhsAddr).numberAD = new Num(Num.LatticeElement.NOT_ZERO);
+		if(BValue.isFalse(rhsVal))
+			for(Address lhsAddr : lhsAddrs)
+				store.apply(lhsAddr).booleanAD = new Bool(Bool.LatticeElement.TRUE);
+		if(BValue.isAddress(rhsVal))
+			for(Address lhsAddr : lhsAddrs)
+				store.apply(lhsAddr).addressAD.addresses.removeAll(rhsVal.addressAD.addresses);
+
+	}
+
+	private void interpretOr(InfixExpression ie, Address selfAddr, boolean not) {
+
+		/* Interpret both sides of the condition if they must both be
+		 * true. */
+		if(not) {
+			interpretCondition(ie.getLeft(), selfAddr, false);
+			interpretCondition(ie.getRight(), selfAddr, false);
+		}
+
+	}
+
+	private void interpretAnd(InfixExpression ie, Address selfAddr, boolean not) {
+
+		/* Interpret both sides of the condition if they must both be
+		 * true. */
+		if(!not) {
+			interpretCondition(ie.getLeft(), selfAddr, false);
+			interpretCondition(ie.getRight(), selfAddr, false);
+		}
+
 	}
 
 	private void interpretConditionParenthesizedExpression(ParenthesizedExpression pe, Address selfAddr) {

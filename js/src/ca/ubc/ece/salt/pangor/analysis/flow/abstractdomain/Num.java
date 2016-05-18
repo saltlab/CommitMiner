@@ -51,6 +51,8 @@ public class Num {
 		if(isReal(l) && isReal(r)) return new Num(LatticeElement.REAL);
 		if(notNaN(l) && notNaN(r)) return new Num(LatticeElement.NOT_NAN);
 		if(notZero(l) && notZero(r)) return new Num(LatticeElement.NOT_ZERO);
+		if(isFalsey(l) && isFalsey(r)) return new Num(LatticeElement.NAN_ZERO);
+		if(notZeroNorNaN(l) && notZeroNorNaN(r)) return new Num(LatticeElement.NOT_ZERO_NOR_NAN);
 
 		return new Num(LatticeElement.TOP);
 
@@ -64,10 +66,20 @@ public class Num {
 		}
 	}
 
+	public static boolean isFalsey(LatticeElement le) {
+		switch(le) {
+		case NAN:
+		case ZERO:
+		case NAN_ZERO: return true;
+		default: return false;
+		}
+	}
+
 	public static boolean notNaN(LatticeElement le) {
 		switch(le) {
 		case NAN:
 		case NOT_ZERO:
+		case NAN_ZERO:
 		case TOP: return false;
 		default: return true;
 		}
@@ -77,6 +89,19 @@ public class Num {
 		switch(le) {
 		case ZERO:
 		case NOT_NAN:
+		case NAN_ZERO:
+		case TOP: return false;
+		default: return true;
+		}
+	}
+
+	public static boolean notZeroNorNaN(LatticeElement le) {
+		switch(le) {
+		case ZERO:
+		case NAN:
+		case NOT_NAN:
+		case NOT_ZERO:
+		case NAN_ZERO:
 		case TOP: return false;
 		default: return true;
 		}
@@ -129,12 +154,14 @@ public class Num {
 		TOP,
 		ZERO,
 		NAN,
+		NAN_ZERO,
 		NI,
 		PI,
 		VAL,
 		REAL,
 		NOT_NAN,
 		NOT_ZERO,
+		NOT_ZERO_NOR_NAN,
 		BOTTOM
 	}
 
