@@ -8,7 +8,6 @@ import java.util.Set;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.EmptyExpression;
 import org.mozilla.javascript.ast.EmptyStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionCall;
@@ -61,6 +60,7 @@ public class State implements IState {
 		AstNode condition = (AstNode)edge.getCondition();
 
 		/* Interpret the statement. */
+		interpretCondition(condition, selfAddr, false);
 
 		return this;
 
@@ -69,27 +69,20 @@ public class State implements IState {
 	/**
 	 * Performs an abstract interpretation on the condition.
 	 */
-	public void interpretCondition(AstNode condition, Address selfAddr) {
-		if(condition == null) { /* Skip. */ }
-		else if(condition instanceof EmptyExpression) { /* Skip. */ }
-		else if(condition instanceof ParenthesizedExpression) {
-			interpretConditionParenthesizedExpression((ParenthesizedExpression)condition, selfAddr);
-		}
-		else if()
-	}
-
 	private void interpretCondition(AstNode condition, Address selfAddr, boolean not) {
 		if(condition instanceof ParenthesizedExpression) {
 			interpretCondition(((ParenthesizedExpression)condition).getExpression(), selfAddr, not);
 		}
 		else if(condition instanceof Name) {
-			// TODO: condition is cast as a boolean... so update it to be truthy or falsey
 			Set<Address> addrs = resolveOrCreate(condition);
+			if(not) interpretAddrsFalsey(addrs);
+			else interpretAddrsTruthy(addrs);
 		}
 		else if(condition instanceof InfixExpression &&
 				((InfixExpression)condition).getOperator() == Token.GETPROP) {
-			// TODO: condition is cast as a boolean... so update it to be truthy or falsey
 			Set<Address> addrs = resolveOrCreate(condition);
+			if(not) interpretAddrsFalsey(addrs);
+			else interpretAddrsTruthy(addrs);
 		}
 		else if(condition instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression)condition;
@@ -116,6 +109,33 @@ public class State implements IState {
 				break;
 			}
 		}
+	}
+
+	private void interpretAddrsFalsey(Set<Address> addrs) {
+
+		/* Update the value(s) to be falsey. */
+		for(Address addr : addrs) {
+			BValue val = Undefined.inject(Undefined.top())
+					.join(Null.inject(Null.top()))
+					.join(Str.inject(new Str(Str.LatticeElement.SBLANK)))
+					.join(Num.inject(new Num(Num.LatticeElement.NAN_ZERO)))
+					.join(Bool.inject(new Bool(Bool.LatticeElement.FALSE)));
+			store.strongUpdate(addr, val);
+		}
+
+	}
+
+	private void interpretAddrsTruthy(Set<Address> addrs) {
+
+		/* Update the value(s) to be truthy. */
+		for(Address addr : addrs) {
+			BValue val = store.apply(addr);
+			val.undefinedAD = Undefined.bottom();
+			val.nullAD = Null.bottom();
+			val.stringAD = new Str(Str.LatticeElement.SNOTBLANK);
+			val.numberAD = new Num(Num.LatticeElement.NOT_ZERO_NOR_NAN);
+		}
+
 	}
 
 	private void interpretNE(InfixExpression ie) {
@@ -152,13 +172,7 @@ public class State implements IState {
 					lhsVal.numberAD = new Num(Num.LatticeElement.NOT_NAN);
 			}
 		if(BValue.isFalse(rhsVal))
-			for(Address lhsAddr : lhsAddrs) {
-				BValue lhsVal = store.apply(lhsAddr);
-				lhsVal.undefinedAD = Undefined.bottom();
-				lhsVal.nullAD = Null.bottom();
-				lhsVal.stringAD = new Str(Str.LatticeElement.SNOTBLANK);
-				lhsVal.numberAD = new Num(Num.LatticeElement.NOT_ZERO_NOR_NAN);
-			}
+			interpretAddrsTruthy(lhsAddrs);
 		if(BValue.isAddress(rhsVal))
 			for(Address lhsAddr : lhsAddrs)
 				store.apply(lhsAddr).addressAD.addresses.removeAll(rhsVal.addressAD.addresses);
@@ -192,14 +206,7 @@ public class State implements IState {
 			for(Address lhsAddr : lhsAddrs)
 				store.strongUpdate(lhsAddr, Num.inject(new Num(Num.LatticeElement.NAN)));
 		if(BValue.isFalse(rhsVal))
-			for(Address lhsAddr : lhsAddrs) {
-				rhsVal = Undefined.inject(Undefined.top())
-						.join(Null.inject(Null.top()))
-						.join(Str.inject(new Str(Str.LatticeElement.SBLANK)))
-						.join(Num.inject(new Num(Num.LatticeElement.NAN_ZERO)))
-						.join(Bool.inject(new Bool(Bool.LatticeElement.FALSE)));
-				store.apply(lhsAddr).booleanAD = new Bool(Bool.LatticeElement.TRUE);
-			}
+			interpretAddrsFalsey(lhsAddrs);
 		if(BValue.isAddress(rhsVal))
 			for(Address lhsAddr : lhsAddrs)
 				store.apply(lhsAddr).addressAD.addresses.retainAll(rhsVal.addressAD.addresses);
@@ -279,10 +286,6 @@ public class State implements IState {
 			interpretCondition(ie.getRight(), selfAddr, false);
 		}
 
-	}
-
-	private void interpretConditionParenthesizedExpression(ParenthesizedExpression pe, Address selfAddr) {
-		interpretCondition(pe.getExpression(), selfAddr);
 	}
 
 	public State transfer(CFGNode node, Address selfAddr) {
