@@ -15,13 +15,11 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 public class Null {
 
 	public LatticeElement le;
+	public Change change;
 
-	public Null() {
-		this.le = LatticeElement.TOP;
-	}
-
-	private Null(LatticeElement le) {
+	private Null(LatticeElement le, Change change) {
 		this.le = le;
+		this.change = change;
 	}
 
 	/**
@@ -29,8 +27,8 @@ public class Null {
 	 * @param le The new lattice element.
 	 * @return The updated state for this domain.
 	 */
-	public Null strongUpdate(LatticeElement le) {
-		return new Null(le);
+	public Null strongUpdate(LatticeElement le, Change change) {
+		return new Null(le, change);
 	}
 
 	/**
@@ -38,9 +36,10 @@ public class Null {
 	 * @param le The lattice element to merge with.
 	 * @return The updated state for this domain.
 	 */
-	public Null weakUpdate(LatticeElement le) {
-		if(this.le == le) return new Null(this.le);
-		return new Null(LatticeElement.BOTTOM);
+	public Null weakUpdate(LatticeElement le, Change change) {
+		change = this.change.join(change);
+		if(this.le == le) return new Null(this.le, change);
+		return new Null(LatticeElement.TOP, change);
 	}
 
 	/**
@@ -49,7 +48,8 @@ public class Null {
 	 * @return A new null that is the join of the two nulls.
 	 */
 	public Null join(Null state) {
-		return this.weakUpdate(state.le);
+		Change jc = this.change.join(state.change);
+		return this.weakUpdate(state.le, jc);
 	}
 
 	/**
@@ -58,26 +58,26 @@ public class Null {
 	 */
 	public static BValue inject(Null nll) {
 		return new BValue(
-				Str.bottom(),
-				Num.bottom(),
-				Bool.bottom(),
+				Str.bottom(nll.change),
+				Num.bottom(nll.change),
+				Bool.bottom(nll.change),
 				nll,
-				Undefined.bottom(),
-				Addresses.bottom());
+				Undefined.bottom(nll.change),
+				Addresses.bottom(nll.change));
 	}
 
 	/**
 	 * @return the top lattice element
 	 */
-	public static Null top() {
-		return new Null(LatticeElement.TOP);
+	public static Null top(Change change) {
+		return new Null(LatticeElement.TOP, change);
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static Null bottom() {
-		return new Null(LatticeElement.BOTTOM);
+	public static Null bottom(Change change) {
+		return new Null(LatticeElement.BOTTOM, change);
 	}
 
 	/** The lattice elements for the abstract domain. **/

@@ -20,18 +20,21 @@ public class Num {
 
 	public LatticeElement le;
 	public String val;
+	public Change change;
 
-	public Num(LatticeElement le) {
+	public Num(LatticeElement le, Change change) {
 		if(le == null) throw new Error("The lattice element cannot be null.");
 		if(le == LatticeElement.VAL) throw new Error("A value must be provided with the NVAL lattice element.");
 		this.le = le;
 		this.val = null;
+		this.change = change;
 	}
 
-	public Num(LatticeElement le, String val) {
+	public Num(LatticeElement le, String val, Change change) {
 		if(le == null) throw new Error("The lattice element cannot be null.");
 		this.le = le;
 		this.val = val;
+		this.change = change;
 	}
 
 	/**
@@ -41,20 +44,22 @@ public class Num {
 	 */
 	public Num join(Num state) {
 
+		Change change = this.change.join(state.change);
+
 		LatticeElement l = this.le;
 		LatticeElement r = state.le;
 
-		if(l == r && this.val == state.val) return new Num(l, this.val);
-		if(l == LatticeElement.BOTTOM) return new Num(r, state.val);
-		if(r == LatticeElement.BOTTOM) return new Num(l, this.val);
+		if(l == r && this.val == state.val) return new Num(l, this.val, change);
+		if(l == LatticeElement.BOTTOM) return new Num(r, state.val, change);
+		if(r == LatticeElement.BOTTOM) return new Num(l, this.val, change);
 
-		if(isReal(l) && isReal(r)) return new Num(LatticeElement.REAL);
-		if(notNaN(l) && notNaN(r)) return new Num(LatticeElement.NOT_NAN);
-		if(notZero(l) && notZero(r)) return new Num(LatticeElement.NOT_ZERO);
-		if(isFalsey(l) && isFalsey(r)) return new Num(LatticeElement.NAN_ZERO);
-		if(notZeroNorNaN(l) && notZeroNorNaN(r)) return new Num(LatticeElement.NOT_ZERO_NOR_NAN);
+		if(isReal(l) && isReal(r)) return new Num(LatticeElement.REAL, change);
+		if(notNaN(l) && notNaN(r)) return new Num(LatticeElement.NOT_NAN, change);
+		if(notZero(l) && notZero(r)) return new Num(LatticeElement.NOT_ZERO, change);
+		if(isFalsey(l) && isFalsey(r)) return new Num(LatticeElement.NAN_ZERO, change);
+		if(notZeroNorNaN(l) && notZeroNorNaN(r)) return new Num(LatticeElement.NOT_ZERO_NOR_NAN, change);
 
-		return new Num(LatticeElement.TOP);
+		return new Num(LatticeElement.TOP, change);
 
 	}
 
@@ -113,12 +118,12 @@ public class Num {
 	 */
 	public static BValue inject(Num number) {
 		return new BValue(
-				Str.bottom(),
+				Str.bottom(number.change),
 				number,
-				Bool.bottom(),
-				Null.bottom(),
-				Undefined.bottom(),
-				Addresses.bottom());
+				Bool.bottom(number.change),
+				Null.bottom(number.change),
+				Undefined.bottom(number.change),
+				Addresses.bottom(number.change));
 	}
 
 	/**
@@ -138,15 +143,15 @@ public class Num {
 	/**
 	 * @return the top lattice element
 	 */
-	public static Num top() {
-		return new Num(LatticeElement.TOP);
+	public static Num top(Change change) {
+		return new Num(LatticeElement.TOP, change);
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static Num bottom() {
-		return new Num(LatticeElement.BOTTOM);
+	public static Num bottom(Change change) {
+		return new Num(LatticeElement.BOTTOM, change);
 	}
 
 	/** The lattice elements for the abstract domain. **/

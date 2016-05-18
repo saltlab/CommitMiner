@@ -11,6 +11,7 @@ public class Addresses extends SmartHash {
 	private static final int MAX_SIZE = 3;
 
 	public LatticeElement le;
+	public Change change;
 
 	/** null if LE = TOP. **/
 	public Set<Address> addresses;
@@ -18,41 +19,45 @@ public class Addresses extends SmartHash {
 	/**
 	 * Create the bottom lattice element.
 	 */
-	public Addresses(LatticeElement le) {
+	public Addresses(LatticeElement le, Change change) {
 		this.addresses = new HashSet<Address>();
 		this.le = le;
+		this.change = change;
 	}
 
-	public Addresses(Set<Address> addresses) {
+	public Addresses(Set<Address> addresses, Change change) {
 		this.addresses = addresses;
 		this.le = LatticeElement.SET;
+		this.change = change;
 	}
 
-	public Addresses(Address address) {
+	public Addresses(Address address, Change change) {
 		this.addresses = new HashSet<Address>();
 		this.addresses.add(address);
+		this.change = change;
 	}
 
-	public Addresses(LatticeElement le, Set<Address> addresses) {
+	public Addresses(LatticeElement le, Set<Address> addresses, Change change) {
 		this.addresses = addresses;
 		this.le = le;
+		this.change = change;
 	}
 
 
 	/**
 	 * Performs a weak update on the set of addresses.
 	 */
-	public Addresses weakUpdate(Set<Address> addresses) {
-		return this.join(new Addresses(addresses));
+	public Addresses weakUpdate(Set<Address> addresses, Change change) {
+		return this.join(new Addresses(addresses, change));
 	}
 
 	/**
 	 * Performs a strong update on the set of addresses.
 	 */
-	public Addresses strongUpdate(Set<Address> addresses) {
+	public Addresses strongUpdate(Set<Address> addresses, Change change) {
 		if(addresses.size() > MAX_SIZE)
-			return new Addresses(LatticeElement.TOP, null);
-		return new Addresses(addresses);
+			return new Addresses(LatticeElement.TOP, null, change);
+		return new Addresses(addresses, change);
 	}
 
 	/**
@@ -62,22 +67,24 @@ public class Addresses extends SmartHash {
 	 */
 	public Addresses join(Addresses a) {
 
+		Change jc = this.change.join(a.change);
+
 		if(a.le == LatticeElement.BOTTOM)
-			return new Addresses(this.le, new HashSet<Address>(this.addresses));
+			return new Addresses(this.le, new HashSet<Address>(this.addresses), jc);
 		if(this.le == LatticeElement.BOTTOM)
-			return new Addresses(a.le, new HashSet<Address>(a.addresses));
+			return new Addresses(a.le, new HashSet<Address>(a.addresses), jc);
 		if(this.le == LatticeElement.TOP || a.le == LatticeElement.TOP)
-			return new Addresses(LatticeElement.TOP, null);
+			return new Addresses(LatticeElement.TOP, null, jc);
 
 		/* We set a limit on the number of addresses so that there is a finite
 		 * address space. This is in lieu of abstracting the abstract machine. */
 		if(this.addresses.size() + a.addresses.size() > 3)
-			return new Addresses(LatticeElement.TOP, null);
+			return new Addresses(LatticeElement.TOP, null, jc);
 
 		/* Join the two address sets. */
 		HashSet<Address> newAddressSet = new HashSet<Address>(this.addresses);
 		newAddressSet.addAll(a.addresses);
-		return new Addresses(LatticeElement.SET, newAddressSet);
+		return new Addresses(LatticeElement.SET, newAddressSet, jc);
 
 	}
 
@@ -87,36 +94,36 @@ public class Addresses extends SmartHash {
 	 */
 	public static BValue inject(Addresses addresses) {
 		return new BValue(
-				Str.bottom(),
-				Num.bottom(),
-				Bool.bottom(),
-				Null.bottom(),
-				Undefined.bottom(),
+				Str.bottom(addresses.change),
+				Num.bottom(addresses.change),
+				Bool.bottom(addresses.change),
+				Null.bottom(addresses.change),
+				Undefined.bottom(addresses.change),
 				addresses);
 	}
 
-	public static BValue dummy() {
+	public static BValue dummy(Change change) {
 		return new BValue(
-				Str.top(),
-				Num.top(),
-				Bool.top(),
-				Null.top(),
-				Undefined.top(),
-				Addresses.bottom());
+				Str.top(change),
+				Num.top(change),
+				Bool.top(change),
+				Null.top(change),
+				Undefined.top(change),
+				Addresses.bottom(change));
 	}
 
 	/**
 	 * @return The top lattice element.
 	 */
-	public static Addresses top() {
-		return new Addresses(LatticeElement.TOP);
+	public static Addresses top(Change change) {
+		return new Addresses(LatticeElement.TOP, change);
 	}
 
 	/**
 	 * @return The bottom lattice element.
 	 */
-	public static Addresses bottom() {
-		return new Addresses(LatticeElement.BOTTOM);
+	public static Addresses bottom(Change change) {
+		return new Addresses(LatticeElement.BOTTOM, change);
 	}
 
 	/** The lattice elements for the abstract domain. **/

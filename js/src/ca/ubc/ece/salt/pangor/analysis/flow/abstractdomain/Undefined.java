@@ -15,13 +15,11 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 public class Undefined {
 
 	public LatticeElement le;
+	public Change change;
 
-	public Undefined() {
-		this.le = LatticeElement.TOP;
-	}
-
-	private Undefined(LatticeElement le) {
+	private Undefined(LatticeElement le, Change change) {
 		this.le = le;
+		this.change = change;
 	}
 
 	/**
@@ -30,8 +28,9 @@ public class Undefined {
 	 * @return A new undefined that is the join of the two addresses.
 	 */
 	public Undefined join(Undefined state) {
-		if(this.le == state.le) return new Undefined(this.le);
-		return new Undefined(LatticeElement.BOTTOM);
+		Change change = this.change.join(state.change);
+		if(this.le == state.le) return new Undefined(this.le, change);
+		return new Undefined(LatticeElement.TOP, change);
 	}
 
 	/**
@@ -40,26 +39,26 @@ public class Undefined {
 	 */
 	public static BValue inject(Undefined undefined) {
 		return new BValue(
-				Str.bottom(),
-				Num.bottom(),
-				Bool.bottom(),
-				Null.bottom(),
+				Str.bottom(undefined.change),
+				Num.bottom(undefined.change),
+				Bool.bottom(undefined.change),
+				Null.bottom(undefined.change),
 				undefined,
-				Addresses.bottom());
+				Addresses.bottom(undefined.change));
 	}
 
 	/**
 	 * @return the top lattice element
 	 */
-	public static Undefined top() {
-		return new Undefined(LatticeElement.TOP);
+	public static Undefined top(Change change) {
+		return new Undefined(LatticeElement.TOP, change);
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static Undefined bottom() {
-		return new Undefined(LatticeElement.BOTTOM);
+	public static Undefined bottom(Change change) {
+		return new Undefined(LatticeElement.BOTTOM, change);
 	}
 
 	/** The lattice elements for the abstract domain. **/

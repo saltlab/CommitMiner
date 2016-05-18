@@ -15,9 +15,11 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 public class Bool {
 
 	public LatticeElement le;
+	public Change change;
 
-	public Bool(LatticeElement le) {
+	public Bool(LatticeElement le, Change change) {
 		this.le = le;
+		this.change = change;
 	}
 
 	/**
@@ -27,14 +29,16 @@ public class Bool {
 	 */
 	public Bool join(Bool state) {
 
+		Change jc = this.change.join(state.change);
+
 		LatticeElement l = this.le;
 		LatticeElement r = this.le;
 
-		if(l == r) return new Bool(l);
-		if(l == LatticeElement.BOTTOM) return new Bool(r);
-		if(r == LatticeElement.BOTTOM) return new Bool(l);
+		if(l == r) return new Bool(l, jc);
+		if(l == LatticeElement.BOTTOM) return new Bool(r, jc);
+		if(r == LatticeElement.BOTTOM) return new Bool(l, jc);
 
-		return new Bool(LatticeElement.TOP);
+		return new Bool(LatticeElement.TOP, jc);
 
 	}
 
@@ -55,26 +59,26 @@ public class Bool {
 	 */
 	public static BValue inject(Bool bool) {
 		return new BValue(
-				Str.bottom(),
-				Num.bottom(),
+				Str.bottom(bool.change),
+				Num.bottom(bool.change),
 				bool,
-				Null.bottom(),
-				Undefined.bottom(),
-				Addresses.bottom());
+				Null.bottom(bool.change),
+				Undefined.bottom(bool.change),
+				Addresses.bottom(bool.change));
 	}
 
 	/**
 	 * @return the top lattice element
 	 */
-	public static Bool top() {
-		return new Bool(LatticeElement.TOP);
+	public static Bool top(Change change) {
+		return new Bool(LatticeElement.TOP, change);
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static Bool bottom() {
-		return new Bool(LatticeElement.BOTTOM);
+	public static Bool bottom(Change change) {
+		return new Bool(LatticeElement.BOTTOM, change);
 	}
 
 	/** The lattice elements for the abstract domain. **/

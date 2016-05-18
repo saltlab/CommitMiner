@@ -7,6 +7,7 @@ import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
@@ -76,7 +77,7 @@ public class StoreFactory {
 
 		Store store = new Store(bValueStore, objectStore);
 
-		bValueStore.put(global_binding_Addr, Address.inject(global_Addr));
+		bValueStore.put(global_binding_Addr, Address.inject(global_Addr, Change.u()));
 
 		GlobalFactory gf = new GlobalFactory(store);
 		objectStore.put(global_Addr, gf.Global_Obj());

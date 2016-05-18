@@ -20,19 +20,22 @@ public class Str {
 
 	public LatticeElement le;
 	public String val;
+	public Change change;
 
-	public Str(LatticeElement le, String val) {
+	public Str(LatticeElement le, String val, Change change) {
 		this.le = le;
 		this.val = val;
+		this.change = change;
 	}
 
-	public Str(LatticeElement le) {
+	public Str(LatticeElement le, Change change) {
 		if(this.le == LatticeElement.SNUMVAL
 				|| this.le == LatticeElement.SNOTNUMNORSPLVAL
 				|| this.le == LatticeElement.SSPLVAL)
 			throw new Error("A value must be provided with a VAL lattice element.");
 		this.le = le;
 		this.val = null;
+		this.change = change;
 	}
 
 	/**
@@ -42,23 +45,25 @@ public class Str {
 	 */
 	public Str join(Str state) {
 
+		Change jc = this.change.join(state.change);
+
 		LatticeElement l = this.le;
 		LatticeElement r = state.le;
 
-		if(l == r && this.val == state.val) return new Str(l, this.val);
-		if(l == LatticeElement.BOTTOM) return new Str(r, state.val);
-		if(r == LatticeElement.BOTTOM) return new Str(l, state.val);
+		if(l == r && this.val == state.val) return new Str(l, this.val, jc);
+		if(l == LatticeElement.BOTTOM) return new Str(r, state.val, jc);
+		if(r == LatticeElement.BOTTOM) return new Str(l, state.val, jc);
 
-		if(isNum(l) && isNum(r)) return new Str(LatticeElement.SNUM);
-		if(isStr(l) && isStr(r)) return new Str(LatticeElement.SNOTNUMNORSPL);
-		if(isSpl(l) && isSpl(r)) return new Str(LatticeElement.SSPL);
+		if(isNum(l) && isNum(r)) return new Str(LatticeElement.SNUM, jc);
+		if(isStr(l) && isStr(r)) return new Str(LatticeElement.SNOTNUMNORSPL, jc);
+		if(isSpl(l) && isSpl(r)) return new Str(LatticeElement.SSPL, jc);
 
-		if(notSpl(l) && notSpl(r)) return new Str(LatticeElement.SNOTSPL);
-		if(notNum(l) && notNum(r)) return new Str(LatticeElement.SNOTNUM);
+		if(notSpl(l) && notSpl(r)) return new Str(LatticeElement.SNOTSPL, jc);
+		if(notNum(l) && notNum(r)) return new Str(LatticeElement.SNOTNUM, jc);
 
-		if(notBlank(l) && notBlank(r)) return new Str(LatticeElement.SNOTBLANK);
+		if(notBlank(l) && notBlank(r)) return new Str(LatticeElement.SNOTBLANK, jc);
 
-		return new Str(LatticeElement.TOP);
+		return new Str(LatticeElement.TOP, jc);
 
 	}
 
@@ -133,25 +138,25 @@ public class Str {
 	public static BValue inject(Str string) {
 		return new BValue(
 				string,
-				Num.bottom(),
-				Bool.bottom(),
-				Null.bottom(),
-				Undefined.bottom(),
-				Addresses.bottom());
+				Num.bottom(string.change),
+				Bool.bottom(string.change),
+				Null.bottom(string.change),
+				Undefined.bottom(string.change),
+				Addresses.bottom(string.change));
 	}
 
 	/**
 	 * @return the top lattice element
 	 */
-	public static Str top() {
-		return new Str(LatticeElement.TOP);
+	public static Str top(Change change) {
+		return new Str(LatticeElement.TOP, change);
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static Str bottom() {
-		return new Str(LatticeElement.BOTTOM);
+	public static Str bottom(Change change) {
+		return new Str(LatticeElement.BOTTOM, change);
 	}
 
 	/** The type of a lattice element for the abstract domain. **/

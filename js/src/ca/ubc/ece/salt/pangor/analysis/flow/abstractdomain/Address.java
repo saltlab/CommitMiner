@@ -45,16 +45,16 @@ public class Address extends SmartHash {
 	 * @param address The address lattice element to inject.
 	 * @return The base value tuple with injected address.
 	 */
-	public static BValue inject(Address address) {
+	public static BValue inject(Address address, Change change) {
 		Set<Address> addresses = new HashSet<Address>();
 		addresses.add(address);
 		return new BValue(
-				Str.bottom(),
-				Num.bottom(),
-				Bool.bottom(),
-				Null.bottom(),
-				Undefined.bottom(),
-				new Addresses(addresses));
+				Str.bottom(change),
+				Num.bottom(change),
+				Bool.bottom(change),
+				Null.bottom(change),
+				Undefined.bottom(change),
+				new Addresses(addresses, change));
 	}
 
 	/**

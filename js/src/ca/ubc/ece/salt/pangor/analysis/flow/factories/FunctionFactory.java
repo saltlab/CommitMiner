@@ -8,6 +8,7 @@ import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
@@ -37,13 +38,13 @@ public class FunctionFactory {
 
 	public Obj Function_proto_Obj() {
 		Map<String, Address> ext = new HashMap<String, Address>();
-		store = Helpers.addProp("external", Num.inject(Num.top()), ext, store);
-		store = Helpers.addProp("apply", Address.inject(StoreFactory.Function_proto_apply_Addr), ext, store);
-		store = Helpers.addProp("call", Address.inject(StoreFactory.Function_proto_call_Addr), ext, store);
-		store = Helpers.addProp("toString", Address.inject(StoreFactory.Function_proto_toString_Addr), ext, store);
+		store = Helpers.addProp("external", Num.inject(Num.top(Change.u())), ext, store);
+		store = Helpers.addProp("apply", Address.inject(StoreFactory.Function_proto_apply_Addr, Change.u()), ext, store);
+		store = Helpers.addProp("call", Address.inject(StoreFactory.Function_proto_call_Addr, Change.u()), ext, store);
+		store = Helpers.addProp("toString", Address.inject(StoreFactory.Function_proto_toString_Addr, Change.u()), ext, store);
 
 		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Function_proto_Addr),
+				Address.inject(StoreFactory.Function_proto_Addr, Change.u()),
 				JSClass.CFunction_prototype_Obj);
 
 		return new Obj(ext, internal, ext.keySet());
@@ -51,9 +52,9 @@ public class FunctionFactory {
 
 	// TODO: apply and call need native closures because their behaviour
 	//		 affects the analysis.
-	public Obj Function_proto_toString_Obj() { return constFunctionObj(Str.inject(Str.top())); }
-	public Obj Function_proto_apply_Obj() { return constFunctionObj(BValue.top()); }
-	public Obj Function_proto_call_Obj() { return constFunctionObj(BValue.top()); }
+	public Obj Function_proto_toString_Obj() { return constFunctionObj(Str.inject(Str.top(Change.u()))); }
+	public Obj Function_proto_apply_Obj() { return constFunctionObj(BValue.top(Change.u())); }
+	public Obj Function_proto_call_Obj() { return constFunctionObj(BValue.top(Change.u())); }
 
 	/**
 	 * Approximate a function which is not modeled.

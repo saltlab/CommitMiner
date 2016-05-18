@@ -151,41 +151,41 @@ public class BValue {
 	/**
 	 * @return the top lattice element
 	 */
-	public static BValue top() {
+	public static BValue top(Change change) {
 		/* Set addresses to BOT to enable dynamic object creation. */
 		return new BValue(
-				Str.top(),
-				Num.top(),
-				Bool.top(),
-				Null.top(),
-				Undefined.top(),
-				Addresses.bottom());
+				Str.top(change),
+				Num.top(change),
+				Bool.top(change),
+				Null.top(change),
+				Undefined.top(change),
+				Addresses.bottom(change));
 	}
 
 	/**
 	 * @return the bottom lattice element
 	 */
-	public static BValue bottom() {
+	public static BValue bottom(Change change) {
 		return new BValue(
-				Str.bottom(),
-				Num.bottom(),
-				Bool.bottom(),
-				Null.bottom(),
-				Undefined.bottom(),
-				Addresses.bottom());
+				Str.bottom(change),
+				Num.bottom(change),
+				Bool.bottom(change),
+				Null.bottom(change),
+				Undefined.bottom(change),
+				Addresses.bottom(change));
 	}
 
 	/**
 	 * @return a primitive value (not an address).
 	 */
-	public static BValue primitive() {
+	public static BValue primitive(Change change) {
 		return new BValue(
-				Str.top(),
-				Num.top(),
-				Bool.top(),
-				Null.top(),
-				Undefined.top(),
-				Addresses.bottom());
+				Str.top(change),
+				Num.top(change),
+				Bool.top(change),
+				Null.top(change),
+				Undefined.top(change),
+				Addresses.bottom(change));
 	}
 
 	@Override

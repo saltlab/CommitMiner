@@ -54,6 +54,20 @@ public class Change {
 		return new Change(LatticeElement.BOTTOM);
 	}
 
+	/**
+	 * @return The "unchanged" lattice element.
+	 */
+	public static Change u(){
+		return new Change(LatticeElement.UNCHANGED);
+	}
+
+	/**
+	 * @return The "changed" lattice element.
+	 */
+	public static Change c() {
+		return new Change(LatticeElement.CHANGED);
+	}
+
 	/** The lattice elements for the abstract domain. **/
 	public enum LatticeElement {
 		TOP,

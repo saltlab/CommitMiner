@@ -7,6 +7,7 @@ import java.util.Stack;
 import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
@@ -33,8 +34,8 @@ public class ArgumentsFactory {
 
 	public Obj Arguments_Obj() {
 		Map<String, Address> ext = new HashMap<String, Address>();
-		store = Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr), ext, store);
-		store = Helpers.addProp("length", Num.inject(Num.top()), ext, store);
+		store = Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr, Change.u()), ext, store);
+		store = Helpers.addProp("length", Num.inject(Num.top(Change.u())), ext, store);
 
 		NativeClosure closure = new NativeClosure() {
 				@Override
