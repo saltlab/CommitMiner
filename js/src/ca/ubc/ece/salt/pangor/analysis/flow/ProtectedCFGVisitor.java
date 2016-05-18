@@ -73,17 +73,17 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 
 			BValue val = state.store.apply(addr);
 			if(val.nullAD.le == Null.LatticeElement.BOTTOM)
-				registerFact(node, identifier, "NULL", val.nullAD.le.toString(), "UNCHANGED");
+				registerFact(node, identifier, "NULL", val.nullAD.le.toString(), val.nullAD.change.toString());
 			if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM)
-				registerFact(node, identifier, "UNDEFINED", val.undefinedAD.le.toString(), "UNCHANGED");
+				registerFact(node, identifier, "UNDEFINED", val.undefinedAD.le.toString(), val.undefinedAD.change.toString());
 			if(Str.notBlank(val.stringAD))
-				registerFact(node, identifier, "BLANK", val.stringAD.toString(), "UNCHANGED");
+				registerFact(node, identifier, "BLANK", val.stringAD.toString(), val.stringAD.change.toString());
 			if(Num.notZero(val.numberAD))
-				registerFact(node, identifier, "ZERO", val.numberAD.toString(), "UNCHANGED");
+				registerFact(node, identifier, "ZERO", val.numberAD.toString(), val.numberAD.change.toString());
 			if(Num.notNaN(val.numberAD))
-				registerFact(node, identifier, "NAN", val.numberAD.toString(), "UNCHANGED");
+				registerFact(node, identifier, "NAN", val.numberAD.toString(), val.numberAD.change.toString());
 			if(Bool.notFalse(val.booleanAD))
-				registerFact(node, identifier, "FALSE", val.booleanAD.toString(), "UNCHANGED");
+				registerFact(node, identifier, "FALSE", val.booleanAD.toString(), val.booleanAD.change.toString());
 
 			/* Recursively check property values. */
 			if(val.addressAD.le == LatticeElement.TOP) continue;
