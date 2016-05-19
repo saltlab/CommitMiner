@@ -7,6 +7,8 @@ import java.util.Map;
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.storage.IRelation;
 
+import ca.ubc.ece.salt.pangor.analysis.factories.IDomainAnalysisFactory;
+
 /**
  * Gathers facts about one commit from various domains and runs queries in
  * datalog against those facts to synthesize alerts.
@@ -23,15 +25,15 @@ public class CommitAnalysis {
 	 * The list of analyses that we will run on this commit. Each
 	 * {@code DomainAnalysis} gathers facts for one domain.
 	 */
-	private List<DomainAnalysis> domainAnalyses;
+	private List<IDomainAnalysisFactory> domainAnalysisFactories;
 
 	/**
 	 * @param dataSet The data set that will generate and store the alerts.
 	 * @param domainAnalyses The domains to extract facts from.
 	 */
-	public CommitAnalysis(DataSet dataSet, List<DomainAnalysis> domainAnalyses) {
+	public CommitAnalysis(DataSet dataSet, List<IDomainAnalysisFactory> domainAnalysisFactories) {
 		this.dataSet = dataSet;
-		this.domainAnalyses = domainAnalyses;
+		this.domainAnalysisFactories = domainAnalysisFactories;
 	}
 
 	/**
@@ -48,7 +50,8 @@ public class CommitAnalysis {
 		Map<IPredicate, IRelation> facts = new HashMap<IPredicate, IRelation>();
 
 		/* Run each domain analysis on the commit. */
-		for(DomainAnalysis domainAnalysis : domainAnalyses) {
+		for(IDomainAnalysisFactory domainAnalysisFactory : domainAnalysisFactories) {
+			DomainAnalysis domainAnalysis = domainAnalysisFactory.newInstance();
 			domainAnalysis.analyze(commit, facts);
 		}
 

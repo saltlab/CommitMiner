@@ -7,6 +7,7 @@ import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.EvaluatorException;
 
+import ca.ubc.ece.salt.pangor.analysis.factories.ISourceCodeFileAnalysisFactory;
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
@@ -17,10 +18,10 @@ import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 public class DomainAnalysis {
 
 	/** The source file analysis to use. **/
-	protected SourceCodeFileAnalysis srcAnalysis;
+	protected ISourceCodeFileAnalysisFactory srcAnalysisFactory;
 
 	/** The destination file analysis to use. **/
-	protected SourceCodeFileAnalysis dstAnalysis;
+	protected ISourceCodeFileAnalysisFactory dstAnalysisFactory;
 
 	/**
 	 * A map of file extensions to CFGFactories (used for control flow differencing).
@@ -34,11 +35,11 @@ public class DomainAnalysis {
 	 * @param srcAnalysis The analysis to run on the source (or buggy) file.
 	 * @param dstAnalysis The analysis to run on the destination (or repaired) file.
 	 */
-	public DomainAnalysis(SourceCodeFileAnalysis srcAnalysis,
-						  SourceCodeFileAnalysis dstAnalysis,
+	public DomainAnalysis(ISourceCodeFileAnalysisFactory srcAnalysisClass,
+						  ISourceCodeFileAnalysisFactory dstAnalysisClass,
 						  CFGFactory cfgFactory, boolean preProcess) {
-		this.srcAnalysis = srcAnalysis;
-		this.dstAnalysis = dstAnalysis;
+		this.srcAnalysisFactory = srcAnalysisClass;
+		this.dstAnalysisFactory = dstAnalysisClass;
 		this.cfgFactory = cfgFactory;
 		this.preProcess = preProcess;
 	}
@@ -96,8 +97,8 @@ public class DomainAnalysis {
 	 * @param sourceCodeFileChange The source code file change information.
 	 * @param facts Stores the facts from this analysis.
 	 * @param preProcess Set to true to enable AST pre-processing.
-	 * @param srcAnalysis The analysis to run on the buggy file.
-	 * @param dstAnalysis The analysis to run on the repaired file.
+	 * @param srcAnalysisFactory The analysis to run on the buggy file.
+	 * @param dstAnalysisClass The analysis to run on the repaired file.
 	 */
 	protected void analyzeFile(SourceCodeFileChange sourceCodeFileChange,
 							   Map<IPredicate, IRelation> facts) throws Exception {
@@ -132,20 +133,13 @@ public class DomainAnalysis {
 			 * and CFGs. */
 			CFDContext cfdContext = cfd.getContext();
 
-			/* Run the analysis. */
-			if(srcAnalysis != null) {
-				srcAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
-			}
-			else {
-				this.srcAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
-			}
+			/* Build the analyzers with reflection. */
+			SourceCodeFileAnalysis srcAnalysis = this.srcAnalysisFactory.newInstance();
+			SourceCodeFileAnalysis dstAnalysis = this.srcAnalysisFactory.newInstance();
 
-			if(dstAnalysis != null) {
-				dstAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.dstScript, cfdContext.dstCFGs);
-			}
-			else {
-				this.dstAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.dstScript, cfdContext.dstCFGs);
-			}
+			/* Run the analysis. */
+			srcAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
+			dstAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.dstScript, cfdContext.dstCFGs);
 
 		}
 

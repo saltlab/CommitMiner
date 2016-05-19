@@ -18,9 +18,8 @@ import org.junit.Test;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.analysis.flow.FlowDomainAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.factories.ICommitAnalysisFactory;
 import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 import ca.ubc.ece.salt.pangor.classify.analysis.Transformer;
@@ -44,12 +43,8 @@ public class TestFlowAnalysis {
 				new LinkedList<IRule>(), getUseQueries());
 
 		/* Set up the analysis. */
-		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
-		FlowDomainAnalysis analysis = FlowDomainAnalysis.createFlowDomainAnalysis();
-		domains.add(analysis);
-
-		/* Set up the commit analysis. */
-		CommitAnalysis commitAnalysis = new CommitAnalysis(dataSet, domains);
+		ICommitAnalysisFactory commitFactory = new FlowCommitAnalysisFactory(dataSet);
+		CommitAnalysis commitAnalysis = commitFactory.newInstance();
 
 		/* Run the analysis. */
 		commitAnalysis.analyze(commit);

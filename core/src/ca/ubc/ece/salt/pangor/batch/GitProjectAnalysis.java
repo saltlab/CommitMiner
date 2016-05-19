@@ -23,6 +23,7 @@ import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
+import ca.ubc.ece.salt.pangor.analysis.factories.ICommitAnalysisFactory;
 import ca.ubc.ece.salt.pangor.git.GitProject;
 
 /**
@@ -31,16 +32,16 @@ import ca.ubc.ece.salt.pangor.git.GitProject;
 public class GitProjectAnalysis extends GitProject {
 
 	/** Runs an analysis on a source file. **/
-	private CommitAnalysis commitAnalysis;
+	private ICommitAnalysisFactory commitAnalysisFactory;
 
 	/**
 	 * Constructor that is used by our static factory methods.
 	 */
 	protected GitProjectAnalysis(GitProject gitProject,
-								 CommitAnalysis commitAnalysis,
+								 ICommitAnalysisFactory commitAnalysisFactory,
 								 String commitMessageRegex) {
 		super(gitProject, commitMessageRegex);
-		this.commitAnalysis = commitAnalysis;
+		this.commitAnalysisFactory = commitAnalysisFactory;
 	}
 
 	/**
@@ -140,6 +141,7 @@ public class GitProjectAnalysis extends GitProject {
 		/* Run the {@code CommitAnalysis} through the AnalysisRunner. */
 
 		try {
+			CommitAnalysis commitAnalysis = commitAnalysisFactory.newInstance();
 			commitAnalysis.analyze(commit);
 		}
 		catch(Exception ignore) {
@@ -209,11 +211,11 @@ public class GitProjectAnalysis extends GitProject {
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitProjectAnalysisException
 	 */
-	public static GitProjectAnalysis fromDirectory(String directory, String commitMessageRegex, CommitAnalysis commitAnalysis)
+	public static GitProjectAnalysis fromDirectory(String directory, String commitMessageRegex, ICommitAnalysisFactory commitAnalysisFactory)
 			throws GitProjectAnalysisException {
 		GitProject gitProject = GitProject.fromDirectory(directory, commitMessageRegex);
 
-		return new GitProjectAnalysis(gitProject, commitAnalysis, commitMessageRegex);
+		return new GitProjectAnalysis(gitProject, commitAnalysisFactory, commitMessageRegex);
 	}
 
 	/**
@@ -229,11 +231,11 @@ public class GitProjectAnalysis extends GitProject {
 	 * @throws TransportException
 	 * @throws InvalidRemoteException
 	 */
-	public static GitProjectAnalysis fromURI(String uri, String directory, String commitMessageRegex, CommitAnalysis commitAnalysis)
+	public static GitProjectAnalysis fromURI(String uri, String directory, String commitMessageRegex, ICommitAnalysisFactory commitAnalysisFactory)
 			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
 		GitProject gitProject = GitProject.fromURI(uri, directory, commitMessageRegex);
 
-		return new GitProjectAnalysis(gitProject, commitAnalysis, commitMessageRegex);
+		return new GitProjectAnalysis(gitProject, commitAnalysisFactory, commitMessageRegex);
 	}
 
 }

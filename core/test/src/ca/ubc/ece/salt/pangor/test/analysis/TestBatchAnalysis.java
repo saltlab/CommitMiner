@@ -16,12 +16,9 @@ import org.deri.iris.factory.Factory;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleCFGFactory;
+import ca.ubc.ece.salt.pangor.analysis.factories.ICommitAnalysisFactory;
+import ca.ubc.ece.salt.pangor.analysis.simple.SimpleCommitAnalysisFactory;
 import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDataSet;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleDstFileAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.simple.SimpleSrcFileAnalysis;
 import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysis;
 
 public class TestBatchAnalysis {
@@ -53,28 +50,13 @@ public class TestBatchAnalysis {
 		/* Set up the data set (stores alerts aka feature vectors). */
 		SimpleDataSet dataSet = new SimpleDataSet(rules, queries);
 
-		/* We will use a simple file analysis for this test. */
-		SimpleSrcFileAnalysis srcAnalysis = new SimpleSrcFileAnalysis();
-		SimpleDstFileAnalysis dstAnalysis = new SimpleDstFileAnalysis();
-
-		/* The SimpleCFGFactory doesn't do anything, so it is generic to any file type. */
-		SimpleCFGFactory cfgFactory = new SimpleCFGFactory();
-
-		/* Set up the domain analysis. */
-		DomainAnalysis domainAnalysis;
-		domainAnalysis = new DomainAnalysis(srcAnalysis, dstAnalysis,
-											cfgFactory, false);
-		List<DomainAnalysis> domainAnalyses = new LinkedList<DomainAnalysis>();
-		domainAnalyses.add(domainAnalysis);
-
-		/* Set up the commit analysis. */
-		CommitAnalysis commitAnalysis;
-		commitAnalysis = new CommitAnalysis(dataSet, domainAnalyses);
+		/* Set up the commit analysis factory. */
+		ICommitAnalysisFactory analysisFactory = new SimpleCommitAnalysisFactory(dataSet);
 
 		/* Set up the project analysis (analyzes one project). */
 		GitProjectAnalysis projectAnalysis = GitProjectAnalysis.fromURI(
 				"https://github.com/naman14/Timber.git", "./repositories/",
-				"^.*$", commitAnalysis);
+				"^.*$", analysisFactory);
 
 		/* Run the analysis. */
 		projectAnalysis.analyze();
