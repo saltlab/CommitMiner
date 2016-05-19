@@ -62,50 +62,6 @@ public class TestProtectDomain {
 	}
 
 	@Test
-	public void testFalsey() throws Exception {
-
-		/* The test files. */
-		String src = "./test/input/learning/falsey_old.js";
-		String dst = "./test/input/learning/falsey_new.js";
-
-		/* Read the source files. */
-		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
-
-		/* Build the expected feature vectors. */
-		Commit commit = getCommit();
-		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "PROTECT", "x_FALSEY_NE_IR"));
-
-		this.runTest(sourceCodeFileChange, expected, true);
-	}
-
-	@Test
-	public void testFalseyMulti() throws Exception {
-
-		/* The test files. */
-		String src = "./test/input/special_type_handling/sth_falsey_old.js";
-		String dst = "./test/input/special_type_handling/sth_falsey_new.js";
-
-		/* Read the source files. */
-		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
-
-		/* Build the expected feature vectors. */
-		Commit commit = getCommit();
-		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "7", "TST", "PROTECT", "a_FALSEY_NE_IR"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "9", "TST", "PROTECT", "a_FALSEY_UNKNOWN_IR"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "10", "TST", "PROTECT", "a_FALSEY_UNKNOWN_IR"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "11", "TST", "PROTECT", "a_FALSEY_UNKNOWN_IR"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "10", "TST", "PROTECT", "b_FALSEY_NE_IR"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "10", "TST", "PROTECT", "c_FALSEY_NE_IR"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "11", "TST", "PROTECT", "b_FALSEY_NE_IR"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/special_type_handling/sth_falsey_new.js", "MethodNA", "11", "TST", "PROTECT", "c_FALSEY_NE_IR"));
-
-		this.runTest(sourceCodeFileChange, expected, true);
-
-	}
-
-	@Test
 	public void testExports() throws Exception {
 
 		/* The test files. */
@@ -118,7 +74,14 @@ public class TestProtectDomain {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "PROTECT", "x_FALSEY_NE_IR"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "5", "TST", "PROTECT", "name_NULL_BOTTOM_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "5", "TST", "PROTECT", "name_UNDEFINED_BOTTOM_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "5", "TST", "PROTECT", "name_ZERO_Num:NOT_ZERO_NOR_NAN_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "5", "TST", "PROTECT", "name_NAN_Num:NOT_ZERO_NOR_NAN_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "5", "TST", "PROTECT", "greeting_NULL_BOTTOM_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "5", "TST", "PROTECT", "greeting_UNDEFINED_BOTTOM_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "5", "TST", "PROTECT", "greeting_ZERO_Num:NOT_ZERO_NOR_NAN_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "5", "TST", "PROTECT", "greeting_NAN_Num:NOT_ZERO_NOR_NAN_Change:CHANGED"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
@@ -158,9 +121,14 @@ public class TestProtectDomain {
 
 		Map<IQuery, Transformer> queries = new HashMap<IQuery, Transformer>();
 
+		String qs = "";
+		qs += "?- Protected(?Version,?File,?Line,?StatementID,?Identifier,?Type,?Element,?ProtectedChange)";
+		qs += ", EQUAL(?ProtectedChange, 'Change:CHANGED')";
+		qs += ", Use(?Version,?File,?Line,?Four,?Five,?Identifier).";
+
 		/* The query that produces the results. */
 		Parser parser = new Parser();
-		parser.parse("?- SpecialType(?Version,?File,?Line,?StatementID,?Identifier,?Type,?Element,?Change).");
+		parser.parse(qs);
 		IQuery query = parser.getQueries().get(0);
 
 		/* Transforms the query results to a ClassifierFeatureVector. */
@@ -172,7 +140,7 @@ public class TestProtectDomain {
 						tuple.get(2).toString().replace("\'", ""),			// Line
 						"TST",												// Type
 						"PROTECT",											// Subtype
-						tuple.get(4).toString().replace("\'", "")
+						tuple.get(3).toString().replace("\'", "")
 							+ "_" + tuple.get(5).toString().replace("\'", "")
 							+ "_" + tuple.get(6).toString().replace("\'", "")
 							+ "_" + tuple.get(7).toString().replace("\'", ""));	// Description
