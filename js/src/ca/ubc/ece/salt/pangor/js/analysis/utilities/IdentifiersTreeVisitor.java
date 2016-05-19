@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.analysis.flow;
+package ca.ubc.ece.salt.pangor.js.analysis.utilities;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -7,8 +7,6 @@ import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
-
-import ca.ubc.ece.salt.pangor.js.analysis.utilities.AnalysisUtilities;
 
 /**
  * Generates a set of identifiers from an "OR" conditional expression. 

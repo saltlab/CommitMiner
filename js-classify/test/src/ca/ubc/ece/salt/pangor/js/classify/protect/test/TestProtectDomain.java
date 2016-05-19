@@ -20,10 +20,10 @@ import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
+import ca.ubc.ece.salt.pangor.analysis.flow.FlowDomainAnalysis;
 import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 import ca.ubc.ece.salt.pangor.classify.analysis.Transformer;
-import ca.ubc.ece.salt.pangor.js.classify.protect.ProtectedDomainAnalysis;
 
 public class TestProtectDomain {
 
@@ -45,7 +45,7 @@ public class TestProtectDomain {
 
 		/* Set up the analysis. */
 		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
-		ProtectedDomainAnalysis analysis = ProtectedDomainAnalysis.createLearningAnalysis();
+		FlowDomainAnalysis analysis = FlowDomainAnalysis.createFlowDomainAnalysis();
 		domains.add(analysis);
 
 		/* Set up the commit analysis. */
