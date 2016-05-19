@@ -18,12 +18,12 @@ import org.junit.Test;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
+import ca.ubc.ece.salt.pangor.analysis.factories.ICommitAnalysisFactory;
 import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 import ca.ubc.ece.salt.pangor.classify.analysis.Transformer;
-import ca.ubc.ece.salt.pangor.js.classify.use.UseDomainAnalysis;
+import ca.ubc.ece.salt.pangor.js.classify.use.UseCommitAnalysisFactory;
 
 public class TestUseDomain {
 
@@ -43,13 +43,9 @@ public class TestUseDomain {
 		ClassifierDataSet dataSet = new ClassifierDataSet(null,
 				new LinkedList<IRule>(), getUseQueries());
 
-		/* Set up the analysis. */
-		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
-		UseDomainAnalysis analysis = UseDomainAnalysis.createLearningAnalysis();
-		domains.add(analysis);
-
 		/* Set up the commit analysis. */
-		CommitAnalysis commitAnalysis = new CommitAnalysis(dataSet, domains);
+		ICommitAnalysisFactory analysisFactory = new UseCommitAnalysisFactory(dataSet);
+		CommitAnalysis commitAnalysis = analysisFactory.newInstance();
 
 		/* Run the analysis. */
 		commitAnalysis.analyze(commit);

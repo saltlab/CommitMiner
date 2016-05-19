@@ -18,12 +18,12 @@ import org.junit.Test;
 import ca.ubc.ece.salt.pangor.analysis.Commit;
 import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
 import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.analysis.flow.FlowDomainAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.factories.ICommitAnalysisFactory;
 import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 import ca.ubc.ece.salt.pangor.classify.analysis.Transformer;
+import ca.ubc.ece.salt.pangor.js.classify.protect.ProtectCommitAnalysisFactory;
 
 public class TestProtectDomain {
 
@@ -43,13 +43,9 @@ public class TestProtectDomain {
 		ClassifierDataSet dataSet = new ClassifierDataSet(null,
 				new LinkedList<IRule>(), getUseQueries());
 
-		/* Set up the analysis. */
-		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
-		FlowDomainAnalysis analysis = FlowDomainAnalysis.createFlowDomainAnalysis();
-		domains.add(analysis);
-
 		/* Set up the commit analysis. */
-		CommitAnalysis commitAnalysis = new CommitAnalysis(dataSet, domains);
+		ICommitAnalysisFactory analysisFactory = new ProtectCommitAnalysisFactory(dataSet);
+		CommitAnalysis commitAnalysis = analysisFactory.newInstance();
 
 		/* Run the analysis. */
 		commitAnalysis.analyze(commit);
@@ -107,6 +103,24 @@ public class TestProtectDomain {
 
 		this.runTest(sourceCodeFileChange, expected, true);
 
+	}
+
+	@Test
+	public void testExports() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/interproc/exports_old.js";
+		String dst = "./test/input/interproc/exports_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "PROTECT", "x_FALSEY_NE_IR"));
+
+		this.runTest(sourceCodeFileChange, expected, true);
 	}
 
 	/**
