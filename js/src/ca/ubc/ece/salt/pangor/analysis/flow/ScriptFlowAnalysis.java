@@ -26,12 +26,22 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StateFactory;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
+import ca.ubc.ece.salt.pangor.cfg.ICFGVisitorFactory;
 
 /**
  * Performs a flow analysis on the publicly accessible functions in the
  * source code file.
  */
 public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
+
+	private List<ICFGVisitorFactory> cfgVisitorFactories;
+
+	/**
+	 * @param cfgVisitors extract facts from the CFG after the analysis is complete.
+	 */
+	public ScriptFlowAnalysis(List<ICFGVisitorFactory> cfgVisitorFactories) {
+		this.cfgVisitorFactories = cfgVisitorFactories;
+	}
 
 	@Override
 	public void analyze(SourceCodeFileChange sourceCodeFileChange,
@@ -57,7 +67,9 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 
 		/* Generate facts from the results of the analysis. */
 		for(CFG cfg : cfgs) {
-			cfg.accept(new ProtectedCFGVisitor(sourceCodeFileChange, facts));
+			for(ICFGVisitorFactory cfgVF : cfgVisitorFactories) {
+				cfg.accept(cfgVF.newInstance(sourceCodeFileChange, facts));
+			}
 		}
 
 	}

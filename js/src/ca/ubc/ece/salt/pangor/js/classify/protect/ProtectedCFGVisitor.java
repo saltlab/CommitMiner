@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.analysis.flow;
+package ca.ubc.ece.salt.pangor.js.classify.protect;
 
 import java.util.Map;
 
