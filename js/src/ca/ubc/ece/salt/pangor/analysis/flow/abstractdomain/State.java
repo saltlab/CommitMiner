@@ -75,14 +75,14 @@ public class State implements IState {
 		}
 		else if(condition instanceof Name) {
 			Set<Address> addrs = resolveOrCreate(condition);
-			Change change = Change.ct2ce(condition);
+			Change change = Change.conv(condition);
 			if(not) interpretAddrsFalsey(addrs, change);
 			else interpretAddrsTruthy(addrs, change);
 		}
 		else if(condition instanceof InfixExpression &&
 				((InfixExpression)condition).getOperator() == Token.GETPROP) {
 			Set<Address> addrs = resolveOrCreate(condition);
-			Change change = Change.ct2ce(condition);
+			Change change = Change.conv(condition);
 			if(not) interpretAddrsFalsey(addrs, change);
 			else interpretAddrsTruthy(addrs, change);
 		}
@@ -151,7 +151,7 @@ public class State implements IState {
 		}
 
 		/* Update the value(s) on the LHS. */
-		Change change = Change.ct2ce(ie);
+		Change change = Change.conv(ie);
 		Set<Address> lhsAddrs = resolveOrCreate(ie.getLeft());
 		if(BValue.isUndefined(rhsVal) || BValue.isNull(rhsVal))
 			for(Address lhsAddr : lhsAddrs) {
@@ -195,7 +195,7 @@ public class State implements IState {
 		}
 
 		/* Update the value(s) on the LHS. */
-		Change change = Change.ct2ce(ie);
+		Change change = Change.conv(ie);
 		Set<Address>lhsAddrs = resolveOrCreate(ie.getLeft());
 		if(BValue.isUndefined(rhsVal) || BValue.isNull(rhsVal))
 			for(Address lhsAddr : lhsAddrs) {
@@ -233,7 +233,7 @@ public class State implements IState {
 		}
 
 		/* Update the value(s) on the LHS. */
-		Change change = Change.ct2ce(ie);
+		Change change = Change.conv(ie);
 		rhsVal.setChange(change);
 		Set<Address> lhsAddrs = resolveOrCreate(ie.getLeft());
 		for(Address lhsAddr : lhsAddrs) {
@@ -253,7 +253,7 @@ public class State implements IState {
 		}
 
 		/* Update the value(s) on the LHS. */
-		Change change = Change.ct2ce(ie);
+		Change change = Change.conv(ie);
 		Set<Address> lhsAddrs = resolveOrCreate(ie.getLeft());
 		if(BValue.isUndefined(rhsVal))
 			for(Address lhsAddr : lhsAddrs)
@@ -389,7 +389,7 @@ public class State implements IState {
 
 	private Set<Address> resolveOrCreate(AstNode node) {
 		Set<Address> result = new HashSet<Address>();
-		Change change = Change.ct2ce(node);
+		Change change = Change.conv(node);
 
 		/* Base Case: A simple name in the environment. */
 		if(node instanceof Name) {

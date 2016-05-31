@@ -1,7 +1,8 @@
 var punctuation = "!";
 var Common = module.exports;
 Common.greet = function(name, greeting) {
+		var space = " ";
 		if(name && greeting) {
-			console.log(greeting + " " + name + punctuation);
+			console.log(greeting + space + name + punctuation);
 		}
 	}

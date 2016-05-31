@@ -131,13 +131,13 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 
 		for(int i = 0; i < f.getParamCount(); i++) {
-			BValue argVal = BValue.top(Change.ct2ce(f));
+			BValue argVal = BValue.top(Change.conv(f));
 			state.store = Helpers.addProp(f.getID(), String.valueOf(i), argVal,
 										  ext, state.store, state.trace);
 		}
 
 		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Arguments_Addr, Change.ct2ce(f)), JSClass.CFunction);
+				Address.inject(StoreFactory.Arguments_Addr, Change.conv(f)), JSClass.CFunction);
 		Obj argObj = new Obj(ext, internal);
 
 		/* Add the argument object to the store. */

@@ -70,7 +70,7 @@ public class ExpEval {
 		}
 
 		/* We could not evaluate the expression. Return top. */
-		Change change = Change.ct2ce(node);
+		Change change = Change.conv(node);
 		return BValue.top(change);
 
 	}
@@ -81,7 +81,7 @@ public class ExpEval {
 	 * @return A BValue that points to the new function object.
 	 */
 	public BValue evalFunctionNode(FunctionNode f){
-		Change change = Change.ct2ce(f);
+		Change change = Change.conv(f);
 		Closure closure = new FunctionClosure(cfgs.get(f), env, cfgs);
 		Address addr = trace.makeAddr(f.getID(), "");
 		store = Helpers.createFunctionObj(closure, store, trace, addr, f.getID());
@@ -96,7 +96,7 @@ public class ExpEval {
 	public BValue evalObjectLiteral(ObjectLiteral ol) {
 		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 		InternalObjectProperties in = new InternalObjectProperties();
-		Change change = Change.ct2ce(ol);
+		Change change = Change.conv(ol);
 
 		for(ObjectProperty property : ol.getElements()) {
 			AstNode prop = property.getLeft();
@@ -124,7 +124,7 @@ public class ExpEval {
 	public BValue evalInfixExpression(InfixExpression ie) {
 		/* We assume this is an identifier and attempt to dereference it, since
 		 * no other operator is currently supported. */
-		Change change = Change.ct2ce(ie);
+		Change change = Change.conv(ie);
 		BValue val = Helpers.resolveValue(env, store, ie);
 		if(val == null) return BValue.top(change);
 		return val;
@@ -136,7 +136,7 @@ public class ExpEval {
 	 */
 	public BValue evalName(Name name) {
 		BValue val = Helpers.resolveValue(env, store, name);
-		Change change = Change.ct2ce(name);
+		Change change = Change.conv(name);
 		if(val == null) return BValue.top(change);
 		return val;
 	}
@@ -146,7 +146,7 @@ public class ExpEval {
 	 * @return the abstract interpretation of the number literal
 	 */
 	public BValue evalNumberLiteral(NumberLiteral numl) {
-		Change change = Change.ct2ce(numl);
+		Change change = Change.conv(numl);
 		return Num.inject(new Num(Num.LatticeElement.VAL, numl.getValue(), change));
 	}
 
@@ -158,7 +158,7 @@ public class ExpEval {
 
 		Str str = null;
 		String val = strl.getValue();
-		Change change = Change.ct2ce(strl);
+		Change change = Change.conv(strl);
 		if(val.equals("")) str = new Str(Str.LatticeElement.SBLANK, change);
 		else if(NumberUtils.isNumber(val)) {
 			str = new Str(Str.LatticeElement.SNUMVAL, val, change);
@@ -176,7 +176,7 @@ public class ExpEval {
 	 * @return the abstract interpretation of the keyword literal.
 	 */
 	public BValue evalKeywordLiteral(KeywordLiteral kwl) {
-		Change change = Change.ct2ce(kwl);
+		Change change = Change.conv(kwl);
 		switch(kwl.getType()) {
 		case Token.THIS:
 			return store.apply(selfAddr);
@@ -209,7 +209,7 @@ public class ExpEval {
 			i++;
 		}
 
-		Change change = Change.ct2ce(fc);
+		Change change = Change.conv(fc);
 		InternalObjectProperties internal = new InternalObjectProperties(
 				Address.inject(StoreFactory.Arguments_Addr, change), JSClass.CFunction);
 		Obj argObj = new Obj(ext, internal);

@@ -72,11 +72,27 @@ public class Change {
 	}
 
 	/**
-	 * Converts a change type to a change lattice element.
+	 * Converts a change type to a change lattice element. Updated nodes are
+	 * considered unchanged.
 	 * @param node The change type will be extracted from node.
 	 * @return The change lattice element for the node.
 	 */
-	public static Change ct2ce(ClassifiedASTNode node) {
+	public static Change conv(ClassifiedASTNode node) {
+		ChangeType ct = node.getChangeType();
+		switch(ct) {
+		case INSERTED:
+		case REMOVED: return c();
+		default: return u();
+		}
+	}
+
+	/**
+	 * Converts a change type to a change lattice element. Updated nodes are
+	 * considered changed.
+	 * @param node The change type will be extracted from node.
+	 * @return The change lattice element for the node.
+	 */
+	public static Change convU(ClassifiedASTNode node) {
 		ChangeType ct = node.getChangeType();
 		switch(ct) {
 		case INSERTED:

@@ -194,9 +194,9 @@ public class Helpers {
 		/* Lift variables into the function's environment and initialize to undefined. */
 		List<Name> localVars = VariableLiftVisitor.getVariableDeclarations(function);
 		for(Name localVar : localVars) {
-			Change change = Change.ct2ce(localVar);
+			Change change = Change.conv(localVar);
 			Address address = trace.makeAddr(localVar.getID(), "");
-			env = env.strongUpdate(new Identifier(localVar.toSource(), Change.ct2ce(localVar)), address);
+			env = env.strongUpdate(new Identifier(localVar.toSource(), Change.conv(localVar)), address);
 			store = store.alloc(address, Undefined.inject(Undefined.top(change)));
 		}
 
@@ -207,8 +207,8 @@ public class Helpers {
 			Address address = trace.makeAddr(child.getID(), "");
 
 			/* The function name variable points to our new function. */
-			env = env.strongUpdate(new Identifier(child.getName(), Change.ct2ce(child.getFunctionName())), address); // Env update with env change type
-			store = store.alloc(address, Address.inject(address, Change.ct2ce(child))); // Store update with value change type
+			env = env.strongUpdate(new Identifier(child.getName(), Change.conv(child.getFunctionName())), address); // Env update with env change type
+			store = store.alloc(address, Address.inject(address, Change.conv(child))); // Store update with value change type
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
@@ -308,7 +308,7 @@ public class Helpers {
 			/* We have a qualified name. Recursively find the addresses. */
 			InfixExpression ie = (InfixExpression) node;
 			Set<Address> addrs = resolve(env, store, ie.getLeft());
-			Change change = Change.ct2ce(node);
+			Change change = Change.conv(node);
 			if(addrs == null) return null;
 			return Addresses.inject(new Addresses(addrs, change));
 		}

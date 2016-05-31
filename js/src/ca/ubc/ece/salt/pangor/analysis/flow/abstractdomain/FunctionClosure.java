@@ -54,7 +54,7 @@ public class FunctionClosure extends Closure {
 				if(param instanceof Name) {
 					Name paramName = (Name) param;
 					Address argAddr = argObj.externalProperties.get(new Identifier(String.valueOf(i), Change.u()));
-					env = env.strongUpdate(new Identifier(paramName.toSource(), Change.ct2ce(paramName)), argAddr);
+					env = env.strongUpdate(new Identifier(paramName.toSource(), Change.conv(paramName)), argAddr);
 				}
 				i++;
 			}
