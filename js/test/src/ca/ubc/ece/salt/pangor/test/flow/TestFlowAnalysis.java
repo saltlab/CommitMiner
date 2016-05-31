@@ -150,6 +150,24 @@ public class TestFlowAnalysis {
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
 
+	@Test
+	public void testExpress() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/interproc/express_old.js";
+		String dst = "./test/input/interproc/express_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/learning/falsey_new.js", "MethodNA", "6", "TST", "PROTECT", "x_FALSEY_NE_IR"));
+
+		this.runTest(sourceCodeFileChange, expected, true);
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */
@@ -188,6 +206,7 @@ public class TestFlowAnalysis {
 		/* The query that produces the results. */
 		Parser parser = new Parser();
 		parser.parse("?- Protected(?Version,?File,?Line,?StatementID,?Identifier,?Type,?Element,?Change).");
+//		parser.parse("?- Protected(?Version,?File,?Line,?StatementID,?Identifier,?Type,?Element,'UNCHANGED').");
 		IQuery query = parser.getQueries().get(0);
 
 		/* Transforms the query results to a ClassifierFeatureVector. */

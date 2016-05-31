@@ -9,6 +9,7 @@ import org.mozilla.javascript.ast.AstNode;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.JSClass;
@@ -33,7 +34,7 @@ public class ArgumentsFactory {
 	}
 
 	public Obj Arguments_Obj() {
-		Map<String, Address> ext = new HashMap<String, Address>();
+		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 		store = Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr, Change.u()), ext, store);
 		store = Helpers.addProp("length", Num.inject(Num.top(Change.u())), ext, store);
 
@@ -51,7 +52,7 @@ public class ArgumentsFactory {
 
 		InternalObjectProperties internal = new InternalFunctionProperties(closures, JSClass.CArguments);
 
-		return new Obj(ext, internal, ext.keySet());
+		return new Obj(ext, internal);
 	}
 
 }

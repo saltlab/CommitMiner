@@ -6,8 +6,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Helpers;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Store;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
@@ -41,7 +43,7 @@ public class EnvironmentFactory {
 	 */
 	private static Environment createBaseEnvironment() {
 		Environment env = new Environment();
-		env = env.strongUpdate("this", StoreFactory.global_binding_Addr);
+		env = env.strongUpdate(new Identifier("this", Change.u()), StoreFactory.global_binding_Addr);
 		return env;
 	}
 

@@ -40,10 +40,10 @@ public class Helpers {
 	 * @param propID The node id of the property being added to the object.
 	 * @param propVal The value of the property.
 	 */
-	public static Store addProp(int propID, String prop, BValue propVal, Map<String, Address> ext, Store store, Trace trace) {
+	public static Store addProp(int propID, String prop, BValue propVal, Map<Identifier, Address> ext, Store store, Trace trace) {
 		Address propAddr = trace.makeAddr(propID, prop);
 		store = store.alloc(propAddr, propVal);
-		ext.put(prop, propAddr);
+		ext.put(new Identifier(prop, Change.u()), propAddr);
 		return store;
 	}
 
@@ -54,7 +54,7 @@ public class Helpers {
 	 */
 	public static Store createFunctionObj(Closure closure, Store store, Trace trace, Address address, int id) {
 
-		Map<String, Address> external = new HashMap<String, Address>();
+		Map<Identifier, Address> external = new HashMap<Identifier, Address>();
 		store = addProp(id, "length", Num.inject(Num.top(Change.u())), external, store, trace);
 
 		InternalFunctionProperties internal = new InternalFunctionProperties(
@@ -62,7 +62,7 @@ public class Helpers {
 				closure,
 				JSClass.CFunction);
 
-		store = store.alloc(address, new Obj(external, internal, external.keySet()));
+		store = store.alloc(address, new Obj(external, internal));
 
 		return store;
 
@@ -196,7 +196,7 @@ public class Helpers {
 		for(Name localVar : localVars) {
 			Change change = Change.ct2ce(localVar);
 			Address address = trace.makeAddr(localVar.getID(), "");
-			env = env.strongUpdate(localVar.toSource(), address);
+			env = env.strongUpdate(new Identifier(localVar.toSource(), Change.ct2ce(localVar)), address);
 			store = store.alloc(address, Undefined.inject(Undefined.top(change)));
 		}
 
@@ -204,12 +204,11 @@ public class Helpers {
 		List<FunctionNode> children = FunctionLiftVisitor.getFunctionDeclarations(function);
 		for(FunctionNode child : children) {
 			if(child.getName().isEmpty()) continue; // Not accessible.
-			Change change = Change.ct2ce(child);
 			Address address = trace.makeAddr(child.getID(), "");
 
 			/* The function name variable points to our new function. */
-			env = env.strongUpdate(child.getName(), address);
-			store = store.alloc(address, Address.inject(address, change));
+			env = env.strongUpdate(new Identifier(child.getName(), Change.ct2ce(child.getFunctionName())), address); // Env update with env change type
+			store = store.alloc(address, Address.inject(address, Change.ct2ce(child))); // Store update with value change type
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);

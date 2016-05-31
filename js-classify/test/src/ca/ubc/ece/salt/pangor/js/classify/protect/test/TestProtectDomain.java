@@ -86,6 +86,50 @@ public class TestProtectDomain {
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
 
+	@Test
+	public void testFalsey() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/interproc/sth_falsey_old.js";
+		String dst = "./test/input/interproc/sth_falsey_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/sth_falsey_new.js", "MethodNA", "5", "TST", "PROTECT", "a_NULL_BOTTOM_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/sth_falsey_new.js", "MethodNA", "5", "TST", "PROTECT", "a_UNDEFINED_BOTTOM_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/sth_falsey_new.js", "MethodNA", "5", "TST", "PROTECT", "a_ZERO_Num:NOT_ZERO_NOR_NAN_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/sth_falsey_new.js", "MethodNA", "5", "TST", "PROTECT", "a_NAN_Num:NOT_ZERO_NOR_NAN_Change:CHANGED"));
+
+		this.runTest(sourceCodeFileChange, expected, true);
+
+	}
+
+	@Test
+	public void testMovieFunctions() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/special_type_handling/movie-functions_old.js";
+		String dst = "./test/input/special_type_handling/movie-functions_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/sth_falsey_new.js", "MethodNA", "5", "TST", "PROTECT", "a_NULL_BOTTOM_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/sth_falsey_new.js", "MethodNA", "5", "TST", "PROTECT", "a_UNDEFINED_BOTTOM_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/sth_falsey_new.js", "MethodNA", "5", "TST", "PROTECT", "a_ZERO_Num:NOT_ZERO_NOR_NAN_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/sth_falsey_new.js", "MethodNA", "5", "TST", "PROTECT", "a_NAN_Num:NOT_ZERO_NOR_NAN_Change:CHANGED"));
+
+		this.runTest(sourceCodeFileChange, expected, true);
+
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */

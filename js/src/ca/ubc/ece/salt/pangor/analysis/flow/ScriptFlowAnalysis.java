@@ -18,6 +18,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.FunctionClosure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Helpers;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.JSClass;
@@ -80,9 +81,9 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 	 * to decide whether or not to run the function as a constructor.
 	 * @param state The end state of the parent function.
 	 */
-	private void analyzePublic(State state, Map<String, Address> props, Address selfAddr, Map<AstNode, CFG> cfgMap) {
+	private void analyzePublic(State state, Map<Identifier, Address> props, Address selfAddr, Map<AstNode, CFG> cfgMap) {
 
-		for(String var : props.keySet()) {
+		for(Identifier var : props.keySet()) {
 			BValue val = state.store.apply(props.get(var));
 
 			for(Address objAddr : val.addressAD.addresses) {
@@ -127,7 +128,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 	private Address createTopArgObject(State state, FunctionNode f) {
 
 		/* Create the argument object. */
-		Map<String, Address> ext = new HashMap<String, Address>();
+		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 
 		for(int i = 0; i < f.getParamCount(); i++) {
 			BValue argVal = BValue.top(Change.ct2ce(f));
@@ -137,7 +138,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 
 		InternalObjectProperties internal = new InternalObjectProperties(
 				Address.inject(StoreFactory.Arguments_Addr, Change.ct2ce(f)), JSClass.CFunction);
-		Obj argObj = new Obj(ext, internal, ext.keySet());
+		Obj argObj = new Obj(ext, internal);
 
 		/* Add the argument object to the store. */
 		Address argAddr = state.trace.makeAddr(f.getID(), "");

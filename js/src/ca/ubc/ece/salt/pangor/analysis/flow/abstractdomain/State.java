@@ -399,7 +399,7 @@ public class State implements IState {
 				 * and add it to the environment/store as BValue.TOP since we know
 				 * nothing about it. */
 				addr = trace.makeAddr(node.getID(), "");
-				env = env.strongUpdate(node.toSource(), addr);
+				env = env.strongUpdate(new Identifier(node.toSource(), Change.top()), addr);
 				store = store.alloc(addr, Addresses.dummy(change));
 			}
 			result.add(addr);
@@ -433,7 +433,8 @@ public class State implements IState {
 				/* We may need to create a dummy object if 'val' doesn't point
 				 * to any objects. */
 				if(val.addressAD.addresses.size() == 0) {
-					Obj dummy = new Obj(new HashMap<String, Address>(), new InternalObjectProperties(), new HashSet<String>());
+					Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
+					Obj dummy = new Obj(ext, new InternalObjectProperties());
 					Address addr = trace.makeAddr(node.getID(), "");
 					store = store.alloc(addr, dummy);
 					val = val.join(Address.inject(addr, change));
@@ -455,7 +456,7 @@ public class State implements IState {
 						 * analysis. Create it and give it the value BValue.TOP. */
 						propAddr = trace.makeAddr(node.getID(), ie.getRight().toSource());
 						store = store.alloc(propAddr, Addresses.dummy(change));
-						obj.externalProperties.put(ie.getRight().toSource(), propAddr);
+						obj.externalProperties.put(new Identifier(ie.getRight().toSource(), Change.u()), propAddr);
 						result.add(propAddr);
 					}
 				}

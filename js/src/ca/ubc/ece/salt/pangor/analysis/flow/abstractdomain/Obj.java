@@ -3,7 +3,6 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * The abstract domain for objects. An object is represented as
@@ -14,56 +13,41 @@ import java.util.Set;
 public class Obj {
 
 	/** Programmer-visible object properties. **/
-	public Map<String, Address> externalProperties;
+	public Map<Identifier, Address> externalProperties;
 
 	/** Interpreter-only properties which are invisible to the programmer. **/
 	public InternalObjectProperties internalProperties;
-
-	/** Tracks properties that definitely exist in the object. **/
-	public Set<String> definitelyPresentProperties;
 
 	/**
 	 * Initialize the object. The initial store will contain a number of
 	 * build-in objects which will be initialized from a template. The
 	 * remainder of objects will be defined by the program and instantiated
 	 * during the analysis.
-	 * @param externalProperties Programmer-visible object properties.
+	 * @param ext Programmer-visible object properties.
 	 * @param internalProperties Interpreter-only properties which are
 	 * 							 invisible to the programmer.
 	 * @param definitelyPresentProperties Properties which are definitely
 	 * 									  present in the object.
 	 */
-	public Obj(Map<String, Address> externalProperties,
-					InternalObjectProperties internalProperties,
-					Set<String> definitelyPresentProperties) {
-		this.externalProperties = externalProperties;
+	public Obj(Map<Identifier, Address> ext,
+					InternalObjectProperties internalProperties) {
+		this.externalProperties = ext;
 		this.internalProperties = internalProperties;
-		this.definitelyPresentProperties = definitelyPresentProperties;
 	}
 
-	/**
-	 * Initialize the function.
-	 * @param externalProperties Programmer-visible object properties.
-	 * @param internalProperties Interpreter-only properties which are
-	 * 							 invisible to the programmer.
-	 * @param definitelyPresentProperties Properties which are definitely
-	 * 									  present in the object.
-	 */
-	public Obj(Map<String, Address> externalProperties,
-				InternalFunctionProperties internalProperties,
-				Set<String> definitelyPresentProperties) {
-		this.externalProperties = externalProperties;
-		this.internalProperties = internalProperties;
-		this.definitelyPresentProperties = definitelyPresentProperties;
-	}
-
-	/**
-	 * @param property The property to look up.
-	 * @return true if the property is definitely present in this object.
-	 */
-	public boolean definitelyProperty(String property) {
-		return this.definitelyPresentProperties.contains(property);
-	}
+//	/**
+//	 * Initialize the function.
+//	 * @param externalProperties Programmer-visible object properties.
+//	 * @param internalProperties Interpreter-only properties which are
+//	 * 							 invisible to the programmer.
+//	 * @param definitelyPresentProperties Properties which are definitely
+//	 * 									  present in the object.
+//	 */
+//	public Obj(HashMap<Identifier, Address> externalProperties,
+//				InternalFunctionProperties internalProperties) {
+//		this.externalProperties = externalProperties;
+//		this.internalProperties = internalProperties;
+//	}
 
 	/**
 	 * @param property The property to look up.
@@ -93,9 +77,9 @@ public class Obj {
 		if(this.internalProperties.klass != right.internalProperties.klass)
 			throw new Error("Cannot join classes of different types.");
 
-		Map<String, Address> ext = new HashMap<String, Address>(this.externalProperties);
+		Map<Identifier, Address> ext = new HashMap<Identifier, Address>(this.externalProperties);
 
-		for(Entry<String, Address> entry : right.externalProperties.entrySet()) {
+		for(Entry<Identifier, Address> entry : right.externalProperties.entrySet()) {
 			if(!ext.containsKey(entry.getKey()))
 				ext.put(entry.getKey(), entry.getValue());
 			else {
@@ -118,15 +102,15 @@ public class Obj {
 			}
 		}
 
-		return new Obj(ext, this.internalProperties, ext.keySet());
+		return new Obj(ext, this.internalProperties);
 
 	}
 
 	@Override
 	public String toString() {
 		String extProp = "";
-		for(String prop : this.externalProperties.keySet())
-			extProp += prop + "|";
+		for(Identifier prop : this.externalProperties.keySet())
+			extProp += prop.name + "|";
 		return "Obj:" + this.externalProperties.size() + "|" + extProp;
 	}
 

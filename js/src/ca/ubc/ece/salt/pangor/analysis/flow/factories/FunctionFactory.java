@@ -11,6 +11,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.JSClass;
@@ -37,7 +38,7 @@ public class FunctionFactory {
 	}
 
 	public Obj Function_proto_Obj() {
-		Map<String, Address> ext = new HashMap<String, Address>();
+		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 		store = Helpers.addProp("external", Num.inject(Num.top(Change.u())), ext, store);
 		store = Helpers.addProp("apply", Address.inject(StoreFactory.Function_proto_apply_Addr, Change.u()), ext, store);
 		store = Helpers.addProp("call", Address.inject(StoreFactory.Function_proto_call_Addr, Change.u()), ext, store);
@@ -47,7 +48,7 @@ public class FunctionFactory {
 				Address.inject(StoreFactory.Function_proto_Addr, Change.u()),
 				JSClass.CFunction_prototype_Obj);
 
-		return new Obj(ext, internal, ext.keySet());
+		return new Obj(ext, internal);
 	}
 
 	// TODO: apply and call need native closures because their behaviour
@@ -63,7 +64,7 @@ public class FunctionFactory {
 	 */
 	public Obj constFunctionObj(BValue retVal) {
 
-		Map<String, Address> external = new HashMap<String, Address>();
+		Map<Identifier, Address> external = new HashMap<Identifier, Address>();
 
 		Closure closure = new NativeClosure() {
 				@Override
@@ -80,7 +81,7 @@ public class FunctionFactory {
 
 		InternalObjectProperties internal = new InternalFunctionProperties(closures, JSClass.CFunction);
 
-		return new Obj(external, internal, external.keySet());
+		return new Obj(external, internal);
 
 	}
 

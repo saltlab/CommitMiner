@@ -11,6 +11,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Bool;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.JSClass;
@@ -37,7 +38,7 @@ public class ObjFactory {
 	}
 
 	public Obj Object_Obj() {
-		Map<String, Address> ext = new HashMap<String, Address>();
+		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 		store = Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr, Change.u()), ext, store);
 		store = Helpers.addProp("number", Num.inject(Num.top(Change.u())), ext, store);
 		store = Helpers.addProp("create", Address.inject(StoreFactory.Object_create_Addr, Change.u()), ext, store);
@@ -69,7 +70,7 @@ public class ObjFactory {
 
 		InternalObjectProperties internal = new InternalFunctionProperties(closures, JSClass.CObject_Obj);
 
-		return new Obj(ext, internal, ext.keySet());
+		return new Obj(ext, internal);
 	}
 
 	// TODO: We can be more precise with these.
@@ -88,7 +89,7 @@ public class ObjFactory {
 	public Obj Object_seal_Obj() { return ff.constFunctionObj(BValue.top(Change.u())); }
 
 	public Obj Object_proto_Obj() {
-		Map<String, Address> ext = new HashMap<String, Address>();
+		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 		store = Helpers.addProp("toString", Address.inject(StoreFactory.Object_proto_toString_Addr, Change.u()), ext, store);
 		store = Helpers.addProp("toLocaleString", Address.inject(StoreFactory.Object_proto_toLocaleString_Addr, Change.u()), ext, store);
 		store = Helpers.addProp("valueOf", Address.inject(StoreFactory.Object_proto_valueOf_Addr, Change.u()), ext, store);
@@ -98,7 +99,7 @@ public class ObjFactory {
 
 		InternalObjectProperties internal = new InternalObjectProperties();
 
-		return new Obj(ext, internal, ext.keySet());
+		return new Obj(ext, internal);
 	}
 
 	public Obj Object_proto_toString_Obj() { return ff.constFunctionObj(Str.inject(Str.top(Change.u()))); }

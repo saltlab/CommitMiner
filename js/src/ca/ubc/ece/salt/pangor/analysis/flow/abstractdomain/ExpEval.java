@@ -94,7 +94,7 @@ public class ExpEval {
 	 * @return A BValue that points to the new object literal.
 	 */
 	public BValue evalObjectLiteral(ObjectLiteral ol) {
-		Map<String, Address> ext = new HashMap<String, Address>();
+		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 		InternalObjectProperties in = new InternalObjectProperties();
 		Change change = Change.ct2ce(ol);
 
@@ -107,10 +107,10 @@ public class ExpEval {
 			BValue propVal = this.eval(property.getRight());
 			Address propAddr = trace.makeAddr(property.getID(), "");
 			store = store.alloc(propAddr, propVal);
-			if(propName != null) ext.put(propName, propAddr);
+			if(propName != null) ext.put(new Identifier(propName, Change.u()), propAddr);
 		}
 
-		Obj obj = new Obj(ext, in, ext.keySet());
+		Obj obj = new Obj(ext, in);
 		Address objAddr = trace.makeAddr(ol.getID(), "");
 		store = store.alloc(objAddr, obj);
 
@@ -200,7 +200,7 @@ public class ExpEval {
 	public State evalFunctionCall(FunctionCall fc) {
 
 		/* Create the argument object. */
-		Map<String, Address> ext = new HashMap<String, Address>();
+		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 		int i = 0;
 		for(AstNode arg : fc.getArguments()) {
 			BValue argVal = eval(arg);
@@ -212,7 +212,7 @@ public class ExpEval {
 		Change change = Change.ct2ce(fc);
 		InternalObjectProperties internal = new InternalObjectProperties(
 				Address.inject(StoreFactory.Arguments_Addr, change), JSClass.CFunction);
-		Obj argObj = new Obj(ext, internal, ext.keySet());
+		Obj argObj = new Obj(ext, internal);
 
 		/* Add the argument object to the store. */
 		Address argAddr = trace.makeAddr(fc.getID(), "");

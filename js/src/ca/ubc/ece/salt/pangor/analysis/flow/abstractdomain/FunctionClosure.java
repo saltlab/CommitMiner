@@ -53,15 +53,15 @@ public class FunctionClosure extends Closure {
 			for(AstNode param : function.getParams()) {
 				if(param instanceof Name) {
 					Name paramName = (Name) param;
-					Address argAddr = argObj.externalProperties.get(String.valueOf(i));
-					env = env.strongUpdate(paramName.toSource(), argAddr);
+					Address argAddr = argObj.externalProperties.get(new Identifier(String.valueOf(i), Change.u()));
+					env = env.strongUpdate(new Identifier(paramName.toSource(), Change.ct2ce(paramName)), argAddr);
 				}
 				i++;
 			}
 		}
 
 		/* Add 'this' to environment (points to caller's object or new object). */
-		env = env.strongUpdate("this", selfAddr);
+		env = env.strongUpdate(new Identifier("this", Change.u()), selfAddr);
 
 		/* Create the initial state for the function call. */
 		State state = new State(store, env, scratchpad, trace, cfgs);

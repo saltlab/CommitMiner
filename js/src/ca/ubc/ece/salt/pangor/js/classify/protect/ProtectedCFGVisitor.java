@@ -15,6 +15,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Addresses.LatticeElement;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Bool;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Null;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Num;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
@@ -54,7 +55,11 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 	 * identifier protection.
 	 */
 	private void visit(AstNode node, State state) {
-		getObjectFacts(node, state.env.environment, state, null);
+		// TODO: There are currently situations in which a function is not
+		//		 analyzed... for example a function that is passed as an
+		//		 argument to an un-resolvable function. We need to handle
+		//		 these.
+		if(state != null) getObjectFacts(node, state.env.environment, state, null);
 	}
 
 	/**
@@ -63,12 +68,12 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
-	private void getObjectFacts(AstNode node, Map<String, Address> props, State state, String prefix) {
-		for(String prop : props.keySet()) {
+	private void getObjectFacts(AstNode node, Map<Identifier, Address> props, State state, String prefix) {
+		for(Identifier prop : props.keySet()) {
 
 			Address addr = props.get(prop);
 			String identifier;
-			if(prefix == null) identifier = prop;
+			if(prefix == null) identifier = prop.name;
 			else identifier = prefix + "." + prop;
 
 			BValue val = state.store.apply(addr);
