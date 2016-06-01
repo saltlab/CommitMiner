@@ -43,6 +43,12 @@ public class Store {
 		this.objectStore = objectStore;
 	}
 
+	@Override
+	public Store clone() {
+		return new Store(new HashMap<Address, BValue>(bValueStore),
+						 new HashMap<Address, Obj>(objectStore));
+	}
+
 	/**
 	 * Computes σ1 u σ2.
 	 * @return a new Store which is this Store joined with the store parameter.

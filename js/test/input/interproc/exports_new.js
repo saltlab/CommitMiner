@@ -5,4 +5,5 @@ Common.greet = function(name, greeting) {
 		if(name && greeting) {
 			console.log(greeting + space + name + punctuation);
 		}
+		console.log("Thanks for visiting!");
 	}

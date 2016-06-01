@@ -103,7 +103,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 
 						/* Analyze the function. */
 						@SuppressWarnings("unused")
-						State newState = ifp.closure.run(selfAddr, argAddr, state.store, state.scratch, state.trace);
+						State newState = ifp.closure.run(selfAddr, argAddr, state.store, state.scratch, state.trace, state.control);
 
 						/* Check the function object. */
 						// TODO: We ignore this for now. We would have to assume the function is being run as a constructor.

@@ -29,12 +29,18 @@ public class Environment {
 		this.environment = env;
 	}
 
+	@Override
+	public Environment clone() {
+		Map<Identifier, Address> map = new HashMap<Identifier, Address>(this.environment);
+		return new Environment(map);
+	}
+
 	/**
 	 * Retrieve a variable's address.
 	 * @param x The variable.
 	 * @return The store address of the var.
 	 */
-	public Address apply(String x) {
+	public Address apply(Identifier x) {
 		return this.environment.get(x);
 	}
 
@@ -68,6 +74,9 @@ public class Environment {
 		for(Map.Entry<Identifier, Address> entry : environment.environment.entrySet()) {
 			if(!this.environment.containsKey(entry.getKey())
 					|| this.environment.get(entry.getKey()) != entry.getValue()) {
+				System.out.println(entry.getKey().name + ":" + entry.getKey().change + ":" + entry.getValue().addr);
+				if(!this.environment.containsKey(entry.getKey())) System.out.println("Does not contain key.");
+				else System.out.println(this.environment.get(entry.getKey()).addr);
 				throw new Error("environments should be the same");
 			}
 		}

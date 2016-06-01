@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Control;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
@@ -29,7 +30,8 @@ public class StateFactory {
 		Pair<Environment, Store> lifted =
 				EnvironmentFactory.createInitialEnvironment(script, store, cfgs, trace);
 		Scratchpad scratchpad = new Scratchpad();
-		return new State(lifted.getRight(), lifted.getLeft(), scratchpad, trace, cfgs);
+		Control control = new Control();
+		return new State(lifted.getRight(), lifted.getLeft(), scratchpad, trace, control, cfgs);
 	}
 
 }

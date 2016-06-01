@@ -23,6 +23,11 @@ public class Scratchpad {
 		this.scratchMem[loc.val] = retVal;
 	}
 
+	@Override
+	public Scratchpad clone() {
+		return new Scratchpad(scratchMem);
+	}
+
 	/**
 	 * @return The value at the location is scratchpad memory.
 	 */

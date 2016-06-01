@@ -14,10 +14,11 @@ public abstract class Closure {
 	 * @param store Main memory.
 	 * @param scratchpad Scratchpad memory.
 	 * @param trace The execution trace.
+	 * @param control Tracks control flow changes.
 	 * @return The new state after executing the function.
 	 */
 	public abstract State run(Address selfAddr, Address argArrayAddr,
 							  Store store, Scratchpad scratchpad,
-							  Trace trace);
+							  Trace trace, Control control);
 
 }

@@ -103,6 +103,7 @@ public class Helpers {
 			pathState.edge.setState(state);
 
 			/* Transfer the abstract state over the edge. */
+			state = state.clone();
 			state = state.transfer(pathState.edge, selfAddr);
 
 			/* Join the abstract states from the 'to' node and the current
@@ -145,7 +146,7 @@ public class Helpers {
 	 * @return The final state of the closure.
 	 */
 	public static State applyClosure(BValue funVal, Address selfAddr, Address args,
-							  Store store, Scratchpad sp, Trace trace) {
+							  Store store, Scratchpad sp, Trace trace, Control control) {
 
 		State state = null;
 
@@ -164,7 +165,7 @@ public class Helpers {
 					(InternalFunctionProperties)functObj.internalProperties;
 
 			/* Run the function. */
-			State endState = ifp.closure.run(selfAddr, args, store, sp, trace);
+			State endState = ifp.closure.run(selfAddr, args, store, sp, trace, control);
 
 			/* Join the states. */
 			if(state == null) state = endState;
@@ -248,7 +249,7 @@ public class Helpers {
 		if(node instanceof Name) {
 
 			/* Base case, we have a simple name. */
-			Address addr = env.apply(node.toSource());
+			Address addr = env.apply(new Identifier(node.toSource()));
 			if(addr == null) return null;
 			result.add(addr);
 			return result;

@@ -28,15 +28,18 @@ public class ExpEval {
 	public Scratchpad scratch;
 	public Trace trace;
 	public Address selfAddr;
+	public Control control;
 	public Map<AstNode, CFG> cfgs;
 
 	public ExpEval(Environment env, Store store, Scratchpad scratch,
-				   Trace trace, Address selfAddr, Map<AstNode, CFG> cfgs) {
+				   Trace trace, Address selfAddr, Control control,
+				   Map<AstNode, CFG> cfgs) {
 		this.env = env;
 		this.store = store;
 		this.scratch = scratch;
 		this.trace = trace;
 		this.selfAddr = selfAddr;
+		this.control = control;
 		this.cfgs = cfgs;
 	}
 
@@ -232,12 +235,12 @@ public class ExpEval {
 			/* If the function was not resolved, we assume the (local)
 			 * state is unchanged, but add BValue.TOP as the return value. */
 			scratch = scratch.strongUpdate(Scratch.RETVAL, BValue.top(change));
-			return new State(store, env, scratch, trace, cfgs);
+			return new State(store, env, scratch, trace, control, cfgs);
 		}
 		else {
 			/* Call the function and get a join of the new states. */
 			return Helpers.applyClosure(funVal, objAddr, argAddr, store,
-												  scratch, trace);
+												  scratch, trace, control);
 		}
 
 	}

@@ -14,6 +14,7 @@ import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
+import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
@@ -35,6 +36,7 @@ public class State implements IState {
 	public Store store;
 	public Scratchpad scratch;
 	public Trace trace;
+	public Control control;
 
 	private Map<AstNode, CFG> cfgs;
 
@@ -43,12 +45,20 @@ public class State implements IState {
 	 * @param store The abstract store of the new state.
 	 * @param environment The abstract environment of the new state.
 	 */
-	public State(Store store, Environment environment, Scratchpad scratchpad, Trace trace, Map<AstNode, CFG> cfgs) {
+	public State(Store store, Environment environment, Scratchpad scratchpad, Trace trace, Control control, Map<AstNode, CFG> cfgs) {
 		this.store = store;
 		this.env = environment;
 		this.scratch = scratchpad;
 		this.trace = trace;
+		this.control = control;
 		this.cfgs = cfgs;
+	}
+
+	@Override
+	public State clone() {
+		State clone =  new State(store.clone(), env.clone(), scratch.clone(), trace,
+						 control.clone(), cfgs);
+		return clone;
 	}
 
 	public State transfer(CFGEdge edge, Address selfAddr) {
@@ -61,6 +71,9 @@ public class State implements IState {
 
 		/* Interpret the statement. */
 		interpretCondition(condition, selfAddr, false);
+
+		/* Interpret the control flow changes. */
+		this.control = this.control.update(edge.getFrom());
 
 		return this;
 
@@ -78,6 +91,11 @@ public class State implements IState {
 			Change change = Change.conv(condition);
 			if(not) interpretAddrsFalsey(addrs, change);
 			else interpretAddrsTruthy(addrs, change);
+		}
+		else if(condition instanceof UnaryExpression &&
+				((UnaryExpression) condition).getOperator() == Token.NOT) {
+			UnaryExpression ue = (UnaryExpression) condition;
+			interpretCondition(ue.getOperand(), selfAddr, !not);
 		}
 		else if(condition instanceof InfixExpression &&
 				((InfixExpression)condition).getOperator() == Token.GETPROP) {
@@ -332,7 +350,7 @@ public class State implements IState {
 			interpretVariableDeclaration((VariableDeclaration)node, selfAddr);
 		}
 		else if(node instanceof FunctionCall) {
-			ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr, cfgs);
+			ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr, control, cfgs);
 			State endState = expEval.evalFunctionCall((FunctionCall) node);
 			this.store = endState.store;
 		}
@@ -373,7 +391,7 @@ public class State implements IState {
 		Set<Address> addrs = resolveOrCreate(lhs);
 
 		/* Resolve the right hand side to a value. */
-		ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr, cfgs);
+		ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr, control, cfgs);
 		BValue val = expEval.eval(rhs);
 		store = expEval.store;
 
@@ -393,7 +411,7 @@ public class State implements IState {
 
 		/* Base Case: A simple name in the environment. */
 		if(node instanceof Name) {
-			Address addr = env.apply(node.toSource());
+			Address addr = env.apply(new Identifier(node.toSource()));
 			if(addr == null) {
 				/* Assume the variable exists in the environment (ie. not a TypeError)
 				 * and add it to the environment/store as BValue.TOP since we know
@@ -480,7 +498,9 @@ public class State implements IState {
 				this.store.join(state.store),
 				this.env.join(state.env),
 				this.scratch.join(state.scratch),
-				this.trace, cfgs);
+				this.trace,
+				this.control.join(state.control),
+				cfgs);
 
 		return joined;
 

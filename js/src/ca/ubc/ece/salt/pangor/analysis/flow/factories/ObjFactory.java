@@ -11,6 +11,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Bool;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Control;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
@@ -59,7 +60,7 @@ public class ObjFactory {
 				@Override
 				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
-								 Trace trace) {
+								 Trace trace, Control control) {
 					// TODO: Update the state
 					return null;
 				}

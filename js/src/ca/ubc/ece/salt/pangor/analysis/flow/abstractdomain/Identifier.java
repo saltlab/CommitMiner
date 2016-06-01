@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+
 /**
  * A variable identifier combined with a change lattice.
  */

@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 
+
 /**
  * Stores the state for the boolean type abstract domain.
  * Lattice element is simple:

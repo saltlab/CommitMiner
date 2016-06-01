@@ -9,6 +9,7 @@ import org.mozilla.javascript.ast.AstNode;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Control;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalObjectProperties;
@@ -42,8 +43,8 @@ public class ArgumentsFactory {
 				@Override
 				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
-								 Trace trace) {
-					return new State(store, null, scratchpad, trace, cfgs);
+								 Trace trace, Control control) {
+					return new State(store, null, scratchpad, trace, control, cfgs);
 				}
 			};
 

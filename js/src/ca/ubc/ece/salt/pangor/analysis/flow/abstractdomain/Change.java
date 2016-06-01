@@ -19,7 +19,7 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
  */
 public class Change {
 
-	private LatticeElement le;
+	public LatticeElement le;
 
 	public Change(LatticeElement le) {
 		this.le = le;

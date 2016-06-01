@@ -10,6 +10,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Closure;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Control;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.InternalFunctionProperties;
@@ -70,9 +71,9 @@ public class FunctionFactory {
 				@Override
 				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
-								 Trace trace) {
+								 Trace trace, Control control) {
 					scratchpad.strongUpdate(Scratch.RETVAL, retVal);
-					return new State(store, new Environment(), scratchpad, trace, cfgs);
+					return new State(store, new Environment(), scratchpad, trace, control, cfgs);
 				}
 			};
 
