@@ -54,7 +54,7 @@ public class TestControlAnalysis {
 
         /* Verify the expected feature vectors match the actual feature vectors. */
 		List<ClassifierFeatureVector> actual = dataSet.getFeatureVectors();
-//		Assert.assertTrue(actual.size() == expected.size());
+		Assert.assertTrue(actual.size() == expected.size());
         for(ClassifierFeatureVector fv : expected) {
         	Assert.assertTrue(actual.contains(fv));
         }
@@ -73,7 +73,7 @@ public class TestControlAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "3", "TST", "ENV", "name_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "6", "TST", "CONTROL", "Change:CHANGED"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
