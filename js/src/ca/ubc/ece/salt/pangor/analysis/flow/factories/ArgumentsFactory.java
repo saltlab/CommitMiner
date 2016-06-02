@@ -36,8 +36,8 @@ public class ArgumentsFactory {
 
 	public Obj Arguments_Obj() {
 		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
-		store = Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr, Change.u()), ext, store);
-		store = Helpers.addProp("length", Num.inject(Num.top(Change.u())), ext, store);
+		store = Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr, Change.u(), Change.u()), ext, store);
+		store = Helpers.addProp("length", Num.inject(Num.top(Change.u()), Change.u()), ext, store);
 
 		NativeClosure closure = new NativeClosure() {
 				@Override

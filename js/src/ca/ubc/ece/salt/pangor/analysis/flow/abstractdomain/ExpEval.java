@@ -73,8 +73,7 @@ public class ExpEval {
 		}
 
 		/* We could not evaluate the expression. Return top. */
-		Change change = Change.conv(node);
-		return BValue.top(change);
+		return BValue.top(Change.convU(node), Change.convU(node)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 
 	}
 
@@ -84,11 +83,10 @@ public class ExpEval {
 	 * @return A BValue that points to the new function object.
 	 */
 	public BValue evalFunctionNode(FunctionNode f){
-		Change change = Change.conv(f);
 		Closure closure = new FunctionClosure(cfgs.get(f), env, cfgs);
 		Address addr = trace.makeAddr(f.getID(), "");
 		store = Helpers.createFunctionObj(closure, store, trace, addr, f.getID());
-		return Address.inject(addr, change);
+		return Address.inject(addr, Change.convU(f), Change.convU(f)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 	}
 
 	/**
@@ -99,7 +97,6 @@ public class ExpEval {
 	public BValue evalObjectLiteral(ObjectLiteral ol) {
 		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 		InternalObjectProperties in = new InternalObjectProperties();
-		Change change = Change.conv(ol);
 
 		for(ObjectProperty property : ol.getElements()) {
 			AstNode prop = property.getLeft();
@@ -117,7 +114,7 @@ public class ExpEval {
 		Address objAddr = trace.makeAddr(ol.getID(), "");
 		store = store.alloc(objAddr, obj);
 
-		return Address.inject(objAddr, change);
+		return Address.inject(objAddr, Change.convU(ol), Change.convU(ol)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 	}
 
 	/**
@@ -127,9 +124,8 @@ public class ExpEval {
 	public BValue evalInfixExpression(InfixExpression ie) {
 		/* We assume this is an identifier and attempt to dereference it, since
 		 * no other operator is currently supported. */
-		Change change = Change.conv(ie);
 		BValue val = Helpers.resolveValue(env, store, ie);
-		if(val == null) return BValue.top(change);
+		if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 		return val;
 	}
 
@@ -139,8 +135,7 @@ public class ExpEval {
 	 */
 	public BValue evalName(Name name) {
 		BValue val = Helpers.resolveValue(env, store, name);
-		Change change = Change.conv(name);
-		if(val == null) return BValue.top(change);
+		if(val == null) return BValue.top(Change.convU(name), Change.convU(name)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 		return val;
 	}
 
@@ -149,8 +144,7 @@ public class ExpEval {
 	 * @return the abstract interpretation of the number literal
 	 */
 	public BValue evalNumberLiteral(NumberLiteral numl) {
-		Change change = Change.conv(numl);
-		return Num.inject(new Num(Num.LatticeElement.VAL, numl.getValue(), change));
+		return Num.inject(new Num(Num.LatticeElement.VAL, numl.getValue(), Change.convU(numl)), Change.convU(numl)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 	}
 
 	/**
@@ -170,7 +164,7 @@ public class ExpEval {
 			str = new Str(Str.LatticeElement.SNOTNUMNORSPLVAL, val, change);
 		}
 
-		return Str.inject(str);
+		return Str.inject(str, change);
 
 	}
 
@@ -184,14 +178,14 @@ public class ExpEval {
 		case Token.THIS:
 			return store.apply(selfAddr);
 		case Token.NULL:
-			return Null.inject(Null.top(change));
+			return Null.inject(Null.top(change), change);
 		case Token.TRUE:
-			return Bool.inject(new Bool(Bool.LatticeElement.TRUE, change));
+			return Bool.inject(new Bool(Bool.LatticeElement.TRUE, change), change);
 		case Token.FALSE:
-			return Bool.inject(new Bool(Bool.LatticeElement.FALSE, change));
+			return Bool.inject(new Bool(Bool.LatticeElement.FALSE, change), change);
 		case Token.DEBUGGER:
 		default:
-			return BValue.bottom(change);
+			return BValue.bottom(change, change);
 		}
 	}
 
@@ -212,9 +206,8 @@ public class ExpEval {
 			i++;
 		}
 
-		Change change = Change.conv(fc);
 		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Arguments_Addr, change), JSClass.CFunction);
+				Address.inject(StoreFactory.Arguments_Addr, Change.u(), Change.u()), JSClass.CFunction);
 		Obj argObj = new Obj(ext, internal);
 
 		/* Add the argument object to the store. */
@@ -234,7 +227,7 @@ public class ExpEval {
 		if(funVal == null) {
 			/* If the function was not resolved, we assume the (local)
 			 * state is unchanged, but add BValue.TOP as the return value. */
-			scratch = scratch.strongUpdate(Scratch.RETVAL, BValue.top(change));
+			scratch = scratch.strongUpdate(Scratch.RETVAL, BValue.top(Change.top(), Change.top()));
 			return new State(store, env, scratch, trace, control, cfgs);
 		}
 		else {

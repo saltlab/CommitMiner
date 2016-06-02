@@ -58,14 +58,15 @@ public class Bool {
 	 * @param bool The boolean lattice element to inject.
 	 * @return The base value tuple with injected boolean.
 	 */
-	public static BValue inject(Bool bool) {
+	public static BValue inject(Bool bool, Change valChange) {
 		return new BValue(
 				Str.bottom(bool.change),
 				Num.bottom(bool.change),
 				bool,
 				Null.bottom(bool.change),
 				Undefined.bottom(bool.change),
-				Addresses.bottom(bool.change));
+				Addresses.bottom(bool.change),
+				valChange);
 	}
 
 	/**

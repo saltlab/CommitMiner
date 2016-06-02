@@ -57,14 +57,15 @@ public class Null {
 	 * @param nll The null lattice element to inject.
 	 * @return The base value tuple with injected null.
 	 */
-	public static BValue inject(Null nll) {
+	public static BValue inject(Null nll, Change valChange) {
 		return new BValue(
 				Str.bottom(nll.change),
 				Num.bottom(nll.change),
 				Bool.bottom(nll.change),
 				nll,
 				Undefined.bottom(nll.change),
-				Addresses.bottom(nll.change));
+				Addresses.bottom(nll.change),
+				valChange);
 	}
 
 	/**

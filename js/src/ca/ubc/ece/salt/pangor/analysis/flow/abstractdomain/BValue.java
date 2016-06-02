@@ -27,15 +27,20 @@ public class BValue {
 	/** The abstract domain for memory addresses. **/
 	public Addresses addressAD;
 
+	/** The lattice element for tracking changes to this value. **/
+	public Change change;
+
 	public BValue(Str stringAD, Num numberAD,
 					  Bool booleanAD, Null nullAD,
-					  Undefined undefinedAD, Addresses addressAD) {
+					  Undefined undefinedAD, Addresses addressAD,
+					  Change change) {
 		this.stringAD = stringAD;
 		this.numberAD = numberAD;
 		this.booleanAD = booleanAD;
 		this.nullAD = nullAD;
 		this.undefinedAD = undefinedAD;
 		this.addressAD = addressAD;
+		this.change = change;
 	}
 
 	public BValue join(BValue state) {
@@ -46,7 +51,8 @@ public class BValue {
 				this.booleanAD.join(state.booleanAD),
 				this.nullAD.join(state.nullAD),
 				this.undefinedAD.join(state.undefinedAD),
-				this.addressAD.join(state.addressAD));
+				this.addressAD.join(state.addressAD),
+				this.change.join(state.change));
 
 	}
 
@@ -162,43 +168,52 @@ public class BValue {
 	}
 
 	/**
+	 * @param valChange The change LE for the value.
+	 * @param typeChange The change LE for the type constraint.
 	 * @return the top lattice element
 	 */
-	public static BValue top(Change change) {
+	public static BValue top(Change valChange, Change typeChange) {
 		/* Set addresses to BOT to enable dynamic object creation. */
 		return new BValue(
-				Str.top(change),
-				Num.top(change),
-				Bool.top(change),
-				Null.top(change),
-				Undefined.top(change),
-				Addresses.bottom(change));
+				Str.top(typeChange),
+				Num.top(typeChange),
+				Bool.top(typeChange),
+				Null.top(typeChange),
+				Undefined.top(typeChange),
+				Addresses.bottom(typeChange),
+				valChange);
 	}
 
 	/**
+	 * @param valChange The change LE for the value.
+	 * @param typeChange The change LE for the type constraint.
 	 * @return the bottom lattice element
 	 */
-	public static BValue bottom(Change change) {
+	public static BValue bottom(Change valChange, Change typeChange) {
 		return new BValue(
-				Str.bottom(change),
-				Num.bottom(change),
-				Bool.bottom(change),
-				Null.bottom(change),
-				Undefined.bottom(change),
-				Addresses.bottom(change));
+				Str.bottom(typeChange),
+				Num.bottom(typeChange),
+				Bool.bottom(typeChange),
+				Null.bottom(typeChange),
+				Undefined.bottom(typeChange),
+				Addresses.bottom(typeChange),
+				valChange);
 	}
 
 	/**
+	 * @param valChange The change LE for the value.
+	 * @param typeChange The change LE for the type constraint.
 	 * @return a primitive value (not an address).
 	 */
-	public static BValue primitive(Change change) {
+	public static BValue primitive(Change valChange, Change typeChange) {
 		return new BValue(
-				Str.top(change),
-				Num.top(change),
-				Bool.top(change),
-				Null.top(change),
-				Undefined.top(change),
-				Addresses.bottom(change));
+				Str.top(typeChange),
+				Num.top(typeChange),
+				Bool.top(typeChange),
+				Null.top(typeChange),
+				Undefined.top(typeChange),
+				Addresses.bottom(typeChange),
+				valChange);
 	}
 
 	@Override

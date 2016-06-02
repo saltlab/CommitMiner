@@ -92,24 +92,26 @@ public class Addresses {
 	 * @param addresses The address lattice element to inject.
 	 * @return The base value tuple with injected addresses.
 	 */
-	public static BValue inject(Addresses addresses) {
+	public static BValue inject(Addresses addresses, Change valChange) {
 		return new BValue(
 				Str.bottom(addresses.change),
 				Num.bottom(addresses.change),
 				Bool.bottom(addresses.change),
 				Null.bottom(addresses.change),
 				Undefined.bottom(addresses.change),
-				addresses);
+				addresses,
+				valChange);
 	}
 
-	public static BValue dummy(Change change) {
+	public static BValue dummy(Change valChange, Change typeChange) {
 		return new BValue(
-				Str.top(change),
-				Num.top(change),
-				Bool.top(change),
-				Null.top(change),
-				Undefined.top(change),
-				Addresses.bottom(change));
+				Str.top(typeChange),
+				Num.top(typeChange),
+				Bool.top(typeChange),
+				Null.top(typeChange),
+				Undefined.top(typeChange),
+				Addresses.bottom(typeChange),
+				valChange);
 	}
 
 	/**

@@ -55,10 +55,10 @@ public class Helpers {
 	public static Store createFunctionObj(Closure closure, Store store, Trace trace, Address address, int id) {
 
 		Map<Identifier, Address> external = new HashMap<Identifier, Address>();
-		store = addProp(id, "length", Num.inject(Num.top(Change.u())), external, store, trace);
+		store = addProp(id, "length", Num.inject(Num.top(Change.u()), Change.u()), external, store, trace);
 
 		InternalFunctionProperties internal = new InternalFunctionProperties(
-				Address.inject(StoreFactory.Function_proto_Addr, Change.u()),
+				Address.inject(StoreFactory.Function_proto_Addr, Change.u(), Change.u()),
 				closure,
 				JSClass.CFunction);
 
@@ -195,10 +195,10 @@ public class Helpers {
 		/* Lift variables into the function's environment and initialize to undefined. */
 		List<Name> localVars = VariableLiftVisitor.getVariableDeclarations(function);
 		for(Name localVar : localVars) {
-			Change change = Change.conv(localVar);
+			Change change = Change.convU(localVar);
 			Address address = trace.makeAddr(localVar.getID(), "");
-			env = env.strongUpdate(new Identifier(localVar.toSource(), Change.conv(localVar)), address);
-			store = store.alloc(address, Undefined.inject(Undefined.top(change)));
+			env = env.strongUpdate(new Identifier(localVar.toSource(), Change.convU(localVar)), address);
+			store = store.alloc(address, Undefined.inject(Undefined.top(change), Change.u()));
 		}
 
 		/* Get a list of function declarations to lift into the function's environment. */
@@ -208,8 +208,8 @@ public class Helpers {
 			Address address = trace.makeAddr(child.getID(), "");
 
 			/* The function name variable points to our new function. */
-			env = env.strongUpdate(new Identifier(child.getName(), Change.conv(child.getFunctionName())), address); // Env update with env change type
-			store = store.alloc(address, Address.inject(address, Change.conv(child))); // Store update with value change type
+			env = env.strongUpdate(new Identifier(child.getName(), Change.convU(child.getFunctionName())), address); // Env update with env change type
+			store = store.alloc(address, Address.inject(address, Change.convU(child), Change.convU(child))); // Store update with value change type
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
@@ -309,9 +309,8 @@ public class Helpers {
 			/* We have a qualified name. Recursively find the addresses. */
 			InfixExpression ie = (InfixExpression) node;
 			Set<Address> addrs = resolve(env, store, ie.getLeft());
-			Change change = Change.conv(node);
 			if(addrs == null) return null;
-			return Addresses.inject(new Addresses(addrs, change));
+			return Addresses.inject(new Addresses(addrs, Change.convU(node)), Change.convU(node));
 		}
 		else {
 			/* Ignore everything else (e.g., method calls) for now. */

@@ -133,13 +133,18 @@ public class State implements IState {
 
 	private void interpretAddrsFalsey(Set<Address> addrs, Change change) {
 
+
 		/* Update the value(s) to be falsey. */
 		for(Address addr : addrs) {
-			BValue val = Undefined.inject(Undefined.top(change))
-					.join(Null.inject(Null.top(change)))
-					.join(Str.inject(new Str(Str.LatticeElement.SBLANK, change)))
-					.join(Num.inject(new Num(Num.LatticeElement.NAN_ZERO, change)))
-					.join(Bool.inject(new Bool(Bool.LatticeElement.FALSE, change)));
+
+			/* Keep the BValue change LE (the value does not change). */
+			BValue oldVal = store.apply(addr);
+
+			BValue val = Undefined.inject(Undefined.top(change), oldVal.change)
+					.join(Null.inject(Null.top(change), oldVal.change))
+					.join(Str.inject(new Str(Str.LatticeElement.SBLANK, change), oldVal.change))
+					.join(Num.inject(new Num(Num.LatticeElement.NAN_ZERO, change), oldVal.change))
+					.join(Bool.inject(new Bool(Bool.LatticeElement.FALSE, change), oldVal.change));
 			store.strongUpdate(addr, val);
 		}
 
@@ -163,7 +168,7 @@ public class State implements IState {
 		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
 
 		/* Get the value of the RHS. */
-		BValue rhsVal = BValue.bottom(Change.bottom());
+		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom());
 		for(Address rhsAddr : rhsAddrs) {
 			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
 		}
@@ -207,7 +212,7 @@ public class State implements IState {
 
 		/* Get the value of the RHS. */
 		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
-		BValue rhsVal = BValue.bottom(Change.bottom());
+		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom());
 		for(Address rhsAddr : rhsAddrs) {
 			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
 		}
@@ -217,19 +222,23 @@ public class State implements IState {
 		Set<Address>lhsAddrs = resolveOrCreate(ie.getLeft());
 		if(BValue.isUndefined(rhsVal) || BValue.isNull(rhsVal))
 			for(Address lhsAddr : lhsAddrs) {
-				rhsVal = Undefined.inject(Undefined.top(change))
-						.join(Null.inject(Null.top(change)));
+				BValue oldVal = store.apply(lhsAddr);
+				rhsVal = Undefined.inject(Undefined.top(change), oldVal.change)
+						.join(Null.inject(Null.top(change), oldVal.change));
 				store.strongUpdate(lhsAddr, rhsVal);
 			}
 		if(BValue.isBlank(rhsVal) || BValue.isZero(rhsVal))
 			for(Address lhsAddr : lhsAddrs) {
-				rhsVal = Str.inject(new Str(Str.LatticeElement.SBLANK, change))
-						.join(Num.inject(new Num(Num.LatticeElement.ZERO, change)));
+				BValue oldVal = store.apply(lhsAddr);
+				rhsVal = Str.inject(new Str(Str.LatticeElement.SBLANK, change), oldVal.change)
+						.join(Num.inject(new Num(Num.LatticeElement.ZERO, change), oldVal.change));
 				store.strongUpdate(lhsAddr, rhsVal);
 			}
 		if(BValue.isNaN(rhsVal))
-			for(Address lhsAddr : lhsAddrs)
-				store.strongUpdate(lhsAddr, Num.inject(new Num(Num.LatticeElement.NAN, change)));
+			for(Address lhsAddr : lhsAddrs) {
+				BValue oldVal = store.apply(lhsAddr);
+				store.strongUpdate(lhsAddr, Num.inject(new Num(Num.LatticeElement.NAN, change), oldVal.change));
+			}
 		if(BValue.isFalse(rhsVal))
 			interpretAddrsFalsey(lhsAddrs, change);
 		if(BValue.isAddress(rhsVal))
@@ -245,7 +254,7 @@ public class State implements IState {
 
 		/* Get the value of the RHS. */
 		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
-		BValue rhsVal = BValue.bottom(Change.bottom());
+		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom());
 		for(Address rhsAddr : rhsAddrs) {
 			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
 		}
@@ -265,7 +274,7 @@ public class State implements IState {
 		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
 
 		/* Get the value of the RHS. */
-		BValue rhsVal = BValue.bottom(Change.bottom());
+		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom());
 		for(Address rhsAddr : rhsAddrs) {
 			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
 		}
@@ -407,7 +416,6 @@ public class State implements IState {
 
 	private Set<Address> resolveOrCreate(AstNode node) {
 		Set<Address> result = new HashSet<Address>();
-		Change change = Change.conv(node);
 
 		/* Base Case: A simple name in the environment. */
 		if(node instanceof Name) {
@@ -418,7 +426,7 @@ public class State implements IState {
 				 * nothing about it. */
 				addr = trace.makeAddr(node.getID(), "");
 				env = env.strongUpdate(new Identifier(node.toSource(), Change.top()), addr);
-				store = store.alloc(addr, Addresses.dummy(change));
+				store = store.alloc(addr, Addresses.dummy(Change.top(), Change.top()));
 			}
 			result.add(addr);
 		}
@@ -455,7 +463,7 @@ public class State implements IState {
 					Obj dummy = new Obj(ext, new InternalObjectProperties());
 					Address addr = trace.makeAddr(node.getID(), "");
 					store = store.alloc(addr, dummy);
-					val = val.join(Address.inject(addr, change));
+					val = val.join(Address.inject(addr, Change.top(), Change.top()));
 					store = store.strongUpdate(valAddr, val);
 				}
 
@@ -473,7 +481,7 @@ public class State implements IState {
 						 * undefined or was initialized somewhere outside the
 						 * analysis. Create it and give it the value BValue.TOP. */
 						propAddr = trace.makeAddr(node.getID(), ie.getRight().toSource());
-						store = store.alloc(propAddr, Addresses.dummy(change));
+						store = store.alloc(propAddr, Addresses.dummy(Change.u(), Change.u()));
 						obj.externalProperties.put(new Identifier(ie.getRight().toSource(), Change.u()), propAddr);
 						result.add(propAddr);
 					}

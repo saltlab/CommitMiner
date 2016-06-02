@@ -136,14 +136,15 @@ public class Str {
 	 * @param string The string lattice element to inject.
 	 * @return The base value tuple with injected string.
 	 */
-	public static BValue inject(Str string) {
+	public static BValue inject(Str string, Change valChange) {
 		return new BValue(
 				string,
 				Num.bottom(string.change),
 				Bool.bottom(string.change),
 				Null.bottom(string.change),
 				Undefined.bottom(string.change),
-				Addresses.bottom(string.change));
+				Addresses.bottom(string.change),
+				valChange);
 	}
 
 	/**
