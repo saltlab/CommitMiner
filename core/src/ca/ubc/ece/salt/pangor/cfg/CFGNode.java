@@ -28,11 +28,16 @@ public class CFGNode {
 	private CFGNode mappedNode;
 
 	/**
-	 * The state of the environment and store. Note that at this point the
-	 * state has not yet been transfered over the term (statement) in this
-	 * node. The state is language dependent.
+	 * The state of the environment and store before transferring over the
+	 * term (statement). The state is language dependent.
 	 */
-	private IState state;
+	private IState beforeState;
+
+	/**
+	 * The state of the environment and store after transferring over the
+	 * term (statement). The state is language dependent.
+	 */
+	private IState afterState;
 
 	/**
 	 * @param statement The statement that is executed when this node is
@@ -44,7 +49,8 @@ public class CFGNode {
 		this.id = id;
 		this.name = null;
 		this.setMappedNode(null);
-		this.state = null;
+		this.beforeState = null;
+		this.afterState = null;
 	}
 
 	/**
@@ -57,7 +63,8 @@ public class CFGNode {
 		this.statement = statement;
 		this.id = id;
 		this.name = name;
-		this.state = null;
+		this.beforeState = null;
+		this.afterState = null;
 	}
 
 	/**
@@ -71,15 +78,30 @@ public class CFGNode {
 	 * Set the lattice element at this point in the program.
 	 * @param as The abstract state.
 	 */
-	public void setState(IState state) {
-		this.state = state;
+	public void setBeforeState(IState state) {
+		this.beforeState = state;
 	}
 
 	/**
 	 * @return the abstract state at this point in the program.
 	 */
-	public IState getState() {
-		return this.state;
+	public IState getBeforeState() {
+		return this.beforeState;
+	}
+
+	/**
+	 * Set the lattice element at this point in the program.
+	 * @param as The abstract state.
+	 */
+	public void setAfterState(IState state) {
+		this.afterState = state;
+	}
+
+	/**
+	 * @return the abstract state at this point in the program.
+	 */
+	public IState getAfterState() {
+		return this.afterState;
 	}
 
 	/**

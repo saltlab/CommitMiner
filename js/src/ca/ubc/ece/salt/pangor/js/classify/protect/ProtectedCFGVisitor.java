@@ -42,12 +42,12 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 
 	@Override
 	public void visit(CFGNode node) {
-		visit((AstNode) node.getStatement(), (State)node.getState());
+		visit((AstNode) node.getStatement(), (State)node.getBeforeState());
 	}
 
 	@Override
 	public void visit(CFGEdge edge) {
-		visit((AstNode) edge.getCondition(), (State)edge.getState());
+		visit((AstNode) edge.getCondition(), (State)edge.getBeforeState());
 	}
 
 	/**

@@ -35,12 +35,12 @@ public class ControlCFGVisitor implements ICFGVisitor {
 
 	@Override
 	public void visit(CFGNode node) {
-		visit((AstNode) node.getStatement(), (State)node.getState());
+		visit((AstNode) node.getStatement(), (State)node.getBeforeState());
 	}
 
 	@Override
 	public void visit(CFGEdge edge) {
-		visit((AstNode) edge.getCondition(), (State)edge.getState());
+		visit((AstNode) edge.getCondition(), (State)edge.getBeforeState());
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class ControlCFGVisitor implements ICFGVisitor {
 
 		/* If the branch change set is non-empty, this statement is affected
 		 * by a control flow change. */
-		if(!state.control.branchChanges.isEmpty()) {
+		if(!state.control.conditions.isEmpty()) {
 			registerFact(node, "Change:CHANGED");
 		}
 

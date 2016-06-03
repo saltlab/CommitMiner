@@ -96,7 +96,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 					FunctionClosure fc = (FunctionClosure)ifp.closure;
 
 					if(ifp.closure instanceof FunctionClosure &&
-							fc.cfg.getEntryNode().getState() == null) {
+							fc.cfg.getEntryNode().getBeforeState() == null) {
 
 						/* Create the argument object. */
 						Address argAddr = createTopArgObject(state, (FunctionNode)fc.cfg.getEntryNode().getStatement());

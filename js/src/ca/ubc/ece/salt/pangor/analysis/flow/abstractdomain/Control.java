@@ -1,7 +1,9 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -12,47 +14,60 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 public class Control {
 
 	/**
-	 * Tracks control flow changes for each branch.
+	 * Tracks control flow changes for each branch. When the negated branch
+	 * condition is encountered, the condition is removed from the set.
 	 */
-	public Map<CFGNode, Integer> branchChanges;
+	public Set<AstNode> conditions;
+
+	/**
+	 * Tracks control flow changes that have been merged and no longer apply.
+	 */
+	public Set<AstNode> negConditions;
 
 	public Control() {
-		branchChanges = new HashMap<CFGNode, Integer>();
+		conditions = new HashSet<AstNode>();
+		negConditions = new HashSet<AstNode>();
 	}
 
-	public Control(Map<CFGNode, Integer> branchChanges) {
-		this.branchChanges = branchChanges;
+	public Control(Set<AstNode> conditions, Set<AstNode> negConditions) {
+		this.conditions = conditions;
+		this.negConditions = negConditions;
 	}
 
 	@Override
 	public Control clone() {
-		return new Control(new HashMap<CFGNode, Integer>(branchChanges));
+		return new Control(new HashSet<AstNode>(conditions),
+						   new HashSet<AstNode>(negConditions));
 	}
 
 	/**
 	 * Updates the state for the branch conditions exiting the CFGNode.
 	 * @return The new state (ControlFlowChange) after update.
 	 */
-	public Control update(CFGNode node) {
+	public Control update(CFGEdge edge, CFGNode node) {
 
-		Map<CFGNode, Integer> branchChanges = new HashMap<CFGNode, Integer>(this.branchChanges);
-		boolean changed = false;
+		Set<AstNode> conditions = new HashSet<AstNode>(this.conditions);
+		Set<AstNode> negConditions = new HashSet<AstNode>(this.negConditions);
 
-		/* Is there an updated branch condition? */
-		for(CFGEdge edge : node.getEdges()) {
-			if(edge.getCondition() != null
-				&& Change.convU(edge.getCondition()).le
-					== Change.LatticeElement.CHANGED) {
-				changed = true;
+		/* We may have a null condition. */
+		if(edge.getCondition() == null) return new Control(conditions, negConditions);
+
+		/* Put the current branch condition in the 'conditions' set and all other
+		 * conditions in the 'neg' set since they must be false. */
+
+		if(Change.convU(edge.getCondition()).le == Change.LatticeElement.CHANGED) {
+
+			conditions.add((AstNode)edge.getCondition());
+
+			for(CFGEdge child : node.getEdges()) {
+				if(child != edge && child.getCondition() != null) {
+					negConditions.add((AstNode)child.getCondition());
+				}
 			}
+
 		}
 
-		/* If a condition was updated, track the branch. */
-		if(changed) {
-			branchChanges.put(node, node.getEdges().size() - 1);
-		}
-
-		return new Control(branchChanges);
+		return new Control(conditions, negConditions);
 
 	}
 
@@ -62,38 +77,18 @@ public class Control {
 	 */
 	public Control join(Control right) {
 
-		Map<CFGNode, Integer> branchChanges = new HashMap<CFGNode, Integer>(this.branchChanges);
+		/* Join the sets. */
+		Set<AstNode> conditions = new HashSet<AstNode>(this.conditions);
+		Set<AstNode> negConditions = new HashSet<AstNode>(this.negConditions);
 
-		/* Decrement any nodes that match. */
-		for(CFGNode node : right.branchChanges.keySet()) {
-			if(branchChanges.containsKey(node)) {
-				Integer count = branchChanges.get(node) - 1;
-				if(count == 0) branchChanges.remove(node);
-				else branchChanges.put(node, count);
-			}
-			else {
-				branchChanges.put(node, right.branchChanges.get(node));
-			}
-		}
+		conditions.addAll(right.conditions);
+		negConditions.addAll(right.negConditions);
 
-		return new Control(branchChanges);
+		/* conditions = conditions - negConditions */
+		conditions.removeAll(negConditions);
+
+		return new Control(conditions, negConditions);
 
 	}
-
-//	private class BranchChange {
-//
-//		/** The number of branches from the CFGNode. **/
-//		public int branchCount;
-//
-//		/** Tracks changes to the branch condition leaving CFGNode. **/
-//		public Change change;
-//
-//		public BranchChange(int branchCount, Change change) {
-//			this.branchCount = branchCount;
-//			this.change = change;
-//		}
-//
-//	}
-//
 
 }

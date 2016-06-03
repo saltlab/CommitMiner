@@ -87,7 +87,8 @@ public class Helpers {
 		}
 
 		/* Set the initial state. */
-		cfg.getEntryNode().setState(state);
+		cfg.getEntryNode().setBeforeState(state);
+		cfg.getEntryNode().setAfterState(state);
 
 		/* Break when the analysis time reaches some limit. */
 		while(!stack.isEmpty() && edgesVisited < 100000) {
@@ -99,20 +100,21 @@ public class Helpers {
 
 			/* Join the lattice elements from the current edge and 'from'
 			 * node. */
-			state = pathState.state.join((State)pathState.edge.getState());
-			pathState.edge.setState(state);
+			state = pathState.state.join((State)pathState.edge.getBeforeState());
+			pathState.edge.setBeforeState(state);
 
 			/* Transfer the abstract state over the edge. */
-			state = state.clone();
-			state = state.transfer(pathState.edge, selfAddr);
+			state = state.clone().transfer(pathState.edge, selfAddr);
+			pathState.edge.setAfterState(state);
 
 			/* Join the abstract states from the 'to' node and the current
 			 * edge. */
-			state = state.join((State)pathState.edge.getTo().getState());
-			pathState.edge.getTo().setState(state);
+			state = state.join((State)pathState.edge.getTo().getBeforeState());
+			pathState.edge.getTo().setBeforeState(state);
 
 			/* Transfer the abstract state over the node. */
-			state = state.transfer(pathState.edge.getTo(), selfAddr);
+			state = state.clone().transfer(pathState.edge.getTo(), selfAddr);
+			pathState.edge.getTo().setAfterState(state);
 
 			/* Add all unvisited edges to the stack.
 			 * We currently only execute loops once. */
@@ -129,7 +131,7 @@ public class Helpers {
 
 		/* Return the merged state of all exit nodes. */
 		for(CFGNode exitNode : cfg.getExitNodes()) {
-			state = state.join((State)exitNode.getState());
+			state = state.join((State)exitNode.getBeforeState());
 		}
 
 		return state;

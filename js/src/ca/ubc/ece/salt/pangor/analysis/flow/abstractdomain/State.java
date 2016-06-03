@@ -73,7 +73,7 @@ public class State implements IState {
 		interpretCondition(condition, selfAddr, false);
 
 		/* Interpret the control flow changes. */
-		this.control = this.control.update(edge.getFrom());
+		this.control = this.control.update(edge, edge.getFrom());
 
 		return this;
 

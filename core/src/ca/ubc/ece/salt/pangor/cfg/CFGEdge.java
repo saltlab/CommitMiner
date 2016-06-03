@@ -26,11 +26,16 @@ public class CFGEdge {
 	public ChangeType changeType;
 
 	/**
-	 * The state of the environment and store. Note that at this point the
-	 * state has not yet been transfered over the term (statement) in this
-	 * node. The state is language dependent.
+	 * The state of the environment and store before transferring over the
+	 * term (statement). The state is language dependent.
 	 */
-	private IState state;
+	private IState beforeState;
+
+	/**
+	 * The state of the environment and store after transferring over the
+	 * term (statement). The state is language dependent.
+	 */
+	private IState afterState;
 
 	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to, int id) {
 		this.condition = condition;
@@ -56,18 +61,33 @@ public class CFGEdge {
 	}
 
 	/**
-	 * Set the abstract state at this point in the program.
+	 * Set the lattice element at this point in the program.
 	 * @param as The abstract state.
 	 */
-	public void setState(IState state) {
-		this.state = state;
+	public void setBeforeState(IState state) {
+		this.beforeState = state;
 	}
 
 	/**
-	 * @return the lattice element at this point in the program.
+	 * @return the abstract state at this point in the program.
 	 */
-	public IState getState() {
-		return this.state;
+	public IState getBeforeState() {
+		return this.beforeState;
+	}
+
+	/**
+	 * Set the lattice element at this point in the program.
+	 * @param as The abstract state.
+	 */
+	public void setAfterState(IState state) {
+		this.afterState = state;
+	}
+
+	/**
+	 * @return the abstract state at this point in the program.
+	 */
+	public IState getAfterState() {
+		return this.afterState;
 	}
 
 	/**
