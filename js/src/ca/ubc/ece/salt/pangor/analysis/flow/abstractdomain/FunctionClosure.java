@@ -64,10 +64,10 @@ public class FunctionClosure extends Closure {
 		env = env.strongUpdate(new Identifier("this", Change.u()), selfAddr);
 
 		/* Create the initial state for the function call. */
-		State state = new State(store, env, scratchpad, trace, control, cfgs);
+		State state = new State(store, env, scratchpad, trace, control, selfAddr, cfgs);
 
 		/* Run the analysis on the CFG. */
-		return Helpers.run(cfg, state, selfAddr);
+		return Helpers.run(cfg, state);
 	}
 
 }

@@ -38,30 +38,35 @@ public class State implements IState {
 	public Trace trace;
 	public Control control;
 
-	private Map<AstNode, CFG> cfgs;
+	public Address selfAddr;
+
+	public Map<AstNode, CFG> cfgs;
 
 	/**
 	 * Create a new state after a transfer or join.
 	 * @param store The abstract store of the new state.
 	 * @param environment The abstract environment of the new state.
 	 */
-	public State(Store store, Environment environment, Scratchpad scratchpad, Trace trace, Control control, Map<AstNode, CFG> cfgs) {
+	public State(Store store, Environment environment, Scratchpad scratchpad,
+				 Trace trace, Control control, Address selfAddr,
+				 Map<AstNode, CFG> cfgs) {
 		this.store = store;
 		this.env = environment;
 		this.scratch = scratchpad;
 		this.trace = trace;
 		this.control = control;
+		this.selfAddr = selfAddr;
 		this.cfgs = cfgs;
 	}
 
 	@Override
 	public State clone() {
 		State clone =  new State(store.clone(), env.clone(), scratch.clone(), trace,
-						 control.clone(), cfgs);
+						 control.clone(), selfAddr, cfgs);
 		return clone;
 	}
 
-	public State transfer(CFGEdge edge, Address selfAddr) {
+	public State transfer(CFGEdge edge) {
 
 		/* Update the trace to the current condition. */
 		this.trace = this.trace.update(edge.getId());
@@ -70,7 +75,7 @@ public class State implements IState {
 		AstNode condition = (AstNode)edge.getCondition();
 
 		/* Interpret the statement. */
-		interpretCondition(condition, selfAddr, false);
+		interpretCondition(condition, false);
 
 		/* Interpret the control flow changes. */
 		this.control = this.control.update(edge, edge.getFrom());
@@ -82,9 +87,9 @@ public class State implements IState {
 	/**
 	 * Performs an abstract interpretation on the condition.
 	 */
-	private void interpretCondition(AstNode condition, Address selfAddr, boolean not) {
+	private void interpretCondition(AstNode condition, boolean not) {
 		if(condition instanceof ParenthesizedExpression) {
-			interpretCondition(((ParenthesizedExpression)condition).getExpression(), selfAddr, not);
+			interpretCondition(((ParenthesizedExpression)condition).getExpression(), not);
 		}
 		else if(condition instanceof Name) {
 			Set<Address> addrs = resolveOrCreate(condition);
@@ -95,7 +100,7 @@ public class State implements IState {
 		else if(condition instanceof UnaryExpression &&
 				((UnaryExpression) condition).getOperator() == Token.NOT) {
 			UnaryExpression ue = (UnaryExpression) condition;
-			interpretCondition(ue.getOperand(), selfAddr, !not);
+			interpretCondition(ue.getOperand(), !not);
 		}
 		else if(condition instanceof InfixExpression &&
 				((InfixExpression)condition).getOperator() == Token.GETPROP) {
@@ -122,10 +127,10 @@ public class State implements IState {
 				else interpretSHNE(ie);
 				break;
 			case Token.AND:
-				interpretAnd(ie, selfAddr, not);
+				interpretAnd(ie, not);
 				break;
 			case Token.OR:
-				interpretOr(ie, selfAddr, not);
+				interpretOr(ie, not);
 				break;
 			}
 		}
@@ -309,29 +314,29 @@ public class State implements IState {
 
 	}
 
-	private void interpretOr(InfixExpression ie, Address selfAddr, boolean not) {
+	private void interpretOr(InfixExpression ie, boolean not) {
 
 		/* Interpret both sides of the condition if they must both be
 		 * true. */
 		if(not) {
-			interpretCondition(ie.getLeft(), selfAddr, false);
-			interpretCondition(ie.getRight(), selfAddr, false);
+			interpretCondition(ie.getLeft(), false);
+			interpretCondition(ie.getRight(), false);
 		}
 
 	}
 
-	private void interpretAnd(InfixExpression ie, Address selfAddr, boolean not) {
+	private void interpretAnd(InfixExpression ie, boolean not) {
 
 		/* Interpret both sides of the condition if they must both be
 		 * true. */
 		if(!not) {
-			interpretCondition(ie.getLeft(), selfAddr, false);
-			interpretCondition(ie.getRight(), selfAddr, false);
+			interpretCondition(ie.getLeft(), false);
+			interpretCondition(ie.getRight(), false);
 		}
 
 	}
 
-	public State transfer(CFGNode node, Address selfAddr) {
+	public State transfer(CFGNode node) {
 
 		/* Update the trace to the current statement. */
 		this.trace = this.trace.update(node.getId());
@@ -340,7 +345,7 @@ public class State implements IState {
 		AstNode statement = (AstNode)node.getStatement();
 
 		/* Interpret the statement. */
-		interpretStatement(statement, selfAddr);
+		interpretStatement(statement);
 
 		return this;
 
@@ -349,14 +354,14 @@ public class State implements IState {
 	/**
 	 * Performs an abstract interpretation on the node.
 	 */
-	private void interpretStatement(AstNode node, Address selfAddr) {
+	private void interpretStatement(AstNode node) {
 
 		if(node instanceof EmptyStatement) { /* Skip. */ }
 		else if(node instanceof ExpressionStatement) {
-			interpretStatement(((ExpressionStatement)node).getExpression(), selfAddr);
+			interpretStatement(((ExpressionStatement)node).getExpression());
 		}
 		else if(node instanceof VariableDeclaration) {
-			interpretVariableDeclaration((VariableDeclaration)node, selfAddr);
+			interpretVariableDeclaration((VariableDeclaration)node);
 		}
 		else if(node instanceof FunctionCall) {
 			ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr, control, cfgs);
@@ -364,7 +369,7 @@ public class State implements IState {
 			this.store = endState.store;
 		}
 		else if(node instanceof Assignment) {
-			interpretAssignment(selfAddr, (Assignment)node);
+			interpretAssignment((Assignment)node);
 		}
 
 	}
@@ -374,10 +379,10 @@ public class State implements IState {
 	 * @param vd The variable declaration. Variables have already been
 	 * lifted into the environment.
 	 */
-	public void interpretVariableDeclaration(VariableDeclaration vd, Address selfAddr) {
+	public void interpretVariableDeclaration(VariableDeclaration vd) {
 		for(VariableInitializer vi : vd.getVariables()) {
 			if(vi.getInitializer() != null) {
-				concreteAssignInterpreter(selfAddr, vi.getTarget(), vi.getInitializer());
+				concreteAssignInterpreter(vi.getTarget(), vi.getInitializer());
 			}
 		}
 	}
@@ -386,14 +391,14 @@ public class State implements IState {
 	 * Updates the store based on abstract interpretation of assignments.
 	 * @param a The assignment.
 	 */
-	private void interpretAssignment(Address selfAddr, Assignment a) {
-		concreteAssignInterpreter(selfAddr, a.getLeft(), a.getRight());
+	public void interpretAssignment(Assignment a) {
+		concreteAssignInterpreter(a.getLeft(), a.getRight());
 	}
 
 	/**
 	 * Helper function since variable initializers and assignments do the same thing.
 	 */
-	private void concreteAssignInterpreter(Address selfAddr, AstNode lhs, AstNode rhs) {
+	private void concreteAssignInterpreter(AstNode lhs, AstNode rhs) {
 
 		/* Resolve the left hand side to a set of addresses. */
 //		Set<Address> addrs = Helpers.resolve(environment, store, lhs);
@@ -508,6 +513,7 @@ public class State implements IState {
 				this.scratch.join(state.scratch),
 				this.trace,
 				this.control.join(state.control),
+				this.selfAddr,
 				cfgs);
 
 		return joined;

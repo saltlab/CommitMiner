@@ -23,6 +23,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 public class ExpEval {
 
+	public State state;
 	public Environment env;
 	public Store store;
 	public Scratchpad scratch;
@@ -122,11 +123,27 @@ public class ExpEval {
 	 * @return the abstract interpretation of the name
 	 */
 	public BValue evalInfixExpression(InfixExpression ie) {
-		/* We assume this is an identifier and attempt to dereference it, since
-		 * no other operator is currently supported. */
+
+		/* This is an identifier.. so we attempt to dereference it. */
 		BValue val = Helpers.resolveValue(env, store, ie);
 		if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 		return val;
+
+//		/* If this is an assignment, we need to interpret it through state. */
+//		switch(ie.getType()) {
+//		case Token.DOT:
+//			/* This is an identifier.. so we attempt to dereference it. */
+//			BValue val = Helpers.resolveValue(env, store, ie);
+//			if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
+//			return val;
+//		case Token.ASSIGN:
+//			/* We need to interpret this assignment and propagate the value
+//			 * left. */
+//			return null; // TODO
+//		default:
+//			return null;
+//		}
+
 	}
 
 	/**
@@ -228,7 +245,7 @@ public class ExpEval {
 			/* If the function was not resolved, we assume the (local)
 			 * state is unchanged, but add BValue.TOP as the return value. */
 			scratch = scratch.strongUpdate(Scratch.RETVAL, BValue.top(Change.top(), Change.top()));
-			return new State(store, env, scratch, trace, control, cfgs);
+			return new State(store, env, scratch, trace, control, selfAddr, cfgs);
 		}
 		else {
 			/* Call the function and get a join of the new states. */

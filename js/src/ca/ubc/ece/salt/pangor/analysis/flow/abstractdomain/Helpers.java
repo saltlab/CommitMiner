@@ -72,10 +72,11 @@ public class Helpers {
 	 * Runs a script or function.
 	 * @param cfg
 	 * @param state
-	 * @param selfAddr The binding of 'this' for the call.
 	 * @return The state after the script has finished.
 	 */
-	public static State run(CFG cfg, State state, Address selfAddr) {
+	public static State run(CFG cfg, State state) {
+
+		/* Update the 'this' address. */
 
 		/* For terminating a long running analysis. */
 		long edgesVisited = 0;
@@ -104,7 +105,7 @@ public class Helpers {
 			pathState.edge.setBeforeState(state);
 
 			/* Transfer the abstract state over the edge. */
-			state = state.clone().transfer(pathState.edge, selfAddr);
+			state = state.clone().transfer(pathState.edge);
 			pathState.edge.setAfterState(state);
 
 			/* Join the abstract states from the 'to' node and the current
@@ -113,7 +114,7 @@ public class Helpers {
 			pathState.edge.getTo().setBeforeState(state);
 
 			/* Transfer the abstract state over the node. */
-			state = state.clone().transfer(pathState.edge.getTo(), selfAddr);
+			state = state.clone().transfer(pathState.edge.getTo());
 			pathState.edge.getTo().setAfterState(state);
 
 			/* Add all unvisited edges to the stack.

@@ -91,7 +91,6 @@ public class TestValueAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "6", "TST", "VAL", "space_Change:CHANGED"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 	}

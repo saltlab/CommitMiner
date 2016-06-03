@@ -31,7 +31,7 @@ public class StateFactory {
 				EnvironmentFactory.createInitialEnvironment(script, store, cfgs, trace);
 		Scratchpad scratchpad = new Scratchpad();
 		Control control = new Control();
-		return new State(lifted.getRight(), lifted.getLeft(), scratchpad, trace, control, cfgs);
+		return new State(lifted.getRight(), lifted.getLeft(), scratchpad, trace, control, StoreFactory.global_binding_Addr, cfgs);
 	}
 
 }

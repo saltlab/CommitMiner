@@ -61,6 +61,23 @@ public class TestEnvAnalysis {
 	}
 
 	@Test
+	public void testExpress() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/interproc/express_old.js";
+		String dst = "./test/input/interproc/express_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		this.runTest(sourceCodeFileChange, expected, true);
+	}
+
+	@Test
 	public void testExports() throws Exception {
 
 		/* The test files. */

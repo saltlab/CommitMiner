@@ -73,7 +73,7 @@ public class FunctionFactory {
 								 Store store, Scratchpad scratchpad,
 								 Trace trace, Control control) {
 					scratchpad.strongUpdate(Scratch.RETVAL, retVal);
-					return new State(store, new Environment(), scratchpad, trace, control, cfgs);
+					return new State(store, new Environment(), scratchpad, trace, control, selfAddr, cfgs);
 				}
 			};
 

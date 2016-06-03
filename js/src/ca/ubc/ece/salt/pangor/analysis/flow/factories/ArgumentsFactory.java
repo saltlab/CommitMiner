@@ -44,7 +44,7 @@ public class ArgumentsFactory {
 				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace, Control control) {
-					return new State(store, null, scratchpad, trace, control, cfgs);
+					return new State(store, null, scratchpad, trace, control, selfAddr, cfgs);
 				}
 			};
 
