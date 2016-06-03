@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.mozilla.javascript.Token;
+import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
@@ -32,16 +33,15 @@ public class ExpEval {
 	public Control control;
 	public Map<AstNode, CFG> cfgs;
 
-	public ExpEval(Environment env, Store store, Scratchpad scratch,
-				   Trace trace, Address selfAddr, Control control,
-				   Map<AstNode, CFG> cfgs) {
-		this.env = env;
-		this.store = store;
-		this.scratch = scratch;
-		this.trace = trace;
-		this.selfAddr = selfAddr;
-		this.control = control;
-		this.cfgs = cfgs;
+	public ExpEval(State state) {
+		this.state = state;
+		this.env = state.env;
+		this.store = state.store;
+		this.scratch = state.scratch;
+		this.trace = state.trace;
+		this.selfAddr = state.selfAddr;
+		this.control = state.control;
+		this.cfgs = state.cfgs;
 	}
 
 	/**
@@ -124,25 +124,20 @@ public class ExpEval {
 	 */
 	public BValue evalInfixExpression(InfixExpression ie) {
 
-		/* This is an identifier.. so we attempt to dereference it. */
-		BValue val = Helpers.resolveValue(env, store, ie);
-		if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
-		return val;
-
-//		/* If this is an assignment, we need to interpret it through state. */
-//		switch(ie.getType()) {
-//		case Token.DOT:
-//			/* This is an identifier.. so we attempt to dereference it. */
-//			BValue val = Helpers.resolveValue(env, store, ie);
-//			if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
-//			return val;
-//		case Token.ASSIGN:
-//			/* We need to interpret this assignment and propagate the value
-//			 * left. */
-//			return null; // TODO
-//		default:
-//			return null;
-//		}
+		/* If this is an assignment, we need to interpret it through state. */
+		switch(ie.getType()) {
+		case Token.ASSIGN:
+			/* We need to interpret this assignment and propagate the value
+			 * left. */
+			state.interpretAssignment((Assignment)ie);
+			return this.eval(ie.getLeft());
+		case Token.DOT:
+		default:
+			/* This is an identifier.. so we attempt to dereference it. */
+			BValue val = Helpers.resolveValue(env, store, ie);
+			if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
+			return val;
+		}
 
 	}
 

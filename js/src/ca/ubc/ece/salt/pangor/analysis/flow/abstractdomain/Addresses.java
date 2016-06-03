@@ -13,7 +13,7 @@ public class Addresses {
 	public LatticeElement le;
 	public Change change;
 
-	/** null if LE = TOP. **/
+	/** Empty if LE = TOP. **/
 	public Set<Address> addresses;
 
 	/**
@@ -56,7 +56,7 @@ public class Addresses {
 	 */
 	public Addresses strongUpdate(Set<Address> addresses, Change change) {
 		if(addresses.size() > MAX_SIZE)
-			return new Addresses(LatticeElement.TOP, null, change);
+			return new Addresses(LatticeElement.TOP, change);
 		return new Addresses(addresses, change);
 	}
 
@@ -74,12 +74,12 @@ public class Addresses {
 		if(this.le == LatticeElement.BOTTOM)
 			return new Addresses(a.le, new HashSet<Address>(a.addresses), jc);
 		if(this.le == LatticeElement.TOP || a.le == LatticeElement.TOP)
-			return new Addresses(LatticeElement.TOP, null, jc);
+			return new Addresses(LatticeElement.TOP, jc);
 
 		/* We set a limit on the number of addresses so that there is a finite
 		 * address space. This is in lieu of abstracting the abstract machine. */
 		if(this.addresses.size() + a.addresses.size() > 3)
-			return new Addresses(LatticeElement.TOP, null, jc);
+			return new Addresses(LatticeElement.TOP, jc);
 
 		/* Join the two address sets. */
 		HashSet<Address> newAddressSet = new HashSet<Address>(this.addresses);

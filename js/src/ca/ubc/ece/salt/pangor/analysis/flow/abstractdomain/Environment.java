@@ -64,21 +64,29 @@ public class Environment {
 	public Environment join(Environment environment) {
 		Environment joined = new Environment(this.environment);
 
-		/* Because we are only using one address per variable, environments
-		 * should be the same when joined.
+		/* Because we dynamically allocate unexpected local variables to the
+		 * environment, sometimes we will need to merge different environments.
 		 *
-		 * If we want to dynamically store unexpected variables (ie. those
-		 * in the global scope from the included JS files), we can merge
-		 * variables by merging the BValue they point to. */
+		 * We do this by merging BValues and keeping only one address. */
 
 		for(Map.Entry<Identifier, Address> entry : environment.environment.entrySet()) {
-			if(!this.environment.containsKey(entry.getKey())
-					|| this.environment.get(entry.getKey()) != entry.getValue()) {
-				System.out.println(entry.getKey().name + ":" + entry.getKey().change + ":" + entry.getValue().addr);
-				if(!this.environment.containsKey(entry.getKey())) System.out.println("Does not contain key.");
-				else System.out.println(this.environment.get(entry.getKey()).addr);
-				throw new Error("environments should be the same");
+
+			/* The variable is missing from left. */
+			if(!this.environment.containsKey(entry.getKey())) {
+				this.environment.put(entry.getKey(), entry.getValue());
 			}
+
+			/* The value of left != the value from right. For now we'll just
+			 * keep left and emit a warning. */
+			if(this.environment.get(entry.getKey()) != entry.getValue()) {
+
+				System.out.println("Warning: Merging unequal environments.");
+				System.out.println("\tVariable name = " + entry.getKey().name);
+				System.out.println("\tChange type = " + entry.getKey().change);
+				System.out.println("\tAddress = " + entry.getValue());
+
+			}
+
 		}
 		return joined;
 	}

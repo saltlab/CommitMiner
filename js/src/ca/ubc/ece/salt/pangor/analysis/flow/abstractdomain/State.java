@@ -364,7 +364,7 @@ public class State implements IState {
 			interpretVariableDeclaration((VariableDeclaration)node);
 		}
 		else if(node instanceof FunctionCall) {
-			ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr, control, cfgs);
+			ExpEval expEval = new ExpEval(this);
 			State endState = expEval.evalFunctionCall((FunctionCall) node);
 			this.store = endState.store;
 		}
@@ -405,7 +405,7 @@ public class State implements IState {
 		Set<Address> addrs = resolveOrCreate(lhs);
 
 		/* Resolve the right hand side to a value. */
-		ExpEval expEval = new ExpEval(env, store, scratch, trace, selfAddr, control, cfgs);
+		ExpEval expEval = new ExpEval(this);
 		BValue val = expEval.eval(rhs);
 		store = expEval.store;
 
