@@ -401,13 +401,11 @@ public class State implements IState {
 	private void concreteAssignInterpreter(AstNode lhs, AstNode rhs) {
 
 		/* Resolve the left hand side to a set of addresses. */
-//		Set<Address> addrs = Helpers.resolve(environment, store, lhs);
 		Set<Address> addrs = resolveOrCreate(lhs);
 
 		/* Resolve the right hand side to a value. */
 		ExpEval expEval = new ExpEval(this);
 		BValue val = expEval.eval(rhs);
-		store = expEval.store;
 
 		/* Update the values in the store. */
 		// TODO: Is this correct? We should probably only do a strong update if

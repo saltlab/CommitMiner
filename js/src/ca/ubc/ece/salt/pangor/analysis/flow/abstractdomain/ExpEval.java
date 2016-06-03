@@ -19,29 +19,13 @@ import org.mozilla.javascript.ast.StringLiteral;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
-import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
-import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 public class ExpEval {
 
 	public State state;
-	public Environment env;
-	public Store store;
-	public Scratchpad scratch;
-	public Trace trace;
-	public Address selfAddr;
-	public Control control;
-	public Map<AstNode, CFG> cfgs;
 
 	public ExpEval(State state) {
 		this.state = state;
-		this.env = state.env;
-		this.store = state.store;
-		this.scratch = state.scratch;
-		this.trace = state.trace;
-		this.selfAddr = state.selfAddr;
-		this.control = state.control;
-		this.cfgs = state.cfgs;
 	}
 
 	/**
@@ -84,9 +68,9 @@ public class ExpEval {
 	 * @return A BValue that points to the new function object.
 	 */
 	public BValue evalFunctionNode(FunctionNode f){
-		Closure closure = new FunctionClosure(cfgs.get(f), env, cfgs);
-		Address addr = trace.makeAddr(f.getID(), "");
-		store = Helpers.createFunctionObj(closure, store, trace, addr, f.getID());
+		Closure closure = new FunctionClosure(state.cfgs.get(f), state.env, state.cfgs);
+		Address addr = state.trace.makeAddr(f.getID(), "");
+		state.store = Helpers.createFunctionObj(closure, state.store, state.trace, addr, f.getID());
 		return Address.inject(addr, Change.convU(f), Change.convU(f)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 	}
 
@@ -106,14 +90,14 @@ public class ExpEval {
 			else if(prop instanceof StringLiteral) propName = ((StringLiteral)prop).getValue();
 			else if(prop instanceof NumberLiteral) propName = ((NumberLiteral)prop).getValue();
 			BValue propVal = this.eval(property.getRight());
-			Address propAddr = trace.makeAddr(property.getID(), "");
-			store = store.alloc(propAddr, propVal);
+			Address propAddr = state.trace.makeAddr(property.getID(), "");
+			state.store = state.store.alloc(propAddr, propVal);
 			if(propName != null) ext.put(new Identifier(propName, Change.u()), propAddr);
 		}
 
 		Obj obj = new Obj(ext, in);
-		Address objAddr = trace.makeAddr(ol.getID(), "");
-		store = store.alloc(objAddr, obj);
+		Address objAddr = state.trace.makeAddr(ol.getID(), "");
+		state.store = state.store.alloc(objAddr, obj);
 
 		return Address.inject(objAddr, Change.convU(ol), Change.convU(ol)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 	}
@@ -134,7 +118,7 @@ public class ExpEval {
 		case Token.DOT:
 		default:
 			/* This is an identifier.. so we attempt to dereference it. */
-			BValue val = Helpers.resolveValue(env, store, ie);
+			BValue val = Helpers.resolveValue(state.env, state.store, ie);
 			if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 			return val;
 		}
@@ -146,7 +130,7 @@ public class ExpEval {
 	 * @return the abstract interpretation of the name
 	 */
 	public BValue evalName(Name name) {
-		BValue val = Helpers.resolveValue(env, store, name);
+		BValue val = Helpers.resolveValue(state.env, state.store, name);
 		if(val == null) return BValue.top(Change.convU(name), Change.convU(name)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 		return val;
 	}
@@ -188,7 +172,7 @@ public class ExpEval {
 		Change change = Change.conv(kwl);
 		switch(kwl.getType()) {
 		case Token.THIS:
-			return store.apply(selfAddr);
+			return state.store.apply(state.selfAddr);
 		case Token.NULL:
 			return Null.inject(Null.top(change), change);
 		case Token.TRUE:
@@ -213,8 +197,8 @@ public class ExpEval {
 		int i = 0;
 		for(AstNode arg : fc.getArguments()) {
 			BValue argVal = eval(arg);
-			store = Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
-							ext, store, trace);
+			state.store = Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
+							ext, state.store, state.trace);
 			i++;
 		}
 
@@ -222,30 +206,30 @@ public class ExpEval {
 				Address.inject(StoreFactory.Arguments_Addr, Change.u(), Change.u()), JSClass.CFunction);
 		Obj argObj = new Obj(ext, internal);
 
-		/* Add the argument object to the store. */
-		Address argAddr = trace.makeAddr(fc.getID(), "");
-		store = store.alloc(argAddr, argObj);
+		/* Add the argument object to the state.store. */
+		Address argAddr = state.trace.makeAddr(fc.getID(), "");
+		state.store = state.store.alloc(argAddr, argObj);
 
 		/* Attempt to resolve the function and it's parent object. */
-		BValue funVal = Helpers.resolveValue(env, store, fc.getTarget());
-		BValue objVal = Helpers.resolveSelf(env, store, fc.getTarget());
+		BValue funVal = Helpers.resolveValue(state.env, state.store, fc.getTarget());
+		BValue objVal = Helpers.resolveSelf(state.env, state.store, fc.getTarget());
 
 		/* If the function is not a member variable, it is local and we
 		 * use the object of the currently executing function as self. */
-		Address objAddr = trace.toAddr("this");
-		if(objVal == null) objAddr = selfAddr;
-		else store = store.alloc(objAddr, objVal);
+		Address objAddr = state.trace.toAddr("this");
+		if(objVal == null) objAddr = state.selfAddr;
+		else state.store = state.store.alloc(objAddr, objVal);
 
 		if(funVal == null) {
 			/* If the function was not resolved, we assume the (local)
 			 * state is unchanged, but add BValue.TOP as the return value. */
-			scratch = scratch.strongUpdate(Scratch.RETVAL, BValue.top(Change.top(), Change.top()));
-			return new State(store, env, scratch, trace, control, selfAddr, cfgs);
+			state.scratch = state.scratch.strongUpdate(Scratch.RETVAL, BValue.top(Change.top(), Change.top()));
+			return new State(state.store, state.env, state.scratch, state.trace, state.control, state.selfAddr, state.cfgs);
 		}
 		else {
 			/* Call the function and get a join of the new states. */
-			return Helpers.applyClosure(funVal, objAddr, argAddr, store,
-												  scratch, trace, control);
+			return Helpers.applyClosure(funVal, objAddr, argAddr, state.store,
+												  state.scratch, state.trace, state.control);
 		}
 
 	}

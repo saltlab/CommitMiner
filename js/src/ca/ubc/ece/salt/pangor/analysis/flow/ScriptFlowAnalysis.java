@@ -84,7 +84,8 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 	private void analyzePublic(State state, Map<Identifier, Address> props, Address selfAddr, Map<AstNode, CFG> cfgMap) {
 
 		for(Identifier var : props.keySet()) {
-			BValue val = state.store.apply(props.get(var));
+			Address addr = props.get(var);
+			BValue val = state.store.apply(addr);
 
 			for(Address objAddr : val.addressAD.addresses) {
 				Obj obj = state.store.getObj(objAddr);
