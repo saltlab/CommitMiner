@@ -10,7 +10,6 @@ import java.util.Stack;
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
-import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
@@ -76,7 +75,9 @@ public class Helpers {
 	 */
 	public static State run(CFG cfg, State state) {
 
-		/* Update the 'this' address. */
+		/* Merge state with prior state if needed. */
+		State initState = (State)cfg.getEntryNode().getBeforeState();
+		if(initState != null) state = state.join(initState);
 
 		/* For terminating a long running analysis. */
 		long edgesVisited = 0;
@@ -224,101 +225,64 @@ public class Helpers {
 
 	}
 
-	/**
-	 * Resolves a variable to its addresses in the store.
-	 * @return The addresses as a BValue.
-	 */
-	public static BValue resolveValue(Environment env, Store store, AstNode node) {
-		BValue value = null;
-		Set<Address> addrs = resolve(env, store, node);
-		if(addrs == null) return null;
-		for(Address addr : addrs) {
-			if(value == null) value = store.apply(addr);
-			else value = value.join(store.apply(addr));
-		}
-		return value;
-	}
-
-	/**
-	 * Resolves a variable to its Address in the store. Follows fields and
-	 * function calls as best it can.
-	 * @return The value of the variable, function or field, or null if it
-	 * 		   cannot be resolved.
-	 */
-	public static Set<Address> resolve(Environment env, Store store, AstNode node) {
-
-		Set<Address> result = new HashSet<Address>();
-
-		if(node instanceof Name) {
-
-			/* Base case, we have a simple name. */
-			Address addr = env.apply(new Identifier(node.toSource()));
-			if(addr == null) return null;
-			result.add(addr);
-			return result;
-
-		}
-		else if(node instanceof InfixExpression) {
-
-			/* We have a qualified name. Recursively find all the addresses
-			 * that lhs can resolve to. */
-			InfixExpression ie = (InfixExpression) node;
-			Set<Address> lhs = resolve(env, store, ie.getLeft());
-
-			/* We may not have been able to resolve the name. */
-			if(lhs == null) return null;
-
-			/* Lookup the current property at each of these addresses. Ignore
-			 * type errors and auto-boxing for now. */
-			for(Address valAddr : lhs) {
-
-				/* Get the value at the address. */
-				BValue val = store.apply(valAddr);
-
-				for(Address objAddr : val.addressAD.addresses) {
-
-					/* Get the Obj from the store. */
-					Obj obj = store.getObj(objAddr);
-
-					/* Look up the property. We do not handle the case when the
-					 * rhs is an expression. */
-					Address propAddr = obj.externalProperties.get(ie.getRight().toSource());
-					result.add(propAddr);
-
-				}
-
-			}
-
-			return result;
-
-		}
-		else {
-			/* Ignore everything else (e.g., method calls) for now. */
-			return null;
-		}
-
-	}
-
-	/**
-	 * Resolves a function's parent object.
-	 * @return The parent object (this) and the function object.
-	 */
-	public static BValue resolveSelf(Environment env, Store store, AstNode node) {
-		if(node instanceof Name) {
-			/* This is a variable name, not a field. */
-			return null;
-		}
-		else if(node instanceof InfixExpression) {
-			/* We have a qualified name. Recursively find the addresses. */
-			InfixExpression ie = (InfixExpression) node;
-			Set<Address> addrs = resolve(env, store, ie.getLeft());
-			if(addrs == null) return null;
-			return Addresses.inject(new Addresses(addrs, Change.convU(node)), Change.convU(node));
-		}
-		else {
-			/* Ignore everything else (e.g., method calls) for now. */
-			return null;
-		}
-	}
+//	/**
+//	 * Resolves a variable to its Address in the store. Follows fields and
+//	 * function calls as best it can.
+//	 * @return The value of the variable, function or field, or null if it
+//	 * 		   cannot be resolved.
+//	 */
+//	public static Set<Address> resolve(Environment env, Store store, AstNode node) {
+//
+//		Set<Address> result = new HashSet<Address>();
+//
+//		if(node instanceof Name) {
+//
+//			/* Base case, we have a simple name. */
+//			Address addr = env.apply(new Identifier(node.toSource()));
+//			if(addr == null) return null;
+//			result.add(addr);
+//			return result;
+//
+//		}
+//		else if(node instanceof InfixExpression) {
+//
+//			/* We have a qualified name. Recursively find all the addresses
+//			 * that lhs can resolve to. */
+//			InfixExpression ie = (InfixExpression) node;
+//			Set<Address> lhs = resolve(env, store, ie.getLeft());
+//
+//			/* We may not have been able to resolve the name. */
+//			if(lhs == null) return null;
+//
+//			/* Lookup the current property at each of these addresses. Ignore
+//			 * type errors and auto-boxing for now. */
+//			for(Address valAddr : lhs) {
+//
+//				/* Get the value at the address. */
+//				BValue val = store.apply(valAddr);
+//
+//				for(Address objAddr : val.addressAD.addresses) {
+//
+//					/* Get the Obj from the store. */
+//					Obj obj = store.getObj(objAddr);
+//
+//					/* Look up the property. We do not handle the case when the
+//					 * rhs is an expression. */
+//					Address propAddr = obj.externalProperties.get(ie.getRight().toSource());
+//					result.add(propAddr);
+//
+//				}
+//
+//			}
+//
+//			return result;
+//
+//		}
+//		else {
+//			/* Ignore everything else (e.g., method calls) for now. */
+//			return null;
+//		}
+//
+//	}
 
 }

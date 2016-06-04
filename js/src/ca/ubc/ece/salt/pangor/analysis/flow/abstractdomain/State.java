@@ -417,7 +417,12 @@ public class State implements IState {
 
 	}
 
-	private Set<Address> resolveOrCreate(AstNode node) {
+	/**
+	 * Resolve an identifier to an address in the store.
+	 * @param node The identifier to resolve.
+	 * @return The set of addresses this identifier can resolve to.
+	 */
+	public Set<Address> resolveOrCreate(AstNode node) {
 		Set<Address> result = new HashSet<Address>();
 
 		/* Base Case: A simple name in the environment. */
@@ -476,7 +481,7 @@ public class State implements IState {
 					Obj obj = store.getObj(objAddr);
 
 					/* Look up the property. */
-					Address propAddr = obj.externalProperties.get(ie.getRight().toSource());
+					Address propAddr = obj.externalProperties.get(new Identifier(ie.getRight().toSource()));
 
 					if(propAddr != null) result.add(propAddr);
 					else {

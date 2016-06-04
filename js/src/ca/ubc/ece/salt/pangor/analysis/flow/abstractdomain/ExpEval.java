@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.mozilla.javascript.Token;
@@ -118,7 +119,7 @@ public class ExpEval {
 		case Token.DOT:
 		default:
 			/* This is an identifier.. so we attempt to dereference it. */
-			BValue val = Helpers.resolveValue(state.env, state.store, ie);
+			BValue val = resolveValue(ie);
 			if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 			return val;
 		}
@@ -130,7 +131,7 @@ public class ExpEval {
 	 * @return the abstract interpretation of the name
 	 */
 	public BValue evalName(Name name) {
-		BValue val = Helpers.resolveValue(state.env, state.store, name);
+		BValue val = resolveValue(name);
 		if(val == null) return BValue.top(Change.convU(name), Change.convU(name)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 		return val;
 	}
@@ -211,8 +212,8 @@ public class ExpEval {
 		state.store = state.store.alloc(argAddr, argObj);
 
 		/* Attempt to resolve the function and it's parent object. */
-		BValue funVal = Helpers.resolveValue(state.env, state.store, fc.getTarget());
-		BValue objVal = Helpers.resolveSelf(state.env, state.store, fc.getTarget());
+		BValue funVal = resolveValue(fc.getTarget());
+		BValue objVal = resolveSelf(fc.getTarget());
 
 		/* If the function is not a member variable, it is local and we
 		 * use the object of the currently executing function as self. */
@@ -220,18 +221,56 @@ public class ExpEval {
 		if(objVal == null) objAddr = state.selfAddr;
 		else state.store = state.store.alloc(objAddr, objVal);
 
-		if(funVal == null) {
-			/* If the function was not resolved, we assume the (local)
-			 * state is unchanged, but add BValue.TOP as the return value. */
-			state.scratch = state.scratch.strongUpdate(Scratch.RETVAL, BValue.top(Change.top(), Change.top()));
-			return new State(state.store, state.env, state.scratch, state.trace, state.control, state.selfAddr, state.cfgs);
-		}
-		else {
+		if(funVal != null) {
 			/* Call the function and get a join of the new states. */
-			return Helpers.applyClosure(funVal, objAddr, argAddr, state.store,
+			State newState = Helpers.applyClosure(funVal, objAddr, argAddr, state.store,
 												  state.scratch, state.trace, state.control);
+			if(newState != null) return newState;
 		}
 
+		/* Because our analysis is not complete, the identifier may not point
+		 * to any function object. In this case, we assume the (local) state
+		 * is unchanged, but add BValue.TOP as the return value. */
+		state.scratch = state.scratch.strongUpdate(Scratch.RETVAL, BValue.top(Change.top(), Change.top()));
+		return new State(state.store, state.env, state.scratch, state.trace, state.control, state.selfAddr, state.cfgs);
+
+	}
+
+	/**
+	 * Resolves a variable to its addresses in the store.
+	 * @return The addresses as a BValue.
+	 */
+	public BValue resolveValue(AstNode node) {
+		BValue value = null;
+		Set<Address> addrs = state.resolveOrCreate(node);
+		if(addrs == null) return null;
+		for(Address addr : addrs) {
+			if(value == null) value = state.store.apply(addr);
+			else value = value.join(state.store.apply(addr));
+		}
+		return value;
+	}
+
+	/**
+	 * Resolves a function's parent object.
+	 * @return The parent object (this) and the function object.
+	 */
+	public BValue resolveSelf(AstNode node) {
+		if(node instanceof Name) {
+			/* This is a variable name, not a field. */
+			return null;
+		}
+		else if(node instanceof InfixExpression) {
+			/* We have a qualified name. Recursively find the addresses. */
+			InfixExpression ie = (InfixExpression) node;
+			Set<Address> addrs = state.resolveOrCreate(ie.getLeft());
+			if(addrs == null) return null;
+			return Addresses.inject(new Addresses(addrs, Change.convU(node)), Change.convU(node));
+		}
+		else {
+			/* Ignore everything else (e.g., method calls) for now. */
+			return null;
+		}
 	}
 
 }
