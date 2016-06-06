@@ -483,14 +483,29 @@ public class State implements IState {
 					/* Look up the property. */
 					Address propAddr = obj.externalProperties.get(new Identifier(ie.getRight().toSource()));
 
-					if(propAddr != null) result.add(propAddr);
+					if(propAddr != null) {
+						result.add(propAddr);
+						// Sanity check that the property address is in the store.
+						BValue propVal = store.apply(propAddr);
+						if(propVal == null) throw new Error("Property value does not exist in store.");
+					}
 					else {
 						/* This property was not found, which means it is either
 						 * undefined or was initialized somewhere outside the
 						 * analysis. Create it and give it the value BValue.TOP. */
 						propAddr = trace.makeAddr(node.getID(), ie.getRight().toSource());
 						store = store.alloc(propAddr, Addresses.dummy(Change.u(), Change.u()));
-						obj.externalProperties.put(new Identifier(ie.getRight().toSource(), Change.u()), propAddr);
+
+						/* We need to create a new object with the updated
+						 * property. If we don't, then any property we add will
+						 * be visible to prior statements which don't have
+						 * access to the property's BValue in the store. */
+
+						Map<Identifier, Address> ext = new HashMap<Identifier, Address>(obj.externalProperties);
+						ext.put(new Identifier(ie.getRight().toSource(), Change.u()), propAddr);
+						obj = new Obj(ext, obj.internalProperties);
+						store = store.strongUpdate(objAddr, obj);
+
 						result.add(propAddr);
 					}
 				}

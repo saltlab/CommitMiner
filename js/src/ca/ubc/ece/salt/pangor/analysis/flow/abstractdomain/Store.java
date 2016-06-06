@@ -127,6 +127,16 @@ public class Store {
 	}
 
 	/**
+	 * Replaces an object using a strong update.
+	 * @return The Store after the strong update.
+	 */
+	public Store strongUpdate(Address addr, Obj obj) {
+		Map<Address, Obj> objectStore = new HashMap<Address, Obj>(this.objectStore);
+		objectStore.put(addr, obj);
+		return new Store(this.bValueStore, objectStore);
+	}
+
+	/**
 	 * @param address The address of the base value to retrieve.
 	 * @return The BValue at the address or null if the BValue does not exist.
 	 */

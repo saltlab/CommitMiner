@@ -59,7 +59,7 @@ public class ExpEval {
 		}
 
 		/* We could not evaluate the expression. Return top. */
-		return BValue.top(Change.convU(node), Change.convU(node)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
+		return BValue.top(Change.convU(node), Change.convU(node));
 
 	}
 
@@ -72,7 +72,7 @@ public class ExpEval {
 		Closure closure = new FunctionClosure(state.cfgs.get(f), state.env, state.cfgs);
 		Address addr = state.trace.makeAddr(f.getID(), "");
 		state.store = Helpers.createFunctionObj(closure, state.store, state.trace, addr, f.getID());
-		return Address.inject(addr, Change.convU(f), Change.convU(f)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
+		return Address.inject(addr, Change.convU(f), Change.convU(f));
 	}
 
 	/**
