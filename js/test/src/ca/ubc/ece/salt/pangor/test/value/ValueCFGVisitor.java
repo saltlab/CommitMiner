@@ -50,10 +50,6 @@ public class ValueCFGVisitor implements ICFGVisitor {
 	 * identifier protection.
 	 */
 	private void visit(AstNode node, State state) {
-		// TODO: There are currently situations in which a function is not
-		//		 analyzed... for example a function that is passed as an
-		//		 argument to an un-resolvable function. We need to handle
-		//		 these.
 		if(state != null) getObjectFacts(node, state.env.environment, state, null);
 	}
 
