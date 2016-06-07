@@ -336,7 +336,8 @@ public class ExpEval {
 		int i = 0;
 		for(AstNode param : f.getParams()) {
 
-			BValue argVal = BValue.top(Change.convU(param), Change.u());
+			Change pc = Change.convU(param);
+			BValue argVal = BValue.top(pc, Change.u());
 			state.store = Helpers.addProp(f.getID(), String.valueOf(i), argVal,
 										  ext, state.store, state.trace);
 

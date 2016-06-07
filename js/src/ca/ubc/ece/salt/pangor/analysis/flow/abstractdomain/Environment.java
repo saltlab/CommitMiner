@@ -52,6 +52,7 @@ public class Environment {
 	 */
 	public Environment strongUpdate(Identifier variable, Address address) {
 		Map<Identifier, Address> map = new HashMap<Identifier, Address>(this.environment);
+		map.remove(variable); // We must remove the old variable to update the change LE.
 		map.put(variable, address);
 		return new Environment(map);
 	}
