@@ -76,18 +76,6 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 
 	}
 
-//	/**
-//	 * TODO:
-//	 * Analyze callback functions.
-//	 * - When should they be analyzed? -> Probably when we discover them as args.
-//	 * - How do we keep track of their scope? -> Execute with env. of finished function.
-//	 * - Can we distinguish between async and sync callbacks? -> Maybe... but for now assume sync.
-//	 * - Should we analyze them when we discover them in an analysis? -> Probably
-//	 */
-//	private void analyzeCallbacks() {
-//
-//	}
-
 	/**
 	 * Analyze publicly accessible functions that have not already been
 	 * analyzed. This is currently not done recursively, because we would have
