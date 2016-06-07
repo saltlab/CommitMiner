@@ -222,9 +222,17 @@ public class ExpEval {
 		else state.store = state.store.alloc(objAddr, objVal);
 
 		if(funVal != null) {
+			/* If this is a new function call, we interpret the control of
+			 * the callee as changed. */
+			Control control = state.control;
+			if(Change.convU(fc).le == Change.LatticeElement.CHANGED) {
+				control = control.clone();
+				control.conditions.add(fc); // All statements in the callee will be labeled control changed
+			}
+
 			/* Call the function and get a join of the new states. */
 			State newState = Helpers.applyClosure(funVal, objAddr, argAddr, state.store,
-												  state.scratch, state.trace, state.control);
+												  state.scratch, state.trace, control);
 			if(newState != null) return newState;
 		}
 

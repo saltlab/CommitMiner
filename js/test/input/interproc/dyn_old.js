@@ -1,47 +1,43 @@
 /**
- * Initialize all folders depending on cst.PM2_ROOT_PATH
+ * Copyright 2013 the PM2 project authors. All rights reserved.
+ * Use of this source code is governed by a license that
+ * can be found in the LICENSE file.
  */
-CLI.pm2Init = function() {
-  if (!fs.existsSync(cst.PM2_ROOT_PATH)) {
-    fs.mkdirSync(cst.PM2_ROOT_PATH);
-    fs.mkdirSync(cst.DEFAULT_LOG_PATH);
-    fs.mkdirSync(cst.DEFAULT_PID_PATH);
-  }
 
-  if (!fs.existsSync(cst.PM2_CONF_FILE)) {
-    fs
-      .createReadStream(path.join(__dirname, cst.SAMPLE_CONF_FILE))
-      .pipe(fs.createWriteStream(cst.PM2_CONF_FILE));
-  }
+var CLI                  = module.exports = {};
 
-  if (cst.PM2_HOME && !fs.existsSync(cst.PM2_HOME)) {
-    try {
-      fs.mkdirSync(cst.PM2_HOME);
-      fs.mkdirSync(cst.DEFAULT_LOG_PATH);
-      fs.mkdirSync(cst.DEFAULT_PID_PATH);
-    } catch(e) {
-      debug(e.stack || e);
-    }
-  }
+/**
+ * Get version of the daemonized PM2
+ * @method getVersion
+ * @callback cb
+ */
+CLI.getVersion = function(cb) {
+  Satan.executeRemote('getVersion', {}, function(err) {
+    return cb ? cb.apply(null, arguments) : Common.exitCli(cst.SUCCESS_EXIT);
+  });
+};
 
-  if (!fs.existsSync(cst.PM2_MODULE_CONF_FILE)) {
-    try {
-      fs.writeFileSync(cst.PM2_MODULE_CONF_FILE, "{}");
-    } catch (e) {
-      console.error(e.stack || e);
-    }
-  }
+/**
+ * Description
+ * @method killDaemon
+ * @param {} cb
+ * @return
+ */
+CLI.killDaemon = CLI.kill = function(cb) {
+  Common.printOut(cst.PREFIX_MSG + 'Stopping PM2...');
 
-  if (!fs.existsSync(p.join(cst.PM2_HOME, 'touch'))) {
-    var dt = fs.readFileSync(path.join(__dirname, cst.KEYMETRICS_BANNER));
-    console.log(dt.toString());
-    try {
-      fs.writeFileSync(p.join(cst.PM2_HOME, 'touch'), Date.now());
-    } catch(e) {
-      debug(e.stack || e);
-    }
-  }
+  Satan.executeRemote('notifyKillPM2', {}, function() {});
+  CLI.killAllModules(function() {
+    CLI._operate('deleteProcessId', 'all', function(err, list) {
+      Common.printOut(cst.PREFIX_MSG + 'All processes have been stopped and deleted');
 
-  if (process.stdout._handle && process.stdout._handle.setBlocking)
-    process.stdout._handle.setBlocking(true);
+      InteractorDaemonizer.killDaemon(function(err, data) {
+        Satan.killDaemon(function(err, res) {
+          if (err) Common.printError(err);
+          Common.printOut(cst.PREFIX_MSG + 'PM2 stopped');
+          return cb ? cb(err, res) : Common.exitCli(cst.SUCCESS_EXIT);
+        });
+      });
+    });
+  });
 };
