@@ -16,6 +16,7 @@ import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Control;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.FunctionClosure;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Helpers;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
@@ -75,6 +76,18 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 
 	}
 
+//	/**
+//	 * TODO:
+//	 * Analyze callback functions.
+//	 * - When should they be analyzed? -> Probably when we discover them as args.
+//	 * - How do we keep track of their scope? -> Execute with env. of finished function.
+//	 * - Can we distinguish between async and sync callbacks? -> Maybe... but for now assume sync.
+//	 * - Should we analyze them when we discover them in an analysis? -> Probably
+//	 */
+//	private void analyzeCallbacks() {
+//
+//	}
+
 	/**
 	 * Analyze publicly accessible functions that have not already been
 	 * analyzed. This is currently not done recursively, because we would have
@@ -102,9 +115,16 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 						/* Create the argument object. */
 						Address argAddr = createTopArgObject(state, (FunctionNode)fc.cfg.getEntryNode().getStatement());
 
+						/* Create the control domain. */
+						Control control = state.control;
+						AstNode node = (AstNode)fc.cfg.getEntryNode().getStatement();
+						if(Change.conv(node).le == Change.LatticeElement.CHANGED) {
+							control = state.control.clone();
+							control.conditions.add(node); // Mark all as control flow modified
+						}
+
 						/* Analyze the function. */
-						@SuppressWarnings("unused")
-						State newState = ifp.closure.run(selfAddr, argAddr, state.store, state.scratch, state.trace, state.control);
+						ifp.closure.run(selfAddr, argAddr, state.store, state.scratch, state.trace, control);
 
 						/* Check the function object. */
 						// TODO: We ignore this for now. We would have to assume the function is being run as a constructor.

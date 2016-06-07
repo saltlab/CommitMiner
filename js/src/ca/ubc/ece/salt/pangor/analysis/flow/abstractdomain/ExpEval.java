@@ -1,6 +1,8 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -187,17 +189,45 @@ public class ExpEval {
 	}
 
 	/**
+	 * @return The list of functions pointed to by the value.
+	 */
+	private List<Address> extractFunctions(BValue val) {
+
+		List<Address> functionAddrs = new LinkedList<Address>();
+
+		for(Address objAddr : val.addressAD.addresses) {
+			Obj obj = state.store.getObj(objAddr);
+			if(obj.internalProperties.klass == JSClass.CFunction) {
+				InternalFunctionProperties ifp = (InternalFunctionProperties) obj.internalProperties;
+				if(ifp.closure instanceof FunctionClosure) {
+					functionAddrs.add(objAddr);
+				}
+			}
+		}
+
+		return functionAddrs;
+
+	}
+
+	/**
 	 * Evaluate a function call expression to a BValue.
 	 * @param fc The function call.
 	 * @return The return value of the function call.
 	 */
 	public State evalFunctionCall(FunctionCall fc) {
 
+		/* The state after the function call. */
+		State newState = null;
+
+		/* Keep track of callback functions. */
+		List<Address> callbacks = new LinkedList<Address>();
+
 		/* Create the argument object. */
 		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 		int i = 0;
 		for(AstNode arg : fc.getArguments()) {
 			BValue argVal = eval(arg);
+			callbacks.addAll(extractFunctions(argVal));
 			state.store = Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
 							ext, state.store, state.trace);
 			i++;
@@ -221,6 +251,7 @@ public class ExpEval {
 		if(objVal == null) objAddr = state.selfAddr;
 		else state.store = state.store.alloc(objAddr, objVal);
 
+
 		if(funVal != null) {
 			/* If this is a new function call, we interpret the control of
 			 * the callee as changed. */
@@ -231,16 +262,47 @@ public class ExpEval {
 			}
 
 			/* Call the function and get a join of the new states. */
-			State newState = Helpers.applyClosure(funVal, objAddr, argAddr, state.store,
+			newState = Helpers.applyClosure(funVal, objAddr, argAddr, state.store,
 												  state.scratch, state.trace, control);
-			if(newState != null) return newState;
 		}
 
-		/* Because our analysis is not complete, the identifier may not point
-		 * to any function object. In this case, we assume the (local) state
-		 * is unchanged, but add BValue.TOP as the return value. */
-		state.scratch = state.scratch.strongUpdate(Scratch.RETVAL, BValue.top(Change.top(), Change.top()));
-		return new State(state.store, state.env, state.scratch, state.trace, state.control, state.selfAddr, state.cfgs);
+		if(newState == null) {
+			/* Because our analysis is not complete, the identifier may not point
+			 * to any function object. In this case, we assume the (local) state
+			 * is unchanged, but add BValue.TOP as the return value. */
+			state.scratch = state.scratch.strongUpdate(Scratch.RETVAL, BValue.top(Change.top(), Change.top()));
+			newState = new State(state.store, state.env, state.scratch, state.trace, state.control, state.selfAddr, state.cfgs);
+		}
+
+		/* Analyze any callbacks that were not analyzed within the callee. */
+		for(Address addr : callbacks) {
+			Obj funct = newState.store.getObj(addr);
+
+			InternalFunctionProperties ifp = (InternalFunctionProperties)funct.internalProperties;
+			FunctionClosure closure = (FunctionClosure)ifp.closure;
+
+			/* Was the callback analyzed within the callee? */
+			if(closure.cfg.getEntryNode().getBeforeState() == null) {
+
+				/* Create the argument object. */
+				argAddr = createTopArgObject((FunctionNode)closure.cfg.getEntryNode().getStatement());
+
+				/* Create the control domain. */
+				Control control = state.control;
+				AstNode node = (AstNode)closure.cfg.getEntryNode().getStatement();
+				if(Change.conv(node).le == Change.LatticeElement.CHANGED) {
+					control = state.control.clone();
+					control.conditions.add(node); // Mark all as control flow modified
+				}
+
+				/* Analyze the function. */
+				ifp.closure.run(objAddr, argAddr, state.store, state.scratch, state.trace, control);
+
+			}
+
+		}
+
+		return newState;
 
 	}
 
@@ -257,6 +319,40 @@ public class ExpEval {
 			else value = value.join(state.store.apply(addr));
 		}
 		return value;
+	}
+
+	/**
+	 * Creates an arg object where each argument corresponds to a parameter
+	 * and each argument value is BValue.TOP.
+	 * @param state
+	 * @param f The function
+	 * @return
+	 */
+	private Address createTopArgObject(FunctionNode f) {
+
+		/* Create the argument object. */
+		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
+
+		int i = 0;
+		for(AstNode param : f.getParams()) {
+
+			BValue argVal = BValue.top(Change.convU(param), Change.u());
+			state.store = Helpers.addProp(f.getID(), String.valueOf(i), argVal,
+										  ext, state.store, state.trace);
+
+			i++;
+		}
+
+		InternalObjectProperties internal = new InternalObjectProperties(
+				Address.inject(StoreFactory.Arguments_Addr, Change.convU(f), Change.u()), JSClass.CFunction);
+		Obj argObj = new Obj(ext, internal);
+
+		/* Add the argument object to the store. */
+		Address argAddr = state.trace.makeAddr(f.getID(), "");
+		state.store = state.store.alloc(argAddr, argObj);
+
+		return argAddr;
+
 	}
 
 	/**
