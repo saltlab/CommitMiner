@@ -64,7 +64,10 @@ public class ValueCFGVisitor implements ICFGVisitor {
 			Address addr = props.get(prop);
 			String identifier;
 			if(prefix == null) identifier = prop.name;
-			else identifier = prefix + "." + prop;
+			else identifier = prefix + "." + prop.name;
+
+			if(identifier.equals("this")) continue;
+			System.out.println(identifier);
 
 			BValue val = state.store.apply(addr);
 

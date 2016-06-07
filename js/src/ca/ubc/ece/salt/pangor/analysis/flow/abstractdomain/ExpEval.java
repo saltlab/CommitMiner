@@ -228,7 +228,7 @@ public class ExpEval {
 		for(AstNode arg : fc.getArguments()) {
 			BValue argVal = eval(arg);
 			callbacks.addAll(extractFunctions(argVal));
-			state.store = Helpers.addProp(arg.getID(), String.valueOf(i), argVal,
+			state.store = Helpers.addProp(fc.getID(), String.valueOf(i), argVal,
 							ext, state.store, state.trace);
 			i++;
 		}
@@ -296,7 +296,7 @@ public class ExpEval {
 				}
 
 				/* Analyze the function. */
-				ifp.closure.run(objAddr, argAddr, state.store, state.scratch, state.trace, control);
+				ifp.closure.run(state.selfAddr, argAddr, state.store, state.scratch, state.trace, control);
 
 			}
 
@@ -336,12 +336,11 @@ public class ExpEval {
 		int i = 0;
 		for(AstNode param : f.getParams()) {
 
-			Change pc = Change.convU(param);
-			BValue argVal = BValue.top(pc, Change.u());
+			BValue argVal = BValue.top(Change.convU(param), Change.u());
 			state.store = Helpers.addProp(f.getID(), String.valueOf(i), argVal,
 										  ext, state.store, state.trace);
-
 			i++;
+
 		}
 
 		InternalObjectProperties internal = new InternalObjectProperties(
