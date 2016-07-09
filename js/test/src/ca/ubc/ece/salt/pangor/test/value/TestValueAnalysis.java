@@ -79,6 +79,24 @@ public class TestValueAnalysis {
 	}
 
 	@Test
+	public void testPM2() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/interproc/pm2_old.js";
+		String dst = "./test/input/interproc/pm2_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "6", "TST", "CONTROL", "Change:CHANGED"));
+
+		this.runTest(sourceCodeFileChange, expected, true);
+	}
+
+	@Test
 	public void testExports() throws Exception {
 
 		/* The test files. */

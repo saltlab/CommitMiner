@@ -68,7 +68,7 @@ public class Helpers {
 	}
 
 	/**
-	 * Runs a script or function.
+	 * Runs a script or function by traversing the CFG.
 	 * @param cfg
 	 * @param state
 	 * @return The state after the script has finished.
@@ -81,6 +81,14 @@ public class Helpers {
 
 		/* For terminating a long running analysis. */
 		long edgesVisited = 0;
+
+		/* TODO: We need to do two things:
+		 * 	1. Compute the number of incoming edges for each node in the CFG...
+		 * 	   which we probably don't want to do here.
+		 * 	2. Change to a breadth-first traversal (probably more efficient in
+		 * 	   practice).
+		 * 	3. Do not transfer over a node if the semaphore for the node != 0.
+		 */
 
 		/* Initialize the stack for a depth-first traversal. */
 		Stack<PathState> stack = new Stack<PathState>();

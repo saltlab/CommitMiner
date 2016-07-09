@@ -136,6 +136,9 @@ public class JavaScriptCFGFactory implements CFGFactory {
         	returnNode.addEdge(null, scriptExit, idgen.getUniqueID());
         }
 
+        /* Count the number of incoming edges for each CFGNode. */
+        CFGFactory.countIncommingEdges(cfg);
+
         return cfg;
 
 	}

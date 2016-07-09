@@ -66,8 +66,9 @@ public class ValueCFGVisitor implements ICFGVisitor {
 			if(prefix == null) identifier = prop.name;
 			else identifier = prefix + "." + prop.name;
 
+			// TODO: why is addr null for pipe?
 			if(identifier.equals("this")) continue;
-			System.out.println(identifier);
+			if(addr == null) continue;
 
 			BValue val = state.store.apply(addr);
 
