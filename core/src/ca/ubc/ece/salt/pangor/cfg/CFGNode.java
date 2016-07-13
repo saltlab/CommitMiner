@@ -31,12 +31,6 @@ public class CFGNode {
 	private int incommingEdges;
 
 	/**
-	 * A semaphore for tracking how many times this node has been visited
-	 * relative to the number of incomming edges.
-	 */
-	private int visitedSemaphore;
-
-	/**
 	 * The state of the environment and store before transferring over the
 	 * term (statement). The state is language dependent.
 	 */
@@ -127,33 +121,6 @@ public class CFGNode {
 	 */
 	public int getIncommingEdges() {
 		return this.incommingEdges;
-	}
-
-	/**
-	 * Resets the semaphore for tracking how many times the node has been
-	 * visited.
-	 */
-	public void resetVisited() {
-		this.visitedSemaphore = this.incommingEdges;
-	}
-
-	/**
-	 * Decrements the visited semaphore by one. Indicates that this node has
-	 * been visited through a new edge.
-	 */
-	public void visited() {
-		this.visitedSemaphore--;
-	}
-
-
-	/**
-	 * @return true if this node has been visited through all incoming edges.
-	 * 				If true, this means the CFG traversal can move on to this
-	 * 				node's outgoing nodes.
-	 */
-	public boolean isVisited() {
-		if(this.visitedSemaphore <= 0) return true;
-		return false;
 	}
 
 	/**

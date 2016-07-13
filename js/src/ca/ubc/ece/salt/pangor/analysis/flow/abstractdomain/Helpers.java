@@ -82,6 +82,11 @@ public class Helpers {
 		/* For terminating a long running analysis. */
 		long edgesVisited = 0;
 
+		/* Stores semaphores for tracking the number of incoming edges that
+		 * have been traversed to a node. Stands for "I(ncoming) E(dges)
+		 * S{emaphore} Map. */
+		Map<CFGNode, Integer> iesMap = new HashMap<CFGNode, Integer>();
+
 		/* TODO: We need to do two things:
 		 * 	1. Compute the number of incoming edges for each node in the CFG...
 		 * 	   which we probably don't want to do here.
@@ -89,9 +94,6 @@ public class Helpers {
 		 * 	   practice).
 		 * 	3. Do not transfer over a node if the semaphore for the node != 0.
 		 */
-
-		/* Initialize the hash map which will track visited node semaphores. */
-		Map<CFGNode, Integer> visitedSemaphores = new HashMap<CFGNode, Integer>();
 
 		/* Initialize the stack for a depth-first traversal. */
 		Stack<PathState> stack = new Stack<PathState>();
@@ -127,33 +129,33 @@ public class Helpers {
 
 			/* Look up the number of times this node has been visited in the
 			 * visitedSemaphores map. */
-			Integer semVal = visitedSemaphores.get(pathState.edge.getTo());
+			Integer semVal = iesMap.get(pathState.edge.getTo());
 
 			/* If it does not exist, put it in the map and initialize the
 			 * semaphore value to the number of incoming edges for the node. */
 			if(semVal == null) semVal = pathState.edge.getTo().getIncommingEdges();
 
-			/* Decrement the semaphore by once since we visited the node. */
-			visitedSemaphores.put(pathState.edge.getTo(), semVal);
+			/* Decrement the semaphore by one since we visited the node. */
+			semVal = semVal - 1;
+			iesMap.put(pathState.edge.getTo(), semVal);
 
-			/* Only transfer over the node if the semaphore for the node is zero. */
-			if(pathState.edge.getTo().isVisited()) {
+			/* Transfer the abstract state over the node. */
+			state = state.clone().transfer(pathState.edge.getTo());
+			pathState.edge.getTo().setAfterState(state);
 
-				/* Transfer the abstract state over the node. */
-				state = state.clone().transfer(pathState.edge.getTo());
-				pathState.edge.getTo().setAfterState(state);
+			/* Add all unvisited edges to the stack.
+			 * We currently only execute loops once. */
+			for(CFGEdge edge : pathState.edge.getTo().getEdges()) {
 
-				/* Add all unvisited edges to the stack.
-				 * We currently only execute loops once. */
-				for(CFGEdge edge : pathState.edge.getTo().getEdges()) {
-					if(!pathState.visited.contains(edge)) {
-						Set<CFGEdge> newVisited = new HashSet<CFGEdge>(pathState.visited);
-						newVisited.add(edge);
-						PathState newState = new PathState(edge, newVisited, state);
-						stack.push(newState);
-					}
+				/* Only visit an edge if the semaphore for the node is zero or if one of the
+				* edges is a loop edge. */
+				if(!pathState.visited.contains(edge)
+						&& (semVal == 0 || edge.isLoopEdge)) {
+					Set<CFGEdge> newVisited = new HashSet<CFGEdge>(pathState.visited);
+					newVisited.add(edge);
+					PathState newState = new PathState(edge, newVisited, state);
+					stack.push(newState);
 				}
-
 			}
 
 		}
