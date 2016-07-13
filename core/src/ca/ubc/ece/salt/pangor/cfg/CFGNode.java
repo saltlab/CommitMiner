@@ -219,6 +219,15 @@ public class CFGNode {
 	}
 
 	/**
+	 * @return The nodes pointed to by this node.
+	 */
+	public List<CFGNode> getAdjacentNodes() {
+		List<CFGNode> nodes = new LinkedList<CFGNode>();
+		for(CFGEdge edge : this.edges) nodes.add(edge.getTo());
+		return nodes;
+	}
+
+	/**
 	 * @return The edges leaving this node.
 	 */
 	public List<CFGEdge> getEdges() {

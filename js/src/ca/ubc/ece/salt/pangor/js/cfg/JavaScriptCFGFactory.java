@@ -137,7 +137,7 @@ public class JavaScriptCFGFactory implements CFGFactory {
         }
 
         /* Count the number of incoming edges for each CFGNode. */
-        CFGFactory.countIncommingEdges(cfg);
+        CFGFactory.labelIncommingEdgesAndLoopEdges(cfg);
 
         return cfg;
 

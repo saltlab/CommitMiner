@@ -131,6 +131,24 @@ public class TestValueAnalysis {
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
 
+	@Test
+	public void testLoop() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/interproc/loop_old.js";
+		String dst = "./test/input/interproc/loop_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		this.runTest(sourceCodeFileChange, expected, true);
+
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */

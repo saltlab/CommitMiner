@@ -25,6 +25,9 @@ public class CFGEdge {
 	/** The change operation applied to the edge from source to destination. **/
 	public ChangeType changeType;
 
+	/** True if this edge is the first edge of a loop. **/
+	public boolean isLoopEdge;
+
 	/**
 	 * The state of the environment and store before transferring over the
 	 * term (statement). The state is language dependent.

@@ -39,33 +39,53 @@ public interface CFGFactory {
 
 	/**
 	 * Helper function for counting the number of incoming edges for each
-	 * {@code CFGNode}.
+	 * {@code CFGNode} and labeling outgoing edges that loop back to the
+	 * {@code CFGNode} which they exit from.
 	 * @param cfg The CFG to count and update. It should not have had its
 	 * 			  incoming edges counted yet.
 	 */
-	static void countIncommingEdges(CFG cfg) {
+	static void labelIncommingEdgesAndLoopEdges(CFG cfg) {
 
-		/* Track which nodes have allready been visited. */
+		/* The nodes which have already visited in the graph traversal. */
 		Set<CFGNode> visited = new HashSet<CFGNode>();
 
-		/* Initialize the stack for a depth-first traversal. */
-		Stack<CFGNode> stack = new Stack<CFGNode>();
-		stack.add(cfg.getEntryNode());
-		visited.add(cfg.getEntryNode());
+		/* The current path in the graph traversal. */
+		Stack<CFGNode> path = new Stack<CFGNode>();
 
+		/* The nodes that have yet to be visited. */
+		Stack<CFGNode> stack = new Stack<CFGNode>();
+
+		/* Traverse the CFG. */
+		stack.push(cfg.getEntryNode());
 		while(!stack.isEmpty()) {
 
 			CFGNode current = stack.pop();
+			path.push(current);
 
-			/* 1. Increment the number of incoming edges at the destination
-			 * 	  nodes of each outgoing edge.
-			 * 2. Add all unvisited nodes to the stack. */
+			/* Traverse each edge leaving the node. */
 			for(CFGEdge edge : current.getEdges()) {
+
 				edge.getTo().incrementIncommingEdges();
-				if(visited.contains(edge.getTo())) {
+
+				if(!visited.contains(edge.getTo())) {
 					stack.push(edge.getTo());
 					visited.add(edge.getTo());
 				}
+				else {
+					/* Pop nodes off the current path until we get to the
+					 * parent of the next node. */
+					while(!path.isEmpty() && !stack.isEmpty()
+							&& !path.peek().getAdjacentNodes().contains(stack.peek())) {
+						path.pop();
+					}
+
+					/* Find the loop edge and label. */
+					CFGNode next = edge.getTo();
+					for(CFGEdge loopEdge : next.getEdges()) {
+						if(path.contains(loopEdge.getTo())) loopEdge.isLoopEdge = true;
+					}
+				}
+
 			}
 
 		}

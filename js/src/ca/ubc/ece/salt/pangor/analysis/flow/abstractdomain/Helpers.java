@@ -90,6 +90,9 @@ public class Helpers {
 		 * 	3. Do not transfer over a node if the semaphore for the node != 0.
 		 */
 
+		/* Initialize the hash map which will track visited node semaphores. */
+		Map<CFGNode, Integer> visitedSemaphores = new HashMap<CFGNode, Integer>();
+
 		/* Initialize the stack for a depth-first traversal. */
 		Stack<PathState> stack = new Stack<PathState>();
 		for(CFGEdge edge : cfg.getEntryNode().getEdges()) {
@@ -122,19 +125,35 @@ public class Helpers {
 			state = state.join((State)pathState.edge.getTo().getBeforeState());
 			pathState.edge.getTo().setBeforeState(state);
 
-			/* Transfer the abstract state over the node. */
-			state = state.clone().transfer(pathState.edge.getTo());
-			pathState.edge.getTo().setAfterState(state);
+			/* Look up the number of times this node has been visited in the
+			 * visitedSemaphores map. */
+			Integer semVal = visitedSemaphores.get(pathState.edge.getTo());
 
-			/* Add all unvisited edges to the stack.
-			 * We currently only execute loops once. */
-			for(CFGEdge edge : pathState.edge.getTo().getEdges()) {
-				if(!pathState.visited.contains(edge)) {
-					Set<CFGEdge> newVisited = new HashSet<CFGEdge>(pathState.visited);
-					newVisited.add(edge);
-					PathState newState = new PathState(edge, newVisited, state);
-					stack.push(newState);
+			/* If it does not exist, put it in the map and initialize the
+			 * semaphore value to the number of incoming edges for the node. */
+			if(semVal == null) semVal = pathState.edge.getTo().getIncommingEdges();
+
+			/* Decrement the semaphore by once since we visited the node. */
+			visitedSemaphores.put(pathState.edge.getTo(), semVal);
+
+			/* Only transfer over the node if the semaphore for the node is zero. */
+			if(pathState.edge.getTo().isVisited()) {
+
+				/* Transfer the abstract state over the node. */
+				state = state.clone().transfer(pathState.edge.getTo());
+				pathState.edge.getTo().setAfterState(state);
+
+				/* Add all unvisited edges to the stack.
+				 * We currently only execute loops once. */
+				for(CFGEdge edge : pathState.edge.getTo().getEdges()) {
+					if(!pathState.visited.contains(edge)) {
+						Set<CFGEdge> newVisited = new HashSet<CFGEdge>(pathState.visited);
+						newVisited.add(edge);
+						PathState newState = new PathState(edge, newVisited, state);
+						stack.push(newState);
+					}
 				}
+
 			}
 
 		}
