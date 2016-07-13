@@ -90,7 +90,9 @@ public class TestEnvAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "6", "TST", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/pm2_new.js", "MethodNA", "1662", "TST", "ENV", "semver_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/pm2_new.js", "MethodNA", "1667", "TST", "ENV", "err_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/pm2_new.js", "MethodNA", "1667", "TST", "ENV", "data_ENV_Change:CHANGED"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
@@ -108,7 +110,9 @@ public class TestEnvAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "6", "TST", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/dyn_new.js", "MethodNA", "27", "TST", "ENV", "semver_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/dyn_new.js", "MethodNA", "33", "TST", "ENV", "err_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/dyn_new.js", "MethodNA", "33", "TST", "ENV", "data_ENV_Change:CHANGED"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
