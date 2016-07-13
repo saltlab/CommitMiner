@@ -73,7 +73,7 @@ public class TestValueAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "6", "TST", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/dyn_new.js", "MethodNA", "45", "TST", "VAL", "PM2_SILENT_Change:CHANGED"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
@@ -91,7 +91,7 @@ public class TestValueAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/exports_new.js", "MethodNA", "6", "TST", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/pm2_new.js", "MethodNA", "1672", "TST", "VAL", "semver_Change:CHANGED"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
@@ -144,6 +144,7 @@ public class TestValueAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/loop_new.js", "MethodNA", "10", "TST", "VAL", "name_Change:CHANGED"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 
