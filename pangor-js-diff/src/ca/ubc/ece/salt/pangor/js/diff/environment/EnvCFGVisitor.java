@@ -17,6 +17,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.cfg.ICFGVisitor;
+import ca.ubc.ece.salt.pangor.js.diff.IsUsedVisitor;
 
 /**
  * Extracts facts from a flow analysis.
@@ -35,7 +36,7 @@ public class EnvCFGVisitor implements ICFGVisitor {
 
 	@Override
 	public void visit(CFGNode node) {
-		visit((AstNode) node.getStatement(), (State)node.getBeforeState());
+		visit((AstNode) node.getStatement(), (State)node.getAfterState());
 	}
 
 	@Override
@@ -61,9 +62,19 @@ public class EnvCFGVisitor implements ICFGVisitor {
 
 			/* Get the environment changes. No need to recurse since
 			 * properties (currently) do not change. */
-			registerFact(node, prop.name, "ENV", prop.change.toString());
+			if(node != null && isUsed(node, prop))
+				registerFact(node, prop.name, "ENV", prop.change.toString());
 
 		}
+	}
+
+	/**
+	 * @param node The statement in which the var/prop may be used.
+	 * @param identity The var/prop to look for in the statement.
+	 * @return true if the var/prop is used in the statement.
+	 */
+	private boolean isUsed(AstNode statement, Identifier identity) {
+		return IsUsedVisitor.isUsed(statement, identity);
 	}
 
 	/**
