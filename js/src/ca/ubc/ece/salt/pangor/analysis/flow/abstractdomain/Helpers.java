@@ -179,7 +179,8 @@ public class Helpers {
 	 * @return The final state of the closure.
 	 */
 	public static State applyClosure(BValue funVal, Address selfAddr, Address args,
-							  Store store, Scratchpad sp, Trace trace, Control control) {
+							  Store store, Scratchpad sp, Trace trace, Control control,
+							  Stack<Address> callStack) {
 
 		State state = null;
 
@@ -197,8 +198,17 @@ public class Helpers {
 			InternalFunctionProperties ifp =
 					(InternalFunctionProperties)functObj.internalProperties;
 
+			/* Is this function being called recursively? If so abort. */
+			if(callStack.contains(address)) return state;
+
+			/* Push this function onto the call stack. */
+			callStack.push(address);
+
 			/* Run the function. */
-			State endState = ifp.closure.run(selfAddr, args, store, sp, trace, control);
+			State endState = ifp.closure.run(selfAddr, args, store, sp, trace, control, callStack);
+
+			/* Pop this function off the call stack. */
+			callStack.pop();
 
 			/* Join the states. */
 			if(state == null) state = endState;

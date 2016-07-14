@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
@@ -33,7 +34,8 @@ public class FunctionClosure extends Closure {
 
 	@Override
 	public State run(Address selfAddr, Address argArrayAddr, Store store,
-			Scratchpad scratchpad, Trace trace, Control control) {
+			Scratchpad scratchpad, Trace trace, Control control,
+			Stack<Address> callStack) {
 
 		/* Advance the trace. */
 		trace = trace.update(environment, store, selfAddr, argArrayAddr,
@@ -65,7 +67,7 @@ public class FunctionClosure extends Closure {
 		env = env.strongUpdate(new Identifier("this", Change.u()), selfAddr);
 
 		/* Create the initial state for the function call. */
-		State state = new State(store, env, scratchpad, trace, control, selfAddr, cfgs);
+		State state = new State(store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
 
 		/* Run the analysis on the CFG. */
 		return Helpers.run(cfg, state);

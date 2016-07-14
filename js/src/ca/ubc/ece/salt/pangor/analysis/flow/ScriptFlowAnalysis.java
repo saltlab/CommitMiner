@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.storage.IRelation;
@@ -111,8 +112,10 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 							control.conditions.add(node); // Mark all as control flow modified
 						}
 
-						/* Analyze the function. */
-						ifp.closure.run(selfAddr, argAddr, state.store, state.scratch, state.trace, control);
+						/* Analyze the function. Use a fresh call stack because we don't have any knowledge of it. */
+						ifp.closure.run(selfAddr, argAddr, state.store,
+										state.scratch, state.trace, control,
+										new Stack<Address>());
 
 						/* Check the function object. */
 						// TODO: We ignore this for now. We would have to assume the function is being run as a constructor.

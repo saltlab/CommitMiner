@@ -71,9 +71,11 @@ public class FunctionFactory {
 				@Override
 				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
-								 Trace trace, Control control) {
+								 Trace trace, Control control,
+								 Stack<Address> callStack) {
 					scratchpad.strongUpdate(Scratch.RETVAL, retVal);
-					return new State(store, new Environment(), scratchpad, trace, control, selfAddr, cfgs);
+					return new State(store, new Environment(), scratchpad,
+									 trace, control, selfAddr, cfgs, callStack);
 				}
 			};
 

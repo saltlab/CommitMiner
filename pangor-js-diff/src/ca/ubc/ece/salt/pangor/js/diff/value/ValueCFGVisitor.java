@@ -69,6 +69,7 @@ public class ValueCFGVisitor implements ICFGVisitor {
 			if(identifier.equals("this")) continue;
 			if(addr == null) continue;
 
+			// TODO: Why do some of these not exist in the store?
 			BValue val = state.store.apply(addr);
 
 			/* Get the environment changes. No need to recurse since
@@ -77,6 +78,10 @@ public class ValueCFGVisitor implements ICFGVisitor {
 				registerFact(node, prop.name, val.change.toString());
 
 			/* Recursively check property values. */
+			if(val == null && node != null)
+				continue; // This never executes. This is good... but why?
+			if(val == null)
+				continue;
 			if(val.addressAD.le == LatticeElement.TOP) continue;
 			for(Address objAddr : val.addressAD.addresses) {
 				getObjectFacts(node, state.store.getObj(objAddr).externalProperties, state, identifier);

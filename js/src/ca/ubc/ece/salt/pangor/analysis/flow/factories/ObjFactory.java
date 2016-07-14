@@ -60,7 +60,8 @@ public class ObjFactory {
 				@Override
 				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
-								 Trace trace, Control control) {
+								 Trace trace, Control control,
+								 Stack<Address> callStack) {
 					// TODO: Update the state
 					return null;
 				}

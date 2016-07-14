@@ -43,8 +43,10 @@ public class ArgumentsFactory {
 				@Override
 				public State run(Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
-								 Trace trace, Control control) {
-					return new State(store, null, scratchpad, trace, control, selfAddr, cfgs);
+								 Trace trace, Control control,
+								 Stack<Address> callStack) {
+					return new State(store, null, scratchpad, trace, control,
+									 selfAddr, cfgs, callStack);
 				}
 			};
 

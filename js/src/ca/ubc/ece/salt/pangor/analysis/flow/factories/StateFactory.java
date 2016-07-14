@@ -1,11 +1,13 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.factories;
 
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Control;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Environment;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad;
@@ -31,7 +33,9 @@ public class StateFactory {
 				EnvironmentFactory.createInitialEnvironment(script, store, cfgs, trace);
 		Scratchpad scratchpad = new Scratchpad();
 		Control control = new Control();
-		return new State(lifted.getRight(), lifted.getLeft(), scratchpad, trace, control, StoreFactory.global_binding_Addr, cfgs);
+		return new State(lifted.getRight(), lifted.getLeft(), scratchpad,
+						 trace, control, StoreFactory.global_binding_Addr,
+						 cfgs, new Stack<Address>());
 	}
 
 }

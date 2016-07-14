@@ -263,7 +263,8 @@ public class ExpEval {
 
 			/* Call the function and get a join of the new states. */
 			newState = Helpers.applyClosure(funVal, objAddr, argAddr, state.store,
-												  state.scratch, state.trace, control);
+												  state.scratch, state.trace, control,
+												  state.callStack);
 		}
 
 		if(newState == null) {
@@ -271,7 +272,9 @@ public class ExpEval {
 			 * to any function object. In this case, we assume the (local) state
 			 * is unchanged, but add BValue.TOP as the return value. */
 			state.scratch = state.scratch.strongUpdate(Scratch.RETVAL, BValue.top(Change.top(), Change.top()));
-			newState = new State(state.store, state.env, state.scratch, state.trace, state.control, state.selfAddr, state.cfgs);
+			newState = new State(state.store, state.env, state.scratch,
+								 state.trace, state.control, state.selfAddr,
+								 state.cfgs, state.callStack);
 		}
 
 		/* Analyze any callbacks
@@ -300,7 +303,9 @@ public class ExpEval {
 				}
 
 				/* Analyze the function. */
-				ifp.closure.run(state.selfAddr, argAddr, state.store, state.scratch, state.trace, control);
+				ifp.closure.run(state.selfAddr, argAddr, state.store,
+								state.scratch, state.trace, control,
+								state.callStack);
 
 //			}
 

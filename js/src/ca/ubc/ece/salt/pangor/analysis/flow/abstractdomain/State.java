@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.Assignment;
@@ -40,6 +41,10 @@ public class State implements IState {
 
 	public Address selfAddr;
 
+	/** Maintain the call stack to prevent recursive calls. **/
+	public Stack<Address> callStack;
+
+	/** A reference to the list of CFGs to use for executing methods. **/
 	public Map<AstNode, CFG> cfgs;
 
 	/**
@@ -49,7 +54,7 @@ public class State implements IState {
 	 */
 	public State(Store store, Environment environment, Scratchpad scratchpad,
 				 Trace trace, Control control, Address selfAddr,
-				 Map<AstNode, CFG> cfgs) {
+				 Map<AstNode, CFG> cfgs, Stack<Address> callStack) {
 		this.store = store;
 		this.env = environment;
 		this.scratch = scratchpad;
@@ -57,12 +62,13 @@ public class State implements IState {
 		this.control = control;
 		this.selfAddr = selfAddr;
 		this.cfgs = cfgs;
+		this.callStack = callStack;
 	}
 
 	@Override
 	public State clone() {
 		State clone =  new State(store.clone(), env.clone(), scratch.clone(), trace,
-						 control.clone(), selfAddr, cfgs);
+						 control.clone(), selfAddr, cfgs, callStack);
 		return clone;
 	}
 
@@ -532,7 +538,7 @@ public class State implements IState {
 				this.trace,
 				this.control.join(state.control),
 				this.selfAddr,
-				cfgs);
+				cfgs, callStack);
 
 		return joined;
 
