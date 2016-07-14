@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.diff.value;
+package ca.ubc.ece.salt.pangor.js.diff;
 
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.DoLoop;
@@ -15,7 +15,7 @@ import org.mozilla.javascript.ast.WithStatement;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 
-class IsUsedVisitor implements NodeVisitor {
+public class IsUsedVisitor implements NodeVisitor {
 
 	/** Flag if the identifier is found in the statement. **/
 	public boolean used;
