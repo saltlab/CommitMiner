@@ -73,12 +73,6 @@ public class ValueCFGVisitor implements ICFGVisitor {
 
 			/* Get the environment changes. No need to recurse since
 			 * properties (currently) do not change. */
-			if(node != null && isUsed(node, prop)) {
-				registerFact(node, prop.name, val.change.toString());
-			}
-
-			/* Get the environment changes. No need to recurse since
-			 * properties (currently) do not change. */
 			registerFact(node, prop.name, val.change.toString());
 
 			/* Recursively check property values. */
@@ -88,15 +82,6 @@ public class ValueCFGVisitor implements ICFGVisitor {
 			}
 
 		}
-	}
-
-	/**
-	 * @param node The statement in which the var/prop may be used.
-	 * @param identity The var/prop to look for in the statement.
-	 * @return true if the var/prop is used in the statement.
-	 */
-	private boolean isUsed(AstNode statement, Identifier identity) {
-		return IsUsedVisitor.isUsed(statement, identity);
 	}
 
 	/**

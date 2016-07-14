@@ -42,7 +42,7 @@ public class ValueCFGVisitor implements ICFGVisitor {
 
 	@Override
 	public void visit(CFGEdge edge) {
-		visit((AstNode) edge.getCondition(), (State)edge.getAfterState());
+		visit((AstNode) edge.getCondition(), (State)edge.getBeforeState());
 	}
 
 	/**
@@ -78,10 +78,10 @@ public class ValueCFGVisitor implements ICFGVisitor {
 				registerFact(node, prop.name, val.change.toString());
 
 			/* Recursively check property values. */
-			if(val == null && node != null)
-				continue; // This never executes. This is good... but why?
-			if(val == null)
-				continue;
+//			if(val == null && node != null)
+//				continue; // This never executes. This is good... but why?
+//			if(val == null)
+//				continue;
 			if(val.addressAD.le == LatticeElement.TOP) continue;
 			for(Address objAddr : val.addressAD.addresses) {
 				getObjectFacts(node, state.store.getObj(objAddr).externalProperties, state, identifier);
