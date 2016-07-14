@@ -274,15 +274,19 @@ public class ExpEval {
 			newState = new State(state.store, state.env, state.scratch, state.trace, state.control, state.selfAddr, state.cfgs);
 		}
 
-		/* Analyze any callbacks that were not analyzed within the callee. */
+		/* Analyze any callbacks
+		 * qhanam: Removed condition: "that were not analyzed within the callee". */
 		for(Address addr : callbacks) {
 			Obj funct = newState.store.getObj(addr);
 
 			InternalFunctionProperties ifp = (InternalFunctionProperties)funct.internalProperties;
 			FunctionClosure closure = (FunctionClosure)ifp.closure;
 
-			/* Was the callback analyzed within the callee? */
-			if(closure.cfg.getEntryNode().getBeforeState() == null) {
+			/* Was the callback analyzed within the callee?
+			 * qhanam: This check is not effective. It misses the case where a
+			 * 		   function needs to be re-checked through a function call.
+			 * 		   It is probably safe to omit the check in most cases. */
+//			if(closure.cfg.getEntryNode().getBeforeState() == null) {
 
 				/* Create the argument object. */
 				argAddr = createTopArgObject((FunctionNode)closure.cfg.getEntryNode().getStatement());
@@ -298,7 +302,7 @@ public class ExpEval {
 				/* Analyze the function. */
 				ifp.closure.run(state.selfAddr, argAddr, state.store, state.scratch, state.trace, control);
 
-			}
+//			}
 
 		}
 

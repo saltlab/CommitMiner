@@ -517,14 +517,18 @@ public class JavaScriptCFGFactory implements CFGFactory {
 
 		Name getNextKey = new Name(0, "~getNextKey");
 		getNextKey.setChangeType(iterator.getChangeType());
+		getNextKey.setVersion(forInLoop.getVersion());
         PropertyGet keyIteratorMethod = new PropertyGet(forInLoop.getIteratedObject(), getNextKey);
         keyIteratorMethod.setChangeType(iterator.getChangeType());
+        keyIteratorMethod.setVersion(forInLoop.getVersion());
         FunctionCall keyIteratorFunction = new FunctionCall();
         keyIteratorFunction.setTarget(keyIteratorMethod);
         keyIteratorFunction.setChangeType(iterator.getChangeType());
+        keyIteratorFunction.setVersion(forInLoop.getVersion());
         Assignment targetAssignment = new Assignment(target, keyIteratorFunction);
         targetAssignment.setType(Token.ASSIGN);
         targetAssignment.setChangeType(target.getChangeType());
+        targetAssignment.setVersion(forInLoop.getVersion());
 
         CFGNode assignment = new CFGNode(targetAssignment, idgen.getUniqueID());
 
@@ -533,9 +537,12 @@ public class JavaScriptCFGFactory implements CFGFactory {
 
         PropertyGet keyConditionMethod = new PropertyGet(forInLoop.getIteratedObject(), new Name(0, "~hasNextKey"));
         keyConditionMethod.setChangeType(iterator.getChangeType());
+        keyConditionMethod.setVersion(forInLoop.getVersion());
         FunctionCall keyConditionFunction = new FunctionCall();
         keyConditionFunction.setTarget(keyConditionMethod);
         keyConditionFunction.setChangeType(iterator.getChangeType());
+        keyConditionFunction.setVersion(forInLoop.getVersion());
+        keyConditionFunction.setParent(forInLoop);
 
 		CFGNode condition = new CFGNode(new EmptyStatement(), "FORIN", idgen.getUniqueID());
 
@@ -580,13 +587,16 @@ public class JavaScriptCFGFactory implements CFGFactory {
 		 * branch condition. */
 		ParenthesizedExpression pe = new ParenthesizedExpression();
 		pe.setExpression(keyConditionFunction.clone(pe));
+		pe.setVersion(forInLoop.getVersion());
 		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, pe);
 		falseBranchCondition.setChangeType(keyConditionFunction.getChangeType());
 		falseBranchCondition.setParent(keyConditionFunction.getParent());
+		falseBranchCondition.setVersion(forInLoop.getVersion());
+		falseBranchCondition.setParent(forInLoop);
 
         /* Add the edges from the assignment node to the start of the loop. */
         assignment.addEdge(null, trueBranch.getEntryNode(), idgen.getUniqueID());
-		condition.addEdge(new CFGEdge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(keyConditionFunction)), condition, falseBranch, idgen.getUniqueID()));
+		condition.addEdge(new CFGEdge(falseBranchCondition, condition, falseBranch, idgen.getUniqueID()));
 
 		return cfg;
 

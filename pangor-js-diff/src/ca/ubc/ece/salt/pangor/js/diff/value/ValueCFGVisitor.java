@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.test.value;
+package ca.ubc.ece.salt.pangor.js.diff.value;
 
 import java.util.Map;
 
@@ -37,12 +37,12 @@ public class ValueCFGVisitor implements ICFGVisitor {
 
 	@Override
 	public void visit(CFGNode node) {
-		visit((AstNode) node.getStatement(), (State)node.getBeforeState());
+		visit((AstNode) node.getStatement(), (State)node.getAfterState());
 	}
 
 	@Override
 	public void visit(CFGEdge edge) {
-		visit((AstNode) edge.getCondition(), (State)edge.getBeforeState());
+		visit((AstNode) edge.getCondition(), (State)edge.getAfterState());
 	}
 
 	/**
@@ -73,7 +73,8 @@ public class ValueCFGVisitor implements ICFGVisitor {
 
 			/* Get the environment changes. No need to recurse since
 			 * properties (currently) do not change. */
-			registerFact(node, prop.name, val.change.toString());
+			if(node != null && isUsed(node, prop))
+				registerFact(node, prop.name, val.change.toString());
 
 			/* Recursively check property values. */
 			if(val.addressAD.le == LatticeElement.TOP) continue;
@@ -82,6 +83,15 @@ public class ValueCFGVisitor implements ICFGVisitor {
 			}
 
 		}
+	}
+
+	/**
+	 * @param node The statement in which the var/prop may be used.
+	 * @param identity The var/prop to look for in the statement.
+	 * @return true if the var/prop is used in the statement.
+	 */
+	private boolean isUsed(AstNode statement, Identifier identity) {
+		return IsUsedVisitor.isUsed(statement, identity);
 	}
 
 	/**
