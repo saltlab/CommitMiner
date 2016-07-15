@@ -115,6 +115,33 @@ public class TestDiffAnalysis {
 		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "48", "TST", "CONTROL", "Change:CHANGED"));
 		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "49", "TST", "CONTROL", "Change:CHANGED"));
 
+		/* The ast-diff alerts. */
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "27", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "36", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "37", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "40", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "41", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "42", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "43", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "45", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "46", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "47", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "48", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "49", "TST", "AST", "MOVED"));
+
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "30", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "31", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "34", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "35", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "36", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "37", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "38", "TST", "AST", "MOVED"));
+
+		/* The ast-diff alerts. */
+
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
 
@@ -168,6 +195,31 @@ public class TestDiffAnalysis {
 		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1683", "TST", "CONTROL", "Change:CHANGED"));
 		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1684", "TST", "CONTROL", "Change:CHANGED"));
 
+		/* The ast-diff alerts. */
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1662", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1675", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1676", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1677", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1678", "TST", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1680", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1681", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1682", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1683", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1684", "TST", "AST", "MOVED"));
+
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1665", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1666", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1669", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1670", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1673", "TST", "AST", "MOVED"));
+
 		this.runTest(sourceCodeFileChange, expected, false);
 	}
 
@@ -206,14 +258,14 @@ public class TestDiffAnalysis {
 
 		Map<IQuery, Transformer> queries = new HashMap<IQuery, Transformer>();
 
-//		Pair<IQuery, Transformer> valueQuery = getValueQuery();
-//		queries.put(valueQuery.getLeft(), valueQuery.getRight());
-//
-//		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
-//		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
-//
-//		Pair<IQuery, Transformer> controlQuery = getControlQuery();
-//		queries.put(controlQuery.getLeft(), controlQuery.getRight());
+		Pair<IQuery, Transformer> valueQuery = getValueQuery();
+		queries.put(valueQuery.getLeft(), valueQuery.getRight());
+
+		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
+		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
+
+		Pair<IQuery, Transformer> controlQuery = getControlQuery();
+		queries.put(controlQuery.getLeft(), controlQuery.getRight());
 
 		Pair<IQuery, Transformer> astQuery = getAstQuery();
 		queries.put(astQuery.getLeft(), astQuery.getRight());
