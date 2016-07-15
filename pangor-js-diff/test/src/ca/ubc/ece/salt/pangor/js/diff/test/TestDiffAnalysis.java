@@ -206,14 +206,17 @@ public class TestDiffAnalysis {
 
 		Map<IQuery, Transformer> queries = new HashMap<IQuery, Transformer>();
 
-		Pair<IQuery, Transformer> valueQuery = getValueQuery();
-		queries.put(valueQuery.getLeft(), valueQuery.getRight());
+//		Pair<IQuery, Transformer> valueQuery = getValueQuery();
+//		queries.put(valueQuery.getLeft(), valueQuery.getRight());
+//
+//		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
+//		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
+//
+//		Pair<IQuery, Transformer> controlQuery = getControlQuery();
+//		queries.put(controlQuery.getLeft(), controlQuery.getRight());
 
-		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
-		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
-
-		Pair<IQuery, Transformer> controlQuery = getControlQuery();
-		queries.put(controlQuery.getLeft(), controlQuery.getRight());
+		Pair<IQuery, Transformer> astQuery = getAstQuery();
+		queries.put(astQuery.getLeft(), astQuery.getRight());
 
 		return queries;
 
@@ -309,6 +312,37 @@ public class TestDiffAnalysis {
 						"TST",												// Type
 						"CONTROL",											// Subtype
 						tuple.get(5).toString().replace("\'", ""));			// Description
+		};
+
+		return Pair.of(query, transformer);
+
+	}
+
+	/**
+	 * @return The query for extracting AST-diff alerts.
+	 * @throws ParserException for incorrect query strings.
+	 */
+	private static Pair<IQuery, Transformer> getAstQuery() throws ParserException {
+
+		String qs = "";
+		qs += "?- AST(?Version,?File,?Line,?StatementID,?Change)";
+		qs += ", NOT_EQUAL(?Change, 'UNCHANGED').";
+
+		/* The query that produces the results. */
+		Parser parser = new Parser();
+		parser.parse(qs);
+		IQuery query = parser.getQueries().get(0);
+
+		/* Transforms the query results to a ClassifierFeatureVector. */
+		Transformer transformer = (commit, tuple) -> {
+				return new ClassifierFeatureVector(commit,
+						tuple.get(0).toString().replace("\'", ""),			// Version
+						tuple.get(1).toString().replace("\'", ""), 			// Class
+						"MethodNA",											// Method
+						tuple.get(2).toString().replace("\'", ""),			// Line
+						"TST",												// Type
+						"AST",												// Subtype
+						tuple.get(4).toString().replace("\'", ""));			// Description
 		};
 
 		return Pair.of(query, transformer);

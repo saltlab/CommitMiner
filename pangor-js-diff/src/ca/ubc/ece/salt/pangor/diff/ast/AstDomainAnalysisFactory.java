@@ -1,16 +1,16 @@
-package ca.ubc.ece.salt.pangor.js.classify.use;
+package ca.ubc.ece.salt.pangor.diff.ast;
 
 import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.factories.IDomainAnalysisFactory;
 import ca.ubc.ece.salt.pangor.analysis.factories.ISourceCodeFileAnalysisFactory;
 import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
 
-public class UseDomainAnalysisFactory implements IDomainAnalysisFactory {
+public class AstDomainAnalysisFactory implements IDomainAnalysisFactory {
 
 	@Override
 	public DomainAnalysis newInstance() {
-		ISourceCodeFileAnalysisFactory srcFactory = new UseScriptAnalysisFactory();
-		ISourceCodeFileAnalysisFactory dstFactory = new UseScriptAnalysisFactory();
+		ISourceCodeFileAnalysisFactory srcFactory = new AstScriptAnalysisFactory();
+		ISourceCodeFileAnalysisFactory dstFactory = new AstScriptAnalysisFactory();
 		return new DomainAnalysis(srcFactory, dstFactory, new JavaScriptCFGFactory(), false);
 	}
 

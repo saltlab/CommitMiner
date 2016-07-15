@@ -1,9 +1,8 @@
-package ca.ubc.ece.salt.pangor.js.classify.use;
+package ca.ubc.ece.salt.pangor.diff.ast;
 
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.api.basics.ITuple;
 import org.deri.iris.factory.Factory;
@@ -14,19 +13,22 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
 /**
- * An analysis of a JavaScript file for extracting identifier use facts.
+ * An analysis of a JavaScript file for extracting AST change facts.
+ * TODO: What kind of information do we want to extract? We could simply label
+ * 		 which statements/lines have been updated in some manner. We could also
+ * 		 do it at a node-level granularity. We could also separate the
+ * 		 structural changes based on the type of change.
  *
  * NOTES:
  * 	1. This class only works with the Rhino AST.
  * 	2. This class is thread-safe.
  */
-public class UseScriptAnalysis extends SourceCodeFileAnalysis {
+public class AstScriptAnalysis extends SourceCodeFileAnalysis {
 
 	@Override
 	public void analyze(SourceCodeFileChange sourceCodeFileChange,
@@ -37,32 +39,28 @@ public class UseScriptAnalysis extends SourceCodeFileAnalysis {
 		if(!(root instanceof AstRoot)) throw new IllegalArgumentException("The AST must be parsed from Eclipse JDT.");
 		AstRoot script = (AstRoot) root;
 
-		/* Visit statements and extract use facts. */
-		Map<AstNode, List<Pair<ChangeType,String>>> uses = UseTreeVisitor.getUses(script);
+		/* Visit statements and extract statement change facts. */
+		List<AstNode> modifiedStatements = AstTreeVisitor.getModifiedStatements(script);
 
 		/* Register the facts. */
-		for(Map.Entry<AstNode, List<Pair<ChangeType,String>>> entries : uses.entrySet()) {
-			for(Pair<ChangeType,String> identifier : entries.getValue()) {
-				registerUseFact(entries.getKey(), identifier.getLeft(),
-								identifier.getRight(), facts,
-								sourceCodeFileChange);
-			}
+		for(AstNode modifiedStatement : modifiedStatements) {
+				registerChangeFact(modifiedStatement, facts,
+								   sourceCodeFileChange);
 		}
 
 	}
 
 	/**
-	 * Registers a Use fact.
-	 * @param statement The statement in which the use occurred.
-	 * @param identifier The identifier that was used.
+	 * Registers a line change fact.
+	 * @param statement The statement in which was changed.
+	 * @param changeType How the statement was modified.
 	 */
-	private static void registerUseFact(AstNode statement,
-									  ChangeType changeType, String identifier,
+	private static void registerChangeFact(AstNode statement,
 									  Map<IPredicate, IRelation> facts,
 									  SourceCodeFileChange sourceCodeFileChange) {
 
 		/* Get the relation for this predicate from the fact base. */
-		IPredicate predicate = Factory.BASIC.createPredicate("Use", 6);
+		IPredicate predicate = Factory.BASIC.createPredicate("AST", 5);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 
@@ -80,8 +78,7 @@ public class UseScriptAnalysis extends SourceCodeFileAnalysis {
 				Factory.TERM.createString(sourceCodeFileChange.repairedFile), 		// File
 				Factory.TERM.createString(String.valueOf(statement.getLineno())),	// Line #
 				Factory.CONCRETE.createInt(statement.getID()),						// Statement ID
-				Factory.TERM.createString(changeType.toString()),					// Change Type
-				Factory.TERM.createString(identifier));								// Identifier
+				Factory.TERM.createString(statement.getChangeType().toString()));	// Change Type
 		relation.add(tuple);
 
 		facts.put(predicate, relation);
