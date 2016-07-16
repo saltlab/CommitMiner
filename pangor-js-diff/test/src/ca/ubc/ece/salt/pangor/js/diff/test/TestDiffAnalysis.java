@@ -258,17 +258,20 @@ public class TestDiffAnalysis {
 
 		Map<IQuery, Transformer> queries = new HashMap<IQuery, Transformer>();
 
-		Pair<IQuery, Transformer> valueQuery = getValueQuery();
-		queries.put(valueQuery.getLeft(), valueQuery.getRight());
+//		Pair<IQuery, Transformer> valueQuery = getValueQuery();
+//		queries.put(valueQuery.getLeft(), valueQuery.getRight());
+//
+//		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
+//		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
+//
+//		Pair<IQuery, Transformer> controlQuery = getControlQuery();
+//		queries.put(controlQuery.getLeft(), controlQuery.getRight());
+//
+//		Pair<IQuery, Transformer> astQuery = getAstQuery();
+//		queries.put(astQuery.getLeft(), astQuery.getRight());
 
-		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
-		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
-
-		Pair<IQuery, Transformer> controlQuery = getControlQuery();
-		queries.put(controlQuery.getLeft(), controlQuery.getRight());
-
-		Pair<IQuery, Transformer> astQuery = getAstQuery();
-		queries.put(astQuery.getLeft(), astQuery.getRight());
+		Pair<IQuery, Transformer> lineQuery = getLineQuery();
+		queries.put(lineQuery.getLeft(), lineQuery.getRight());
 
 		return queries;
 
@@ -395,6 +398,36 @@ public class TestDiffAnalysis {
 						"TST",												// Type
 						"AST",												// Subtype
 						tuple.get(4).toString().replace("\'", ""));			// Description
+		};
+
+		return Pair.of(query, transformer);
+	}
+
+	/**
+	 * @return The query for extracting line-diff alerts.
+	 * @throws ParserException for incorrect query strings.
+	 */
+	private static Pair<IQuery, Transformer> getLineQuery() throws ParserException {
+
+		String qs = "";
+		qs += "?- Line(?Version,?File,?Line,?Change)";
+		qs += ", EQUAL(?Version, 'SOURCE').";
+
+		/* The query that produces the results. */
+		Parser parser = new Parser();
+		parser.parse(qs);
+		IQuery query = parser.getQueries().get(0);
+
+		/* Transforms the query results to a ClassifierFeatureVector. */
+		Transformer transformer = (commit, tuple) -> {
+				return new ClassifierFeatureVector(commit,
+						tuple.get(0).toString().replace("\'", ""),			// Version
+						tuple.get(1).toString().replace("\'", ""), 			// Class
+						"MethodNA",											// Method
+						tuple.get(2).toString().replace("\'", ""),			// Line
+						"TST",												// Type
+						"LINE",												// Subtype
+						tuple.get(3).toString().replace("\'", ""));			// Description
 		};
 
 		return Pair.of(query, transformer);
