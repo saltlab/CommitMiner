@@ -272,8 +272,11 @@ public class TestDiffAnalysis {
 //		Pair<IQuery, Transformer> astQuery = getAstQuery();
 //		queries.put(astQuery.getLeft(), astQuery.getRight());
 
-		Pair<IQuery, Transformer> lineQuery = getLineQuery();
-		queries.put(lineQuery.getLeft(), lineQuery.getRight());
+//		Pair<IQuery, Transformer> lineQuery = getLineQuery();
+//		queries.put(lineQuery.getLeft(), lineQuery.getRight());
+
+		Pair<IQuery, Transformer> totalLinesQuery = getTotalLinesQuery();
+		queries.put(totalLinesQuery.getLeft(), totalLinesQuery.getRight());
 
 		return queries;
 
@@ -403,6 +406,36 @@ public class TestDiffAnalysis {
 		};
 
 		return Pair.of(query, transformer);
+	}
+
+	/**
+	 * @return The query for extracting total number of lines in a file.
+	 * @throws ParserException for incorrect query strings.
+	 */
+	private static Pair<IQuery, Transformer> getTotalLinesQuery() throws ParserException {
+
+		String qs = "";
+		qs += "?- TotalLines(?Version,?File,?TotalLines).";
+
+		/* The query that produces the results. */
+		Parser parser = new Parser();
+		parser.parse(qs);
+		IQuery query = parser.getQueries().get(0);
+
+		/* Transforms the query results to a ClassifierFeatureVector. */
+		Transformer transformer = (commit, tuple) -> {
+				return new ClassifierFeatureVector(commit,
+						tuple.get(0).toString().replace("\'", ""),			// Version
+						tuple.get(1).toString().replace("\'", ""), 			// Class
+						"MethodNA",											// Method
+						"NA",												// Line
+						"DIFF",												// Type
+						"TOTAL_LINES",										// Subtype
+						tuple.get(2).toString().replace("\'", ""));			// Description
+		};
+
+		return Pair.of(query, transformer);
+
 	}
 
 	/**

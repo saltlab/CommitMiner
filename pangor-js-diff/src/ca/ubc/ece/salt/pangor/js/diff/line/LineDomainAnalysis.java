@@ -64,6 +64,44 @@ public class LineDomainAnalysis extends DomainAnalysis {
 		  }
 		}
 
+		registerTotalLinesFact(Version.SOURCE, i, facts, sourceCodeFileChange);
+		registerTotalLinesFact(Version.DESTINATION, j, facts, sourceCodeFileChange);
+
+	}
+
+	/**
+	 * Registers a fact that stores the total number of lines in the file.
+	 * @param version The version of the file: SOURCE or DESTINATION
+	 * @param total_lines The total number of lines in the file.
+	 * @param tag The type of modification: CHANGE, DELETE or INSERT
+	 * @param changeType How the statement was modified.
+	 */
+	private static void registerTotalLinesFact(Version version, int total_lines,
+									  Map<IPredicate, IRelation> facts,
+									  SourceCodeFileChange sourceCodeFileChange) {
+
+		/* Get the relation for this predicate from the fact base. */
+		IPredicate predicate = Factory.BASIC.createPredicate("TotalLines", 3);
+		IRelation relation = facts.get(predicate);
+		if(relation == null) {
+
+			/* The predicate does not yet exist in the fact base. Create a
+			 * relation for the predicate and add it to the fact base. */
+			IRelationFactory relationFactory = new SimpleRelationFactory();
+			relation = relationFactory.createRelation();
+			facts.put(predicate, relation);
+
+		}
+
+		/* Add the new tuple to the relation. */
+		ITuple tuple = Factory.BASIC.createTuple(
+				Factory.TERM.createString(version.toString()),						// Version
+				Factory.TERM.createString(sourceCodeFileChange.repairedFile), 		// File
+				Factory.TERM.createString(String.valueOf(total_lines)));			// Line #
+		relation.add(tuple);
+
+		facts.put(predicate, relation);
+
 	}
 
 	/**
