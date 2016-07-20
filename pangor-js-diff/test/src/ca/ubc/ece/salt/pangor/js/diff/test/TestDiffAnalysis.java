@@ -140,7 +140,9 @@ public class TestDiffAnalysis {
 		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "37", "TST", "AST", "MOVED"));
 		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "38", "TST", "AST", "MOVED"));
 
-		/* The ast-diff alerts. */
+		/* The test-diff alerts. */
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "27", "TST", "LINE", "INSERT"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "54", "TST", "LINE", "INSERT"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
@@ -411,7 +413,7 @@ public class TestDiffAnalysis {
 
 		String qs = "";
 		qs += "?- Line(?Version,?File,?Line,?Change)";
-		qs += ", EQUAL(?Version, 'SOURCE').";
+		qs += ", NOT_EQUAL(?Change, 'UNCHANGED').";
 
 		/* The query that produces the results. */
 		Parser parser = new Parser();
