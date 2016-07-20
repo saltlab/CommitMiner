@@ -124,6 +124,12 @@ public class GitProjectAnalysis extends GitProject {
 				return;
 			}
 
+			/* Skip anything that is not a js file. */
+			if (!diff.getOldPath().endsWith(".js") || !diff.getNewPath().endsWith(".js")) {
+				logger.info("[SKIP_FILE] Skipping non-js file: " + diff.getOldPath());
+				return;
+			}
+
 			logger.debug("Exploring diff \n {} \n {} - {} \n {} - {}", getURI(), buggyRevision, diff.getOldPath(),
 					bugFixingRevision, diff.getNewPath());
 
