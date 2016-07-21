@@ -293,6 +293,29 @@ public class TestDiffAnalysis {
 		this.runTest(sourceCodeFileChange, expected, false);
 	}
 
+	@Test
+	public void testPM2_mocha() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/diff/pm2_mocha_old.js";
+		String dst = "./test/input/diff/pm2_mocha_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		/* The environment-diff alerts. */
+		/* The control-flow-diff alerts. */
+		/* The ast-diff alerts. */
+		/* The line-diff alerts. */
+		/* The line-total alerts. */
+
+		this.runTest(sourceCodeFileChange, expected, false);
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */

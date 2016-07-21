@@ -302,10 +302,19 @@ public class ExpEval {
 					control.conditions.add(node); // Mark all as control flow modified
 				}
 
+				/* Is this function being called recursively? If so abort. */
+				if(state.callStack.contains(addr)) return state;
+
+				/* Push this function onto the call stack. */
+				state.callStack.push(addr);
+
 				/* Analyze the function. */
 				ifp.closure.run(state.selfAddr, argAddr, state.store,
 								state.scratch, state.trace, control,
 								state.callStack);
+
+				/* Pop this function off the call stack. */
+				state.callStack.pop();
 
 //			}
 

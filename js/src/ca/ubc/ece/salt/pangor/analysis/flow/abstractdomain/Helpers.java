@@ -156,6 +156,7 @@ public class Helpers {
 					PathState newState = new PathState(edge, newVisited, state);
 					stack.push(newState);
 				}
+
 			}
 
 		}
