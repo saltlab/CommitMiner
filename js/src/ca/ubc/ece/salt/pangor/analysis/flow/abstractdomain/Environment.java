@@ -63,7 +63,7 @@ public class Environment {
 	 * @return The joined environments as a new environment.
 	 */
 	public Environment join(Environment environment) {
-		Environment joined = new Environment(this.environment);
+		Environment joined = new Environment(new HashMap<Identifier, Address>(this.environment));
 
 		/* Because we dynamically allocate unexpected local variables to the
 		 * environment, sometimes we will need to merge different environments.
@@ -73,13 +73,13 @@ public class Environment {
 		for(Map.Entry<Identifier, Address> entry : environment.environment.entrySet()) {
 
 			/* The variable is missing from left. */
-			if(!this.environment.containsKey(entry.getKey())) {
-				this.environment.put(entry.getKey(), entry.getValue());
+			if(!joined.environment.containsKey(entry.getKey())) {
+				joined.environment.put(entry.getKey(), entry.getValue());
 			}
 
 			/* The value of left != the value from right. For now we'll just
 			 * keep left and emit a warning. */
-			if(this.environment.get(entry.getKey()) != entry.getValue()) {
+			if(joined.environment.get(entry.getKey()) != entry.getValue()) {
 
 				System.out.println("Warning: Merging unequal environments.");
 				System.out.println("\tVariable name = " + entry.getKey().name);

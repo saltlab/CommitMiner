@@ -34,12 +34,14 @@ public class TestDiffAnalysis {
 	 * @param args The command line arguments (i.e., old and new file names).
 	 * @throws Exception
 	 */
-	protected void runTest(SourceCodeFileChange sourceFileChange,
+	protected void runTest(List<SourceCodeFileChange> sourceFileChanges,
 						  List<ClassifierFeatureVector> expected,
 						   boolean checkSize) throws Exception {
 
 		Commit commit = getCommit();
-		commit.addSourceCodeFileChange(sourceFileChange);
+		for(SourceCodeFileChange sourceFileChange : sourceFileChanges) {
+			commit.addSourceCodeFileChange(sourceFileChange);
+		}
 
 		/* Builds the data set with our custom queries. */
 		ClassifierDataSet dataSet = new ClassifierDataSet(null,
@@ -71,7 +73,8 @@ public class TestDiffAnalysis {
 		String dst = "./test/input/diff/dyn_new.js";
 
 		/* Read the source files. */
-		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
 
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
@@ -176,7 +179,7 @@ public class TestDiffAnalysis {
 		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "NA", "DIFF", "TOTAL_LINES", "43"));
 		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "NA", "DIFF", "TOTAL_LINES", "56"));
 
-		this.runTest(sourceCodeFileChange, expected, true);
+		this.runTest(sourceCodeFileChanges, expected, true);
 	}
 
 	@Test
@@ -187,7 +190,8 @@ public class TestDiffAnalysis {
 		String dst = "./test/input/diff/pm2_new.js";
 
 		/* Read the source files. */
-		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
 
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
@@ -290,7 +294,7 @@ public class TestDiffAnalysis {
 		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "NA", "DIFF", "TOTAL_LINES", "2373"));
 		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "NA", "DIFF", "TOTAL_LINES", "2386"));
 
-		this.runTest(sourceCodeFileChange, expected, false);
+		this.runTest(sourceCodeFileChanges, expected, false);
 	}
 
 	@Test
@@ -301,19 +305,52 @@ public class TestDiffAnalysis {
 		String dst = "./test/input/diff/pm2_mocha_new.js";
 
 		/* Read the source files. */
-		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
 
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
 
-		/* The environment-diff alerts. */
-		/* The control-flow-diff alerts. */
-		/* The ast-diff alerts. */
-		/* The line-diff alerts. */
-		/* The line-total alerts. */
+		// No checks, no error is pass.
 
-		this.runTest(sourceCodeFileChange, expected, false);
+		this.runTest(sourceCodeFileChanges, expected, false);
+	}
+
+	@Test
+	public void testPM2_treekill() throws Exception {
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(
+				"./test/input/diff/pm2_treekill_old.js",
+				"./test/input/diff/pm2_treekill_new.js"));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		// No checks, no error is pass.
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+	}
+
+	@Test
+	public void testPM2_reload() throws Exception {
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(
+				"./test/input/diff/pm2_reload_old.js",
+				"./test/input/diff/pm2_reload_new.js"));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		// No checks, no error is pass.
+
+		this.runTest(sourceCodeFileChanges, expected, false);
 	}
 
 	/**
