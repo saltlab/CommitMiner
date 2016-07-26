@@ -249,7 +249,7 @@ public class ExpEval {
 		 * use the object of the currently executing function as self. */
 		Address objAddr = state.trace.toAddr("this");
 		if(objVal == null) objAddr = state.selfAddr;
-		else state.store = state.store.alloc(objAddr, objVal); // Problem: objVal is a BValue... not an Obj
+		else state.store = state.store.alloc(objAddr, objVal);
 
 
 		if(funVal != null) {
