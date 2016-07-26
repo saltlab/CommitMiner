@@ -249,7 +249,7 @@ public class ExpEval {
 		 * use the object of the currently executing function as self. */
 		Address objAddr = state.trace.toAddr("this");
 		if(objVal == null) objAddr = state.selfAddr;
-		else state.store = state.store.alloc(objAddr, objVal);
+		else state.store = state.store.alloc(objAddr, objVal); // Problem: objVal is a BValue... not an Obj
 
 
 		if(funVal != null) {
@@ -387,7 +387,20 @@ public class ExpEval {
 			InfixExpression ie = (InfixExpression) node;
 			Set<Address> addrs = state.resolveOrCreate(ie.getLeft());
 			if(addrs == null) return null;
-			return Addresses.inject(new Addresses(addrs, Change.convU(node)), Change.convU(node));
+
+			/* Resolve all the objects in the address list and create a new
+			 * BValue which points to those objects. */
+			Addresses selfAddrs = new Addresses(Addresses.LatticeElement.SET, Change.u());
+			for(Address addr : addrs) {
+				BValue val = this.state.store.apply(addr);
+				for(Address objAddr : val.addressAD.addresses) {
+					Obj obj = this.state.store.getObj(objAddr);
+					if(obj != null) selfAddrs.addresses.add(objAddr);
+				}
+			}
+			if(selfAddrs.addresses.isEmpty()) return BValue.bottom(Change.u(), Change.u());
+
+			return Addresses.inject(selfAddrs, Change.u());
 		}
 		else {
 			/* Ignore everything else (e.g., method calls) for now. */

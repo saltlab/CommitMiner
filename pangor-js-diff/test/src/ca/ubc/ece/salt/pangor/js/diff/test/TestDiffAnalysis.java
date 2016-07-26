@@ -353,6 +353,24 @@ public class TestDiffAnalysis {
 		this.runTest(sourceCodeFileChanges, expected, false);
 	}
 
+	@Test
+	public void testPM2_self() throws Exception {
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(
+				"./test/input/diff/pm2_self_old.js",
+				"./test/input/diff/pm2_self_new.js"));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		// No checks, no error is pass.
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */

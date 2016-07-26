@@ -82,8 +82,6 @@ public class ValueCFGVisitor implements ICFGVisitor {
 			if(val.addressAD.le == LatticeElement.TOP) continue;
 			for(Address propAddr : val.addressAD.addresses) {
 				Obj propObj = state.store.getObj(propAddr);
-				if(propObj == null)
-					System.out.println("propObj is null");
 				getObjectFacts(node, propObj.externalProperties, state, identifier);
 			}
 
