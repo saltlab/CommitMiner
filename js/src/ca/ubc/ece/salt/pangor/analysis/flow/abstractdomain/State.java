@@ -424,101 +424,131 @@ public class State implements IState {
 	}
 
 	/**
-	 * Resolve an identifier to an address in the store.
-	 * @param node The identifier to resolve.
+	 * Base case: A simple name in the environment.
+	 * @param node A Name node
 	 * @return The set of addresses this identifier can resolve to.
 	 */
-	public Set<Address> resolveOrCreate(AstNode node) {
+	private Set<Address> resolveOrCreateBaseCase(Name node) {
+
 		Set<Address> result = new HashSet<Address>();
 
-		/* Base Case: A simple name in the environment. */
-		if(node instanceof Name) {
-			Address addr = env.apply(new Identifier(node.toSource()));
-			if(addr == null) {
-				/* Assume the variable exists in the environment (ie. not a TypeError)
-				 * and add it to the environment/store as BValue.TOP since we know
-				 * nothing about it. */
-				addr = trace.makeAddr(node.getID(), "");
-				env = env.strongUpdate(new Identifier(node.toSource(), Change.top()), addr);
-				store = store.alloc(addr, Addresses.dummy(Change.top(), Change.top()));
-			}
-			result.add(addr);
+		Address addr = env.apply(new Identifier(node.toSource()));
+		if(addr == null) {
+			/* Assume the variable exists in the environment (ie. not a TypeError)
+			 * and add it to the environment/store as BValue.TOP since we know
+			 * nothing about it. */
+			addr = trace.makeAddr(node.getID(), "");
+			env = env.strongUpdate(new Identifier(node.toSource(), Change.top()), addr);
+			store = store.alloc(addr, Addresses.dummy(Change.top(), Change.top()));
 		}
 
-		/* Recursive Case: A property access. */
-		else if(node instanceof InfixExpression) {
+		result.add(addr);
+		return result;
 
-			InfixExpression ie = (InfixExpression) node;
+	}
 
-			/* We do not handle the cases where:
-			 * 	1. The rhs is an expression
-			 *  2. The operator is not a property access */
-			if(!(ie.getRight() instanceof Name)
-					|| ie.getOperator() != Token.GETPROP) return result;
+	/**
+	 * Recursive case: A property access.
+	 * @param ie A qualified name node.
+	 * @return The set of addresses this identifier can resolve to.
+	 */
+	private Set<Address> resolveOrCreateInfixCase(InfixExpression ie) {
 
-			/* We have a qualified name. Recursively find all the addresses
-			 * that lhs can resolve to. */
-			Set<Address> lhs = resolveOrCreate(ie.getLeft());
+		Set<Address> result = new HashSet<Address>();
 
-			/* Just in case we couldn't resolve or create the sub-expression. */
-			if(lhs == null) return result;
+		/* We do not handle the cases where:
+		 * 	1. The rhs is an expression
+		 *  2. The operator is not a property access */
+		if(!(ie.getRight() instanceof Name)
+				|| ie.getOperator() != Token.GETPROP) return result;
 
-			/* Lookup the current property at each of these addresses. Ignore
-			 * type errors and auto-boxing for now. */
-			for(Address valAddr : lhs) {
+		/* We have a qualified name. Recursively find all the addresses
+		 * that lhs can resolve to. */
+		Set<Address> lhs = resolveOrCreate(ie.getLeft());
 
-				/* Get the value at the address. */
-				BValue val = store.apply(valAddr);
+		/* Just in case we couldn't resolve or create the sub-expression. */
+		if(lhs == null) return result;
 
-				/* We may need to create a dummy object if 'val' doesn't point
-				 * to any objects. */
-				if(val.addressAD.addresses.size() == 0) {
-					Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
-					Obj dummy = new Obj(ext, new InternalObjectProperties());
-					Address addr = trace.makeAddr(node.getID(), "");
-					store = store.alloc(addr, dummy);
-					val = val.join(Address.inject(addr, Change.top(), Change.top()));
-					store = store.strongUpdate(valAddr, val);
+		/* Lookup the current property at each of these addresses. Ignore
+		 * type errors and auto-boxing for now. */
+		for(Address valAddr : lhs) {
+
+			/* Get the value at the address. */
+			BValue val = store.apply(valAddr);
+
+			/* We may need to create a dummy object if 'val' doesn't point
+			 * to any objects. */
+			if(val.addressAD.addresses.size() == 0) {
+				Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
+				Obj dummy = new Obj(ext, new InternalObjectProperties());
+				Address addr = trace.makeAddr(ie.getID(), "");
+				store = store.alloc(addr, dummy);
+				val = val.join(Address.inject(addr, Change.top(), Change.top()));
+				store = store.strongUpdate(valAddr, val);
+			}
+
+			for(Address objAddr : val.addressAD.addresses) {
+
+				/* Get the Obj from the store. */
+				Obj obj = store.getObj(objAddr);
+
+				/* Look up the property. */
+				Address propAddr = obj.externalProperties.get(new Identifier(ie.getRight().toSource()));
+
+				if(propAddr != null) {
+					result.add(propAddr);
+					// Sanity check that the property address is in the store.
+					BValue propVal = store.apply(propAddr);
+					if(propVal == null)
+						throw new Error("Property value does not exist in store.");
 				}
+				else {
+					/* This property was not found, which means it is either
+					 * undefined or was initialized somewhere outside the
+					 * analysis. Create it and give it the value BValue.TOP. */
 
-				for(Address objAddr : val.addressAD.addresses) {
+					/* Create a new address (BValue) for the property and
+					 * put it in the store. */
+					propAddr = trace.makeAddr(ie.getID(), ie.getRight().toSource());
+					BValue propVal = Addresses.dummy(Change.u(), Change.u());
+					store = store.alloc(propAddr, propVal);
 
-					/* Get the Obj from the store. */
-					Obj obj = store.getObj(objAddr);
+					/* Add the property to the external properties of the object. */
+					Map<Identifier, Address> ext = new HashMap<Identifier, Address>(obj.externalProperties);
+					ext.put(new Identifier(ie.getRight().toSource(), Change.u()), propAddr);
 
-					/* Look up the property. */
-					Address propAddr = obj.externalProperties.get(new Identifier(ie.getRight().toSource()));
+					/* We need to create a new object so that the previous
+					 * states are not affected by this update. */
+					Obj newObj = new Obj(ext, obj.internalProperties);
+					store = store.strongUpdate(objAddr, newObj);
 
-					if(propAddr != null) {
-						result.add(propAddr);
-						// Sanity check that the property address is in the store.
-						BValue propVal = store.apply(propAddr);
-						if(propVal == null) throw new Error("Property value does not exist in store.");
-					}
-					else {
-						/* This property was not found, which means it is either
-						 * undefined or was initialized somewhere outside the
-						 * analysis. Create it and give it the value BValue.TOP. */
-						propAddr = trace.makeAddr(node.getID(), ie.getRight().toSource());
-						store = store.alloc(propAddr, Addresses.dummy(Change.u(), Change.u()));
-
-						/* We need to create a new object with the updated
-						 * property. If we don't, then any property we add will
-						 * be visible to prior statements which don't have
-						 * access to the property's BValue in the store. */
-
-						Map<Identifier, Address> ext = new HashMap<Identifier, Address>(obj.externalProperties);
-						ext.put(new Identifier(ie.getRight().toSource(), Change.u()), propAddr);
-						obj = new Obj(ext, obj.internalProperties);
-						store = store.strongUpdate(objAddr, obj);
-
-						result.add(propAddr);
-					}
+					result.add(propAddr);
 				}
 			}
 		}
 
 		return result;
+
+	}
+
+	/**
+	 * Resolve an identifier to an address in the store.
+	 * @param node The identifier to resolve.
+	 * @return The set of addresses this identifier can resolve to.
+	 */
+	public Set<Address> resolveOrCreate(AstNode node) {
+
+		/* Base Case: A simple name in the environment. */
+		if(node instanceof Name) {
+			return resolveOrCreateBaseCase((Name)node);
+		}
+
+		/* Recursive Case: A property access. */
+		else if(node instanceof InfixExpression) {
+			return resolveOrCreateInfixCase((InfixExpression)node);
+		}
+
+		return new HashSet<Address>();
 
 	}
 
