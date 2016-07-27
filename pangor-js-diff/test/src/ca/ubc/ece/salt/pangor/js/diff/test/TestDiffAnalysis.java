@@ -390,6 +390,31 @@ public class TestDiffAnalysis {
 	}
 
 	/**
+	 * This is an example of where our analysis fails to display an updated
+	 * value in the store. The object literal is passed to process.send as an
+	 * argument. Because the object literal is not stored in a variable
+	 * accessible from the local environment, the object literal is not
+	 * visible (through the environment) when visited by ValueCFGVisitor.
+	 */
+	@Test
+	public void testPM2_human_event() throws Exception {
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(
+				"./test/input/diff/pm2_human_event_old.js",
+				"./test/input/diff/pm2_human_event_new.js"));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		// No checks, no error is pass.
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+	}
+
+	/**
 	 * @return A dummy commit for testing.
 	 */
 	public static Commit getCommit() {
