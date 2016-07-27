@@ -371,6 +371,24 @@ public class TestDiffAnalysis {
 		this.runTest(sourceCodeFileChanges, expected, false);
 	}
 
+	@Test
+	public void testPM2_interactor() throws Exception {
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(
+				"./test/input/diff/pm2_interactor_old.js",
+				"./test/input/diff/pm2_interactor_new.js"));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		// No checks, no error is pass.
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */
@@ -412,17 +430,17 @@ public class TestDiffAnalysis {
 		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
 		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
 
-		Pair<IQuery, Transformer> controlQuery = getControlQuery();
-		queries.put(controlQuery.getLeft(), controlQuery.getRight());
-
-		Pair<IQuery, Transformer> astQuery = getAstQuery();
-		queries.put(astQuery.getLeft(), astQuery.getRight());
-
-		Pair<IQuery, Transformer> lineQuery = getLineQuery();
-		queries.put(lineQuery.getLeft(), lineQuery.getRight());
-
-		Pair<IQuery, Transformer> totalLinesQuery = getTotalLinesQuery();
-		queries.put(totalLinesQuery.getLeft(), totalLinesQuery.getRight());
+//		Pair<IQuery, Transformer> controlQuery = getControlQuery();
+//		queries.put(controlQuery.getLeft(), controlQuery.getRight());
+//
+//		Pair<IQuery, Transformer> astQuery = getAstQuery();
+//		queries.put(astQuery.getLeft(), astQuery.getRight());
+//
+//		Pair<IQuery, Transformer> lineQuery = getLineQuery();
+//		queries.put(lineQuery.getLeft(), lineQuery.getRight());
+//
+//		Pair<IQuery, Transformer> totalLinesQuery = getTotalLinesQuery();
+//		queries.put(totalLinesQuery.getLeft(), totalLinesQuery.getRight());
 
 		return queries;
 

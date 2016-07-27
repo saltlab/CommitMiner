@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.pangor.js.diff;
 
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.DoLoop;
 import org.mozilla.javascript.ast.ForInLoop;
 import org.mozilla.javascript.ast.ForLoop;
@@ -26,7 +27,11 @@ public class IsUsedVisitor implements NodeVisitor {
 	public static boolean isUsed(AstNode statement, Identifier identity) {
 		IsUsedVisitor visitor = new IsUsedVisitor(statement, identity);
 
-		if(statement instanceof FunctionNode) {
+		if(statement instanceof AstRoot) {
+			/* This is the root. Nothing should be flagged. */
+			return false;
+		}
+		else if(statement instanceof FunctionNode) {
 			/* This is a function declaration, so only check the parameters. */
 			FunctionNode function = (FunctionNode) statement;
 			for(AstNode param : function.getParams()) {
