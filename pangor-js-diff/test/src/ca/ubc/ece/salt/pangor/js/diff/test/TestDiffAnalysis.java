@@ -395,6 +395,9 @@ public class TestDiffAnalysis {
 	 * argument. Because the object literal is not stored in a variable
 	 * accessible from the local environment, the object literal is not
 	 * visible (through the environment) when visited by ValueCFGVisitor.
+	 *
+	 * Solution TODO: Create a dummy variable in the environment pointing to
+	 * 				  the object literal.
 	 */
 	@Test
 	public void testPM2_human_event() throws Exception {
