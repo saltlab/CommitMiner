@@ -418,6 +418,34 @@ public class TestDiffAnalysis {
 	}
 
 	/**
+	 * This is an example of where our analysis fails to display an updated
+	 * value. Because the property being assigned is accessed through a
+	 * dynamic access (ie. 'God.clusters_db[clu.pm2_env.pm_id]...'), the
+	 * value of which is not available to the analysis, the analysis cannot
+	 * create a property name where the value should be stored in the object.
+	 *
+	 * Solution TODO: Create a dummy property. This will make the solution
+	 * 				  less sound, but is probably ok in practice.
+	 */
+	@Test
+	public void testPM2_dynprop() throws Exception {
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(
+				"./test/input/diff/pm2_dynprop_old.js",
+				"./test/input/diff/pm2_dynprop_new.js"));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		// No checks, no error is pass.
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+	}
+
+	/**
 	 * @return A dummy commit for testing.
 	 */
 	public static Commit getCommit() {
@@ -458,9 +486,9 @@ public class TestDiffAnalysis {
 		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
 		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
 
-//		Pair<IQuery, Transformer> controlQuery = getControlQuery();
-//		queries.put(controlQuery.getLeft(), controlQuery.getRight());
-//
+		Pair<IQuery, Transformer> controlQuery = getControlQuery();
+		queries.put(controlQuery.getLeft(), controlQuery.getRight());
+
 //		Pair<IQuery, Transformer> astQuery = getAstQuery();
 //		queries.put(astQuery.getLeft(), astQuery.getRight());
 //
