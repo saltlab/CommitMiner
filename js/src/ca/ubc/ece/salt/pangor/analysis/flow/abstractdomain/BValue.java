@@ -45,11 +45,6 @@ public class BValue {
 
 	public BValue join(BValue state) {
 
-		if(state == null)
-			System.out.println("State == null");
-		if(this.stringAD == null)
-			System.out.println("StringAD == null");
-
 		return new BValue(
 				this.stringAD.join(state.stringAD),
 				this.numberAD.join(state.numberAD),

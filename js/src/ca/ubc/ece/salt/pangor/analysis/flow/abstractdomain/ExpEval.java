@@ -154,7 +154,7 @@ public class ExpEval {
 
 		Str str = null;
 		String val = strl.getValue();
-		Change change = Change.conv(strl);
+		Change change = Change.convU(strl);
 		if(val.equals("")) str = new Str(Str.LatticeElement.SBLANK, change);
 		else if(NumberUtils.isNumber(val)) {
 			str = new Str(Str.LatticeElement.SNUMVAL, val, change);
