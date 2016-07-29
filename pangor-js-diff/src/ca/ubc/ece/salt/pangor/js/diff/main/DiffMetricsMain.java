@@ -75,8 +75,8 @@ public class DiffMetricsMain {
 			source.envLineSubtraction = subtract(sfp.source.environment, sfp.source.line);
 			source.valLineSubtraction = subtract(sfp.source.value, sfp.source.line);
 			source.conAstSubtraction = subtract(sfp.source.control, sfp.source.ast);
-			source.envAstSubtraction = subtract(sfp.source.environment, sfp.source.environment);
-			source.valAstSubtraction = subtract(sfp.source.value, sfp.source.value);
+			source.envAstSubtraction = subtract(sfp.source.environment, sfp.source.ast);
+			source.valAstSubtraction = subtract(sfp.source.value, sfp.source.ast);
 			sourceComparisons.add(source);
 
 			/* Destination */
