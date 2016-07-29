@@ -9,12 +9,11 @@ public class SourceFilePair {
 	public SourceFile source;
 	public SourceFile destination;
 
-	public SourceFilePair(String commit, String file,
-						  SourceFile source, SourceFile destination) {
+	public SourceFilePair(String commit, String file) {
 		this.commit = commit;
 		this.file = file;
-		this.source = source;
-		this.destination = destination;
+		this.source = new SourceFile();
+		this.destination = new SourceFile();
 	}
 
 
