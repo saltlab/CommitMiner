@@ -36,6 +36,7 @@ public class SourceFile {
 			this.line.add(fv.line);
 		}
 		else if(fv.subType.equals("AST") && !fv.change.equals("MOVED")) {
+//		else if(fv.subType.equals("AST")) {
 			this.ast.add(fv.line);
 		}
 		else if(fv.subType.equals("CONTROL")) {

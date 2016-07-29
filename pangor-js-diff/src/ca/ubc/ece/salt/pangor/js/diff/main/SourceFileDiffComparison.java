@@ -13,6 +13,9 @@ public class SourceFileDiffComparison {
 //	public int envAstIntersection;
 //	public int valAstIntersection;
 
+	public String commit;
+	public String file;
+
 	public int totalLines;
 	public int lineChanges;
 	public int astChanges;
