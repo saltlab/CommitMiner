@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ca.ubc.ece.salt.pangor.js.diff.main.SourceFile.DiffType;
+
 public class DiffMetricsMain {
 
 	public static void main(String[] args) {
@@ -56,158 +58,202 @@ public class DiffMetricsMain {
 		}
 
 		/* Compute the metrics for each file. */
+		List<SourceFileDiffComparison> pairComparisons = new LinkedList<SourceFileDiffComparison>();
 		List<SourceFileDiffComparison> sourceComparisons = new LinkedList<SourceFileDiffComparison>();
 		List<SourceFileDiffComparison> destinationComparisons = new LinkedList<SourceFileDiffComparison>();
 		for(SourceFilePair sfp : sourceFilePairs.values()) {
 
+			/* Pair */
+			SourceFileDiffComparison pair = new SourceFileDiffComparison();
+			pair.commit = sfp.commit;
+			pair.file = sfp.file;
+			pair.totalLines = sfp.getAvgTotalLines();
+			pair.lineChanges = sfp.getSize(DiffType.LINE);
+			pair.astChanges = sfp.getSize(DiffType.AST);
+			pair.conChanges = sfp.getSize(DiffType.CONTROL);
+			pair.envChanges = sfp.getSize(DiffType.ENVIRONMENT);
+			pair.valChanges = sfp.getSize(DiffType.VALUE);
+			pair.multiChanges = sfp.getSize(DiffType.MULTI);
+			pair.conAstSubtraction = sfp.subtract(DiffType.CONTROL, DiffType.AST);
+			pair.envAstSubtraction = sfp.subtract(DiffType.ENVIRONMENT, DiffType.AST);
+			pair.valAstSubtraction = sfp.subtract(DiffType.VALUE, DiffType.AST);
+			pair.multiAstSubtraction = sfp.subtract(DiffType.MULTI, DiffType.AST);
+			pairComparisons.add(pair);
 
 			/* Source */
 			SourceFileDiffComparison source = new SourceFileDiffComparison();
 			source.commit = sfp.commit;
 			source.file = sfp.file;
-			source.totalLines = sfp.source.totalLines;
-			source.lineChanges = sfp.source.line.size();
-			source.astChanges = sfp.source.ast.size();
-			source.conChanges = sfp.source.control.size();
-			source.envChanges = sfp.source.environment.size();
-			source.astLineSubtraction = subtract(sfp.source.ast, sfp.source.line);
-			source.conLineSubtraction = subtract(sfp.source.control, sfp.source.line);
-			source.envLineSubtraction = subtract(sfp.source.environment, sfp.source.line);
-			source.valLineSubtraction = subtract(sfp.source.value, sfp.source.line);
-			source.conAstSubtraction = subtract(sfp.source.control, sfp.source.ast);
-			source.envAstSubtraction = subtract(sfp.source.environment, sfp.source.ast);
-			source.valAstSubtraction = subtract(sfp.source.value, sfp.source.ast);
+			source.totalLines = sfp.source.getTotalLines();
+			source.lineChanges = sfp.source.getSize(DiffType.LINE);
+			source.astChanges = sfp.source.getSize(DiffType.AST);
+			source.conChanges = sfp.source.getSize(DiffType.CONTROL);
+			source.envChanges = sfp.source.getSize(DiffType.ENVIRONMENT);
+			source.valChanges = sfp.source.getSize(DiffType.VALUE);
+			source.multiChanges = sfp.source.getSize(DiffType.MULTI);
+			source.conAstSubtraction = sfp.source.subtract(DiffType.CONTROL, DiffType.AST);
+			source.envAstSubtraction = sfp.source.subtract(DiffType.ENVIRONMENT, DiffType.AST);
+			source.valAstSubtraction = sfp.source.subtract(DiffType.VALUE, DiffType.AST);
+			source.multiAstSubtraction = sfp.source.subtract(DiffType.MULTI, DiffType.AST);
 			sourceComparisons.add(source);
 
 			/* Destination */
 			SourceFileDiffComparison destination = new SourceFileDiffComparison();
 			destination.commit = sfp.commit;
 			destination.file = sfp.file;
-			destination.totalLines = sfp.destination.totalLines;
-			destination.lineChanges = sfp.destination.line.size();
-			destination.astChanges = sfp.destination.ast.size();
-			destination.conChanges = sfp.destination.control.size();
-			destination.envChanges = sfp.destination.environment.size();
-			destination.astLineSubtraction = subtract(sfp.destination.ast, sfp.destination.line);
-			destination.conLineSubtraction = subtract(sfp.destination.control, sfp.destination.line);
-			destination.envLineSubtraction = subtract(sfp.destination.environment, sfp.destination.line);
-			destination.valLineSubtraction = subtract(sfp.destination.value, sfp.destination.line);
-			destination.conAstSubtraction = subtract(sfp.destination.control, sfp.destination.ast);
-			destination.envAstSubtraction = subtract(sfp.destination.environment, sfp.destination.ast);
-			destination.valAstSubtraction = subtract(sfp.destination.value, sfp.destination.ast);
+			destination.totalLines = sfp.destination.getTotalLines();
+			destination.lineChanges = sfp.destination.getSize(DiffType.LINE);
+			destination.astChanges = sfp.destination.getSize(DiffType.AST);
+			destination.conChanges = sfp.destination.getSize(DiffType.CONTROL);
+			destination.envChanges = sfp.destination.getSize(DiffType.ENVIRONMENT);
+			destination.valChanges = sfp.destination.getSize(DiffType.VALUE);
+			destination.multiChanges = sfp.destination.getSize(DiffType.MULTI);
+			destination.conAstSubtraction = sfp.destination.subtract(DiffType.CONTROL, DiffType.AST);
+			destination.envAstSubtraction = sfp.destination.subtract(DiffType.ENVIRONMENT, DiffType.AST);
+			destination.valAstSubtraction = sfp.destination.subtract(DiffType.VALUE, DiffType.AST);
+			destination.multiAstSubtraction = sfp.destination.subtract(DiffType.MULTI, DiffType.AST);
 			destinationComparisons.add(destination);
 
 		}
 
-		/* Print the mean and median. */
-		Set<String> pairLineImprovedCommits = new HashSet<String>();
-		Set<String> pairLineImprovedFiles = new HashSet<String>();
-		Set<String> pairImprovedCommits = new HashSet<String>();
-		Set<String> pairImprovedFiles = new HashSet<String>();
-		Set<String> pairASTCommit = new HashSet<String>();
-		Set<String> pairASTFile = new HashSet<String>();
+		/* Print the metrics. */
 		System.out.println("--Source Metrics--");
-		printMetrics(sourceComparisons, pairLineImprovedCommits, pairLineImprovedFiles, pairImprovedCommits, pairImprovedFiles, pairASTCommit, pairASTFile);
+		printMetrics(sourceComparisons);
 		System.out.println("\n--Destination Metrics--");
-		printMetrics(destinationComparisons, pairLineImprovedCommits, pairLineImprovedFiles, pairImprovedCommits, pairImprovedFiles, pairASTCommit, pairASTFile);
+		printMetrics(destinationComparisons);
 		System.out.println("\n--Pair Metrics--");
-		System.out.println("Total Files Line-Improved = " + pairLineImprovedFiles.size());
-		System.out.println("Total Commits Line-Improved = " + pairLineImprovedCommits.size());
-		System.out.println("Total Files Improved = " + pairImprovedFiles.size());
-		System.out.println("Total Commits Improved = " + pairImprovedCommits.size());
-		System.out.println("Total Files With AST Changes = " + pairASTFile.size());
-		System.out.println("Total Commits With AST Changes = " + pairASTCommit.size());
+		printMetrics(pairComparisons);
 
 	}
 
-	private void printMetrics(List<SourceFileDiffComparison> sourceComparisons,
-			Set<String> pairLineImprovedCommits, Set<String> pairLineImprovedFiles,
-			Set<String> pairImprovedCommits, Set<String> pairImprovedFiles,
-			Set<String> pairASTCommit, Set<String> pairASTFile) {
+
+	private void printMetrics(List<SourceFileDiffComparison> sourceComparisons) {
 
 		Set<String> totalCommits = new HashSet<String>();
-		Set<String> improvedCommits = new HashSet<String>();
+		Set<String> totalASTModifiedCommits = new HashSet<String>();
+		int totalASTModifiedFiles = 0;
 
-		double astLineAvg = 0;
-		double conAstAvg = 0;
-		double envAstAvg = 0;
-		double valAstAvg = 0;
+		/* Count the number of commits with at least one multi-diff fact. */
+		Set<String> multiContextImprovedCommits = new HashSet<String>();
+		Set<String> conContextImprovedCommits = new HashSet<String>();
+		Set<String> envContextImprovedCommits = new HashSet<String>();
+		Set<String> valContextImprovedCommits = new HashSet<String>();
 
-		int astCnt = 0;
-		int conCnt = 0;
-		int envCnt = 0;
-		int valCnt = 0;
-		int anyCnt = 0;
+		/* Count the number of files with at least one multi-diff fact. */
+		int multiContextImprovedFilePairs = 0;
+		int conContextImprovedFilePairs = 0;
+		int envContextImprovedFilePairs = 0;
+		int valContextImprovedFilePairs = 0;
 
+		/* Count the number of commits with at least one line improvement. */
+		Set<String> multiLineImprovedCommits = new HashSet<String>();
+		Set<String> conLineImprovedCommits = new HashSet<String>();
+		Set<String> envLineImprovedCommits = new HashSet<String>();
+		Set<String> valLineImprovedCommits = new HashSet<String>();
+
+		/* Count the number of files with at least one line improvement. */
+		int multiLineImprovedFilePairs = 0;
+		int conLineImprovedFilePairs = 0;
+		int envLineImprovedFilePairs = 0;
+		int valLineImprovedFilePairs = 0;
+
+		/* Count the total number of line-improvements. */
+		int multiLinesAdded = 0;
+		int conLinesAdded = 0;
+		int envLinesAdded = 0;
+		int valLinesAdded = 0;
+
+		/* Count the total number of multi-diff facts added. */
+		int multiFactsAdded = 0;
+		int conFactsAdded = 0;
+		int envFactsAdded = 0;
+		int valFactsAdded = 0;
+
+		/* Compute the totals. */
 		for(SourceFileDiffComparison source : sourceComparisons) {
 
-			if(source.astChanges > 0) {
-				pairASTCommit.add(source.commit);
-				pairASTFile.add(source.commit + "~" + source.file);
-			}
-
-			if(source.conChanges > 0
-					|| source.envChanges > 0
-					|| source.valChanges > 0) {
-				pairImprovedCommits.add(source.commit);
-				pairImprovedFiles.add(source.commit + "~" + source.file);
-			}
-
-			if(source.astLineSubtraction > 0) {
-				astLineAvg += source.astLineSubtraction;
-				astCnt++;
-			}
-			if(source.conAstSubtraction > 0) {
-				conAstAvg += source.conAstSubtraction;
-				conCnt++;
-			}
-			if(source.envAstSubtraction > 0) {
-				envAstAvg += source.envAstSubtraction;
-				envCnt++;
-			}
-			if(source.valAstSubtraction > 0) {
-				valAstAvg += source.valAstSubtraction;
-				valCnt++;
-			}
-			if(source.conAstSubtraction > 0
-					|| source.envAstSubtraction > 0
-					|| source.valAstSubtraction > 0) {
-				anyCnt++;
-				improvedCommits.add(source.commit);
-				pairLineImprovedCommits.add(source.commit);
-				pairLineImprovedFiles.add(source.commit + "~" + source.file);
-			}
-
+			/* For computing the total number of commits. */
 			totalCommits.add(source.commit);
 
-//			System.out.println(source.astChanges + "," + source.conAstSubtraction);
+			/* For computing the total number of commits with at least one
+			 * AST change. */
+			if(source.astChanges > 0) {
+				totalASTModifiedCommits.add(source.commit);
+				totalASTModifiedFiles++;
+			}
+
+			/* Check if the file is line-improved. */
+			if(source.multiAstSubtraction > 0) {
+				multiLineImprovedCommits.add(source.commit);
+				multiLineImprovedFilePairs++;
+				multiLinesAdded += source.multiAstSubtraction;
+			}
+			if(source.conAstSubtraction > 0) {
+				conLineImprovedCommits.add(source.commit);
+				conLineImprovedFilePairs++;
+				conLinesAdded += source.conAstSubtraction;
+			}
+			if(source.envAstSubtraction > 0) {
+				envLineImprovedCommits.add(source.commit);
+				envLineImprovedFilePairs++;
+				envLinesAdded += source.envAstSubtraction;
+			}
+			if(source.valAstSubtraction > 0) {
+				valLineImprovedCommits.add(source.commit);
+				valLineImprovedFilePairs++;
+				valLinesAdded += source.valAstSubtraction;
+			}
+
+			/* Check if the file is context-improved. */
+			if(source.multiChanges > 0) {
+				multiContextImprovedCommits.add(source.commit);
+				multiContextImprovedFilePairs++;
+				multiFactsAdded += source.multiChanges;
+			}
+			if(source.conChanges > 0) {
+				conContextImprovedCommits.add(source.commit);
+				conContextImprovedFilePairs++;
+				conFactsAdded += source.conChanges;
+			}
+			if(source.envChanges > 0) {
+				envContextImprovedCommits.add(source.commit);
+				envContextImprovedFilePairs++;
+				envFactsAdded += source.envChanges;
+			}
+			if(source.valChanges > 0) {
+				valContextImprovedCommits.add(source.commit);
+				valContextImprovedFilePairs++;
+				valFactsAdded += source.valChanges;
+			}
+
 		}
 
-		if(sourceComparisons.size() > 0) {
-			astLineAvg /= astCnt;
-			conAstAvg /= conCnt;
-			envAstAvg /= envCnt;
-			valAstAvg /= valCnt;
-		}
-
-		System.out.println("AST - Line Avg = " + astLineAvg);
-		System.out.println("Control - AST Avg = " + conAstAvg);
-		System.out.println("Environment - AST Avg = " + envAstAvg);
-		System.out.println("Value - AST Avg = " + valAstAvg);
-		System.out.println("Control Improves AST Count = " + conCnt);
-		System.out.println("Environment Improves AST Count = " + envCnt);
-		System.out.println("Value Improves AST Count = " + valCnt);
-		System.out.println("Any Improves AST Count = " + anyCnt);
-		System.out.println("Total Files Analyzed = " + sourceComparisons.size());
-		System.out.println("Any Improves AST Count in Commit = " + improvedCommits.size());
 		System.out.println("Total Commits Analyzed = " + totalCommits.size());
+		System.out.println("Total Files Analyzed = " + sourceComparisons.size());
+		System.out.println("");
+		System.out.println("Total Commits With AST Change = " + totalASTModifiedCommits.size());
+		System.out.println("Total File With AST Change = " + totalASTModifiedFiles);
+		System.out.println("");
+		System.out.println("Multi-Context-Commit = " + multiContextImprovedCommits.size());
+		System.out.println("Control-Context-Commit = " + conContextImprovedCommits.size());
+		System.out.println("Environment-Context-Commit = " + envContextImprovedCommits.size());
+		System.out.println("Value-Context-Commit = " + valContextImprovedCommits.size());
+		System.out.println("");
+		System.out.println("Multi-Context-FilePair = " + multiContextImprovedFilePairs);
+		System.out.println("Control-Context-FilePair = " + conContextImprovedFilePairs);
+		System.out.println("Environment-Context-FilePair = " + envContextImprovedFilePairs);
+		System.out.println("Value-Context-FilePair = " + valContextImprovedFilePairs);
+		System.out.println("");
+		System.out.println("Multi-Line-Commit = " + multiLineImprovedCommits.size());
+		System.out.println("Control-Line-Commit = " + conLineImprovedCommits.size());
+		System.out.println("Environment-Line-Commit = " + envLineImprovedCommits.size());
+		System.out.println("Value-Line-Commit = " + valLineImprovedCommits.size());
+		System.out.println("");
+		System.out.println("Multi-Line-FilePair = " + multiLineImprovedFilePairs);
+		System.out.println("Control-Line-FilePair = " + conLineImprovedFilePairs);
+		System.out.println("Environment-Line-FilePair = " + envLineImprovedFilePairs);
+		System.out.println("Value-Line-FilePair = " + valLineImprovedFilePairs);
 
-	}
-
-	private int subtract(Set<Integer> left, Set<Integer> right) {
-		Set<Integer> tmp = new HashSet<Integer>(left);
-		tmp.removeAll(right);
-		return tmp.size();
 	}
 
 }

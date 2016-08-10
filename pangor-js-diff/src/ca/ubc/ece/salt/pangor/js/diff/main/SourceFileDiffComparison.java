@@ -1,37 +1,27 @@
 package ca.ubc.ece.salt.pangor.js.diff.main;
 
+
 public class SourceFileDiffComparison {
 
-	// Intersection: Lines covered by both lhs and rhs
-//	public int astLineIntersection;
-//
-//	public int conLineIntersection;
-//	public int envLineIntersection;
-//	public int valLineIntersection;
-//
-//	public int conAstIntersection;
-//	public int envAstIntersection;
-//	public int valAstIntersection;
-
+	// Identifier information
 	public String commit;
 	public String file;
 
+	// Total number of lines in the file
 	public int totalLines;
+
+	// Total number of facts presented by each diff
 	public int lineChanges;
 	public int astChanges;
 	public int conChanges;
 	public int envChanges;
 	public int valChanges;
+	public int multiChanges;
 
 	// Subtraction: Lines covered by lhs which are not covered by rhs
-	public int astLineSubtraction;
-
-	public int conLineSubtraction;
-	public int envLineSubtraction;
-	public int valLineSubtraction;
-
 	public int conAstSubtraction;
 	public int envAstSubtraction;
 	public int valAstSubtraction;
+	public int multiAstSubtraction;
 
 }

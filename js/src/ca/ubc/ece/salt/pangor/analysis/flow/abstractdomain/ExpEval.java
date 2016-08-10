@@ -122,6 +122,7 @@ public class ExpEval {
 		default:
 			/* This is an identifier.. so we attempt to dereference it. */
 			BValue val = resolveValue(ie);
+			// TODO: This isn't how we want to handle these expressions. Update to follow the formal specification of binary operators.
 			if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
 			return val;
 		}

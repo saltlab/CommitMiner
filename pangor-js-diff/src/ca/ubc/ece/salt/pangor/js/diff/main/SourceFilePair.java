@@ -1,5 +1,8 @@
 package ca.ubc.ece.salt.pangor.js.diff.main;
 
+import ca.ubc.ece.salt.pangor.js.diff.main.SourceFile.DiffType;
+
+
 public class SourceFilePair {
 
 	public String project;
@@ -16,6 +19,33 @@ public class SourceFilePair {
 		this.destination = new SourceFile();
 	}
 
+	/**
+	 * @return the averages size of the file in # of lines
+	 */
+	public int getAvgTotalLines() {
+		int s = this.source.totalLines;
+		int d = this.destination.totalLines;
+		return (s+d)/2;
+	}
+
+	/**
+	 * Set subtracts the right set from the left set.
+	 * @return the number of lines in {@code left} that were not in {@code right}
+	 */
+	public int subtract(DiffType left, DiffType right) {
+		int s = this.source.subtract(left, right);
+		int d = this.destination.subtract(left, right);
+		return s + d;
+	}
+
+	/**
+	 * @return the size of the diff for the file
+	 */
+	public int getSize(DiffType type) {
+		int s = this.source.getSize(type);
+		int d = this.destination.getSize(type);
+		return s + d;
+	}
 
 	@Override
 	public int hashCode() {

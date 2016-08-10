@@ -9,7 +9,6 @@ public class SourceFile {
 
 	public Set<Integer> line;
 	public Set<Integer> ast;
-	public Set<Integer> astMoved;
 	public Set<Integer> astUpdated;
 	public Set<Integer> control;
 	public Set<Integer> environment;
@@ -49,6 +48,61 @@ public class SourceFile {
 			this.value.add(fv.line);
 		}
 
+	}
+
+	/**
+	 * @return the total number of lines in the file
+	 */
+	public int getTotalLines() {
+		return this.totalLines;
+	}
+
+	/**
+	 * @return the size of the diff for the file
+	 */
+	public int getSize(DiffType type) {
+		return getDiffSet(type).size();
+	}
+
+	/**
+	 * Set subtracts the right set from the left set.
+	 * @return the number of lines in {@code left} that were not in {@code right}
+	 */
+	public int subtract(DiffType left, DiffType right) {
+		Set<Integer> leftSet = getDiffSet(left);
+		Set<Integer> rightSet = getDiffSet(right);
+		Set<Integer> tmp = new HashSet<Integer>(leftSet);
+		tmp.removeAll(rightSet);
+		return tmp.size();
+	}
+
+	/**
+	 * @return The set associated with the diff type.
+	 */
+	private Set<Integer> getDiffSet(DiffType type) {
+		switch(type) {
+		default:
+		case MULTI:
+			Set<Integer> multi = new HashSet<Integer>();
+			multi.addAll(this.control);
+			multi.addAll(this.environment);
+			multi.addAll(this.value);
+			return multi;
+		case LINE: return this.line;
+		case AST: return this.ast;
+		case CONTROL: return this.control;
+		case ENVIRONMENT: return this.environment;
+		case VALUE: return this.value;
+		}
+	}
+
+	public static enum DiffType {
+		MULTI,
+		LINE,
+		AST,
+		CONTROL,
+		ENVIRONMENT,
+		VALUE
 	}
 
 }
