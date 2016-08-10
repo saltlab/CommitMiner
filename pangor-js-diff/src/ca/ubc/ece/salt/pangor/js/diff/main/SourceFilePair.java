@@ -8,13 +8,16 @@ public class SourceFilePair {
 	public String project;
 	public String commit;
 	public String file;
+	public String url;
 
 	public SourceFile source;
 	public SourceFile destination;
 
-	public SourceFilePair(String commit, String file) {
+	public SourceFilePair(String project, String commit, String file, String url) {
+		this.project = project;
 		this.commit = commit;
 		this.file = file;
+		this.url = url;
 		this.source = new SourceFile();
 		this.destination = new SourceFile();
 	}

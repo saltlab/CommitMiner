@@ -42,7 +42,7 @@ public class DiffMetricsMain {
 				/* Get the source file pair for the feture vector. */
 				SourceFilePair sfp = sourceFilePairs.get(fv);
 				if(sfp == null) {
-					sfp = new SourceFilePair(fv.bfc, fv.file);
+					sfp = new SourceFilePair(fv.project, fv.bfc, fv.file, fv.url);
 					sourceFilePairs.put(fv, sfp);
 				}
 
@@ -65,8 +65,10 @@ public class DiffMetricsMain {
 
 			/* Pair */
 			SourceFileDiffComparison pair = new SourceFileDiffComparison();
+			pair.project = sfp.project;
 			pair.commit = sfp.commit;
 			pair.file = sfp.file;
+			pair.url = sfp.url;
 			pair.totalLines = sfp.getAvgTotalLines();
 			pair.lineChanges = sfp.getSize(DiffType.LINE);
 			pair.astChanges = sfp.getSize(DiffType.AST);
@@ -82,8 +84,10 @@ public class DiffMetricsMain {
 
 			/* Source */
 			SourceFileDiffComparison source = new SourceFileDiffComparison();
+			source.project = sfp.project;
 			source.commit = sfp.commit;
 			source.file = sfp.file;
+			source.url = sfp.url;
 			source.totalLines = sfp.source.getTotalLines();
 			source.lineChanges = sfp.source.getSize(DiffType.LINE);
 			source.astChanges = sfp.source.getSize(DiffType.AST);
@@ -99,8 +103,10 @@ public class DiffMetricsMain {
 
 			/* Destination */
 			SourceFileDiffComparison destination = new SourceFileDiffComparison();
+			destination.project = sfp.project;
 			destination.commit = sfp.commit;
 			destination.file = sfp.file;
+			destination.url = sfp.url;
 			destination.totalLines = sfp.destination.getTotalLines();
 			destination.lineChanges = sfp.destination.getSize(DiffType.LINE);
 			destination.astChanges = sfp.destination.getSize(DiffType.AST);
@@ -239,20 +245,40 @@ public class DiffMetricsMain {
 		System.out.println("Environment-Context-Commit = " + envContextImprovedCommits.size());
 		System.out.println("Value-Context-Commit = " + valContextImprovedCommits.size());
 		System.out.println("");
+		System.out.println("Multi-AvgFactsAdded-Commit = " + multiFactsAdded/multiContextImprovedCommits.size());
+		System.out.println("Control-AvgFactsAdded-Commit = " + conFactsAdded/conContextImprovedCommits.size());
+		System.out.println("Environment-AvgFactsAdded-Commit = " + envFactsAdded/envContextImprovedCommits.size());
+		System.out.println("Value-AvgFactsAdded-Commit = " + envFactsAdded/valContextImprovedCommits.size());
+		System.out.println("");
 		System.out.println("Multi-Context-FilePair = " + multiContextImprovedFilePairs);
 		System.out.println("Control-Context-FilePair = " + conContextImprovedFilePairs);
 		System.out.println("Environment-Context-FilePair = " + envContextImprovedFilePairs);
 		System.out.println("Value-Context-FilePair = " + valContextImprovedFilePairs);
+		System.out.println("");
+		System.out.println("Multi-AvgFactsAdded-FilePair = " + multiFactsAdded/multiContextImprovedFilePairs);
+		System.out.println("Control-AvgFactsAdded-FilePair = " + conFactsAdded/conContextImprovedFilePairs);
+		System.out.println("Environment-AvgFactsAdded-FilePair = " + envFactsAdded/envContextImprovedFilePairs);
+		System.out.println("Value-AvgFactsAdded-FilePair = " + valFactsAdded/valContextImprovedFilePairs);
 		System.out.println("");
 		System.out.println("Multi-Line-Commit = " + multiLineImprovedCommits.size());
 		System.out.println("Control-Line-Commit = " + conLineImprovedCommits.size());
 		System.out.println("Environment-Line-Commit = " + envLineImprovedCommits.size());
 		System.out.println("Value-Line-Commit = " + valLineImprovedCommits.size());
 		System.out.println("");
+		System.out.println("Multi-AvgLinesAdded-Commit = " + multiLinesAdded/multiLineImprovedCommits.size());
+		System.out.println("Control-AvgLinesAdded-Commit = " + conLinesAdded/conLineImprovedCommits.size());
+		System.out.println("Environment-AvgLinesAdded-Commit = " + envLinesAdded/envLineImprovedCommits.size());
+		System.out.println("Value-AvgLinesAdded-Commit = " + valLinesAdded/valLineImprovedCommits.size());
+		System.out.println("");
 		System.out.println("Multi-Line-FilePair = " + multiLineImprovedFilePairs);
 		System.out.println("Control-Line-FilePair = " + conLineImprovedFilePairs);
 		System.out.println("Environment-Line-FilePair = " + envLineImprovedFilePairs);
 		System.out.println("Value-Line-FilePair = " + valLineImprovedFilePairs);
+		System.out.println("");
+		System.out.println("Multi-AvgLinesAdded-FilePair = " + multiLinesAdded/multiLineImprovedFilePairs);
+		System.out.println("Control-AvgLinesAdded-FilePair = " + conLinesAdded/conLineImprovedFilePairs);
+		System.out.println("Environment-AvgLinesAdded-FilePair = " + envLinesAdded/envLineImprovedFilePairs);
+		System.out.println("Value-AvgLinesAdded-FilePair = " + valLinesAdded/valLineImprovedFilePairs);
 
 	}
 

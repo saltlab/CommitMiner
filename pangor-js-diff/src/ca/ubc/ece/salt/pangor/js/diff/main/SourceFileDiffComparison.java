@@ -4,8 +4,10 @@ package ca.ubc.ece.salt.pangor.js.diff.main;
 public class SourceFileDiffComparison {
 
 	// Identifier information
+	public String project;
 	public String commit;
 	public String file;
+	public String url;
 
 	// Total number of lines in the file
 	public int totalLines;
