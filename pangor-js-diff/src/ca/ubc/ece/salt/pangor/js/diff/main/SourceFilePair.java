@@ -44,9 +44,9 @@ public class SourceFilePair {
 	/**
 	 * @return the size of the diff for the file
 	 */
-	public int getSize(DiffType type) {
-		int s = this.source.getSize(type);
-		int d = this.destination.getSize(type);
+	public int getFactSize(DiffType type) {
+		int s = this.source.getFactSize(type);
+		int d = this.destination.getFactSize(type);
 		return s + d;
 	}
 

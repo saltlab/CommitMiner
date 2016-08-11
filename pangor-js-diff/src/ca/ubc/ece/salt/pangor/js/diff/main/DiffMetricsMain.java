@@ -70,12 +70,12 @@ public class DiffMetricsMain {
 			pair.file = sfp.file;
 			pair.url = sfp.url;
 			pair.totalLines = sfp.getAvgTotalLines();
-			pair.lineChanges = sfp.getSize(DiffType.LINE);
-			pair.astChanges = sfp.getSize(DiffType.AST);
-			pair.conChanges = sfp.getSize(DiffType.CONTROL);
-			pair.envChanges = sfp.getSize(DiffType.ENVIRONMENT);
-			pair.valChanges = sfp.getSize(DiffType.VALUE);
-			pair.multiChanges = sfp.getSize(DiffType.MULTI);
+			pair.lineChanges = sfp.getFactSize(DiffType.LINE);
+			pair.astChanges = sfp.getFactSize(DiffType.AST);
+			pair.conChanges = sfp.getFactSize(DiffType.CONTROL);
+			pair.envChanges = sfp.getFactSize(DiffType.ENVIRONMENT);
+			pair.valChanges = sfp.getFactSize(DiffType.VALUE);
+			pair.multiChanges = sfp.getFactSize(DiffType.MULTI);
 			pair.conAstSubtraction = sfp.subtract(DiffType.CONTROL, DiffType.AST);
 			pair.envAstSubtraction = sfp.subtract(DiffType.ENVIRONMENT, DiffType.AST);
 			pair.valAstSubtraction = sfp.subtract(DiffType.VALUE, DiffType.AST);
@@ -89,12 +89,12 @@ public class DiffMetricsMain {
 			source.file = sfp.file;
 			source.url = sfp.url;
 			source.totalLines = sfp.source.getTotalLines();
-			source.lineChanges = sfp.source.getSize(DiffType.LINE);
-			source.astChanges = sfp.source.getSize(DiffType.AST);
-			source.conChanges = sfp.source.getSize(DiffType.CONTROL);
-			source.envChanges = sfp.source.getSize(DiffType.ENVIRONMENT);
-			source.valChanges = sfp.source.getSize(DiffType.VALUE);
-			source.multiChanges = sfp.source.getSize(DiffType.MULTI);
+			source.lineChanges = sfp.source.getFactSize(DiffType.LINE);
+			source.astChanges = sfp.source.getFactSize(DiffType.AST);
+			source.conChanges = sfp.source.getFactSize(DiffType.CONTROL);
+			source.envChanges = sfp.source.getFactSize(DiffType.ENVIRONMENT);
+			source.valChanges = sfp.source.getFactSize(DiffType.VALUE);
+			source.multiChanges = sfp.source.getFactSize(DiffType.MULTI);
 			source.conAstSubtraction = sfp.source.subtract(DiffType.CONTROL, DiffType.AST);
 			source.envAstSubtraction = sfp.source.subtract(DiffType.ENVIRONMENT, DiffType.AST);
 			source.valAstSubtraction = sfp.source.subtract(DiffType.VALUE, DiffType.AST);
@@ -108,12 +108,13 @@ public class DiffMetricsMain {
 			destination.file = sfp.file;
 			destination.url = sfp.url;
 			destination.totalLines = sfp.destination.getTotalLines();
-			destination.lineChanges = sfp.destination.getSize(DiffType.LINE);
-			destination.astChanges = sfp.destination.getSize(DiffType.AST);
-			destination.conChanges = sfp.destination.getSize(DiffType.CONTROL);
-			destination.envChanges = sfp.destination.getSize(DiffType.ENVIRONMENT);
-			destination.valChanges = sfp.destination.getSize(DiffType.VALUE);
-			destination.multiChanges = sfp.destination.getSize(DiffType.MULTI);
+			destination.lineChanges = sfp.destination.getFactSize(DiffType.LINE);
+			destination.astChanges = sfp.destination.getFactSize(DiffType.AST);
+			destination.conChanges = sfp.destination.getFactSize(DiffType.CONTROL);
+			destination.envChanges = sfp.destination.getFactSize(DiffType.ENVIRONMENT);
+			destination.valChanges = sfp.destination.getFactSize(DiffType.VALUE);
+			destination.multiChanges = sfp.destination.getFactSize(DiffType.MULTI);
+			destination.multiChanges = sfp.destination.getFactSize(DiffType.MULTI);
 			destination.conAstSubtraction = sfp.destination.subtract(DiffType.CONTROL, DiffType.AST);
 			destination.envAstSubtraction = sfp.destination.subtract(DiffType.ENVIRONMENT, DiffType.AST);
 			destination.valAstSubtraction = sfp.destination.subtract(DiffType.VALUE, DiffType.AST);
@@ -135,9 +136,18 @@ public class DiffMetricsMain {
 
 	private void printMetrics(List<SourceFileDiffComparison> sourceComparisons) {
 
+		Set<String> repeatedFiles = new HashSet<String>();
+
 		Set<String> totalCommits = new HashSet<String>();
 		Set<String> totalASTModifiedCommits = new HashSet<String>();
 		int totalASTModifiedFiles = 0;
+
+		/* Count the ast facts each time there is a multi-diff fact added. */
+		int astFactsAdded = 0;
+		int multiASTFactsAdded = 0;
+		int conASTFactsAdded = 0;
+		int envASTFactsAdded = 0;
+		int valASTFactsAdded = 0;
 
 		/* Count the number of commits with at least one multi-diff fact. */
 		Set<String> multiContextImprovedCommits = new HashSet<String>();
@@ -178,6 +188,10 @@ public class DiffMetricsMain {
 		/* Compute the totals. */
 		for(SourceFileDiffComparison source : sourceComparisons) {
 
+			String file = source.project + "~" + source.commit + "~" + source.file;
+			if(repeatedFiles.contains(file)) throw new Error("Repeated file");
+			else repeatedFiles.add(file);
+
 			/* For computing the total number of commits. */
 			totalCommits.add(source.commit);
 
@@ -186,53 +200,109 @@ public class DiffMetricsMain {
 			if(source.astChanges > 0) {
 				totalASTModifiedCommits.add(source.commit);
 				totalASTModifiedFiles++;
+				astFactsAdded += source.astChanges;
 			}
 
 			/* Check if the file is line-improved. */
 			if(source.multiAstSubtraction > 0) {
-				multiLineImprovedCommits.add(source.commit);
+				multiLineImprovedCommits.add(source.project + "~" + source.commit);
 				multiLineImprovedFilePairs++;
 				multiLinesAdded += source.multiAstSubtraction;
 			}
 			if(source.conAstSubtraction > 0) {
-				conLineImprovedCommits.add(source.commit);
+				conLineImprovedCommits.add(source.project + "~" + source.commit);
 				conLineImprovedFilePairs++;
 				conLinesAdded += source.conAstSubtraction;
 			}
 			if(source.envAstSubtraction > 0) {
-				envLineImprovedCommits.add(source.commit);
+				envLineImprovedCommits.add(source.project + "~" + source.commit);
 				envLineImprovedFilePairs++;
 				envLinesAdded += source.envAstSubtraction;
 			}
 			if(source.valAstSubtraction > 0) {
-				valLineImprovedCommits.add(source.commit);
+				valLineImprovedCommits.add(source.project + "~" + source.commit);
 				valLineImprovedFilePairs++;
 				valLinesAdded += source.valAstSubtraction;
 			}
 
 			/* Check if the file is context-improved. */
 			if(source.multiChanges > 0) {
-				multiContextImprovedCommits.add(source.commit);
+				multiContextImprovedCommits.add(source.project + "~" + source.commit);
 				multiContextImprovedFilePairs++;
 				multiFactsAdded += source.multiChanges;
+				multiASTFactsAdded += source.astChanges;
 			}
 			if(source.conChanges > 0) {
-				conContextImprovedCommits.add(source.commit);
+				conContextImprovedCommits.add(source.project + "~" + source.commit);
 				conContextImprovedFilePairs++;
 				conFactsAdded += source.conChanges;
+				conASTFactsAdded += source.astChanges;
 			}
 			if(source.envChanges > 0) {
-				envContextImprovedCommits.add(source.commit);
+				envContextImprovedCommits.add(source.project + "~" + source.commit);
 				envContextImprovedFilePairs++;
 				envFactsAdded += source.envChanges;
+				envASTFactsAdded += source.astChanges;
 			}
 			if(source.valChanges > 0) {
-				valContextImprovedCommits.add(source.commit);
+				valContextImprovedCommits.add(source.project + "~" + source.commit);
 				valContextImprovedFilePairs++;
 				valFactsAdded += source.valChanges;
+				valASTFactsAdded += source.astChanges;
 			}
 
 		}
+
+		double multiContextCommit = (double)multiContextImprovedCommits.size()/(double)totalASTModifiedCommits.size();
+		double controlContextCommit = (double)conContextImprovedCommits.size()/(double)totalASTModifiedCommits.size();
+		double environmentContextCommit = (double)envContextImprovedCommits.size()/(double)totalASTModifiedCommits.size();
+		double valueContextCommit = (double)valContextImprovedCommits.size()/(double)totalASTModifiedCommits.size();
+
+		double multiAvgFactsAddedCommit = (double)multiFactsAdded/(double)multiContextImprovedCommits.size();
+		double controlAvgFactsAddedCommit = (double)conFactsAdded/(double)conContextImprovedCommits.size();
+		double environmentAvgFactsAddedCommit = (double)envFactsAdded/(double)envContextImprovedCommits.size();
+		double valueAvgFactsAddedCommit = (double)valFactsAdded/(double)valContextImprovedCommits.size();
+
+		double multiAvgASTFactsAddedCommit = (double)multiASTFactsAdded/(double)multiContextImprovedCommits.size();
+		double controlAvgASTFactsAddedCommit = (double)conASTFactsAdded/(double)conContextImprovedCommits.size();
+		double environmentAvgASTFactsAddedCommit = (double)envASTFactsAdded/(double)envContextImprovedCommits.size();
+		double valueAvgASTFactsAddedCommit = (double)valASTFactsAdded/(double)valContextImprovedCommits.size();
+
+		double multiContextFilePair = (double)multiContextImprovedFilePairs/(double)totalASTModifiedFiles;
+		double controlContextFilePair = (double)conContextImprovedFilePairs/(double)totalASTModifiedFiles;
+		double environmentContextFilePair = (double)envContextImprovedFilePairs/(double)totalASTModifiedFiles;
+		double valueContextFilePair = (double)valContextImprovedFilePairs/(double)totalASTModifiedFiles;
+
+		double multiAvgFactsAddedFilePair = (double)multiFactsAdded/(double)multiContextImprovedFilePairs;
+		double controlAvgFactsAddedFilePair = (double)conFactsAdded/(double)conContextImprovedFilePairs;
+		double environmentAvgFactsAddedFilePair = (double)envFactsAdded/(double)envContextImprovedFilePairs;
+		double valueAvgFactsAddedFilePair = (double)valFactsAdded/(double)valContextImprovedFilePairs;
+
+		double astAvgASTFactsAddedFilePair = (double)astFactsAdded/(double)totalASTModifiedFiles;
+		double multiAvgASTFactsAddedFilePair = (double)multiASTFactsAdded/(double)multiContextImprovedFilePairs;
+		double controlAvgASTFactsAddedFilePair = (double)conASTFactsAdded/(double)conContextImprovedFilePairs;
+		double environmentAvgASTFactsAddedFilePair = (double)envASTFactsAdded/(double)envContextImprovedFilePairs;
+		double valueAvgASTFactsAddedFilePair = (double)valASTFactsAdded/(double)valContextImprovedFilePairs;
+
+		double multiLineCommit = (double)multiLineImprovedCommits.size()/(double)totalASTModifiedCommits.size();
+		double controlLineCommit = (double)conLineImprovedCommits.size()/(double)totalASTModifiedCommits.size();
+		double environmentLineCommit = (double)envLineImprovedCommits.size()/(double)totalASTModifiedCommits.size();
+		double valueLineCommit = (double)valLineImprovedCommits.size()/(double)totalASTModifiedCommits.size();
+
+		double multiAvgLinesAddedCommit = (double)multiLinesAdded/(double)multiLineImprovedCommits.size();
+		double controlAvgLinesAddedCommit = (double)conLinesAdded/(double)conLineImprovedCommits.size();
+		double environmentAvgLinesAddedCommit = (double)envLinesAdded/(double)envLineImprovedCommits.size();
+		double valueAvgLinesAddedCommit = (double)valLinesAdded/(double)valLineImprovedCommits.size();
+
+		double multiLineFilePair = (double)multiLineImprovedFilePairs/(double)totalASTModifiedFiles;
+		double controlLineFilePair = (double)conLineImprovedFilePairs/(double)totalASTModifiedFiles;
+		double environmentLineFilePair = (double)envLineImprovedFilePairs/(double)totalASTModifiedFiles;
+		double valueLineFilePair = (double)valLineImprovedFilePairs/(double)totalASTModifiedFiles;
+
+		double multiAvgLinesAddedFilePair = (double)multiLinesAdded/(double)multiLineImprovedFilePairs;
+		double controlAvgLinesAddedFilePair = (double)conLinesAdded/(double)conLineImprovedFilePairs;
+		double environmentAvgLinesAddedFilePair = (double)envLinesAdded/(double)envLineImprovedFilePairs;
+		double valueAvgLinesAddedFilePair = (double)valLinesAdded/(double)valLineImprovedFilePairs;
 
 		System.out.println("Total Commits Analyzed = " + totalCommits.size());
 		System.out.println("Total Files Analyzed = " + sourceComparisons.size());
@@ -240,45 +310,71 @@ public class DiffMetricsMain {
 		System.out.println("Total Commits With AST Change = " + totalASTModifiedCommits.size());
 		System.out.println("Total File With AST Change = " + totalASTModifiedFiles);
 		System.out.println("");
-		System.out.println("Multi-Context-Commit = " + multiContextImprovedCommits.size());
-		System.out.println("Control-Context-Commit = " + conContextImprovedCommits.size());
-		System.out.println("Environment-Context-Commit = " + envContextImprovedCommits.size());
-		System.out.println("Value-Context-Commit = " + valContextImprovedCommits.size());
+		System.out.println("Multi-Context-Commit = " + multiContextCommit);
+		System.out.println("Control-Context-Commit = " + controlContextCommit);
+		System.out.println("Environment-Context-Commit = " + environmentContextCommit);
+		System.out.println("Value-Context-Commit = " + valueContextCommit);
 		System.out.println("");
-		System.out.println("Multi-AvgFactsAdded-Commit = " + multiFactsAdded/multiContextImprovedCommits.size());
-		System.out.println("Control-AvgFactsAdded-Commit = " + conFactsAdded/conContextImprovedCommits.size());
-		System.out.println("Environment-AvgFactsAdded-Commit = " + envFactsAdded/envContextImprovedCommits.size());
-		System.out.println("Value-AvgFactsAdded-Commit = " + envFactsAdded/valContextImprovedCommits.size());
+		System.out.println("Multi-AvgFactsAdded-Commit = " + multiAvgFactsAddedCommit);
+		System.out.println("Control-AvgFactsAdded-Commit = " + controlAvgFactsAddedCommit);
+		System.out.println("Environment-AvgFactsAdded-Commit = " + environmentAvgFactsAddedCommit);
+		System.out.println("Value-AvgFactsAdded-Commit = " + valueAvgFactsAddedCommit);
 		System.out.println("");
-		System.out.println("Multi-Context-FilePair = " + multiContextImprovedFilePairs);
-		System.out.println("Control-Context-FilePair = " + conContextImprovedFilePairs);
-		System.out.println("Environment-Context-FilePair = " + envContextImprovedFilePairs);
-		System.out.println("Value-Context-FilePair = " + valContextImprovedFilePairs);
+		System.out.println("Multi-AvgASTFactsAdded-Commit = " + multiAvgASTFactsAddedCommit);
+		System.out.println("Control-AvgASTFactsAdded-Commit = " + controlAvgASTFactsAddedCommit);
+		System.out.println("Environment-AvgASTFactsAdded-Commit = " + environmentAvgASTFactsAddedCommit);
+		System.out.println("Value-AvgASTFactsAdded-Commit = " + valueAvgASTFactsAddedCommit);
 		System.out.println("");
-		System.out.println("Multi-AvgFactsAdded-FilePair = " + multiFactsAdded/multiContextImprovedFilePairs);
-		System.out.println("Control-AvgFactsAdded-FilePair = " + conFactsAdded/conContextImprovedFilePairs);
-		System.out.println("Environment-AvgFactsAdded-FilePair = " + envFactsAdded/envContextImprovedFilePairs);
-		System.out.println("Value-AvgFactsAdded-FilePair = " + valFactsAdded/valContextImprovedFilePairs);
+		System.out.println("Multi-Context-FilePair = " + multiContextFilePair);
+		System.out.println("Control-Context-FilePair = " + controlContextFilePair);
+		System.out.println("Environment-Context-FilePair = " + environmentContextFilePair);
+		System.out.println("Value-Context-FilePair = " + valueContextFilePair);
 		System.out.println("");
-		System.out.println("Multi-Line-Commit = " + multiLineImprovedCommits.size());
-		System.out.println("Control-Line-Commit = " + conLineImprovedCommits.size());
-		System.out.println("Environment-Line-Commit = " + envLineImprovedCommits.size());
-		System.out.println("Value-Line-Commit = " + valLineImprovedCommits.size());
+		System.out.println("Multi-AvgFactsAdded-FilePair = " + multiAvgFactsAddedFilePair);
+		System.out.println("Control-AvgFactsAdded-FilePair = " + controlAvgFactsAddedFilePair);
+		System.out.println("Environment-AvgFactsAdded-FilePair = " + environmentAvgFactsAddedFilePair);
+		System.out.println("Value-AvgFactsAdded-FilePair = " + valueAvgFactsAddedFilePair);
 		System.out.println("");
-		System.out.println("Multi-AvgLinesAdded-Commit = " + multiLinesAdded/multiLineImprovedCommits.size());
-		System.out.println("Control-AvgLinesAdded-Commit = " + conLinesAdded/conLineImprovedCommits.size());
-		System.out.println("Environment-AvgLinesAdded-Commit = " + envLinesAdded/envLineImprovedCommits.size());
-		System.out.println("Value-AvgLinesAdded-Commit = " + valLinesAdded/valLineImprovedCommits.size());
+		System.out.println("AST-AvgASTFactsAdded-FilePair = " + astAvgASTFactsAddedFilePair);
+		System.out.println("Multi-AvgASTFactsAdded-FilePair = " + multiAvgASTFactsAddedFilePair);
+		System.out.println("Control-AvgASTFactsAdded-FilePair = " + controlAvgASTFactsAddedFilePair);
+		System.out.println("Environment-AvgASTFactsAdded-FilePair = " + environmentAvgASTFactsAddedFilePair);
+		System.out.println("Value-AvgASTFactsAdded-FilePair = " + valueAvgASTFactsAddedFilePair);
 		System.out.println("");
-		System.out.println("Multi-Line-FilePair = " + multiLineImprovedFilePairs);
-		System.out.println("Control-Line-FilePair = " + conLineImprovedFilePairs);
-		System.out.println("Environment-Line-FilePair = " + envLineImprovedFilePairs);
-		System.out.println("Value-Line-FilePair = " + valLineImprovedFilePairs);
+		System.out.println("Multi-Line-Commit = " + multiLineCommit);
+		System.out.println("Control-Line-Commit = " + controlLineCommit);
+		System.out.println("Environment-Line-Commit = " + environmentLineCommit);
+		System.out.println("Value-Line-Commit = " + valueLineCommit);
 		System.out.println("");
-		System.out.println("Multi-AvgLinesAdded-FilePair = " + multiLinesAdded/multiLineImprovedFilePairs);
-		System.out.println("Control-AvgLinesAdded-FilePair = " + conLinesAdded/conLineImprovedFilePairs);
-		System.out.println("Environment-AvgLinesAdded-FilePair = " + envLinesAdded/envLineImprovedFilePairs);
-		System.out.println("Value-AvgLinesAdded-FilePair = " + valLinesAdded/valLineImprovedFilePairs);
+		System.out.println("Multi-AvgLinesAdded-Commit = " + multiAvgLinesAddedCommit);
+		System.out.println("Control-AvgLinesAdded-Commit = " + controlAvgLinesAddedCommit);
+		System.out.println("Environment-AvgLinesAdded-Commit = " + environmentAvgLinesAddedCommit);
+		System.out.println("Value-AvgLinesAdded-Commit = " + valueAvgLinesAddedCommit);
+		System.out.println("");
+		System.out.println("Multi-Line-FilePair = " + multiLineFilePair);
+		System.out.println("Control-Line-FilePair = " + controlLineFilePair);
+		System.out.println("Environment-Line-FilePair = " + environmentLineFilePair);
+		System.out.println("Value-Line-FilePair = " + valueLineFilePair);
+		System.out.println("");
+		System.out.println("Multi-AvgLinesAdded-FilePair = " + multiAvgLinesAddedFilePair);
+		System.out.println("Control-AvgLinesAdded-FilePair = " + controlAvgLinesAddedFilePair);
+		System.out.println("Environment-AvgLinesAdded-FilePair = " + environmentAvgLinesAddedFilePair);
+		System.out.println("Value-AvgLinesAdded-FilePair = " + valueAvgLinesAddedFilePair);
+		System.out.println("");
+
+		System.out.println("chart_context_lines.csv");
+		System.out.println("Diff, ContextCommit, ContextFile, LineCommit, LineFile");
+		System.out.println("All," + multiContextCommit + "," + multiContextFilePair + "," + multiLineCommit + "," + multiLineFilePair);
+		System.out.println("Ctrl," + controlContextCommit + "," + controlContextFilePair + "," + controlLineCommit + "," + controlLineFilePair);
+		System.out.println("Env," + environmentContextCommit + "," + environmentContextFilePair + "," + environmentLineCommit + "," + environmentLineFilePair);
+		System.out.println("Val," + valueContextCommit + "," + valueContextFilePair + "," + valueLineCommit + "," + valueLineFilePair);
+
+		System.out.println("chart_facts_lines.csv");
+		System.out.println("Diff, ContextCommit, ContextFile, LineCommit, LineFile, ASTCommit, ASTFile");
+		System.out.println("All," + multiAvgFactsAddedCommit + "," + multiAvgFactsAddedFilePair + "," + multiAvgLinesAddedCommit + "," + multiAvgLinesAddedFilePair + "," + multiAvgASTFactsAddedCommit + "," + astAvgASTFactsAddedFilePair);
+		System.out.println("Ctrl," + controlAvgFactsAddedCommit + "," + controlAvgFactsAddedFilePair + "," + controlAvgLinesAddedCommit + "," + controlAvgLinesAddedFilePair + "," + controlAvgASTFactsAddedCommit + "," + controlAvgASTFactsAddedFilePair);
+		System.out.println("Env," + environmentAvgFactsAddedCommit + "," + environmentAvgFactsAddedFilePair + "," + environmentAvgLinesAddedCommit + "," + environmentAvgLinesAddedFilePair + "," + environmentAvgASTFactsAddedCommit + "," + environmentAvgASTFactsAddedFilePair);
+		System.out.println("Val," + valueAvgFactsAddedCommit + "," + valueAvgFactsAddedFilePair + "," + valueAvgLinesAddedCommit + "," + valueAvgLinesAddedFilePair + "," + valueAvgASTFactsAddedCommit + "," + valueAvgASTFactsAddedFilePair);
 
 	}
 
