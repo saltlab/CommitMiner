@@ -636,7 +636,7 @@ public class TestDiffAnalysis {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
 						"TST",												// Type
 						"AST",												// Subtype

@@ -42,10 +42,16 @@ public class AstScriptAnalysis extends SourceCodeFileAnalysis {
 		/* Visit statements and extract statement change facts. */
 		List<AstNode> modifiedStatements = AstTreeVisitor.getModifiedStatements(script);
 
+
 		/* Register the facts. */
 		for(AstNode modifiedStatement : modifiedStatements) {
-				registerChangeFact(modifiedStatement, facts,
-								   sourceCodeFileChange);
+
+			/* Get the line numbers from parts of the AST that were changed. */
+			String lines = AstLineVisitor.getStatementLines(modifiedStatement);
+
+			registerChangeFact(modifiedStatement, facts,
+							   sourceCodeFileChange, lines);
+
 		}
 
 	}
@@ -57,7 +63,8 @@ public class AstScriptAnalysis extends SourceCodeFileAnalysis {
 	 */
 	private static void registerChangeFact(AstNode statement,
 									  Map<IPredicate, IRelation> facts,
-									  SourceCodeFileChange sourceCodeFileChange) {
+									  SourceCodeFileChange sourceCodeFileChange,
+									  String lines) {
 
 		/* Get the relation for this predicate from the fact base. */
 		IPredicate predicate = Factory.BASIC.createPredicate("AST", 5);
@@ -76,7 +83,7 @@ public class AstScriptAnalysis extends SourceCodeFileAnalysis {
 		ITuple tuple = Factory.BASIC.createTuple(
 				Factory.TERM.createString(statement.getVersion().toString()),		// Version
 				Factory.TERM.createString(sourceCodeFileChange.repairedFile), 		// File
-				Factory.TERM.createString(String.valueOf(statement.getLineno())),	// Line #
+				Factory.TERM.createString(lines),									// Line #
 				Factory.CONCRETE.createInt(statement.getID()),						// Statement ID
 				Factory.TERM.createString(statement.getChangeType().toString()));	// Change Type
 		relation.add(tuple);

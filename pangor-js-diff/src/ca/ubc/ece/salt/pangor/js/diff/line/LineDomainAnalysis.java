@@ -133,7 +133,7 @@ public class LineDomainAnalysis extends DomainAnalysis {
 		ITuple tuple = Factory.BASIC.createTuple(
 				Factory.TERM.createString(version.toString()),						// Version
 				Factory.TERM.createString(sourceCodeFileChange.repairedFile), 		// File
-				Factory.TERM.createString(String.valueOf(line)),					// Line #
+				Factory.TERM.createString("{" + String.valueOf(line) + "}"),		// Line #
 				Factory.TERM.createString(type.toString()));						// Change Type
 		relation.add(tuple);
 
