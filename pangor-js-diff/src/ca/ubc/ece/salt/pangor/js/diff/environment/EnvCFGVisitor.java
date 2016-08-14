@@ -62,8 +62,10 @@ public class EnvCFGVisitor implements ICFGVisitor {
 
 			/* Get the environment changes. No need to recurse since
 			 * properties (currently) do not change. */
-			if(node != null && isUsed(node, prop))
-				registerFact(node, prop.name, "ENV", prop.change.toString());
+			if(node != null) {
+				String lines = isUsed(node, prop);
+				if(!lines.equals("{}")) registerFact(node, prop.name, "ENV", prop.change.toString(), lines);
+			}
 
 		}
 	}
@@ -71,9 +73,9 @@ public class EnvCFGVisitor implements ICFGVisitor {
 	/**
 	 * @param node The statement in which the var/prop may be used.
 	 * @param identity The var/prop to look for in the statement.
-	 * @return true if the var/prop is used in the statement.
+	 * @return the serialized list of lines where the var/prop is used in the statement.
 	 */
-	private boolean isUsed(AstNode statement, Identifier identity) {
+	private String isUsed(AstNode statement, Identifier identity) {
 		return IsUsedVisitor.isUsed(statement, identity);
 	}
 
@@ -83,7 +85,7 @@ public class EnvCFGVisitor implements ICFGVisitor {
 	 * @param ad The abstract domain of the fact.
 	 * @param cle The change lattice element.
 	 */
-	private void registerFact(AstNode statement, String identifier, String ad, String cle) {
+	private void registerFact(AstNode statement, String identifier, String ad, String cle, String lines) {
 
 		if(statement == null || statement.getID() == null) return;
 
@@ -99,7 +101,7 @@ public class EnvCFGVisitor implements ICFGVisitor {
 		ITuple tuple = Factory.BASIC.createTuple(
 				Factory.TERM.createString(statement.getVersion().toString()),
 				Factory.TERM.createString(sourceCodeFileChange.repairedFile),
-				Factory.TERM.createString(String.valueOf(statement.getLineno())),
+				Factory.TERM.createString(lines),
 				Factory.TERM.createString(String.valueOf(statement.getID())),
 				Factory.TERM.createString(identifier),
 				Factory.TERM.createString(ad),

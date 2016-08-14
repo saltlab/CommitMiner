@@ -1,5 +1,8 @@
 package ca.ubc.ece.salt.pangor.js.diff;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.DoLoop;
@@ -18,18 +21,22 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 
 public class IsUsedVisitor implements NodeVisitor {
 
-	/** Flag if the identifier is found in the statement. **/
-	public boolean used;
+	/** The set of uses found in the statement. **/
+	public Set<Integer> lines;
 
 	/** The identifier to look for. **/
 	private Identifier identity;
 
-	public static boolean isUsed(AstNode statement, Identifier identity) {
+	/**
+	 * Detects uses of the identifier.
+	 * @return the set of nodes where the identifier is used.
+	 */
+	public static String isUsed(AstNode statement, Identifier identity) {
 		IsUsedVisitor visitor = new IsUsedVisitor(statement, identity);
 
 		if(statement instanceof AstRoot) {
 			/* This is the root. Nothing should be flagged. */
-			return false;
+			return "{}";
 		}
 		else if(statement instanceof FunctionNode) {
 			/* This is a function declaration, so only check the parameters. */
@@ -42,10 +49,19 @@ public class IsUsedVisitor implements NodeVisitor {
 			statement.visit(visitor);
 		}
 
-		return visitor.used;
+		/* Serialize the set of lines. */
+		String serial = "{";
+		for(Integer line : visitor.lines) {
+			serial += line + ",";
+		}
+		if(serial.length() > 1) serial = serial.substring(0, serial.length() - 1);
+		serial += "}";
+
+		return serial;
 	}
 
 	public IsUsedVisitor(AstNode statement, Identifier identity) {
+		this.lines = new HashSet<Integer>();
 		this.identity = identity;
 	}
 
@@ -53,7 +69,7 @@ public class IsUsedVisitor implements NodeVisitor {
 	public boolean visit(AstNode node) {
 
 		if(node instanceof InfixExpression || node instanceof Name) {
-			if(node.toSource().equals(identity.name)) this.used = true;
+			if(node.toSource().equals(identity.name)) this.lines.add(node.getLineno());
 		}
 		/* Ignore the body of loops, ifs and functions. */
 		else if(node instanceof IfStatement) {

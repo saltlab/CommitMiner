@@ -540,7 +540,7 @@ public class TestDiffAnalysis {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
 						"TST",												// Type
 						"VAL",											// Subtype
@@ -572,10 +572,10 @@ public class TestDiffAnalysis {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
 						"TST",												// Type
-						"ENV",											// Subtype
+						"ENV",												// Subtype
 						tuple.get(4).toString().replace("\'", "")
 							+ "_" + tuple.get(5).toString().replace("\'", "")
 							+ "_" + tuple.get(6).toString().replace("\'", ""));	// Description
