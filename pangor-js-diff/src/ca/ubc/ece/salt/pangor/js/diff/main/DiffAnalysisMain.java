@@ -228,9 +228,9 @@ public class DiffAnalysisMain {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
-						"TST",												// Type
+						"DIFF",												// Type
 						"VAL",											// Subtype
 						tuple.get(4).toString().replace("\'", "")
 							+ "_" + tuple.get(5).toString().replace("\'", ""));	// Description
@@ -260,10 +260,10 @@ public class DiffAnalysisMain {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
-						"TST",												// Type
-						"ENV",											// Subtype
+						"DIFF",												// Type
+						"ENV",												// Subtype
 						tuple.get(4).toString().replace("\'", "")
 							+ "_" + tuple.get(5).toString().replace("\'", "")
 							+ "_" + tuple.get(6).toString().replace("\'", ""));	// Description
@@ -293,9 +293,9 @@ public class DiffAnalysisMain {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
-						"TST",												// Type
+						"DIFF",												// Type
 						"CONTROL",											// Subtype
 						tuple.get(5).toString().replace("\'", ""));			// Description
 		};
@@ -324,9 +324,9 @@ public class DiffAnalysisMain {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
-						"TST",												// Type
+						"DIFF",												// Type
 						"AST",												// Subtype
 						tuple.get(4).toString().replace("\'", ""));			// Description
 		};
@@ -353,7 +353,7 @@ public class DiffAnalysisMain {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						"NA",												// Method
 						"NA",												// Line
 						"DIFF",												// Type
 						"TOTAL_LINES",										// Subtype
@@ -384,9 +384,9 @@ public class DiffAnalysisMain {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						"NA",												// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
-						"TST",												// Type
+						"DIFF",												// Type
 						"LINE",												// Subtype
 						tuple.get(3).toString().replace("\'", ""));			// Description
 		};

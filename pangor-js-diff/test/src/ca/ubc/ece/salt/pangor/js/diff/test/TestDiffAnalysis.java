@@ -81,99 +81,99 @@ public class TestDiffAnalysis {
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
 
 		/* The value-diff alerts. */
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "14", "TST", "VAL", "cb_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "16", "TST", "VAL", "cb_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "27", "TST", "VAL", "semver_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "TST", "VAL", "semver_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "VAL", "err_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "VAL", "data_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "TST", "VAL", "err_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "TST", "VAL", "data_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "36", "TST", "VAL", "PM2_SILENT_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "43", "TST", "VAL", "PM2_SILENT_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "14", "DIFF", "VAL", "cb_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "16", "DIFF", "VAL", "cb_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "27", "DIFF", "VAL", "semver_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "DIFF", "VAL", "semver_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "DIFF", "VAL", "err_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "DIFF", "VAL", "data_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "DIFF", "VAL", "err_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "DIFF", "VAL", "data_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "36", "DIFF", "VAL", "PM2_SILENT_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "43", "DIFF", "VAL", "PM2_SILENT_Change:CHANGED"));
 
 		/* The environment-diff alerts. */
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "27", "TST", "ENV", "semver_ENV_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "TST", "ENV", "semver_ENV_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "ENV", "data_ENV_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "ENV", "err_ENV_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "TST", "ENV", "data_ENV_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "TST", "ENV", "err_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "27", "DIFF", "ENV", "semver_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "DIFF", "ENV", "semver_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "DIFF", "ENV", "data_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "DIFF", "ENV", "err_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "DIFF", "ENV", "data_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "DIFF", "ENV", "err_ENV_Change:CHANGED"));
 
 		/* The control-flow-diff alerts. */
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "14", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "15", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "16", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "36", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "37", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "40", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "41", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "42", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "43", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "45", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "46", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "47", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "48", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "49", "TST", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "14", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "15", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "16", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "36", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "37", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "40", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "41", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "42", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "43", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "45", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "46", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "47", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "48", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "49", "DIFF", "CONTROL", "Change:CHANGED"));
 
 		/* The ast-diff alerts. */
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "27", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "36", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "37", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "40", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "41", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "42", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "43", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "45", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "46", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "47", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "48", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "49", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "27", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "36", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "37", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "40", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "41", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "42", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "43", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "45", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "46", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "47", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "48", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "49", "DIFF", "AST", "MOVED"));
 
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "30", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "31", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "34", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "35", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "36", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "37", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "38", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "30", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "31", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "32", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "34", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "35", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "36", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "37", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "38", "DIFF", "AST", "MOVED"));
 
 		/* The line-diff alerts. */
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "27", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "31", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "34", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "35", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "36", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "37", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "38", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "39", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "40", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "41", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "42", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "43", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "45", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "46", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "47", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "48", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "49", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "50", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "54", "TST", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "27", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "31", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "32", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "33", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "34", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "35", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "36", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "37", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "38", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "39", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "40", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "41", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "42", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "43", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "45", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "46", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "47", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "48", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "49", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "50", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/dyn_new.js", "MethodNA", "54", "DIFF", "LINE", "INSERTED"));
 
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "30", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "31", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "32", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "34", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "35", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "36", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "37", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "38", "TST", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "30", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "31", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "32", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "34", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "35", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "36", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "37", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "38", "DIFF", "LINE", "REMOVED"));
 
 		/* The line-total alerts. */
 		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/dyn_new.js", "MethodNA", "NA", "DIFF", "TOTAL_LINES", "43"));
@@ -196,99 +196,99 @@ public class TestDiffAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "480", "TST", "VAL", "cb_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "482", "TST", "VAL", "cb_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1662", "TST", "VAL", "semver_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "TST", "VAL", "semver_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "VAL", "err_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "VAL", "data_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "TST", "VAL", "err_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "TST", "VAL", "data_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "TST", "VAL", "PM2_SILENT_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1678", "TST", "VAL", "PM2_SILENT_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "480", "DIFF", "VAL", "cb_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "482", "DIFF", "VAL", "cb_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1662", "DIFF", "VAL", "semver_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "DIFF", "VAL", "semver_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "DIFF", "VAL", "err_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "DIFF", "VAL", "data_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "DIFF", "VAL", "err_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "DIFF", "VAL", "data_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "DIFF", "VAL", "PM2_SILENT_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1678", "DIFF", "VAL", "PM2_SILENT_Change:CHANGED"));
 
 		/* The environment-diff alerts. */
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1662", "TST", "ENV", "semver_ENV_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "TST", "ENV", "semver_ENV_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "ENV", "data_ENV_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "ENV", "err_ENV_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "TST", "ENV", "data_ENV_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "TST", "ENV", "err_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1662", "DIFF", "ENV", "semver_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "DIFF", "ENV", "semver_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "DIFF", "ENV", "data_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "DIFF", "ENV", "err_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "DIFF", "ENV", "data_ENV_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "DIFF", "ENV", "err_ENV_Change:CHANGED"));
 
 		/* The control-flow-diff alerts. */
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "480", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "481", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "482", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1675", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1676", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1677", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1678", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1680", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1681", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1682", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1683", "TST", "CONTROL", "Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1684", "TST", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "480", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "481", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "482", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1675", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1676", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1677", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1678", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1680", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1681", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1682", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1683", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1684", "DIFF", "CONTROL", "Change:CHANGED"));
 
 		/* The ast-diff alerts. */
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1662", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1675", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1676", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1677", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1678", "TST", "AST", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1680", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1681", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1682", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1683", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1684", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1662", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1675", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1676", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1677", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1678", "DIFF", "AST", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1680", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1681", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1682", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1683", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1684", "DIFF", "AST", "MOVED"));
 
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1665", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1666", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1669", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1670", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "TST", "AST", "MOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1673", "TST", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1665", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1666", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1669", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1670", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "DIFF", "AST", "MOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1673", "DIFF", "AST", "MOVED"));
 
 		/* The line-diff alerts. */
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1662", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1666", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1669", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1670", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1673", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1674", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1675", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1676", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1677", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1678", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1680", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1681", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1682", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1683", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1684", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1685", "TST", "LINE", "INSERTED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1689", "TST", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1662", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1666", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1668", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1669", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1670", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1673", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1674", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1675", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1676", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1677", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1678", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1680", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1681", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1682", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1683", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1684", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1685", "DIFF", "LINE", "INSERTED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/pm2_new.js", "MethodNA", "1689", "DIFF", "LINE", "INSERTED"));
 
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1665", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1666", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1669", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1670", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "TST", "LINE", "REMOVED"));
-		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1673", "TST", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1665", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1666", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1667", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1669", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1670", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1671", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1672", "DIFF", "LINE", "REMOVED"));
+		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "1673", "DIFF", "LINE", "REMOVED"));
 
 		/* The line-total alerts. */
 		expected.add(new ClassifierFeatureVector(commit, "SOURCE", "./test/input/diff/pm2_new.js", "MethodNA", "NA", "DIFF", "TOTAL_LINES", "2373"));
@@ -542,7 +542,7 @@ public class TestDiffAnalysis {
 						tuple.get(1).toString().replace("\'", ""), 			// Class
 						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
-						"TST",												// Type
+						"DIFF",												// Type
 						"VAL",											// Subtype
 						tuple.get(4).toString().replace("\'", "")
 							+ "_" + tuple.get(5).toString().replace("\'", ""));	// Description
@@ -574,7 +574,7 @@ public class TestDiffAnalysis {
 						tuple.get(1).toString().replace("\'", ""), 			// Class
 						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
-						"TST",												// Type
+						"DIFF",												// Type
 						"ENV",												// Subtype
 						tuple.get(4).toString().replace("\'", "")
 							+ "_" + tuple.get(5).toString().replace("\'", "")
@@ -607,7 +607,7 @@ public class TestDiffAnalysis {
 						tuple.get(1).toString().replace("\'", ""), 			// Class
 						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
-						"TST",												// Type
+						"DIFF",												// Type
 						"CONTROL",											// Subtype
 						tuple.get(5).toString().replace("\'", ""));			// Description
 		};
@@ -638,7 +638,7 @@ public class TestDiffAnalysis {
 						tuple.get(1).toString().replace("\'", ""), 			// Class
 						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
-						"TST",												// Type
+						"DIFF",												// Type
 						"AST",												// Subtype
 						tuple.get(4).toString().replace("\'", ""));			// Description
 		};
@@ -665,7 +665,7 @@ public class TestDiffAnalysis {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						"NA",												// Method
 						"NA",												// Line
 						"DIFF",												// Type
 						"TOTAL_LINES",										// Subtype
@@ -696,9 +696,9 @@ public class TestDiffAnalysis {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"MethodNA",											// Method
+						"NA",												// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
-						"TST",												// Type
+						"DIFF",												// Type
 						"LINE",												// Subtype
 						tuple.get(3).toString().replace("\'", ""));			// Description
 		};
