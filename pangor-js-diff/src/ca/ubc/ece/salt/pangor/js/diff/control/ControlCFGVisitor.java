@@ -83,11 +83,13 @@ public class ControlCFGVisitor implements ICFGVisitor {
 			facts.put(predicate, relation);
 		}
 
+		String lines = ControlLineVisitor.getStatementLines(statement);
+
 		/* Add the new tuple to the relation. */
 		ITuple tuple = Factory.BASIC.createTuple(
 				Factory.TERM.createString(statement.getVersion().toString()),
 				Factory.TERM.createString(sourceCodeFileChange.repairedFile),
-				Factory.TERM.createString(String.valueOf(statement.getLineno())),
+				Factory.TERM.createString(lines),
 				Factory.TERM.createString(String.valueOf(statement.getID())),
 				Factory.TERM.createString("CONTROL"),
 				Factory.TERM.createString(cle));
