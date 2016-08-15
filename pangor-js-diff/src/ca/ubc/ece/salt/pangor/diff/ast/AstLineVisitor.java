@@ -39,10 +39,6 @@ public class AstLineVisitor implements NodeVisitor {
 		if(serial.length() > 1) serial = serial.substring(0, serial.length() - 1);
 		serial += "}";
 
-		if(serial.equals("{1}")) {
-			System.out.println("wtf?");
-		}
-
 		return serial;
 	}
 

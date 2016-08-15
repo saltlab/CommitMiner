@@ -28,8 +28,10 @@ public class ControlLineVisitor implements NodeVisitor {
 	 * @return The serialized set of lines the statement spans.
 	 */
 	public static String getStatementLines(AstNode statement) {
+
 		ControlLineVisitor visitor = new ControlLineVisitor();
 		statement.visit(visitor);
+
 		String serial = "{";
 		for(Integer line : visitor.lines) {
 			serial += line + ",";
@@ -37,11 +39,8 @@ public class ControlLineVisitor implements NodeVisitor {
 		if(serial.length() > 1) serial = serial.substring(0, serial.length() - 1);
 		serial += "}";
 
-		if(serial.equals("{1}")) {
-			System.out.println("wtf?");
-		}
-
 		return serial;
+
 	}
 
 	public ControlLineVisitor() {

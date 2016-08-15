@@ -77,7 +77,8 @@ public class ValueCFGVisitor implements ICFGVisitor {
 			 * properties (currently) do not change. */
 			if(node != null) {
 				String lines = isUsed(node, prop);
-				if(!lines.equals("{}")) registerFact(node, prop.name, prop.change.toString(), lines);
+				if(!lines.equals("{}"))
+					registerFact(node, prop.name, val.change.toString(), lines);
 			}
 
 			/* Recursively check property values. */

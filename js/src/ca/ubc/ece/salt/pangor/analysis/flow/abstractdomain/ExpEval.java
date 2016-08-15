@@ -20,6 +20,7 @@ import org.mozilla.javascript.ast.ObjectLiteral;
 import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.StringLiteral;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
 import ca.ubc.ece.salt.pangor.analysis.flow.factories.StoreFactory;
 
@@ -118,14 +119,158 @@ public class ExpEval {
 			 * left. */
 			state.interpretAssignment((Assignment)ie);
 			return this.eval(ie.getLeft());
-		case Token.DOT:
-		default:
+		case Token.DOT: {
 			/* This is an identifier.. so we attempt to dereference it. */
 			BValue val = resolveValue(ie);
-			// TODO: This isn't how we want to handle these expressions. Update to follow the formal specification of binary operators.
 			if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
-			return val;
+			return val; }
+		case Token.ADD:
+			return evalPlus(ie);
+		case Token.SUB:
+		case Token.MUL:
+		case Token.DIV:
+		case Token.MOD:
+			return evalMathOp(ie);
+		case Token.ASSIGN_ADD: {
+			BValue val = evalPlus(ie);
+			state.interpretAssignment(ie.getLeft(), val);
+			return this.eval(ie.getLeft()); }
+		case Token.ASSIGN_SUB:
+		case Token.ASSIGN_MUL:
+		case Token.ASSIGN_DIV:
+		case Token.ASSIGN_MOD: {
+			BValue val = evalMathOp(ie);
+			state.interpretAssignment(ie.getLeft(), val);
+			return this.eval(ie.getLeft()); }
+		default:
+			return this.evalBinOp(ie);
 		}
+
+	}
+
+	/**
+	 * Evaluates an unknown binary operator on two BValues.
+	 */
+	public BValue evalBinOp(InfixExpression ie) {
+
+		BValue left = this.eval(ie.getLeft());
+		BValue right = this.eval(ie.getRight());
+
+		/* First create a bottom BValue with the proper change type. We will
+		 * put in values later. */
+		BValue val;
+		if(left.change.le == Change.LatticeElement.CHANGED
+				|| left.change.le == Change.LatticeElement.TOP
+				|| right.change.le == Change.LatticeElement.CHANGED
+				|| right.change.le == Change.LatticeElement.TOP) {
+			val = BValue.top(Change.c(), Change.u());
+		}
+		else if(ie.getChangeType() == ChangeType.INSERTED
+				|| ie.getChangeType() == ChangeType.REMOVED
+				|| ie.getChangeType() == ChangeType.UPDATED) {
+			val = BValue.top(Change.c(), Change.u());
+		}
+		else {
+			val = BValue.top(Change.u(), Change.u());
+		}
+
+		return val;
+
+	}
+
+	/**
+	 * Evaluates the plus operation on two BValues.
+	 *
+	 * TODO: The value evaluations are not very precise right now, because
+	 * for MultiDiff they don't need to be. We are more interested in the
+	 * value's change type. When we start to deal with type changes again,
+	 * the binary operator evaluations should be updated.
+	 */
+	public BValue evalPlus(InfixExpression ie) {
+
+		BValue left = this.eval(ie.getLeft());
+		BValue right = this.eval(ie.getRight());
+
+		/* First create a bottom BValue with the proper change type. We will
+		 * put in values later. */
+		BValue plus;
+		if(left.change.le == Change.LatticeElement.CHANGED
+				|| left.change.le == Change.LatticeElement.TOP
+				|| right.change.le == Change.LatticeElement.CHANGED
+				|| right.change.le == Change.LatticeElement.TOP) {
+			plus = BValue.bottom(Change.c(), Change.u());
+		}
+		else if(ie.getChangeType() == ChangeType.INSERTED
+				|| ie.getChangeType() == ChangeType.REMOVED
+				|| ie.getChangeType() == ChangeType.UPDATED) {
+			plus = BValue.top(Change.c(), Change.u());
+		}
+		else {
+			plus = BValue.bottom(Change.u(), Change.u());
+		}
+
+		/* For now, just do a basic conservative estimate of binary operator
+		 * evaluations. */
+
+		/* Strings. */
+		if(left.stringAD.le != Str.LatticeElement.BOTTOM
+				|| right.stringAD.le != Str.LatticeElement.BOTTOM) {
+				plus.stringAD.le = Str.LatticeElement.TOP;
+		}
+		/* Numbers. */
+		if(left.numberAD.le != Num.LatticeElement.BOTTOM
+				|| right.numberAD.le != Num.LatticeElement.BOTTOM) {
+			plus.numberAD.le = Num.LatticeElement.TOP;
+		}
+		/* Booleans and Nulls. */
+		if((left.booleanAD.le != Bool.LatticeElement.BOTTOM
+				|| left.nullAD.le == Null.LatticeElement.TOP)
+				&& (right.booleanAD.le != Bool.LatticeElement.BOTTOM
+				|| right.nullAD.le == Null.LatticeElement.TOP)) {
+			plus.numberAD.le = Num.LatticeElement.TOP;
+		}
+
+		return plus;
+
+	}
+
+	/**
+	 * Evaluates a math operation on two BValues.
+	 *
+	 * TODO: The value evaluations are not very precise right now, because
+	 * for MultiDiff they don't need to be. We are more interested in the
+	 * value's change type. When we start to deal with type changes again,
+	 * the binary operator evaluations should be updated.
+	 */
+	public BValue evalMathOp(InfixExpression ie) {
+
+		BValue left = this.eval(ie.getLeft());
+		BValue right = this.eval(ie.getRight());
+
+		/* First create a bottom BValue with the proper change type. We will
+		 * put in values later. */
+		BValue val;
+		if(left.change.le == Change.LatticeElement.CHANGED
+				|| left.change.le == Change.LatticeElement.TOP
+				|| right.change.le == Change.LatticeElement.CHANGED
+				|| right.change.le == Change.LatticeElement.TOP) {
+			val = BValue.bottom(Change.c(), Change.u());
+		}
+		else if(ie.getChangeType() == ChangeType.INSERTED
+				|| ie.getChangeType() == ChangeType.REMOVED
+				|| ie.getChangeType() == ChangeType.UPDATED) {
+			val = BValue.top(Change.c(), Change.u());
+		}
+		else {
+			val = BValue.bottom(Change.u(), Change.u());
+		}
+
+		/* For now, just do a basic conservative estimate of binary operator
+		 * evaluations. */
+
+		val.numberAD.le = Num.LatticeElement.TOP;
+
+		return val;
 
 	}
 

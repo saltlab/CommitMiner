@@ -66,6 +66,27 @@ public class TestDiffAnalysis {
 	}
 
 	@Test
+	public void testBinOp() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/diff/binary_old.js";
+		String dst = "./test/input/diff/binary_new.js";
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/binary_new.js", "MethodNA", "{3}", "DIFF", "VAL", "c_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/binary_new.js", "MethodNA", "{4}", "DIFF", "VAL", "c_Change:CHANGED"));
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+
+	}
+
+	@Test
 	public void testDyn() throws Exception {
 
 		/* The test files. */

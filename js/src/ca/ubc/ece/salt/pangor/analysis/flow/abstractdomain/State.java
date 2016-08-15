@@ -424,6 +424,24 @@ public class State implements IState {
 	}
 
 	/**
+	 * Helper function since variable initializers and assignments do the same thing.
+	 */
+	public void interpretAssignment(AstNode lhs, BValue val) {
+
+		/* Resolve the left hand side to a set of addresses. */
+		Set<Address> addrs = resolveOrCreate(lhs);
+
+		/* Update the values in the store. */
+		// TODO: Is this correct? We should probably only do a strong update if
+		//		 there is only one address. Otherwise we don't know which one
+		//		 to update.
+		for(Address addr : addrs) {
+			store = store.strongUpdate(addr, val);
+		}
+
+	}
+
+	/**
 	 * Base case: A simple name in the environment.
 	 * @param node A Name node
 	 * @return The set of addresses this identifier can resolve to.
