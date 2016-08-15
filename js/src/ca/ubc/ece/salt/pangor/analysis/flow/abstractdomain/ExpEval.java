@@ -19,6 +19,7 @@ import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.ObjectLiteral;
 import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.StringLiteral;
+import org.mozilla.javascript.ast.UnaryExpression;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
@@ -44,6 +45,9 @@ public class ExpEval {
 		}
 		else if(node instanceof InfixExpression) {
 			return evalInfixExpression((InfixExpression)node);
+		}
+		else if(node instanceof UnaryExpression) {
+			return evalUnaryExpression((UnaryExpression)node);
 		}
 		else if(node instanceof KeywordLiteral) {
 			return evalKeywordLiteral((KeywordLiteral)node);
@@ -104,6 +108,51 @@ public class ExpEval {
 		state.store = state.store.alloc(objAddr, obj);
 
 		return Address.inject(objAddr, Change.convU(ol), Change.convU(ol)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
+	}
+
+	/**
+	 * @param ue The unary expression.
+	 * @return the abstract interpretation of the expression.
+	 */
+	public BValue evalUnaryExpression(UnaryExpression ue) {
+
+		BValue operand = this.eval(ue.getOperand());
+
+		/* First create a bottom BValue with the proper change type. We will
+		 * put in values later. */
+		BValue val;
+		if(operand.change.le == Change.LatticeElement.CHANGED
+				|| operand.change.le == Change.LatticeElement.TOP) {
+			val = BValue.bottom(Change.c(), Change.u());
+		}
+		else if(ue.getChangeType() == ChangeType.INSERTED
+				|| ue.getChangeType() == ChangeType.REMOVED
+				|| ue.getChangeType() == ChangeType.UPDATED) {
+			val = BValue.bottom(Change.c(), Change.u());
+		}
+		else {
+			val = BValue.bottom(Change.u(), Change.u());
+		}
+
+		/* For now, just do a basic conservative estimate of unary operator
+		 * evaluations. */
+
+		switch(ue.getType()) {
+		case Token.NOT:
+			val.booleanAD.le = Bool.LatticeElement.TOP;
+			return val;
+		case Token.INC:
+		case Token.DEC:
+			val.numberAD.le = Num.LatticeElement.TOP;
+			return val;
+		case Token.TYPEOF:
+			val.stringAD.le = Str.LatticeElement.TOP;
+			return val;
+		default:
+			val.undefinedAD.le = Undefined.LatticeElement.TOP;
+			return val;
+		}
+
 	}
 
 	/**
