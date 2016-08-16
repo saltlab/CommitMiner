@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.DiffCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
@@ -30,6 +32,8 @@ import ca.ubc.ece.salt.pangor.git.GitProject;
  * Performs analysis on a Git project using an AnalysisRunner
  */
 public class GitProjectAnalysis extends GitProject {
+
+	protected static final Logger logger = LogManager.getLogger(GitProjectAnalysis.class);
 
 	/** Runs an analysis on a source file. **/
 	private ICommitAnalysisFactory commitAnalysisFactory;

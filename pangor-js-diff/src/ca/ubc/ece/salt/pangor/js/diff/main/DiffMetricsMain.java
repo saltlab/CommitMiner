@@ -1,7 +1,10 @@
 package ca.ubc.ece.salt.pangor.js.diff.main;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -13,8 +16,8 @@ import ca.ubc.ece.salt.pangor.js.diff.main.SourceFile.DiffType;
 
 public class DiffMetricsMain {
 
-	public static void main(String[] args) {
-		DiffMetricsMain metrics = new DiffMetricsMain("./output/dataset_2016-07-28.csv");
+	public static void main(String[] args) throws Exception{
+		DiffMetricsMain metrics = new DiffMetricsMain("./output/dataset_2016-08-14.csv");
 		metrics.analyze();
 	}
 
@@ -27,7 +30,7 @@ public class DiffMetricsMain {
 		this.sourceFilePairs = new HashMap<FV, SourceFilePair>();
 	}
 
-	private void analyze() {
+	private void analyze() throws Exception{
 
 		try(BufferedReader reader = new BufferedReader(new FileReader(datasetPath))) {
 
@@ -134,7 +137,10 @@ public class DiffMetricsMain {
 	}
 
 
-	private void printMetrics(List<SourceFileDiffComparison> sourceComparisons) {
+	private void printMetrics(List<SourceFileDiffComparison> sourceComparisons) throws Exception {
+
+		List<MetricsRow> fileFactMetrics = new LinkedList<MetricsRow>();
+		List<MetricsRow> fileLineMetrics = new LinkedList<MetricsRow>();
 
 		Set<String> repeatedFiles = new HashSet<String>();
 
@@ -208,21 +214,37 @@ public class DiffMetricsMain {
 				multiLineImprovedCommits.add(source.project + "~" + source.commit);
 				multiLineImprovedFilePairs++;
 				multiLinesAdded += source.multiAstSubtraction;
+
+				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.ALL,
+													source.multiAstSubtraction,
+													source.astChanges));
 			}
 			if(source.conAstSubtraction > 0) {
 				conLineImprovedCommits.add(source.project + "~" + source.commit);
 				conLineImprovedFilePairs++;
 				conLinesAdded += source.conAstSubtraction;
+
+				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.CONTROL,
+													source.conAstSubtraction,
+													source.astChanges));
 			}
 			if(source.envAstSubtraction > 0) {
 				envLineImprovedCommits.add(source.project + "~" + source.commit);
 				envLineImprovedFilePairs++;
 				envLinesAdded += source.envAstSubtraction;
+
+				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.ENVIRONMENT,
+													source.envAstSubtraction,
+													source.astChanges));
 			}
 			if(source.valAstSubtraction > 0) {
 				valLineImprovedCommits.add(source.project + "~" + source.commit);
 				valLineImprovedFilePairs++;
 				valLinesAdded += source.valAstSubtraction;
+
+				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.VALUE,
+													source.valAstSubtraction,
+													source.astChanges));
 			}
 
 			/* Check if the file is context-improved. */
@@ -231,27 +253,47 @@ public class DiffMetricsMain {
 				multiContextImprovedFilePairs++;
 				multiFactsAdded += source.multiChanges;
 				multiASTFactsAdded += source.astChanges;
+
+				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.ALL,
+													source.multiChanges,
+													source.astChanges));
 			}
 			if(source.conChanges > 0) {
 				conContextImprovedCommits.add(source.project + "~" + source.commit);
 				conContextImprovedFilePairs++;
 				conFactsAdded += source.conChanges;
 				conASTFactsAdded += source.astChanges;
+
+				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.CONTROL,
+													source.conChanges,
+													source.astChanges));
 			}
 			if(source.envChanges > 0) {
 				envContextImprovedCommits.add(source.project + "~" + source.commit);
 				envContextImprovedFilePairs++;
 				envFactsAdded += source.envChanges;
 				envASTFactsAdded += source.astChanges;
+
+				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.ENVIRONMENT,
+													source.envChanges,
+													source.astChanges));
 			}
 			if(source.valChanges > 0) {
 				valContextImprovedCommits.add(source.project + "~" + source.commit);
 				valContextImprovedFilePairs++;
 				valFactsAdded += source.valChanges;
 				valASTFactsAdded += source.astChanges;
+
+				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.VALUE,
+													source.valChanges,
+													source.astChanges));
 			}
 
 		}
+
+		/* Write the data to a file. */
+		this.writeMetrics("chart_file_line_metrics.csv", fileLineMetrics);
+		this.writeMetrics("chart_file_fact_metrics.csv", fileFactMetrics);
 
 		double multiContextCommit = (double)multiContextImprovedCommits.size()/(double)totalASTModifiedCommits.size();
 		double controlContextCommit = (double)conContextImprovedCommits.size()/(double)totalASTModifiedCommits.size();
@@ -375,6 +417,29 @@ public class DiffMetricsMain {
 		System.out.println("Ctrl," + controlAvgFactsAddedCommit + "," + controlAvgFactsAddedFilePair + "," + controlAvgLinesAddedCommit + "," + controlAvgLinesAddedFilePair + "," + controlAvgASTFactsAddedCommit + "," + controlAvgASTFactsAddedFilePair);
 		System.out.println("Env," + environmentAvgFactsAddedCommit + "," + environmentAvgFactsAddedFilePair + "," + environmentAvgLinesAddedCommit + "," + environmentAvgLinesAddedFilePair + "," + environmentAvgASTFactsAddedCommit + "," + environmentAvgASTFactsAddedFilePair);
 		System.out.println("Val," + valueAvgFactsAddedCommit + "," + valueAvgFactsAddedFilePair + "," + valueAvgLinesAddedCommit + "," + valueAvgLinesAddedFilePair + "," + valueAvgASTFactsAddedCommit + "," + valueAvgASTFactsAddedFilePair);
+
+	}
+
+	private void writeMetrics(String fileName, List<MetricsRow> rows) throws Exception {
+
+		/* The path to the file may not exist. Create it if needed. */
+		File path = new File("/Users/qhanam/Repositories/quinn-papers/multi-diff/" + fileName);
+		path.getParentFile().mkdirs();
+		path.delete();
+		path.createNewFile();
+
+		/* May throw IOException if the path does not exist. */
+		PrintStream stream = new PrintStream(new FileOutputStream(path, true));
+
+		stream.println("Type,Added,AST");
+
+		/* Write the data set. */
+		for(MetricsRow row : rows) {
+			stream.println(row.serialize());
+		}
+
+		/* Finished writing the feature vector. */
+		stream.close();
 
 	}
 

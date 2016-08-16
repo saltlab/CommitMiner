@@ -11,8 +11,8 @@ class FV {
 	public String bfc;				// 5
 	public String version;			// 6
 	public String file;				// 7
-	public String method;			// 8
-	public int line;				// 9
+	public int statement;			// 8
+	public int[] lines; 			// 9
 	public String type;				// 10
 	public String subType; 			// 11
 	public String change;			// 12
@@ -26,11 +26,27 @@ class FV {
 		this.bfc = tokens[5];
 		this.version = tokens[6];
 		this.file = tokens[7];
-		this.method = tokens[8];
-		this.line = StringUtils.isNumeric(tokens[9]) ? Integer.parseInt(tokens[9]) : -1;
+		this.statement = StringUtils.isNumeric(tokens[8]) ? Integer.parseInt(tokens[8]) : -1;
+		this.lines = getLines(tokens[9]);
 		this.type = tokens[10];
 		this.subType = tokens[11];
 		this.change = tokens[12];
+	}
+
+	/**
+	 * Create an array of line numbers from the serialized data.
+	 * @param token has the format "{n1,n2,...,nN}"
+	 * @return The de-serialized integer array
+	 */
+	private int[] getLines(String serial) {
+		if(serial.length() == 2) return null;
+		String csv = serial.substring(1, serial.length() - 1);
+		String[] tokens = csv.split(";");
+		int[] lines = new int[tokens.length];
+		for(int i = 0; i < tokens.length; i++) {
+			lines[i] = Integer.parseInt(tokens[i]);
+		}
+		return lines;
 	}
 
 	@Override

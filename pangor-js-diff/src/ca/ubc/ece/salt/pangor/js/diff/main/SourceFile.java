@@ -43,25 +43,35 @@ public class SourceFile {
 			this.totalLines = Integer.parseInt(fv.change);
 		}
 		else if(fv.subType.equals("LINE")) {
-			this.lineLines.add(fv.line);
-			this.lineFact.add(fv.subType + "~" + fv.line + "~" + fv.change);
+			for(int line : fv.lines) {
+				this.lineLines.add(line);
+				this.lineFact.add(fv.subType + "~" + line + "~" + fv.change);
+			}
 		}
 //		else if(fv.subType.equals("AST") && !fv.change.equals("MOVED")) {
 		else if(fv.subType.equals("AST")) {
-			this.astLines.add(fv.line);
-			this.astFact.add(fv.subType + "~" + fv.line + "~" + fv.change);
+			for(int line : fv.lines) {
+				this.astLines.add(line);
+				this.astFact.add(fv.subType + "~" + line + "~" + fv.change);
+			}
 		}
 		else if(fv.subType.equals("CONTROL")) {
-			this.controlLines.add(fv.line);
-			this.controlFact.add(fv.subType + "~" + fv.line + "~" + fv.change);
+			for(int line : fv.lines) {
+				this.controlLines.add(line);
+				this.controlFact.add(fv.subType + "~" + line + "~" + fv.change);
+			}
 		}
 		else if(fv.subType.equals("ENV")) {
-			this.environmentLines.add(fv.line);
-			this.environmentFact.add(fv.subType + "~" + fv.line + "~" + fv.change);
+			for(int line : fv.lines) {
+				this.environmentLines.add(line);
+				this.environmentFact.add(fv.subType + "~" + line + "~" + fv.change);
+			}
 		}
 		else if(fv.subType.equals("VAL")) {
-			this.valueLines.add(fv.line);
-			this.valueFact.add(fv.subType + "~" + fv.line + "~" + fv.change);
+			for(int line : fv.lines) {
+				this.valueLines.add(line);
+				this.valueFact.add(fv.subType + "~" + line + "~" + fv.change);
+			}
 		}
 
 	}
