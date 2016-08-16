@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -142,6 +143,9 @@ public class DiffMetricsMain {
 		List<MetricsRow> fileFactMetrics = new LinkedList<MetricsRow>();
 		List<MetricsRow> fileLineMetrics = new LinkedList<MetricsRow>();
 
+		Map<String, MetricsRow> commitFactMetrics = new HashMap<String, MetricsRow>();
+		Map<String, MetricsRow> commitLineMetrics = new HashMap<String, MetricsRow>();
+
 		Set<String> repeatedFiles = new HashSet<String>();
 
 		Set<String> totalCommits = new HashSet<String>();
@@ -194,9 +198,7 @@ public class DiffMetricsMain {
 		/* Compute the totals. */
 		for(SourceFileDiffComparison source : sourceComparisons) {
 
-			String file = source.project + "~" + source.commit + "~" + source.file;
-			if(repeatedFiles.contains(file)) throw new Error("Repeated file");
-			else repeatedFiles.add(file);
+			String commit = source.project + "~" + source.commit;
 
 			/* For computing the total number of commits. */
 			totalCommits.add(source.commit);
@@ -215,6 +217,11 @@ public class DiffMetricsMain {
 				multiLineImprovedFilePairs++;
 				multiLinesAdded += source.multiAstSubtraction;
 
+				addFileFactsToCommit(commitLineMetrics, commit,
+									 MetricsRow.Type.ALL,
+									 source.multiAstSubtraction,
+									 source.astChanges);
+
 				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.ALL,
 													source.multiAstSubtraction,
 													source.astChanges));
@@ -223,6 +230,11 @@ public class DiffMetricsMain {
 				conLineImprovedCommits.add(source.project + "~" + source.commit);
 				conLineImprovedFilePairs++;
 				conLinesAdded += source.conAstSubtraction;
+
+				addFileFactsToCommit(commitLineMetrics, commit,
+									 MetricsRow.Type.CONTROL,
+									 source.conAstSubtraction,
+									 source.astChanges);
 
 				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.CONTROL,
 													source.conAstSubtraction,
@@ -233,6 +245,11 @@ public class DiffMetricsMain {
 				envLineImprovedFilePairs++;
 				envLinesAdded += source.envAstSubtraction;
 
+				addFileFactsToCommit(commitLineMetrics, commit,
+									 MetricsRow.Type.ENVIRONMENT,
+									 source.envAstSubtraction,
+									 source.astChanges);
+
 				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.ENVIRONMENT,
 													source.envAstSubtraction,
 													source.astChanges));
@@ -241,6 +258,11 @@ public class DiffMetricsMain {
 				valLineImprovedCommits.add(source.project + "~" + source.commit);
 				valLineImprovedFilePairs++;
 				valLinesAdded += source.valAstSubtraction;
+
+				addFileFactsToCommit(commitLineMetrics, commit,
+									 MetricsRow.Type.VALUE,
+									 source.valAstSubtraction,
+									 source.astChanges);
 
 				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.VALUE,
 													source.valAstSubtraction,
@@ -254,6 +276,11 @@ public class DiffMetricsMain {
 				multiFactsAdded += source.multiChanges;
 				multiASTFactsAdded += source.astChanges;
 
+				addFileFactsToCommit(commitFactMetrics, commit,
+									 MetricsRow.Type.ALL,
+									 source.multiChanges,
+									 source.astChanges);
+
 				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.ALL,
 													source.multiChanges,
 													source.astChanges));
@@ -263,6 +290,11 @@ public class DiffMetricsMain {
 				conContextImprovedFilePairs++;
 				conFactsAdded += source.conChanges;
 				conASTFactsAdded += source.astChanges;
+
+				addFileFactsToCommit(commitFactMetrics, commit,
+									 MetricsRow.Type.CONTROL,
+									 source.conChanges,
+									 source.astChanges);
 
 				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.CONTROL,
 													source.conChanges,
@@ -274,6 +306,11 @@ public class DiffMetricsMain {
 				envFactsAdded += source.envChanges;
 				envASTFactsAdded += source.astChanges;
 
+				addFileFactsToCommit(commitFactMetrics, commit,
+									 MetricsRow.Type.ENVIRONMENT,
+									 source.envChanges,
+									 source.astChanges);
+
 				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.ENVIRONMENT,
 													source.envChanges,
 													source.astChanges));
@@ -283,6 +320,11 @@ public class DiffMetricsMain {
 				valContextImprovedFilePairs++;
 				valFactsAdded += source.valChanges;
 				valASTFactsAdded += source.astChanges;
+
+				addFileFactsToCommit(commitFactMetrics, commit,
+									 MetricsRow.Type.VALUE,
+									 source.valChanges,
+									 source.astChanges);
 
 				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.VALUE,
 													source.valChanges,
@@ -294,6 +336,8 @@ public class DiffMetricsMain {
 		/* Write the data to a file. */
 		this.writeMetrics("chart_file_line_metrics.csv", fileLineMetrics);
 		this.writeMetrics("chart_file_fact_metrics.csv", fileFactMetrics);
+		this.writeMetrics("chart_commit_line_metrics.csv", commitLineMetrics.values());
+		this.writeMetrics("chart_commit_fact_metrics.csv", commitFactMetrics.values());
 
 		double multiContextCommit = (double)multiContextImprovedCommits.size()/(double)totalASTModifiedCommits.size();
 		double controlContextCommit = (double)conContextImprovedCommits.size()/(double)totalASTModifiedCommits.size();
@@ -420,7 +464,30 @@ public class DiffMetricsMain {
 
 	}
 
-	private void writeMetrics(String fileName, List<MetricsRow> rows) throws Exception {
+	private void addFileFactsToCommit(Map<String, MetricsRow> map,
+									  String commit,
+									  MetricsRow.Type type,
+									  int added, int ast) {
+
+		String key = commit + "~" + type.toString();
+		MetricsRow row = map.get(key);
+
+		if(row == null) {
+			row = new MetricsRow(type, added, ast);
+			map.put(key, row);
+		}
+		else {
+			if(row.type != type) throw new Error("Map type does not match input type.");
+			row.added += added;
+			row.ast += ast;
+		}
+
+	}
+
+	/**
+	 * Creates a csv file for building boxplots in R
+	 */
+	private void writeMetrics(String fileName, Collection<MetricsRow> rows) throws Exception {
 
 		/* The path to the file may not exist. Create it if needed. */
 		File path = new File("/Users/qhanam/Repositories/quinn-papers/multi-diff/" + fileName);
