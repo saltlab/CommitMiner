@@ -444,6 +444,9 @@ public class ExpEval {
 		Obj argObj = new Obj(ext, internal);
 
 		/* Add the argument object to the state.store. */
+		if(state == null || state.store == null || state.trace == null || fc == null || fc.getID() == null) {
+			System.out.println("Problem here");
+		}
 		Address argAddr = state.trace.makeAddr(fc.getID(), "");
 		state.store = state.store.alloc(argAddr, argObj);
 
