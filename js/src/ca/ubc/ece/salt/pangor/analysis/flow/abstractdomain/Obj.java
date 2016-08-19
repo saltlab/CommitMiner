@@ -74,8 +74,8 @@ public class Obj {
 	 * @return A new Obj with this Obj joined with the Obj parameter.
 	 */
 	public Obj join(Obj right, Map<Address, BValue> bValueMap) {
-		if(this.internalProperties.klass != right.internalProperties.klass)
-			throw new Error("Cannot join classes of different types.");
+//		if(this.internalProperties.klass != right.internalProperties.klass) TODO: Ignore this for diff analysis. We dynamically create objects and type does not matter.
+//			throw new Error("Cannot join classes of different types.");
 
 		Map<Identifier, Address> ext = new HashMap<Identifier, Address>(this.externalProperties);
 

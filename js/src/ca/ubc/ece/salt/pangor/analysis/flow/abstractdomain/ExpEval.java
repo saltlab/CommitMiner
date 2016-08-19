@@ -444,9 +444,6 @@ public class ExpEval {
 		Obj argObj = new Obj(ext, internal);
 
 		/* Add the argument object to the state.store. */
-		if(state == null || state.store == null || state.trace == null || fc == null || fc.getID() == null) {
-			System.out.println("Problem here");
-		}
 		Address argAddr = state.trace.makeAddr(fc.getID(), "");
 		state.store = state.store.alloc(argAddr, argObj);
 
@@ -476,11 +473,20 @@ public class ExpEval {
 												  state.callStack);
 		}
 
+		/* Get the call change type. */
+		boolean callChange =
+				Change.convU(fc).le == Change.LatticeElement.CHANGED
+					|| Change.convU(fc).le == Change.LatticeElement.TOP
+				? true : false;
+
 		if(newState == null) {
 			/* Because our analysis is not complete, the identifier may not point
 			 * to any function object. In this case, we assume the (local) state
 			 * is unchanged, but add BValue.TOP as the return value. */
-			state.scratch = state.scratch.strongUpdate(Scratch.RETVAL, BValue.top(Change.top(), Change.top()));
+			BValue value = callChange
+					? BValue.top(Change.top(), Change.u())
+					: BValue.top(Change.u(), Change.u());
+			state.scratch = state.scratch.strongUpdate(Scratch.RETVAL, value);
 			newState = new State(state.store, state.env, state.scratch,
 								 state.trace, state.control, state.selfAddr,
 								 state.cfgs, state.callStack);
@@ -488,16 +494,8 @@ public class ExpEval {
 		else {
 
 			/* This could be a new value if the call is new. */
-			if(newState.scratch.apply(Scratch.RETVAL) != null) {
-				Change callChange = Change.convU(fc);
-				switch(callChange.le) {
-				case CHANGED:
-				case TOP:
-					newState.scratch.apply(Scratch.RETVAL).change = Change.top();
-				default:
-					break;
-				}
-			}
+			if(callChange)
+				newState.scratch.apply(Scratch.RETVAL).change = Change.top();
 
 		}
 
