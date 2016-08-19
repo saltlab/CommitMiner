@@ -456,8 +456,8 @@ public class State implements IState {
 			 * and add it to the environment/store as BValue.TOP since we know
 			 * nothing about it. */
 			addr = trace.makeAddr(node.getID(), "");
-			env = env.strongUpdate(new Identifier(node.toSource(), Change.top()), addr);
-			store = store.alloc(addr, Addresses.dummy(Change.top(), Change.top()));
+			env = env.strongUpdate(new Identifier(node.toSource(), Change.bottom()), addr);
+			store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom()));
 		}
 
 		result.add(addr);
@@ -501,7 +501,7 @@ public class State implements IState {
 				Obj dummy = new Obj(ext, new InternalObjectProperties());
 				Address addr = trace.makeAddr(ie.getID(), "");
 				store = store.alloc(addr, dummy);
-				val = val.join(Address.inject(addr, Change.top(), Change.top()));
+				val = val.join(Address.inject(addr, Change.bottom(), Change.bottom()));
 				store = store.strongUpdate(valAddr, val);
 			}
 
@@ -528,7 +528,7 @@ public class State implements IState {
 					/* Create a new address (BValue) for the property and
 					 * put it in the store. */
 					propAddr = trace.makeAddr(ie.getID(), ie.getRight().toSource());
-					BValue propVal = Addresses.dummy(Change.u(), Change.u());
+					BValue propVal = Addresses.dummy(Change.bottom(), Change.bottom());
 					store = store.alloc(propAddr, propVal);
 
 					/* Add the property to the external properties of the object. */

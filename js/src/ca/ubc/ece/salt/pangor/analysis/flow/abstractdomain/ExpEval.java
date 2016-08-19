@@ -168,10 +168,11 @@ public class ExpEval {
 			 * left. */
 			state.interpretAssignment((Assignment)ie);
 			return this.eval(ie.getLeft());
-		case Token.DOT: {
+		case Token.GETPROPNOWARN:
+		case Token.GETPROP: {
 			/* This is an identifier.. so we attempt to dereference it. */
 			BValue val = resolveValue(ie);
-			if(val == null) return BValue.top(Change.convU(ie), Change.convU(ie)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
+			if(val == null) return BValue.top(Change.u(), Change.u());
 			return val; }
 		case Token.ADD:
 			return evalPlus(ie);
@@ -329,7 +330,7 @@ public class ExpEval {
 	 */
 	public BValue evalName(Name name) {
 		BValue val = resolveValue(name);
-		if(val == null) return BValue.top(Change.convU(name), Change.convU(name)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
+		if(val == null) return BValue.top(Change.u(), Change.u());
 		return val;
 	}
 
