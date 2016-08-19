@@ -64,6 +64,12 @@ public class ExpEval {
 		else if(node instanceof FunctionNode) {
 			return evalFunctionNode((FunctionNode)node);
 		}
+		else if(node instanceof FunctionCall) {
+			State endState = this.evalFunctionCall((FunctionCall) node);
+			this.state.store = endState.store;
+			BValue retVal =  endState.scratch.apply(Scratch.RETVAL);
+			return retVal;
+		}
 
 		/* We could not evaluate the expression. Return top. */
 		return BValue.top(Change.convU(node), Change.convU(node));

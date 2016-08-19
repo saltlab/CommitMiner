@@ -15,11 +15,13 @@ import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
+import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.IState;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Scratchpad.Scratch;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
@@ -377,7 +379,29 @@ public class State implements IState {
 		else if(node instanceof Assignment) {
 			interpretAssignment((Assignment)node);
 		}
+		else if(node instanceof ReturnStatement) {
+			interpretReturn((ReturnStatement)node);
+		}
 
+	}
+
+	/**
+	 * Evaluates the return expression and stores the value in the scratchpad
+	 * for use by the caller.
+	 */
+	public void interpretReturn(ReturnStatement rs) {
+		ExpEval expEval = new ExpEval(this);
+
+		BValue retVal = null;
+
+		if(rs.getReturnValue() == null) {
+			retVal = BValue.bottom(Change.convU(rs), Change.convU(rs));
+		}
+		else {
+			retVal = expEval.eval(rs.getReturnValue());
+		}
+
+		this.scratch = this.scratch.strongUpdate(Scratch.RETVAL, retVal);
 	}
 
 	/**
