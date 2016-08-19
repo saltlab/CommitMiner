@@ -9,7 +9,10 @@ var h;
 var i;
 
 function bar() {
-	return 5;
+	if(a) {
+		return 10; }
+	else {
+		return 5; }
 }
 
 function gat() {

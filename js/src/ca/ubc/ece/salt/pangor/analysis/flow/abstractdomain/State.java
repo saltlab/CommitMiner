@@ -390,18 +390,26 @@ public class State implements IState {
 	 * for use by the caller.
 	 */
 	public void interpretReturn(ReturnStatement rs) {
-		ExpEval expEval = new ExpEval(this);
 
 		BValue retVal = null;
 
+		/* Evaluate the return value from the return expression. */
 		if(rs.getReturnValue() == null) {
 			retVal = BValue.bottom(Change.convU(rs), Change.convU(rs));
 		}
 		else {
+			ExpEval expEval = new ExpEval(this);
 			retVal = expEval.eval(rs.getReturnValue());
 		}
 
+		/* Join the values if a return value allready exists on the path. */
+		BValue oldVal = this.scratch.apply(Scratch.RETVAL);
+		if(oldVal != null)
+			retVal = retVal.join(oldVal);
+
+		/* Update the return value on the scratchpad. */
 		this.scratch = this.scratch.strongUpdate(Scratch.RETVAL, retVal);
+
 	}
 
 	/**

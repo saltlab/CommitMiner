@@ -68,6 +68,10 @@ public class ExpEval {
 			State endState = this.evalFunctionCall((FunctionCall) node);
 			this.state.store = endState.store;
 			BValue retVal =  endState.scratch.apply(Scratch.RETVAL);
+			if(retVal == null) {
+				/* Functions with no return statement return undefined. */
+				retVal = Undefined.inject(Undefined.top(Change.convU(node)), Change.u());
+			}
 			return retVal;
 		}
 

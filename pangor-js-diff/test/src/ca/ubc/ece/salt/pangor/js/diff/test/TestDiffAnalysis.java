@@ -610,7 +610,8 @@ public class TestDiffAnalysis {
 
 		String qs = "";
 		qs += "?- Value(?Version,?File,?Line,?StatementID,?Identifier,?ValChange)";
-		qs += ", EQUAL(?ValChange, 'Change:CHANGED').";
+		qs += ", NOT_EQUAL(?ValChange, 'Change:UNCHANGED')";
+		qs += ", NOT_EQUAL(?ValChange, 'Change:BOTTOM').";
 
 		/* The query that produces the results. */
 		Parser parser = new Parser();

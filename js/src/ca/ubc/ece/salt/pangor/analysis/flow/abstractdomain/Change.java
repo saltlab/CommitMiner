@@ -33,7 +33,7 @@ public class Change {
 	public Change join(Change state) {
 
 		LatticeElement l = this.le;
-		LatticeElement r = this.le;
+		LatticeElement r = state.le;
 
 		if(l == r) return new Change(l);
 		if(l == LatticeElement.BOTTOM) return new Change(r);

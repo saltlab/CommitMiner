@@ -9,7 +9,10 @@ var h = module;
 var i = module.exports;
 
 function bar() {
-	return 10;
+	if(a)
+		return 10;
+	else 
+		return 0;
 }
 
 function gat() {
