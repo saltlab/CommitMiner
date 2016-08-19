@@ -61,8 +61,23 @@ public class TestDiffAnalysis {
 		List<ClassifierFeatureVector> actual = dataSet.getFeatureVectors();
 		if(checkSize) Assert.assertTrue(actual.size() == expected.size());
         for(ClassifierFeatureVector fv : expected) {
-        	Assert.assertTrue(actual.contains(fv));
+        	Assert.assertTrue(contains(actual,fv));
         }
+	}
+
+	private static boolean contains(List<ClassifierFeatureVector> fvs, ClassifierFeatureVector test) {
+		for(ClassifierFeatureVector fv : fvs) {
+			if(fv.commit.equals(test.commit)
+					&& fv.version.equals(test.version)
+					&& fv.klass.equals(test.klass)
+					&& fv.line.equals(test.line)
+					&& fv.type.equals(test.type)
+					&& fv.subtype.equals(test.subtype)
+					&& fv.description.equals(test.description)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Test
@@ -100,6 +115,14 @@ public class TestDiffAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/create_new.js", "NA", "{1}", "DIFF", "VAL", "a_Change:TOP"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/create_new.js", "NA", "{2}", "DIFF", "VAL", "b_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/create_new.js", "NA", "{3}", "DIFF", "VAL", "c_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/create_new.js", "NA", "{4}", "DIFF", "VAL", "d_Change:TOP"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/create_new.js", "NA", "{5}", "DIFF", "VAL", "e_Change:TOP"));
+
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/create_new.js", "NA", "{18}", "DIFF", "CONTROL", "Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/create_new.js", "NA", "{19}", "DIFF", "CONTROL", "Change:CHANGED"));
 
 		this.runTest(sourceCodeFileChanges, expected, false);
 
@@ -119,8 +142,8 @@ public class TestDiffAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/binary_new.js", "MethodNA", "{3}", "DIFF", "VAL", "c_Change:CHANGED"));
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/binary_new.js", "MethodNA", "{4}", "DIFF", "VAL", "c_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/unary_new.js", "MethodNA", "{3}", "DIFF", "VAL", "c_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/unary_new.js", "MethodNA", "{4}", "DIFF", "VAL", "c_Change:CHANGED"));
 
 		this.runTest(sourceCodeFileChanges, expected, false);
 
@@ -588,15 +611,15 @@ public class TestDiffAnalysis {
 
 		Pair<IQuery, Transformer> controlQuery = getControlQuery();
 		queries.put(controlQuery.getLeft(), controlQuery.getRight());
-//
-//		Pair<IQuery, Transformer> astQuery = getAstQuery();
-//		queries.put(astQuery.getLeft(), astQuery.getRight());
-//
-//		Pair<IQuery, Transformer> lineQuery = getLineQuery();
-//		queries.put(lineQuery.getLeft(), lineQuery.getRight());
-//
-//		Pair<IQuery, Transformer> totalLinesQuery = getTotalLinesQuery();
-//		queries.put(totalLinesQuery.getLeft(), totalLinesQuery.getRight());
+
+		Pair<IQuery, Transformer> astQuery = getAstQuery();
+		queries.put(astQuery.getLeft(), astQuery.getRight());
+
+		Pair<IQuery, Transformer> lineQuery = getLineQuery();
+		queries.put(lineQuery.getLeft(), lineQuery.getRight());
+
+		Pair<IQuery, Transformer> totalLinesQuery = getTotalLinesQuery();
+		queries.put(totalLinesQuery.getLeft(), totalLinesQuery.getRight());
 
 		return queries;
 

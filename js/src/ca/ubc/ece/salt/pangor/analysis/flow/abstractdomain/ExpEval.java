@@ -469,7 +469,7 @@ public class ExpEval {
 
 			/* Call the function and get a join of the new states. */
 			newState = Helpers.applyClosure(funVal, objAddr, argAddr, state.store,
-												  state.scratch, state.trace, control,
+												  new Scratchpad(), state.trace, control,
 												  state.callStack);
 		}
 
@@ -481,6 +481,21 @@ public class ExpEval {
 			newState = new State(state.store, state.env, state.scratch,
 								 state.trace, state.control, state.selfAddr,
 								 state.cfgs, state.callStack);
+		}
+		else {
+
+			/* This could be a new value if the call is new. */
+			if(newState.scratch.apply(Scratch.RETVAL) != null) {
+				Change callChange = Change.convU(fc);
+				switch(callChange.le) {
+				case CHANGED:
+				case TOP:
+					newState.scratch.apply(Scratch.RETVAL).change = Change.top();
+				default:
+					break;
+				}
+			}
+
 		}
 
 		/* Analyze any callbacks

@@ -42,7 +42,8 @@ public class Scratchpad {
 	 * @return The updated scratchpad.
 	 */
 	public Scratchpad strongUpdate(Scratch loc, BValue retVal) {
-		BValue[] scratchMem = this.scratchMem.clone();
+		BValue[] scratchMem = new BValue[this.scratchMem.length];
+		for(int i = 0; i < scratchMem.length; i++) scratchMem[i] = this.scratchMem[i];
 		scratchMem[loc.val] = retVal;
 		return new Scratchpad(scratchMem);
 	}
