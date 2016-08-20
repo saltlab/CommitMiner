@@ -504,9 +504,6 @@ public class ExpEval {
 		for(Address addr : callbacks) {
 			Obj funct = newState.store.getObj(addr);
 
-			if(funct == null) {
-				System.out.println("pause");
-			}
 			InternalFunctionProperties ifp = (InternalFunctionProperties)funct.internalProperties;
 			FunctionClosure closure = (FunctionClosure)ifp.closure;
 

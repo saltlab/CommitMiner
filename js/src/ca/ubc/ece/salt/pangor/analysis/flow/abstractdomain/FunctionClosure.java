@@ -71,11 +71,12 @@ public class FunctionClosure extends Closure {
 
 		/* If this has already been analyzed, we can short-circuit. */
 		boolean runAnalysis = this.runAnalysis(control, argArrayAddr, store);
-		if(!runAnalysis) { //!cfg.getExitNodes().isEmpty()) {
+		if(!runAnalysis) {
 
 			State exitState = null;
 
 			for(CFGNode exitNode : cfg.getExitNodes()) {
+				/* Merge all exit states, because we can only return one. */
 				State s = (State)exitNode.getAfterState();
 				if(exitState == null) exitState = s;
 				else if(s != null) exitState = exitState.join(s);
