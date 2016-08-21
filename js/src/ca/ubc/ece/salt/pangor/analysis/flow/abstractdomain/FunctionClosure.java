@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Stack;
 
@@ -33,6 +34,34 @@ public class FunctionClosure extends Closure {
 		this.cfgs = cfgs;
 	}
 
+	private boolean hasValueChanges(Collection<Address> bvalAddrs, Store store) {
+
+		/* Look for changes to each value. */
+		for(Address bvalAddr : bvalAddrs) {
+			BValue value = store.apply(bvalAddr);
+
+			/* Check for changes. */
+			switch(value.change.le) {
+			case CHANGED:
+			case TOP:
+				return true;
+			default:
+				break;
+			}
+
+			/* Recursively look at objects. */
+			for(Address objAddr : value.addressAD.addresses) {
+				Obj obj = store.getObj(objAddr);
+				return hasValueChanges(obj.externalProperties.values(), store);
+			}
+
+		}
+
+		/* No changes found. */
+		return false;
+
+	}
+
 	/**
 	 * @return true if the analysis needs to be (re-)run on the function
 	 */
@@ -49,18 +78,7 @@ public class FunctionClosure extends Closure {
 
 		/* Re-run the analysis if there are value changes in the arg list. */
 		Obj argObj = store.getObj(argArrayAddr);
-		for(Address address : argObj.externalProperties.values()) {
-			BValue value = store.apply(address);
-			switch(value.change.le) {
-			case CHANGED:
-			case TOP:
-				return true;
-			default:
-				continue;
-			}
-		}
-
-		return false;
+		return hasValueChanges(argObj.externalProperties.values(), store);
 
 	}
 
