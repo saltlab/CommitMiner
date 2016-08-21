@@ -67,12 +67,7 @@ public class ExpEval {
 		else if(node instanceof FunctionCall) {
 			State endState = this.evalFunctionCall((FunctionCall) node);
 			this.state.store = endState.store;
-			BValue retVal =  endState.scratch.apply(Scratch.RETVAL);
-			if(retVal == null) {
-				/* Functions with no return statement return undefined. */
-				retVal = Undefined.inject(Undefined.top(Change.convU(node)), Change.u());
-			}
-			return retVal;
+			return endState.scratch.apply(Scratch.RETVAL);
 		}
 
 		/* We could not evaluate the expression. Return top. */
@@ -490,12 +485,24 @@ public class ExpEval {
 			newState = new State(state.store, state.env, state.scratch,
 								 state.trace, state.control, state.selfAddr,
 								 state.cfgs, state.callStack);
+
+			/* Create the return value. */
+			BValue retVal =  BValue.top(Change.convU(fc), Change.u());
+			newState.scratch.strongUpdate(Scratch.RETVAL, retVal);
 		}
 		else {
 
+			BValue retVal =  newState.scratch.apply(Scratch.RETVAL);
+			if(retVal == null) {
+				/* Functions with no return statement return undefined. */
+				retVal = Undefined.inject(Undefined.top(Change.convU(fc)), Change.u());
+				newState.scratch = newState.scratch.strongUpdate(Scratch.RETVAL, retVal);
+			}
+
 			/* This could be a new value if the call is new. */
-			if(callChange)
+			if(callChange) {
 				newState.scratch.apply(Scratch.RETVAL).change = Change.top();
+			}
 
 		}
 
