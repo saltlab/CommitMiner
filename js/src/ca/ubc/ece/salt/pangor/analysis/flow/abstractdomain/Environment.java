@@ -58,6 +58,17 @@ public class Environment {
 	}
 
 	/**
+	 * Performs a strong update on a variable in the environment.
+	 * Updates the object directly without making a copy.
+	 * @param variable The variable to update.
+	 * @param address The address for the variable.
+	 * @return The updated environment.
+	 */
+	public void strongUpdateNoCopy(Identifier variable, Address address) {
+		this.environment.put(variable,  address);
+	}
+
+	/**
 	 * Computes ρ ∪ ρ
 	 * @param environment The environment to join with this environment.
 	 * @return The joined environments as a new environment.
@@ -90,6 +101,15 @@ public class Environment {
 
 		}
 		return joined;
+	}
+
+	@Override
+	public String toString() {
+		String str = "-Variables-\n";
+		for(Map.Entry<Identifier, Address> entry : this.environment.entrySet()) {
+			str += entry.getKey().name.toString() + "_" + entry.getKey().change.toString() + ": " + entry.getValue().toString() + "\n";
+		}
+		return str;
 	}
 
 }

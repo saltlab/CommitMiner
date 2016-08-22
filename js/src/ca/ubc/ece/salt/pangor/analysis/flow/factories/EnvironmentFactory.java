@@ -35,7 +35,8 @@ public class EnvironmentFactory {
 	 */
 	public static Pair<Environment, Store> createInitialEnvironment(ScriptNode script, Store store, Map<AstNode, CFG> cfgs, Trace trace) {
 		Environment env = createBaseEnvironment();
-		return Helpers.lift(env, store, script, cfgs, trace);
+		store = Helpers.lift(env, store, script, cfgs, trace);
+		return Pair.of(env,  store);
 	}
 
 	/**

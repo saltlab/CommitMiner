@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
@@ -229,8 +228,9 @@ public class Helpers {
 	 * @param cfgs The control flow graphs for the file. Needed for
 	 * 			   initializing lifted functions.
 	 * @param trace The program trace including the call site of this function.
+	 * @return The new store. The environment is updated directly (no new object is created)
 	 */
-	public static Pair<Environment, Store> lift(Environment env,
+	public static Store lift(Environment env,
 										  Store store,
 										  ScriptNode function,
 										  Map<AstNode, CFG> cfgs,
@@ -241,7 +241,7 @@ public class Helpers {
 		for(Name localVar : localVars) {
 			Change change = Change.convU(localVar);
 			Address address = trace.makeAddr(localVar.getID(), "");
-			env = env.strongUpdate(new Identifier(localVar.toSource(), Change.convU(localVar)), address);
+			env.strongUpdateNoCopy(new Identifier(localVar.toSource(), Change.convU(localVar)), address);
 			store = store.alloc(address, Undefined.inject(Undefined.top(change), Change.u()));
 		}
 
@@ -252,7 +252,7 @@ public class Helpers {
 			Address address = trace.makeAddr(child.getID(), "");
 
 			/* The function name variable points to our new function. */
-			env = env.strongUpdate(new Identifier(child.getName(), Change.convU(child.getFunctionName())), address); // Env update with env change type
+			env.strongUpdateNoCopy(new Identifier(child.getName(), Change.convU(child.getFunctionName())), address); // Env update with env change type
 			store = store.alloc(address, Address.inject(address, Change.convU(child), Change.convU(child))); // Store update with value change type
 
 			/* Create a function object. */
@@ -261,7 +261,7 @@ public class Helpers {
 
 		}
 
-		return Pair.of(env, store);
+		return store;
 
 	}
 

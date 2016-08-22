@@ -18,7 +18,7 @@ import ca.ubc.ece.salt.pangor.js.diff.main.SourceFile.DiffType;
 public class DiffMetricsMain {
 
 	public static void main(String[] args) throws Exception{
-		DiffMetricsMain metrics = new DiffMetricsMain("./output/dataset_2016-08-14.csv");
+		DiffMetricsMain metrics = new DiffMetricsMain("./output/dataset_2016-08-21.csv");
 		metrics.analyze();
 	}
 

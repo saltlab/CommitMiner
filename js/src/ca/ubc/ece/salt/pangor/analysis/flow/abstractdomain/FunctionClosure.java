@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
@@ -38,6 +37,7 @@ public class FunctionClosure extends Closure {
 
 		/* Look for changes to each value. */
 		for(Address bvalAddr : bvalAddrs) {
+
 			BValue value = store.apply(bvalAddr);
 
 			/* Check for changes. */
@@ -52,7 +52,9 @@ public class FunctionClosure extends Closure {
 			/* Recursively look at objects. */
 			for(Address objAddr : value.addressAD.addresses) {
 				Obj obj = store.getObj(objAddr);
-				return hasValueChanges(obj.externalProperties.values(), store);
+				boolean recursiveChanged = hasValueChanges(obj.externalProperties.values(), store);
+				if(recursiveChanged)
+					return true;
 			}
 
 		}
@@ -114,10 +116,10 @@ public class FunctionClosure extends Closure {
 							 (ScriptNode)cfg.getEntryNode().getStatement());
 
 		/* Lift local variables and function declarations into the environment. */
-		Pair<Environment, Store> pair = Helpers.lift(this.environment,
-				store, (ScriptNode)cfg.getEntryNode().getStatement(), cfgs, trace);
-		Environment env = pair.getLeft();
-		store = pair.getRight();
+		Environment env = this.environment.clone();
+		store = Helpers.lift(env, store,
+							 (ScriptNode)cfg.getEntryNode().getStatement(),
+							 cfgs, trace);
 
 		/* Match parameters with arguments. */
 		Obj argObj = store.getObj(argArrayAddr);
