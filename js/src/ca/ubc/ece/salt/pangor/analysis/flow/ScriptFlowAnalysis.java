@@ -153,7 +153,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		}
 
 		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Arguments_Addr, Change.convU(f), Change.u()), JSClass.CFunction);
+				Address.inject(StoreFactory.Arguments_Addr, Change.convU(f), Change.u()), JSClass.CObject);
 		Obj argObj = new Obj(ext, internal);
 
 		/* Add the argument object to the store. */

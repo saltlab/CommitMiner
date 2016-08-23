@@ -69,7 +69,7 @@ public class GitProjectAnalysis extends GitProject {
 			try {
 			this.analyzeDiff(commit.getLeft(), commit.getMiddle(), commit.getRight());
 			} catch (Exception e) {
-				logger.error("[ERROR] {} ", e.getMessage());
+				logger.error("[ERROR] {}, {}", commit.getMiddle(),  e.getMessage());
 			}
 		}
 

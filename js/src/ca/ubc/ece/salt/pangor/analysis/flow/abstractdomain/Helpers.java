@@ -250,6 +250,7 @@ public class Helpers {
 		for(FunctionNode child : children) {
 			if(child.getName().isEmpty()) continue; // Not accessible.
 			Address address = trace.makeAddr(child.getID(), "");
+			address = trace.modAddr(address, JSClass.CFunction);
 
 			/* The function name variable points to our new function. */
 			env.strongUpdateNoCopy(new Identifier(child.getName(), Change.convU(child.getFunctionName())), address); // Env update with env change type

@@ -83,6 +83,7 @@ public class ExpEval {
 	public BValue evalFunctionNode(FunctionNode f){
 		Closure closure = new FunctionClosure(state.cfgs.get(f), state.env, state.cfgs);
 		Address addr = state.trace.makeAddr(f.getID(), "");
+		addr = state.trace.modAddr(addr, JSClass.CFunction);
 		state.store = Helpers.createFunctionObj(closure, state.store, state.trace, addr, f.getID());
 		return Address.inject(addr, Change.convU(f), Change.convU(f));
 	}
@@ -435,7 +436,7 @@ public class ExpEval {
 		}
 
 		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Arguments_Addr, Change.u(), Change.u()), JSClass.CFunction);
+				Address.inject(StoreFactory.Arguments_Addr, Change.u(), Change.u()), JSClass.CObject);
 		Obj argObj = new Obj(ext, internal);
 
 		/* Add the argument object to the state.store. */
@@ -591,7 +592,7 @@ public class ExpEval {
 		}
 
 		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Arguments_Addr, Change.convU(f), Change.u()), JSClass.CFunction);
+				Address.inject(StoreFactory.Arguments_Addr, Change.convU(f), Change.u()), JSClass.CObject);
 		Obj argObj = new Obj(ext, internal);
 
 		/* Add the argument object to the store. */

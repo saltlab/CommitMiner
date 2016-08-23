@@ -1,3 +1,5 @@
+// Bug Intoducing Commit: https://github.com/npm/npm/commit/ceba53c278b4509f46bdf391d2090b0ecbb4b93d
+// Bug Fixing Commit: https://github.com/npm/npm/commit/b62635afd00c5d0711b33aeb6369dd4fd22de7bb
 module.exports = helpSearch
 
 var fs = require("graceful-fs")

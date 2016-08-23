@@ -94,6 +94,7 @@ public class TestDiffAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/help-search_new.js", "NA", "{161}", "DIFF", "VAL", "results_Change:TOP"));
 
 		this.runTest(sourceCodeFileChanges, expected, false);
 
@@ -623,20 +624,20 @@ public class TestDiffAnalysis {
 		Pair<IQuery, Transformer> valueQuery = getValueQuery();
 		queries.put(valueQuery.getLeft(), valueQuery.getRight());
 
-//		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
-//		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
-//
-//		Pair<IQuery, Transformer> controlQuery = getControlQuery();
-//		queries.put(controlQuery.getLeft(), controlQuery.getRight());
-//
-//		Pair<IQuery, Transformer> astQuery = getAstQuery();
-//		queries.put(astQuery.getLeft(), astQuery.getRight());
-//
-//		Pair<IQuery, Transformer> lineQuery = getLineQuery();
-//		queries.put(lineQuery.getLeft(), lineQuery.getRight());
-//
-//		Pair<IQuery, Transformer> totalLinesQuery = getTotalLinesQuery();
-//		queries.put(totalLinesQuery.getLeft(), totalLinesQuery.getRight());
+		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
+		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
+
+		Pair<IQuery, Transformer> controlQuery = getControlQuery();
+		queries.put(controlQuery.getLeft(), controlQuery.getRight());
+
+		Pair<IQuery, Transformer> astQuery = getAstQuery();
+		queries.put(astQuery.getLeft(), astQuery.getRight());
+
+		Pair<IQuery, Transformer> lineQuery = getLineQuery();
+		queries.put(lineQuery.getLeft(), lineQuery.getRight());
+
+		Pair<IQuery, Transformer> totalLinesQuery = getTotalLinesQuery();
+		queries.put(totalLinesQuery.getLeft(), totalLinesQuery.getRight());
 
 		return queries;
 
