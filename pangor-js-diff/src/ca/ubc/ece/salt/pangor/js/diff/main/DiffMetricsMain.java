@@ -18,7 +18,7 @@ import ca.ubc.ece.salt.pangor.js.diff.main.SourceFile.DiffType;
 public class DiffMetricsMain {
 
 	public static void main(String[] args) throws Exception{
-		DiffMetricsMain metrics = new DiffMetricsMain("./output/dataset_2016-08-21.csv");
+		DiffMetricsMain metrics = new DiffMetricsMain("./output/dataset_2016-08-22.csv");
 		metrics.analyze();
 	}
 
@@ -142,11 +142,10 @@ public class DiffMetricsMain {
 
 		List<MetricsRow> fileFactMetrics = new LinkedList<MetricsRow>();
 		List<MetricsRow> fileLineMetrics = new LinkedList<MetricsRow>();
+		List<MetricsRow> fileBaseMetrics = new LinkedList<MetricsRow>();
 
 		Map<String, MetricsRow> commitFactMetrics = new HashMap<String, MetricsRow>();
 		Map<String, MetricsRow> commitLineMetrics = new HashMap<String, MetricsRow>();
-
-		Set<String> repeatedFiles = new HashSet<String>();
 
 		Set<String> totalCommits = new HashSet<String>();
 		Set<String> totalASTModifiedCommits = new HashSet<String>();
@@ -203,12 +202,25 @@ public class DiffMetricsMain {
 			/* For computing the total number of commits. */
 			totalCommits.add(source.commit);
 
+			fileBaseMetrics.add(new MetricsRow(MetricsRow.Type.LINE,
+											   source.lineChanges,
+											   source.totalLines));
+			fileFactMetrics.add(new MetricsRow(MetricsRow.Type.LINE,
+												source.lineChanges,
+												source.astChanges));
+
 			/* For computing the total number of commits with at least one
 			 * AST change. */
 			if(source.astChanges > 0) {
 				totalASTModifiedCommits.add(source.commit);
 				totalASTModifiedFiles++;
 				astFactsAdded += source.astChanges;
+				fileBaseMetrics.add(new MetricsRow(MetricsRow.Type.AST,
+												   source.astChanges,
+												   source.totalLines));
+				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.AST,
+													source.astChanges,
+													source.astChanges));
 			}
 
 			/* Check if the file is line-improved. */
@@ -218,11 +230,11 @@ public class DiffMetricsMain {
 				multiLinesAdded += source.multiAstSubtraction;
 
 				addFileFactsToCommit(commitLineMetrics, commit,
-									 MetricsRow.Type.ALL,
+									 MetricsRow.Type.MULTI,
 									 source.multiAstSubtraction,
 									 source.astChanges);
 
-				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.ALL,
+				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.MULTI,
 													source.multiAstSubtraction,
 													source.astChanges));
 			}
@@ -246,11 +258,11 @@ public class DiffMetricsMain {
 				envLinesAdded += source.envAstSubtraction;
 
 				addFileFactsToCommit(commitLineMetrics, commit,
-									 MetricsRow.Type.ENVIRONMENT,
+									 MetricsRow.Type.VAR,
 									 source.envAstSubtraction,
 									 source.astChanges);
 
-				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.ENVIRONMENT,
+				fileLineMetrics.add(new MetricsRow(MetricsRow.Type.VAR,
 													source.envAstSubtraction,
 													source.astChanges));
 			}
@@ -277,11 +289,11 @@ public class DiffMetricsMain {
 				multiASTFactsAdded += source.astChanges;
 
 				addFileFactsToCommit(commitFactMetrics, commit,
-									 MetricsRow.Type.ALL,
+									 MetricsRow.Type.MULTI,
 									 source.multiChanges,
 									 source.astChanges);
 
-				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.ALL,
+				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.MULTI,
 													source.multiChanges,
 													source.astChanges));
 			}
@@ -307,11 +319,11 @@ public class DiffMetricsMain {
 				envASTFactsAdded += source.astChanges;
 
 				addFileFactsToCommit(commitFactMetrics, commit,
-									 MetricsRow.Type.ENVIRONMENT,
+									 MetricsRow.Type.VAR,
 									 source.envChanges,
 									 source.astChanges);
 
-				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.ENVIRONMENT,
+				fileFactMetrics.add(new MetricsRow(MetricsRow.Type.VAR,
 													source.envChanges,
 													source.astChanges));
 			}
@@ -334,6 +346,7 @@ public class DiffMetricsMain {
 		}
 
 		/* Write the data to a file. */
+		this.writeMetrics("chart_file_baseline_metrics.csv", fileBaseMetrics);
 		this.writeMetrics("chart_file_line_metrics.csv", fileLineMetrics);
 		this.writeMetrics("chart_file_fact_metrics.csv", fileFactMetrics);
 		this.writeMetrics("chart_commit_line_metrics.csv", commitLineMetrics.values());
@@ -498,7 +511,7 @@ public class DiffMetricsMain {
 		/* May throw IOException if the path does not exist. */
 		PrintStream stream = new PrintStream(new FileOutputStream(path, true));
 
-		stream.println("Type,Added,AST");
+		stream.println("Ordinal,Type,Added,AST");
 
 		/* Write the data set. */
 		for(MetricsRow row : rows) {

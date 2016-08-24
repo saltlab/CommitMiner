@@ -833,15 +833,16 @@ public class JavaScriptCFGFactory implements CFGFactory {
             AstNode catchCondition = catchClause.getCatchCondition();
             if(catchCondition == null) {
 
-            	/* Create a special method that contains the exception. */
-            	Name n = new Name(0, "~exception");
-            	n.setID(catchClause.getID() * -1);
-            	FunctionCall exception = new FunctionCall();
-            	List<AstNode> args = new LinkedList<AstNode>();
-            	args.add(catchClause.getVarName());
-            	exception.setArguments(args);
-            	exception.setTarget(n);
-                catchCondition = exception;
+				/* Create a special method that contains the exception. */
+				Name n = new Name(0, "~exception");
+				n.setID(catchClause.getID() * -1);
+				FunctionCall exception = new FunctionCall();
+				List<AstNode> args = new LinkedList<AstNode>();
+				args.add(catchClause.getVarName());
+				exception.setArguments(args);
+				exception.setTarget(n);
+				exception.setChangeType(catchClause.getChangeType());
+				catchCondition = exception;
 
             }
 
@@ -917,7 +918,6 @@ public class JavaScriptCFGFactory implements CFGFactory {
 		}
 
 		tryNode.addEdge(null, tryBlock.getEntryNode(), idgen.getUniqueID());
-
 
 		return cfg;
 

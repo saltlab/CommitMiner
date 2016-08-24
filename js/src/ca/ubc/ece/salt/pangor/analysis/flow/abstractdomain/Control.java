@@ -49,13 +49,12 @@ public class Control {
 		Set<AstNode> conditions = new HashSet<AstNode>(this.conditions);
 		Set<AstNode> negConditions = new HashSet<AstNode>(this.negConditions);
 
-		/* We may have a null condition. */
-		if(edge.getCondition() == null) return new Control(conditions, negConditions);
-
 		/* Put the current branch condition in the 'conditions' set and all other
 		 * conditions in the 'neg' set since they must be false. */
 
-		if(Change.convU(edge.getCondition()).le == Change.LatticeElement.CHANGED) {
+		if(edge.getCondition() != null
+				&& Change.convU(edge.getCondition()).le ==
+								Change.LatticeElement.CHANGED) {
 
 			conditions.add((AstNode)edge.getCondition());
 
@@ -65,6 +64,16 @@ public class Control {
 				}
 			}
 
+		}
+
+		/* Check the siblings for neg conditions. */
+		for(CFGEdge child : node.getEdges()) {
+			if(child != edge
+					&& child.getCondition() != null
+					&& Change.convU(child.getCondition()).le ==
+									Change.LatticeElement.CHANGED) {
+				negConditions.add((AstNode)child.getCondition());
+			}
 		}
 
 		return new Control(conditions, negConditions);

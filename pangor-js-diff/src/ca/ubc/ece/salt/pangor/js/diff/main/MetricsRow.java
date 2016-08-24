@@ -13,14 +13,16 @@ public class MetricsRow {
 	}
 
 	public String serialize() {
-		return type + "," + added + "," + ast;
+		return type.ordinal() + "," + type + "," + added + "," + ast;
 	}
 
 	public enum Type {
-		ALL,
+		MULTI,
 		CONTROL,
-		ENVIRONMENT,
-		VALUE
+		VAR,
+		VALUE,
+		AST,
+		LINE
 	}
 
 }
