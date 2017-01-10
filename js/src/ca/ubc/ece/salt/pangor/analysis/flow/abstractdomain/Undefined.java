@@ -1,7 +1,5 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
-
-
 /**
  * Stores the state for the undefined type abstract domain.
  * Lattice element is simple:

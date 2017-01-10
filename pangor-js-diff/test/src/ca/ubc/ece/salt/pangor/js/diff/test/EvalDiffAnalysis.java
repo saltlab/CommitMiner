@@ -194,6 +194,26 @@ public class EvalDiffAnalysis {
 
 	}
 
+	@Test
+	public void testCaseStudy() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/diff/help-search_old.js";
+		String dst = "./test/input/diff/help-search_new.js";
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/help-search_new.js", "NA", "{161}", "DIFF", "VAL", "results_Change:TOP"));
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */
@@ -229,11 +249,11 @@ public class EvalDiffAnalysis {
 
 		Map<IQuery, Transformer> queries = new HashMap<IQuery, Transformer>();
 
-		Pair<IQuery, Transformer> valueQuery = getValueQuery();
-		queries.put(valueQuery.getLeft(), valueQuery.getRight());
+//		Pair<IQuery, Transformer> valueQuery = getValueQuery();
+//		queries.put(valueQuery.getLeft(), valueQuery.getRight());
 
-		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
-		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
+//		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
+//		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
 
 		Pair<IQuery, Transformer> controlQuery = getControlQuery();
 		queries.put(controlQuery.getLeft(), controlQuery.getRight());

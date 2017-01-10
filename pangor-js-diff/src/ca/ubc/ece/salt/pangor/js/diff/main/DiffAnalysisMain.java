@@ -195,6 +195,9 @@ public class DiffAnalysisMain {
 		Pair<IQuery, Transformer> controlQuery = getControlQuery();
 		queries.put(controlQuery.getLeft(), controlQuery.getRight());
 
+		Pair<IQuery, Transformer> typeErrorQuery = getTypeErrorQuery();
+		queries.put(typeErrorQuery.getLeft(), typeErrorQuery.getRight());
+
 		Pair<IQuery, Transformer> astQuery = getAstQuery();
 		queries.put(astQuery.getLeft(), astQuery.getRight());
 
@@ -299,6 +302,37 @@ public class DiffAnalysisMain {
 						"DIFF",												// Type
 						"CONTROL",											// Subtype
 						tuple.get(5).toString().replace("\'", ""));			// Description
+		};
+
+		return Pair.of(query, transformer);
+
+	}
+
+	/**
+	 * @return The query for extracting type-error-diff alerts.
+	 * @throws ParserException for incorrect query strings.
+	 */
+	private static Pair<IQuery, Transformer> getTypeErrorQuery() throws ParserException {
+
+		String qs = "";
+		qs += "?- Type('SOURCE',?File,?LineA,?StatementID,?Identifier,'undef','BOTTOM')";
+		qs += ", Type('DESTINATION',?File,?LineB,?StatementID,?Identifier,'undef','TOP').";
+
+		/* The query that produces the results. */
+		Parser parser = new Parser();
+		parser.parse(qs);
+		IQuery query = parser.getQueries().get(0);
+
+		/* Transforms the query results to a ClassifierFeatureVector. */
+		Transformer transformer = (commit, tuple) -> {
+				return new ClassifierFeatureVector(commit,
+						"DESTINATION",										// Version
+						tuple.get(0).toString().replace("\'", ""), 			// Class
+						tuple.get(1).toString().replace("\'",  ""),			// AST Node ID
+						tuple.get(4).toString().replace("\'", ""),			// Line
+						"DIFF",												// Type
+						"TypeError",										// Subtype
+						tuple.get(2).toString().replace("\'", ""));			// Description
 		};
 
 		return Pair.of(query, transformer);

@@ -18,7 +18,7 @@ import ca.ubc.ece.salt.pangor.js.diff.main.SourceFile.DiffType;
 public class DiffMetricsMain {
 
 	public static void main(String[] args) throws Exception{
-		DiffMetricsMain metrics = new DiffMetricsMain("./output/dataset_2016-08-22.csv");
+		DiffMetricsMain metrics = new DiffMetricsMain("./output/dataset_2016-08-26.csv");
 		metrics.analyze();
 	}
 
@@ -462,18 +462,18 @@ public class DiffMetricsMain {
 		System.out.println("");
 
 		System.out.println("chart_context_lines.csv");
-		System.out.println("Diff, ContextCommit, ContextFile, LineCommit, LineFile");
-		System.out.println("All," + multiContextCommit + "," + multiContextFilePair + "," + multiLineCommit + "," + multiLineFilePair);
-		System.out.println("Ctrl," + controlContextCommit + "," + controlContextFilePair + "," + controlLineCommit + "," + controlLineFilePair);
-		System.out.println("Env," + environmentContextCommit + "," + environmentContextFilePair + "," + environmentLineCommit + "," + environmentLineFilePair);
-		System.out.println("Val," + valueContextCommit + "," + valueContextFilePair + "," + valueLineCommit + "," + valueLineFilePair);
+		System.out.println("Ordinal,Diff, ContextCommit, ContextFile, LineCommit, LineFile");
+		System.out.println("0,Multi," + multiContextCommit + "," + multiContextFilePair + "," + multiLineCommit + "," + multiLineFilePair);
+		System.out.println("1,Control," + controlContextCommit + "," + controlContextFilePair + "," + controlLineCommit + "," + controlLineFilePair);
+		System.out.println("2,Variable," + environmentContextCommit + "," + environmentContextFilePair + "," + environmentLineCommit + "," + environmentLineFilePair);
+		System.out.println("3,Value," + valueContextCommit + "," + valueContextFilePair + "," + valueLineCommit + "," + valueLineFilePair);
 
 		System.out.println("chart_facts_lines.csv");
-		System.out.println("Diff, ContextCommit, ContextFile, LineCommit, LineFile, ASTCommit, ASTFile");
-		System.out.println("All," + multiAvgFactsAddedCommit + "," + multiAvgFactsAddedFilePair + "," + multiAvgLinesAddedCommit + "," + multiAvgLinesAddedFilePair + "," + multiAvgASTFactsAddedCommit + "," + astAvgASTFactsAddedFilePair);
-		System.out.println("Ctrl," + controlAvgFactsAddedCommit + "," + controlAvgFactsAddedFilePair + "," + controlAvgLinesAddedCommit + "," + controlAvgLinesAddedFilePair + "," + controlAvgASTFactsAddedCommit + "," + controlAvgASTFactsAddedFilePair);
-		System.out.println("Env," + environmentAvgFactsAddedCommit + "," + environmentAvgFactsAddedFilePair + "," + environmentAvgLinesAddedCommit + "," + environmentAvgLinesAddedFilePair + "," + environmentAvgASTFactsAddedCommit + "," + environmentAvgASTFactsAddedFilePair);
-		System.out.println("Val," + valueAvgFactsAddedCommit + "," + valueAvgFactsAddedFilePair + "," + valueAvgLinesAddedCommit + "," + valueAvgLinesAddedFilePair + "," + valueAvgASTFactsAddedCommit + "," + valueAvgASTFactsAddedFilePair);
+		System.out.println("Ordinal,Diff, ContextCommit, ContextFile, LineCommit, LineFile, ASTCommit, ASTFile");
+		System.out.println("0,Multi," + multiAvgFactsAddedCommit + "," + multiAvgFactsAddedFilePair + "," + multiAvgLinesAddedCommit + "," + multiAvgLinesAddedFilePair + "," + multiAvgASTFactsAddedCommit + "," + astAvgASTFactsAddedFilePair);
+		System.out.println("1,Control," + controlAvgFactsAddedCommit + "," + controlAvgFactsAddedFilePair + "," + controlAvgLinesAddedCommit + "," + controlAvgLinesAddedFilePair + "," + controlAvgASTFactsAddedCommit + "," + controlAvgASTFactsAddedFilePair);
+		System.out.println("2,Variable," + environmentAvgFactsAddedCommit + "," + environmentAvgFactsAddedFilePair + "," + environmentAvgLinesAddedCommit + "," + environmentAvgLinesAddedFilePair + "," + environmentAvgASTFactsAddedCommit + "," + environmentAvgASTFactsAddedFilePair);
+		System.out.println("3,Value," + valueAvgFactsAddedCommit + "," + valueAvgFactsAddedFilePair + "," + valueAvgLinesAddedCommit + "," + valueAvgLinesAddedFilePair + "," + valueAvgASTFactsAddedCommit + "," + valueAvgASTFactsAddedFilePair);
 
 	}
 

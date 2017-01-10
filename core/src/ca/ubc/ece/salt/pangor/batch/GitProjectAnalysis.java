@@ -67,7 +67,7 @@ public class GitProjectAnalysis extends GitProject {
 		for(Triple<String, String, Type> commit : commits) {
 
 			try {
-			this.analyzeDiff(commit.getLeft(), commit.getMiddle(), commit.getRight());
+				this.analyzeDiff(commit.getLeft(), commit.getMiddle(), commit.getRight());
 			} catch (Exception e) {
 				logger.error("[ERROR] {}, {}", commit.getMiddle(),  e.getMessage());
 			}

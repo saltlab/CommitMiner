@@ -1,0 +1,10 @@
+/* From BugAID */
+
+ChangeType,Variable,File,BFC,BIC
+RESERVED:CONDITION:INSERTED:falsey:1,pkgMeta,lib/core/Project.js,https://github.com/bower/bower/commit/e42d3d56208f52247b09499d6a3934b463f0cd82,https://github.com/bower/bower/commit/6125c0423f7764050bea159ae5adc2571926a88e
+RESERVED:CONDITION:INSERTED:falsey:1,node.pkgMeta,lib/core/Project.js,https://github.com/bower/bower/commit/ce06b2cb189d42ee99142c4a4d74f1181d9d5184,https://github.com/bower/bower/commit/7becb19da48985fd17b45b92012f657697985eee
+
+R:C:I:undefined:1+R:C:I:typeof:1,pathname,lib/connect/index.js,https://github.com/senchalabs/connect/commit/0ddbb2616cd59ae86125b9f501dcabe47a5a5e58,https://github.com/senchalabs/connect/commit/b2e7d1075ce9bf5dee42afad747e190df1590689
+R:C:I:undefined:1+R:C:I:typeof:1,unit,lib/less/functions/types.js,https://github.com/less/less.js/commit/ab8deae516f3bdf9e5cb646782f5b0529805d555,https://github.com/less/less.js/commit/56b739c15327253f057e23b3dced0f2295375608
+R:C:I:undefined:1+R:C:I:typeof:1,config.schedule,lib/utils/scheduler.js,https://github.com/jansmolders86/mediacenterjs/commit/607de61c137ea474712e771e2d985186d130b157,https://github.com/jansmolders86/mediacenterjs/commit/6005eac33810363e398a31eb6a6d7f0a8318eaa4
+R:C:I:undefined:1+R:C:I:typeof:1,val,lib/document.js,https://github.com/Automattic/mongoose/commit/8fbe3288778a3585d95490e3aa4d63a314c305c1,https://github.com/Automattic/mongoose/commit/7b5288852650c11c20fab885ede5ebcb2c76f036
