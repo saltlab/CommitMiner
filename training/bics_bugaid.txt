@@ -1,10 +1,42 @@
 /* From BugAID */
 
+/* TypeErrors (Dereference Non-Value)
 ChangeType,Variable,File,BFC,BIC
-RESERVED:CONDITION:INSERTED:falsey:1,pkgMeta,lib/core/Project.js,https://github.com/bower/bower/commit/e42d3d56208f52247b09499d6a3934b463f0cd82,https://github.com/bower/bower/commit/6125c0423f7764050bea159ae5adc2571926a88e
-RESERVED:CONDITION:INSERTED:falsey:1,node.pkgMeta,lib/core/Project.js,https://github.com/bower/bower/commit/ce06b2cb189d42ee99142c4a4d74f1181d9d5184,https://github.com/bower/bower/commit/7becb19da48985fd17b45b92012f657697985eee
-
-R:C:I:undefined:1+R:C:I:typeof:1,pathname,lib/connect/index.js,https://github.com/senchalabs/connect/commit/0ddbb2616cd59ae86125b9f501dcabe47a5a5e58,https://github.com/senchalabs/connect/commit/b2e7d1075ce9bf5dee42afad747e190df1590689
-R:C:I:undefined:1+R:C:I:typeof:1,unit,lib/less/functions/types.js,https://github.com/less/less.js/commit/ab8deae516f3bdf9e5cb646782f5b0529805d555,https://github.com/less/less.js/commit/56b739c15327253f057e23b3dced0f2295375608
-R:C:I:undefined:1+R:C:I:typeof:1,config.schedule,lib/utils/scheduler.js,https://github.com/jansmolders86/mediacenterjs/commit/607de61c137ea474712e771e2d985186d130b157,https://github.com/jansmolders86/mediacenterjs/commit/6005eac33810363e398a31eb6a6d7f0a8318eaa4
+R:C:I:falsey:1,pkgMeta,lib/core/Project.js,https://github.com/bower/bower/commit/e42d3d56208f52247b09499d6a3934b463f0cd82,https://github.com/bower/bower/commit/6125c0423f7764050bea159ae5adc2571926a88e ==> NEED TO IMPROVE ANALYSIS TO RESOLVE RETURN VALUES
+R:C:I:falsey:1,node.pkgMeta,lib/core/Project.js,https://github.com/bower/bower/commit/ce06b2cb189d42ee99142c4a4d74f1181d9d5184,https://github.com/bower/bower/commit/7becb19da48985fd17b45b92012f657697985eee ==> NEED TO IMPROVE ANALYAIS TO RESOLVE RETURN VALUES
+R:C:I:undefined:1+R:C:I:typeof:1,pathname,lib/connect/index.js,https://github.com/senchalabs/connect/commit/0ddbb2616cd59ae86125b9f501dcabe47a5a5e58,https://github.com/senchalabs/connect/commit/9b9d5a2bd8464b5c336be06d691a8e1e314860a4,https://github.com/senchalabs/connect/commit/9b9d5a2bd8464b5c336be06d691a8e1e314860a4 ==> NEED TO INTERPRET DELETED TOKEN IN DESTINATION
+R:C:I:undefined:1+R:C:I:typeof:1,unit,lib/less/functions/types.js,https://github.com/less/less.js/commit/ab8deae516f3bdf9e5cb646782f5b0529805d555,https://github.com/less/less.js/commit/56b739c15327253f057e23b3dced0f2295375608 ==> NEED A TYPE DIFF
+R:C:I:undefined:1+R:C:I:typeof:1,config.schedule,lib/utils/scheduler.js,https://github.com/jansmolders86/mediacenterjs/commit/607de61c137ea474712e771e2d985186d130b157,https://github.com/jansmolders86/mediacenterjs/commit/6005eac33810363e398a31eb6a6d7f0a8318eaa4 ==> WORKS, BUT SMALL, POOR CANDIDATE
 R:C:I:undefined:1+R:C:I:typeof:1,val,lib/document.js,https://github.com/Automattic/mongoose/commit/8fbe3288778a3585d95490e3aa4d63a314c305c1,https://github.com/Automattic/mongoose/commit/7b5288852650c11c20fab885ede5ebcb2c76f036
+
+/* Undefined self when binding self = this for callback. */
+R:S:I:var:i+R:A_RHS:I:this:1,self,lib/mongodb/db.js,https://github.com/mongodb/node-mongodb-native/commit/d9b1390d3f9972e239d05c1cb48e0e98b0a8e8d8,https://github.com/mongodb/node-mongodb-native/commit/77eb2bb882a27d1db5277395138649f8c7afdf65
+R:S:I:var:i+R:A_RHS:I:this:1,self,lib/mongodb/collection.js,https://github.com/mongodb/node-mongodb-native/commit/63b20b7d0cce58241445b14650f2d0de6b87b7ed,https://github.com/mongodb/node-mongodb-native/commit/a243fbeb788d0d6191800decb0629be4b9f4dd63
+R:S:I:var:i+R:A_RHS:I:this:1,self,lib/Pool.js,https://github.com/mysqljs/mysql/commit/30d24e0d98df74b33bf424e5edd573bbd831d583,https://github.com/mysqljs/mysql/commit/65a330ed3f57723ed87bfb480f9c6842980c2261
+R:S:I:var:i+R:A_RHS:I:this:1,self,lib/engines/SMTP.js,https://github.com/nodemailer/nodemailer/commit/d45ea500162aea192e33f77bc02e56d67ff4b7a7,https://github.com/nodemailer/nodemailer/commit/e834625a88e3e6f8986a1df5144809ca59e556d7
+R:S:I:var:i+R:A_RHS:I:this:1,self,lib/hooks/pubsub/index.js,https://github.com/balderdashy/sails/commit/884b59c2161ee19ce10ac65a4eb455feab3e56a2,https://github.com/balderdashy/sails/commit/1e8278d704626ee7c519b5aa0413410f18ac87fe
+R:S:I:var:i+R:A_RHS:I:this:1,self,lib/winston/transports/file.js,https://github.com/winstonjs/winston/commit/0b05c48eb21c3c8b3734e17ca7713554c5650718,https://github.com/winstonjs/winston/commit/4efdf874a34da40d51a7a3fb6e914a563699fda3
+
+/* Missing binding context for method call. */
+R:A:I:this,this,glob.js,https://github.com/isaacs/node-glob/commit/8315c2d576f9f3092cdc2f2cc41a398bc656035a,https://github.com/isaacs/node-glob/commit/42982b423eac351a2a7484908fd80d1851a67e9a
+R:A:I:this,this,lib/hooks/pubsub/index.js,https://github.com/balderdashy/sails/commit/67d80e7c696a31408fcf22d965bef1d3b6dc8893,https://github.com/balderdashy/sails/commit/8ed67bab52d74e0f7c61035a41cab69614e4e1b9
+R:A:I:this,this,lib/hooks/pubsub/index.js,https://github.com/balderdashy/sails/commit/d8d699d12cfbc869d235ff0399ef656dadd53183,https://github.com/balderdashy/sails/commit/98d97fbe24e80d8be58c47211cc4ae14c076123e
+
+/* Missing binding this in callback. */
+R:A:I:this:1+M:MC:I:bind:1,bind,lib/core/package.js,https://github.com/bower/bower/commit/b9304d219be05b40c92ae50e74643fe166fea1cd,https://github.com/bower/bower/commit/fd472403c1f9992b57e15b4ff745732677b64ee1
+R:A:I:this:1+M:MC:I:bind:1,bind,lib/actions/install.js,https://github.com/yeoman/generator/commit/ec3691425cb281253ac531cc1bc798442bb76574,https://github.com/yeoman/generator/commit/2e024731612c66eb72727345380e5d6a273515cb
+R:A:I:this:1+M:MC:I:bind:1,bind,client/src/models/application.js,https://github.com/prawnsalad/KiwiIRC/commit/cd6579b32808e9294479101e7bbb6bcbe23803dc,https://github.com/prawnsalad/KiwiIRC/commit/a9bc007fbde5d284ebfac235a9d5a4c7bca63dfe
+R:A:I:this:1+M:MC:I:bind:1,bind,lib/BreakEventHandler.js,https://github.com/node-inspector/node-inspector/commit/4cd16d4adf31deaa8ff8552cc0cf2d9d5e988218,https://github.com/node-inspector/node-inspector/commit/3b546ff3c94d66ae0ea75c4ce4f47020ca39ed4d
+R:A:I:this:1+M:MC:I:bind:1,bind,lib/debug-server.js,https://github.com/node-inspector/node-inspector/commit/528d441be39b29b7282dcc3df6abac2488028f6e,https://github.com/node-inspector/node-inspector/commit/a242e9225e1458e0b21804c4f84f9a2168fac16e ==> GOOD CANDIDATE
+
+/* Did not propagate error to callback. */
+R:A:I:error:1,error,lib/connect/index.js,https://github.com/senchalabs/connect/commit/4638aea3d84e3b4b97f0df2fe1665d3e1c5c05ce,https://github.com/senchalabs/connect/commit/558d5357d8a280813132ba723e058e918ebf41e5 ==> GOOD CANDIDATE
+R:A:I:error:1,error,lib/runner.js,https://github.com/karma-runner/karma/commit/439bddb1d69347bbdec56e279f6002de380c00c2,https://github.com/karma-runner/karma/commit/19e4d1e71ddfe838a436fc22a60a2b0cf9d91a3a
+R:A:I:error:1,error,index.js,https://github.com/jansmolders86/mediacenterjs/commit/ed6a118d825346050d0b8d9971d6a6dece410f48,https://github.com/jansmolders86/mediacenterjs/commit/fce0550e3b5ee7b480543ccb1bb0f613cd75b6db
+
+/* Did not check error passed to callback. */
+R:C:I:falsey:1+R:C:I:error:1,error,lib/preprocessor.js,https://github.com/karma-runner/karma/commit/bb4edde9f15a07e6dac0d4dc01731f1e277d34a4,https://github.com/karma-runner/karma/commit/ebd31c290b539e3a973cdaf7505fafd264175b47
+R:C:I:falsey:1+R:C:I:error:1,error,lib/file-list.js,https://github.com/karma-runner/karma/commit/74ccc9a8017f869bd7bbbf8831415964110a7073,https://github.com/karma-runner/karma/commit/0cb7096e48b32fd0e02bd913a65841acc7f91f38
+
+/* Uncaught exception (synchronous, normal stack-based control flow) */
+R:S:I:try:1+R:EC:I:error:1,error,lib/api/attributes.js,https://github.com/cheeriojs/cheerio/commit/4c0a1079f40aedd5d1abc38b548e49eb6b72c427,https://github.com/cheeriojs/cheerio/commit/5e31b0df9e8c5df18b5089598468b05c0996821b

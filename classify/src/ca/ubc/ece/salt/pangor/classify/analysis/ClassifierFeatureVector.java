@@ -26,6 +26,12 @@ public class ClassifierFeatureVector extends FeatureVector {
 	/** The line number for the alert. **/
 	public String line;
 
+	/** The absolute position of the alert in the file. **/
+	public String absolutePosition;
+
+	/** The length of the highlighting in the file. **/
+	public String length;
+
 	/** The type of pattern found. **/
 	public String type;
 
@@ -40,15 +46,43 @@ public class ClassifierFeatureVector extends FeatureVector {
 	 * @param klass The class that the features were extracted from.
 	 * @param method The method that the features were extracted from.
 	 */
+	@Deprecated
 	public ClassifierFeatureVector(Commit commit, String version,
 								   String klass, String method,
-								   String line, String type, String subtype,
+								   String line,
+								   String type, String subtype,
 								   String description) {
 		super(commit);
 		this.version = version;
 		this.klass = klass;
 		this.method = method;
 		this.line = line;
+		this.absolutePosition = "0";
+		this.length = "0";
+		this.type = type;
+		this.subtype = subtype;
+		this.description = description;
+	}
+
+	/**
+	 * @param commit The commit that the features were extracted from.
+	 * @param klass The class that the features were extracted from.
+	 * @param method The method that the features were extracted from.
+	 */
+	public ClassifierFeatureVector(Commit commit, String version,
+								   String klass, String method,
+								   String line,
+								   String absolutePosition,
+								   String length,
+								   String type, String subtype,
+								   String description) {
+		super(commit);
+		this.version = version;
+		this.klass = klass;
+		this.method = method;
+		this.line = line;
+		this.absolutePosition = absolutePosition;
+		this.length = length;
 		this.type = type;
 		this.subtype = subtype;
 		this.description = description;
@@ -91,7 +125,11 @@ public class ClassifierFeatureVector extends FeatureVector {
 				+ "," + this.commit.url + "/commit/" + this.commit.repairedCommitID
 				+ "," + this.commit.buggyCommitID + "," + this.commit.repairedCommitID
 				+ "," + this.version
-				+ "," + this.klass + "," + this.method + "," + this.line + "," + this.type
+				+ "," + this.klass + "," + this.method
+				+ "," + this.line
+				+ "," + this.absolutePosition
+				+ "," + this.length
+				+ "," + this.type
 				+ "," + this.subtype + "," + this.description;
 
 		return serialized;
@@ -137,6 +175,8 @@ public class ClassifierFeatureVector extends FeatureVector {
 					&& this.klass.equals(sa.klass)
 					&& this.method.equals(sa.method)
 					&& this.line.equals(sa.line)
+					&& this.absolutePosition.equals(sa.absolutePosition)
+					&& this.length.equals(sa.length)
 					&& this.type.equals(sa.type)
 					&& this.subtype.equals(sa.subtype)
 					&& this.description.equals(sa.description)) return true;

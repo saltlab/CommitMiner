@@ -21,8 +21,11 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 
 public class IsUsedVisitor implements NodeVisitor {
 
-	/** The set of uses found in the statement. **/
-	public Set<Integer> lines;
+	/**
+	 * The set of uses found in the statement, identified by line number,
+	 * absolute position and string length.
+	 **/
+	public Set<Annotation> annotations;
 
 	/** The identifier to look for. **/
 	private Identifier identity;
@@ -31,12 +34,12 @@ public class IsUsedVisitor implements NodeVisitor {
 	 * Detects uses of the identifier.
 	 * @return the set of nodes where the identifier is used.
 	 */
-	public static String isUsed(AstNode statement, Identifier identity) {
+	public static Set<Annotation> isUsed(AstNode statement, Identifier identity) {
 		IsUsedVisitor visitor = new IsUsedVisitor(statement, identity);
 
 		if(statement instanceof AstRoot) {
 			/* This is the root. Nothing should be flagged. */
-			return "{}";
+			return visitor.annotations;
 		}
 		else if(statement instanceof FunctionNode) {
 			/* This is a function declaration, so only check the parameters. */
@@ -49,19 +52,11 @@ public class IsUsedVisitor implements NodeVisitor {
 			statement.visit(visitor);
 		}
 
-		/* Serialize the set of lines. */
-		String serial = "{";
-		for(Integer line : visitor.lines) {
-			serial += line + ",";
-		}
-		if(serial.length() > 1) serial = serial.substring(0, serial.length() - 1);
-		serial += "}";
-
-		return serial;
+		return visitor.annotations;
 	}
 
 	public IsUsedVisitor(AstNode statement, Identifier identity) {
-		this.lines = new HashSet<Integer>();
+		this.annotations = new HashSet<Annotation>();
 		this.identity = identity;
 	}
 
@@ -69,7 +64,14 @@ public class IsUsedVisitor implements NodeVisitor {
 	public boolean visit(AstNode node) {
 
 		if(node instanceof InfixExpression || node instanceof Name) {
-			if(node.toSource().equals(identity.name)) this.lines.add(node.getLineno());
+			if(node.toSource().equals(identity.name)) {
+				/* This idenfier is being used. */
+				this.annotations.add(new Annotation(node.getLineno(), node.getAbsolutePosition(), node.toSource().length()));
+				System.out.println(node.toSource()
+						+ ":\n\tline = " + node.getLineno()
+						+ "\n\tlength = " + node.toSource().length()
+						+ "\n\tabsolute position = " + node.getAbsolutePosition());
+			}
 		}
 		/* Ignore the body of loops, ifs and functions. */
 		else if(node instanceof IfStatement) {

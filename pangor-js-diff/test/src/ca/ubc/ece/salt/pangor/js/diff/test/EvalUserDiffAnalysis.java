@@ -27,7 +27,7 @@ import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 import ca.ubc.ece.salt.pangor.classify.analysis.Transformer;
 import ca.ubc.ece.salt.pangor.js.diff.DiffCommitAnalysisFactory;
 
-public class EvalDiffAnalysis {
+public class EvalUserDiffAnalysis {
 
 	/**
 	 * Tests data mining data set construction.
@@ -81,11 +81,11 @@ public class EvalDiffAnalysis {
 	}
 
 	@Test
-	public void testBowerTypeError() throws Exception {
+	public void testTMP() throws Exception {
 
 		/* The test files. */
-		String src = "./test/input/eval/mediacenterjs-6005eac33810363e398a31eb6a6d7f0a8318eaa4_old.js";
-		String dst = "./test/input/eval/mediacenterjs-6005eac33810363e398a31eb6a6d7f0a8318eaa4_new.js";
+		String src = "/Users/qhanam/multidiff_eval/tmp_old.js";
+		String dst = "/Users/qhanam/multidiff_eval/tmp_new.js";
 
 		/* Read the source files. */
 		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
@@ -94,6 +94,121 @@ public class EvalDiffAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+
+	}
+
+	@Test
+	public void testOne() throws Exception {
+
+		/* The test files. */
+		String src = "/Users/qhanam/multidiff_eval/1_old.js";
+		String dst = "/Users/qhanam/multidiff_eval/1_new.js";
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+
+	}
+
+	@Test
+	public void testTwo() throws Exception {
+
+		/* The test files. */
+		String src = "/Users/qhanam/multidiff_eval/2_old.js";
+		String dst = "/Users/qhanam/multidiff_eval/2_new.js";
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+
+	}
+
+	@Test
+	public void testThree() throws Exception {
+
+		/* The test files. */
+		String src = "/Users/qhanam/multidiff_eval/3_old.js";
+		String dst = "/Users/qhanam/multidiff_eval/3_new.js";
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+
+	}
+
+	@Test
+	public void testFour() throws Exception {
+
+		/* The test files. */
+		String src = "/Users/qhanam/multidiff_eval/4_old.js";
+		String dst = "/Users/qhanam/multidiff_eval/4_new.js";
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+
+	}
+
+	@Test
+	public void testFive() throws Exception {
+
+		/* The test files. */
+		String src = "/Users/qhanam/multidiff_eval/5_old.js";
+		String dst = "/Users/qhanam/multidiff_eval/5_new.js";
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+
+		this.runTest(sourceCodeFileChanges, expected, false);
+
+	}
+
+	@Test
+	public void testCaseStudy() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/diff/help-search_old.js";
+		String dst = "./test/input/diff/help-search_new.js";
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+
+		/* Build the expected feature vectors. */
+		Commit commit = getCommit();
+		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/diff/help-search_new.js", "NA", "{161}", "DIFF", "VAL", "results_Change:TOP"));
 
 		this.runTest(sourceCodeFileChanges, expected, false);
 
@@ -134,14 +249,14 @@ public class EvalDiffAnalysis {
 
 		Map<IQuery, Transformer> queries = new HashMap<IQuery, Transformer>();
 
-		Pair<IQuery, Transformer> valueQuery = getValueQuery();
-		queries.put(valueQuery.getLeft(), valueQuery.getRight());
+//		Pair<IQuery, Transformer> valueQuery = getValueQuery();
+//		queries.put(valueQuery.getLeft(), valueQuery.getRight());
 
 //		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
 //		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
 
-//		Pair<IQuery, Transformer> controlQuery = getControlQuery();
-//		queries.put(controlQuery.getLeft(), controlQuery.getRight());
+		Pair<IQuery, Transformer> controlQuery = getControlQuery();
+		queries.put(controlQuery.getLeft(), controlQuery.getRight());
 
 //		Pair<IQuery, Transformer> astQuery = getAstQuery();
 //		queries.put(astQuery.getLeft(), astQuery.getRight());

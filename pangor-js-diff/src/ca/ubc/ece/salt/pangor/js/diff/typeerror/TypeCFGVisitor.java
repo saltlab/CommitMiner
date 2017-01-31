@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.diff.environment;
+package ca.ubc.ece.salt.pangor.js.diff.typeerror;
 
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +13,10 @@ import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Addresses.LatticeElement;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -24,14 +27,14 @@ import ca.ubc.ece.salt.pangor.js.diff.IsUsedVisitor;
 /**
  * Extracts facts from a flow analysis.
  */
-public class EnvCFGVisitor implements ICFGVisitor {
+public class TypeCFGVisitor implements ICFGVisitor {
 
 	private SourceCodeFileChange sourceCodeFileChange;
 
 	/* The fact database we will populate. */
 	private Map<IPredicate, IRelation> facts;
 
-	public EnvCFGVisitor(SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts) {
+	public TypeCFGVisitor(SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts) {
 		this.sourceCodeFileChange = sourceCodeFileChange;
 		this.facts = facts;
 	}
@@ -55,20 +58,36 @@ public class EnvCFGVisitor implements ICFGVisitor {
 	}
 
 	/**
-	 * Recursively visits objects and extracts facts about environment changes.
+	 * Recursively visits objects and extracts facts about types.
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
 	private void getObjectFacts(AstNode node, Map<Identifier, Address> props, State state, String prefix) {
 		for(Identifier prop : props.keySet()) {
 
-			/* Get the environment changes. No need to recurse since
-			 * properties (currently) do not change. */
+			Address addr = props.get(prop);
+			String identifier;
+			if(prefix == null) identifier = prop.name;
+			else identifier = prefix + "." + prop.name;
+
+			if(identifier.equals("this")) continue;
+			if(addr == null) continue;
+
+			BValue val = state.store.apply(addr);
+
+			/* Get the type if the value has changed. */
 			if(node != null) {
 				Set<Annotation> annotations = isUsed(node, prop);
 				for(Annotation annotation : annotations) {
-					registerFact(node, prop.name, "ENV", prop.change.toString(), annotation);
+					registerFact(node, prop.name, "undef", val.undefinedAD.le.name(), annotation);
 				}
+			}
+
+			/* Recursively check property values. */
+			if(val.addressAD.le == LatticeElement.TOP) continue;
+			for(Address propAddr : val.addressAD.addresses) {
+				Obj propObj = state.store.getObj(propAddr);
+				getObjectFacts(node, propObj.externalProperties, state, identifier);
 			}
 
 		}
@@ -86,14 +105,14 @@ public class EnvCFGVisitor implements ICFGVisitor {
 	/**
 	 * @param statement The statement for which we are registering a fact.
 	 * @param identifier The identifier for which we are registering a fact.
-	 * @param ad The abstract domain of the fact.
-	 * @param cle The change lattice element.
+	 * @param type The type being reported.
+	 * @param le The lattice element for the type.
 	 */
-	private void registerFact(AstNode statement, String identifier, String ad, String cle, Annotation annotation) {
+	private void registerFact(AstNode statement, String identifier, String type, String le, Annotation annotation) {
 
 		if(statement == null || statement.getID() == null) return;
 
-		IPredicate predicate = Factory.BASIC.createPredicate("Environment", 7);
+		IPredicate predicate = Factory.BASIC.createPredicate("Type", 7);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 			IRelationFactory relationFactory = new SimpleRelationFactory();
@@ -110,11 +129,9 @@ public class EnvCFGVisitor implements ICFGVisitor {
 				Factory.TERM.createString(annotation.length.toString()),
 				Factory.TERM.createString(String.valueOf(statement.getID())),
 				Factory.TERM.createString(identifier),
-				Factory.TERM.createString(ad),
-				Factory.TERM.createString(cle));
+				Factory.TERM.createString(type),
+				Factory.TERM.createString(le));
 		relation.add(tuple);
-
-//		facts.put(predicate,  relation);
 
 	}
 

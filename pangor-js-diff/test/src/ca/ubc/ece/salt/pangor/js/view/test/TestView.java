@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.diff.test;
+package ca.ubc.ece.salt.pangor.js.view.test;
 
 
 import java.io.File;
@@ -14,7 +14,6 @@ import org.deri.iris.api.basics.IQuery;
 import org.deri.iris.api.basics.IRule;
 import org.deri.iris.compiler.Parser;
 import org.deri.iris.compiler.ParserException;
-import org.junit.Assert;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.pangor.analysis.Commit;
@@ -26,17 +25,19 @@ import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 import ca.ubc.ece.salt.pangor.classify.analysis.Transformer;
 import ca.ubc.ece.salt.pangor.js.diff.DiffCommitAnalysisFactory;
+import ca.ubc.ece.salt.pangor.js.diff.view.HTMLDiffViewer;
 
-public class EvalDiffAnalysis {
+public class TestView {
 
 	/**
 	 * Tests data mining data set construction.
 	 * @param args The command line arguments (i.e., old and new file names).
 	 * @throws Exception
 	 */
-	protected void runTest(List<SourceCodeFileChange> sourceFileChanges,
-						  List<ClassifierFeatureVector> expected,
-						   boolean checkSize) throws Exception {
+	protected List<ClassifierFeatureVector> runTest(List<SourceCodeFileChange> sourceFileChanges,
+						   boolean checkSize,
+						   String outSrc,
+						   String outDst) throws Exception {
 
 		Commit commit = getCommit();
 		for(SourceCodeFileChange sourceFileChange : sourceFileChanges) {
@@ -57,45 +58,30 @@ public class EvalDiffAnalysis {
         /* Print the data set. */
 		dataSet.printDataSet();
 
-        /* Verify the expected feature vectors match the actual feature vectors. */
-		List<ClassifierFeatureVector> actual = dataSet.getFeatureVectors();
-		if(checkSize) Assert.assertTrue(actual.size() == expected.size());
-        for(ClassifierFeatureVector fv : expected) {
-        	Assert.assertTrue(contains(actual,fv));
-        }
-	}
+        /* Return the alerts. */
+		return dataSet.getFeatureVectors();
 
-	private static boolean contains(List<ClassifierFeatureVector> fvs, ClassifierFeatureVector test) {
-		for(ClassifierFeatureVector fv : fvs) {
-			if(fv.commit.equals(test.commit)
-					&& fv.version.equals(test.version)
-					&& fv.klass.equals(test.klass)
-					&& fv.line.equals(test.line)
-					&& fv.type.equals(test.type)
-					&& fv.subtype.equals(test.subtype)
-					&& fv.description.equals(test.description)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	@Test
-	public void testBowerTypeError() throws Exception {
+	public void testCreate() throws Exception {
 
 		/* The test files. */
-		String src = "./test/input/eval/mediacenterjs-6005eac33810363e398a31eb6a6d7f0a8318eaa4_old.js";
-		String dst = "./test/input/eval/mediacenterjs-6005eac33810363e398a31eb6a6d7f0a8318eaa4_new.js";
+		String src = "./test/input/diff/create_old.js";
+		String dst = "./test/input/diff/create_new.js";
+
+		/* The output file. */
+		String outSrc = "./output/create_old.html";
+		String outDst = "./output/create_new.html";
 
 		/* Read the source files. */
 		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
 		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
 
-		/* Build the expected feature vectors. */
-		Commit commit = getCommit();
-		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false, outSrc, outDst);
 
-		this.runTest(sourceCodeFileChanges, expected, false);
+		HTMLDiffViewer.annotate(src, outSrc, alerts, "SOURCE");
+		HTMLDiffViewer.annotate(dst, outDst, alerts, "DESTINATION");
 
 	}
 
@@ -139,18 +125,9 @@ public class EvalDiffAnalysis {
 
 //		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
 //		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
-
+//
 //		Pair<IQuery, Transformer> controlQuery = getControlQuery();
 //		queries.put(controlQuery.getLeft(), controlQuery.getRight());
-
-//		Pair<IQuery, Transformer> astQuery = getAstQuery();
-//		queries.put(astQuery.getLeft(), astQuery.getRight());
-//
-//		Pair<IQuery, Transformer> lineQuery = getLineQuery();
-//		queries.put(lineQuery.getLeft(), lineQuery.getRight());
-//
-//		Pair<IQuery, Transformer> totalLinesQuery = getTotalLinesQuery();
-//		queries.put(totalLinesQuery.getLeft(), totalLinesQuery.getRight());
 
 		return queries;
 
@@ -163,7 +140,7 @@ public class EvalDiffAnalysis {
 	private static Pair<IQuery, Transformer> getValueQuery() throws ParserException {
 
 		String qs = "";
-		qs += "?- Value(?Version,?File,?Line,?StatementID,?Identifier,?ValChange)";
+		qs += "?- Value(?Version,?File,?Line,?Pos,?Len,?StatementID,?Identifier,?ValChange)";
 		qs += ", NOT_EQUAL(?ValChange, 'Change:UNCHANGED')";
 		qs += ", NOT_EQUAL(?ValChange, 'Change:BOTTOM').";
 
@@ -177,12 +154,14 @@ public class EvalDiffAnalysis {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
+						tuple.get(5).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						tuple.get(3).toString().replace("\'", ""),			// Position
+						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
-						"VAL",											// Subtype
-						tuple.get(4).toString().replace("\'", "")
-							+ "_" + tuple.get(5).toString().replace("\'", ""));	// Description
+						"VAL",												// Subtype
+						tuple.get(6).toString().replace("\'", "")
+							+ "_" + tuple.get(7).toString().replace("\'", ""));	// Description
 		};
 
 		return Pair.of(query, transformer);
@@ -247,97 +226,6 @@ public class EvalDiffAnalysis {
 						"DIFF",												// Type
 						"CONTROL",											// Subtype
 						tuple.get(5).toString().replace("\'", ""));			// Description
-		};
-
-		return Pair.of(query, transformer);
-
-	}
-
-	/**
-	 * @return The query for extracting AST-diff alerts.
-	 * @throws ParserException for incorrect query strings.
-	 */
-	private static Pair<IQuery, Transformer> getAstQuery() throws ParserException {
-
-		String qs = "";
-		qs += "?- AST(?Version,?File,?Line,?StatementID,?Change)";
-		qs += ", NOT_EQUAL(?Change, 'UNCHANGED').";
-
-		/* The query that produces the results. */
-		Parser parser = new Parser();
-		parser.parse(qs);
-		IQuery query = parser.getQueries().get(0);
-
-		/* Transforms the query results to a ClassifierFeatureVector. */
-		Transformer transformer = (commit, tuple) -> {
-				return new ClassifierFeatureVector(commit,
-						tuple.get(0).toString().replace("\'", ""),			// Version
-						tuple.get(1).toString().replace("\'", ""), 			// Class
-						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
-						tuple.get(2).toString().replace("\'", ""),			// Line
-						"DIFF",												// Type
-						"AST",												// Subtype
-						tuple.get(4).toString().replace("\'", ""));			// Description
-		};
-
-		return Pair.of(query, transformer);
-	}
-
-	/**
-	 * @return The query for extracting total number of lines in a file.
-	 * @throws ParserException for incorrect query strings.
-	 */
-	private static Pair<IQuery, Transformer> getTotalLinesQuery() throws ParserException {
-
-		String qs = "";
-		qs += "?- TotalLines(?Version,?File,?TotalLines).";
-
-		/* The query that produces the results. */
-		Parser parser = new Parser();
-		parser.parse(qs);
-		IQuery query = parser.getQueries().get(0);
-
-		/* Transforms the query results to a ClassifierFeatureVector. */
-		Transformer transformer = (commit, tuple) -> {
-				return new ClassifierFeatureVector(commit,
-						tuple.get(0).toString().replace("\'", ""),			// Version
-						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"NA",												// Method
-						"NA",												// Line
-						"DIFF",												// Type
-						"TOTAL_LINES",										// Subtype
-						tuple.get(2).toString().replace("\'", ""));			// Description
-		};
-
-		return Pair.of(query, transformer);
-
-	}
-
-	/**
-	 * @return The query for extracting line-diff alerts.
-	 * @throws ParserException for incorrect query strings.
-	 */
-	private static Pair<IQuery, Transformer> getLineQuery() throws ParserException {
-
-		String qs = "";
-		qs += "?- Line(?Version,?File,?Line,?Change)";
-		qs += ", NOT_EQUAL(?Change, 'UNCHANGED').";
-
-		/* The query that produces the results. */
-		Parser parser = new Parser();
-		parser.parse(qs);
-		IQuery query = parser.getQueries().get(0);
-
-		/* Transforms the query results to a ClassifierFeatureVector. */
-		Transformer transformer = (commit, tuple) -> {
-				return new ClassifierFeatureVector(commit,
-						tuple.get(0).toString().replace("\'", ""),			// Version
-						tuple.get(1).toString().replace("\'", ""), 			// Class
-						"NA",												// AST Node ID
-						tuple.get(2).toString().replace("\'", ""),			// Line
-						"DIFF",												// Type
-						"LINE",												// Subtype
-						tuple.get(3).toString().replace("\'", ""));			// Description
 		};
 
 		return Pair.of(query, transformer);
