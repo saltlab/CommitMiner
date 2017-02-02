@@ -17,6 +17,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.cfg.ICFGVisitor;
+import ca.ubc.ece.salt.pangor.js.diff.Annotation;
 
 /**
  * Extracts facts from a flow analysis.
@@ -75,7 +76,11 @@ public class ControlCFGVisitor implements ICFGVisitor {
 
 		if(statement == null || statement.getID() == null) return;
 
-		IPredicate predicate = Factory.BASIC.createPredicate("Control", 6);
+		Annotation annotation = new Annotation(statement.getLineno(),
+				statement.getAbsolutePosition(),
+				statement.getLength());
+
+		IPredicate predicate = Factory.BASIC.createPredicate("Control", 8);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 			IRelationFactory relationFactory = new SimpleRelationFactory();
@@ -89,7 +94,9 @@ public class ControlCFGVisitor implements ICFGVisitor {
 		ITuple tuple = Factory.BASIC.createTuple(
 				Factory.TERM.createString(statement.getVersion().toString()),
 				Factory.TERM.createString(sourceCodeFileChange.repairedFile),
-				Factory.TERM.createString(lines),
+				Factory.TERM.createString(annotation.line.toString()),
+				Factory.TERM.createString(annotation.absolutePosition.toString()),
+				Factory.TERM.createString(annotation.length.toString()),
 				Factory.TERM.createString(String.valueOf(statement.getID())),
 				Factory.TERM.createString("CONTROL"),
 				Factory.TERM.createString(cle));

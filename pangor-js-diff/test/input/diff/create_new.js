@@ -1,12 +1,13 @@
 var a = require('foo'); // VAR = TOP (require could return a new value, although we can't see)
-var b = 10;							// VAR = CHANGED (it is a new value)
-var c = b;							// VAR = CHANGED (it is a new value)
-var d = bar();					// VAR = TOP (bar could return a new value)
-var e = gat();					// VAR = TOP (gat returns a new integer)
-var f = module;					// VAR = UNCHANGED (we assume module is unchanged)
+var b = 10;             // VAR = CHANGED (it is a new value)
+var c = b;              // VAR = CHANGED (it is a new value)
+var d = bar();          // VAR = TOP (bar could return a new value)
+var e = gat();          // VAR = TOP (gat returns a new integer)
+var f = module;         // VAR = UNCHANGED (we assume module is unchanged)
 var g = module.exports; // VAR = UNCHANGED (we assume module.exports is unchanged)
-var h = module;					// VAR = UNCHANGED (we assume module is unchanged)
+var h = module;         // VAR = UNCHANGED (we assume module is unchanged)
 var i = module.exports; // VAR = UNCHANGED (we assume module.exports is unchanged)
+var j = "Hello World";
 
 function bar() {
 	if(a) {
@@ -17,4 +18,8 @@ function bar() {
 
 function gat() {
 	return 5;
+}
+
+function foo() {
+	return j;
 }

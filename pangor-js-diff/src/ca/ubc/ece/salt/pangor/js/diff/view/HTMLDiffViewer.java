@@ -51,7 +51,7 @@ public class HTMLDiffViewer {
 				Integer i1 = Integer.parseInt(o1.absolutePosition);
 				Integer i2 = Integer.parseInt(o2.absolutePosition);
 
-				if(i1 != i2) return i1.compareTo(i2);
+				if(!i1.equals(i2)) return i1.compareTo(i2);
 
 				/* Since these annotations start at the same spot, we need
 				 * the longer annotation to be printed first. */
@@ -59,11 +59,15 @@ public class HTMLDiffViewer {
 				i1 = Integer.parseInt(o1.length);
 				i2 = Integer.parseInt(o2.length);
 
-				return i1.compareTo(i2);
+				return i2.compareTo(i1);
 
 			}
 
 		});
+
+		for(ClassifierFeatureVector fv : filtered) {
+			System.out.println(fv.subtype + "-" + fv.absolutePosition + "-" + fv.length);
+		}
 
 		try(BufferedWriter out = new BufferedWriter(new FileWriter(outputPath))) {
 
@@ -88,8 +92,7 @@ public class HTMLDiffViewer {
 				while(current != null && Integer.parseInt(current.absolutePosition) == i) {
 
 					/* Open the tag. */
-					out.write("<span class='" + current.subtype + "'>");
-					System.out.println("<span class='" + current.subtype + "'>" + i);
+					out.write("<span class='" + current.subtype + "-tag'>");
 
 					/* Set the close tag position. */
 					Integer closePosition = Integer.parseInt(current.length) + i;
@@ -108,8 +111,6 @@ public class HTMLDiffViewer {
 			}
 
 		}
-
-		System.out.println("Finished");
 
 	}
 

@@ -43,6 +43,9 @@ public class IsUsedVisitor implements NodeVisitor {
 		}
 		else if(statement instanceof FunctionNode) {
 			/* This is a function declaration, so only check the parameters. */
+
+			// TODO: We also want to look at/highlight the function name.
+
 			FunctionNode function = (FunctionNode) statement;
 			for(AstNode param : function.getParams()) {
 				param.visit(visitor);
@@ -66,11 +69,9 @@ public class IsUsedVisitor implements NodeVisitor {
 		if(node instanceof InfixExpression || node instanceof Name) {
 			if(node.toSource().equals(identity.name)) {
 				/* This idenfier is being used. */
+				System.out.println(node.toSource());
+				System.out.println(node.toSource().length());
 				this.annotations.add(new Annotation(node.getLineno(), node.getAbsolutePosition(), node.toSource().length()));
-				System.out.println(node.toSource()
-						+ ":\n\tline = " + node.getLineno()
-						+ "\n\tlength = " + node.toSource().length()
-						+ "\n\tabsolute position = " + node.getAbsolutePosition());
 			}
 		}
 		/* Ignore the body of loops, ifs and functions. */

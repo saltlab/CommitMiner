@@ -93,7 +93,7 @@ public class EnvCFGVisitor implements ICFGVisitor {
 
 		if(statement == null || statement.getID() == null) return;
 
-		IPredicate predicate = Factory.BASIC.createPredicate("Environment", 7);
+		IPredicate predicate = Factory.BASIC.createPredicate("Environment", 9);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 			IRelationFactory relationFactory = new SimpleRelationFactory();

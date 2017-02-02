@@ -85,6 +85,28 @@ public class TestView {
 
 	}
 
+	@Test
+	public void testHelpSearch() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/diff/help-search_old.js";
+		String dst = "./test/input/diff/help-search_new.js";
+
+		/* The output file. */
+		String outSrc = "./output/help-search.multidiffSRC";
+		String outDst = "./output/help-search.multidiffDST";
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+
+		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false, outSrc, outDst);
+
+		HTMLDiffViewer.annotate(src, outSrc, alerts, "SOURCE");
+		HTMLDiffViewer.annotate(dst, outDst, alerts, "DESTINATION");
+
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */
@@ -123,11 +145,11 @@ public class TestView {
 		Pair<IQuery, Transformer> valueQuery = getValueQuery();
 		queries.put(valueQuery.getLeft(), valueQuery.getRight());
 
-//		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
-//		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
-//
-//		Pair<IQuery, Transformer> controlQuery = getControlQuery();
-//		queries.put(controlQuery.getLeft(), controlQuery.getRight());
+		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
+		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
+
+		Pair<IQuery, Transformer> controlQuery = getControlQuery();
+		queries.put(controlQuery.getLeft(), controlQuery.getRight());
 
 		return queries;
 
@@ -175,7 +197,7 @@ public class TestView {
 	private static Pair<IQuery, Transformer> getEnvironmentQuery() throws ParserException {
 
 		String qs = "";
-		qs += "?- Environment(?Version,?File,?Line,?StatementID,?Identifier,?Type,?EnvChange)";
+		qs += "?- Environment(?Version,?File,?Line,?Position,?Length,?StatementID,?Identifier,?Type,?EnvChange)";
 		qs += ", EQUAL(?EnvChange, 'Change:CHANGED').";
 
 		/* The query that produces the results. */
@@ -188,13 +210,15 @@ public class TestView {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
+						tuple.get(5).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						tuple.get(3).toString().replace("\'", ""),			// Position
+						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
 						"ENV",												// Subtype
-						tuple.get(4).toString().replace("\'", "")
-							+ "_" + tuple.get(5).toString().replace("\'", "")
-							+ "_" + tuple.get(6).toString().replace("\'", ""));	// Description
+						tuple.get(6).toString().replace("\'", "")
+							+ "_" + tuple.get(7).toString().replace("\'", "")
+							+ "_" + tuple.get(8).toString().replace("\'", ""));	// Description
 		};
 
 		return Pair.of(query, transformer);
@@ -208,7 +232,7 @@ public class TestView {
 	private static Pair<IQuery, Transformer> getControlQuery() throws ParserException {
 
 		String qs = "";
-		qs += "?- Control(?Version,?File,?Line,?StatementID,?Type,?Change)";
+		qs += "?- Control(?Version,?File,?Line,?Position,?Length,?StatementID,?Type,?Change)";
 		qs += ", EQUAL(?Change, 'Change:CHANGED').";
 
 		/* The query that produces the results. */
@@ -221,11 +245,13 @@ public class TestView {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
+						tuple.get(5).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						tuple.get(3).toString().replace("\'", ""),			// Position
+						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
 						"CONTROL",											// Subtype
-						tuple.get(5).toString().replace("\'", ""));			// Description
+						tuple.get(7).toString().replace("\'", ""));			// Description
 		};
 
 		return Pair.of(query, transformer);
