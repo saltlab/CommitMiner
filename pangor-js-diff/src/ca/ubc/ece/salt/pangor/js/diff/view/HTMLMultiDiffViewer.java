@@ -17,7 +17,7 @@ import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 /**
  * Prints source code as annotated HTML.
  */
-public class HTMLDiffViewer {
+public class HTMLMultiDiffViewer {
 
 	/**
 	 * Creates an html file annotated with alerts.
@@ -64,10 +64,6 @@ public class HTMLDiffViewer {
 			}
 
 		});
-
-		for(ClassifierFeatureVector fv : filtered) {
-			System.out.println(fv.subtype + "-" + fv.absolutePosition + "-" + fv.length);
-		}
 
 		try(BufferedWriter out = new BufferedWriter(new FileWriter(outputPath))) {
 

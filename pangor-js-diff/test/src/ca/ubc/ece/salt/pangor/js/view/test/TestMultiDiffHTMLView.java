@@ -25,9 +25,9 @@ import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 import ca.ubc.ece.salt.pangor.classify.analysis.Transformer;
 import ca.ubc.ece.salt.pangor.js.diff.DiffCommitAnalysisFactory;
-import ca.ubc.ece.salt.pangor.js.diff.view.HTMLDiffViewer;
+import ca.ubc.ece.salt.pangor.js.diff.view.HTMLMultiDiffViewer;
 
-public class TestView {
+public class TestMultiDiffHTMLView {
 
 	/**
 	 * Tests data mining data set construction.
@@ -80,8 +80,8 @@ public class TestView {
 
 		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false, outSrc, outDst);
 
-		HTMLDiffViewer.annotate(src, outSrc, alerts, "SOURCE");
-		HTMLDiffViewer.annotate(dst, outDst, alerts, "DESTINATION");
+		HTMLMultiDiffViewer.annotate(src, outSrc, alerts, "SOURCE");
+		HTMLMultiDiffViewer.annotate(dst, outDst, alerts, "DESTINATION");
 
 	}
 
@@ -102,8 +102,8 @@ public class TestView {
 
 		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false, outSrc, outDst);
 
-		HTMLDiffViewer.annotate(src, outSrc, alerts, "SOURCE");
-		HTMLDiffViewer.annotate(dst, outDst, alerts, "DESTINATION");
+		HTMLMultiDiffViewer.annotate(src, outSrc, alerts, "SOURCE");
+		HTMLMultiDiffViewer.annotate(dst, outDst, alerts, "DESTINATION");
 
 	}
 
