@@ -55,7 +55,8 @@ public class HTMLUnixDiffViewer {
 			/* If an EQUALS diff follows a DELETE diff, we need to add blank
 			 * lines in the destination file to align the diff. */
 			if(diff.operation == DiffMatchPatch.Operation.EQUAL && sem > 0)
-				for(; sem > 0; sem--) outDst += "\n";
+				for(; sem > 0; sem--)
+					outDst += "<td class='line alignment'></td><td class='alignment'></td>\n";
 
 			System.out.println(diff.operation.toString());
 
@@ -66,22 +67,22 @@ public class HTMLUnixDiffViewer {
 				  // Print lines from both files side by side
 				  i++;
 				  j++;
-				  outSrc += i + "\t" + srcLines[i-1] + "\n";
-				  outDst += j + "\t" + dstLines[j-1] + "\n";
+				  outSrc += "<td class='line'>" + i + "</td><td>" + srcLines[i-1].replace("\t", "  ") + "</td>\n";
+				  outDst += "<td class='line'>" + j + "</td><td>" + dstLines[j-1].replace("\t", "  ") + "</td>\n";
 				  break;
 			  case DELETE:
 				  // Print source line and, if needed, blank lines in destination
 				  i++;
-				  outSrc += i + "\t" + srcLines[i-1] + "\n";
+				  outSrc += "<td class='line deleteLine'>" + i + "</td><td class='delete'>" + srcLines[i-1].replace("\t", "  ") + "</td>\n";
 				  break;
 			  case INSERT:
 				  // Print destination line and, if needed, blank lines in source
 				  j++;
-				  outDst += j + "\t" + dstLines[j-1] + "\n";
+				  outDst += "<td class='line insertLine'>" + j + "</td><td class='insert'>" + dstLines[j-1].replace("\t", "  ") + "</td>\n";
 
 				  /* Add lines to the source file as needed. */
 				  if(sem > 0) sem--;
-				  else outSrc += "\n";
+				  else outSrc += "<td class='line alignment'></td><td class='alignment'></td>\n";
 
 				  break;
 			  }
@@ -90,13 +91,38 @@ public class HTMLUnixDiffViewer {
 			/* Add lines to the destination file as needed. */
 			if(diff.operation == DiffMatchPatch.Operation.INSERT)
 				for(; sem > 0; sem--)
-					outDst += "\n";
+					outDst += "<td class='line alignment'></td><td class='alignment'></td>\n";
 
 		}
 
+		String[] srcRows = outSrc.split("\n");
+		String[] dstRows = outDst.split("\n");
 
-		Files.write(Paths.get("./output/unixDiffSrc"), outSrc.getBytes(), StandardOpenOption.CREATE);
-		Files.write(Paths.get("./output/unixDiffDst"), outDst.getBytes(), StandardOpenOption.CREATE);
+		String out = "<html><head><link type='text/css' href='./resources/multidiff.css' rel='stylesheet'></head><body>\n";
+		out += "<table border='0'>\n";
+		out += "<colgroup>\n";
+		out += "<col width='44'>\n";
+		out += "<col>\n";
+		out += "<col width='44'>\n";
+		out += "<col>\n";
+		out += "</colgroup>\n";
+		out += "<tbody>\n";
+
+		if(srcRows.length != dstRows.length) throw new Error("SRC rows and DST rows should be equal");
+
+		for(int k = 0; k < srcRows.length; k++) {
+			out += "<tr class='code'>\n";
+			out += srcRows[k] + "\n";
+			out += dstRows[k] + "\n";
+			out += "</tr>";
+		}
+
+		out += "</tbody>\n";
+		out += "</table></body></html>";
+
+		Files.write(Paths.get("./output/unixDiff.html"), out.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+		Files.write(Paths.get("./output/unixDiffSrc.html"), outSrc.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+		Files.write(Paths.get("./output/unixDiffDst.html"), outDst.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
 	}
 
