@@ -3,6 +3,9 @@ package ca.ubc.ece.salt.pangor.js.view.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +29,7 @@ import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 import ca.ubc.ece.salt.pangor.classify.analysis.Transformer;
 import ca.ubc.ece.salt.pangor.js.diff.DiffCommitAnalysisFactory;
 import ca.ubc.ece.salt.pangor.js.diff.view.HTMLMultiDiffViewer;
+import ca.ubc.ece.salt.pangor.js.diff.view.HTMLUnixDiffViewer;
 
 public class TestMultiDiffHTMLView {
 
@@ -35,9 +39,7 @@ public class TestMultiDiffHTMLView {
 	 * @throws Exception
 	 */
 	protected List<ClassifierFeatureVector> runTest(List<SourceCodeFileChange> sourceFileChanges,
-						   boolean checkSize,
-						   String outSrc,
-						   String outDst) throws Exception {
+						   boolean checkSize) throws Exception {
 
 		Commit commit = getCommit();
 		for(SourceCodeFileChange sourceFileChange : sourceFileChanges) {
@@ -78,10 +80,12 @@ public class TestMultiDiffHTMLView {
 		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
 		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
 
-		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false, outSrc, outDst);
+		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false);
 
-		HTMLMultiDiffViewer.annotate(src, outSrc, alerts, "SOURCE");
-		HTMLMultiDiffViewer.annotate(dst, outDst, alerts, "DESTINATION");
+		/* Only annotate the destination file. The source file isn't especially useful. */
+		String annotatedDst = HTMLMultiDiffViewer.annotate(dst, alerts, "DESTINATION");
+
+		Files.write(Paths.get(outDst), annotatedDst.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
 	}
 
@@ -97,13 +101,22 @@ public class TestMultiDiffHTMLView {
 		String outDst = "./output/help-search.multidiffDST";
 
 		/* Read the source files. */
+		String srcCode = new String(Files.readAllBytes(Paths.get(src)));
+		String dstCode = new String(Files.readAllBytes(Paths.get(dst)));
+
+		/* Read the source files. */
 		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
 		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
 
-		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false, outSrc, outDst);
+		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false);
 
-		HTMLMultiDiffViewer.annotate(src, outSrc, alerts, "SOURCE");
-		HTMLMultiDiffViewer.annotate(dst, outDst, alerts, "DESTINATION");
+		/* Only annotate the destination file. The source file isn't especially useful. */
+		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, alerts, "DESTINATION");
+		Files.write(Paths.get(outDst), annotatedDst.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+		/* Combine the annotated file with the UnixDiff. */
+		String annotatedCombined = HTMLUnixDiffViewer.annotate(srcCode, dstCode, annotatedDst);
+		Files.write(Paths.get("./output/unixDiff.html"), annotatedCombined.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
 	}
 

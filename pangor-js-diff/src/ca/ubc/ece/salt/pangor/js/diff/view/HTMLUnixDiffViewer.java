@@ -1,9 +1,6 @@
 package ca.ubc.ece.salt.pangor.js.diff.view;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.LinkedList;
 
 import ca.ubc.ece.salt.pangor.js.diff.line.DiffMatchPatch;
@@ -15,19 +12,17 @@ public class HTMLUnixDiffViewer {
 
 	/**
 	 * Creates an html file annotated with alerts.
-	 * @param inputPath The original source code file (text)
-	 * @param outputPath The path to write the annotated html file
-	 * @param alerts The alerts used to annotate the file
+	 * @param srcCode The original text of the source file
+	 * @param dstCode The original text of the destination file
+	 * @param dstAnnotated The annotated text of the destination file
 	 * @throws IOException when files cannot be read or written
 	 */
-	public static void annotate(String srcPath,
-						  		String dstPath) throws IOException {
-
-		String srcCode = new String(Files.readAllBytes(Paths.get(srcPath)));
-		String dstCode = new String(Files.readAllBytes(Paths.get(dstPath)));
+	public static String annotate(String srcCode,
+						  		  String dstCode,
+						  		  String dstAnnotated) throws IOException {
 
 		String[] srcLines = srcCode.split("\n");
-		String[] dstLines = dstCode.split("\n");
+		String[] dstLines = dstAnnotated.split("\n");
 
 		String outSrc = "";
 		String outDst = "";
@@ -118,7 +113,7 @@ public class HTMLUnixDiffViewer {
 		out += "</tbody>\n";
 		out += "</table></body></html>";
 
-		Files.write(Paths.get("./output/unixDiff.html"), out.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+		return out;
 
 	}
 
