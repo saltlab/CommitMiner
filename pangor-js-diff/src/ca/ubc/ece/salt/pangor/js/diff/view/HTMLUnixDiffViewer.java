@@ -58,8 +58,6 @@ public class HTMLUnixDiffViewer {
 				for(; sem > 0; sem--)
 					outDst += "<td class='line alignment'></td><td class='alignment'></td>\n";
 
-			System.out.println(diff.operation.toString());
-
 			/* Print the lines. */
 			for (int y = 0; y < diff.text.length(); y++) {
 			  switch(diff.operation) {
@@ -121,8 +119,6 @@ public class HTMLUnixDiffViewer {
 		out += "</table></body></html>";
 
 		Files.write(Paths.get("./output/unixDiff.html"), out.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-		Files.write(Paths.get("./output/unixDiffSrc.html"), outSrc.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-		Files.write(Paths.get("./output/unixDiffDst.html"), outDst.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
 	}
 

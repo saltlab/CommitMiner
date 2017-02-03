@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 public class HTMLMultiDiffViewer {
 
 	/**
-	 * Creates an html file annotated with alerts.
+	 * Adds html alert annotations to the file.
 	 * @param inputPath The original source code file (text)
 	 * @param outputPath The path to write the annotated html file
 	 * @param alerts The alerts used to annotate the file
@@ -73,7 +74,11 @@ public class HTMLMultiDiffViewer {
 
 			char[] chars = source.toCharArray();
 
+			/* Track when to close tags key=position value=semaphore. */
 			Map<Integer,Integer> closeAt = new HashMap<Integer,Integer>();
+
+			/* Track which tags are currently open. */
+			LinkedList<ClassifierFeatureVector> openTags = new LinkedList<ClassifierFeatureVector>();
 
 			for(int i = 0; i < chars.length; i++) {
 
@@ -81,14 +86,29 @@ public class HTMLMultiDiffViewer {
 				Integer sem = closeAt.get(i);
 				for(int j = 0; sem != null && j < sem; j++) {
 					out.write("</span>");
+					openTags.pop();
 				}
 				closeAt.remove(i);
+
+				/* Re-open all closed tags after a line break. */
+				if(i > 0 && chars[i-1] == '\n') {
+					Iterator<ClassifierFeatureVector> it = openTags.descendingIterator();
+					while(it.hasNext()) {
+						ClassifierFeatureVector openTag = it.next();
+						out.write("<span class='" + openTag.subtype + "-tag'>");
+					}
+				}
+
+				/* Close all tags before a line break. */
+				for(int k = 0; chars[i] == '\n' && k < openTags.size(); k++)
+					out.write("</span>");
 
 				/* Open tags where needed. */
 				while(current != null && Integer.parseInt(current.absolutePosition) == i) {
 
 					/* Open the tag. */
 					out.write("<span class='" + current.subtype + "-tag'>");
+					openTags.push(current);
 
 					/* Set the close tag position. */
 					Integer closePosition = Integer.parseInt(current.length) + i;
