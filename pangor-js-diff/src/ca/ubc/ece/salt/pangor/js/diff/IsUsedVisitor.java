@@ -42,14 +42,17 @@ public class IsUsedVisitor implements NodeVisitor {
 			return visitor.annotations;
 		}
 		else if(statement instanceof FunctionNode) {
-			/* This is a function declaration, so only check the parameters. */
-
-			// TODO: We also want to look at/highlight the function name.
+			/* This is a function declaration, so only check the parameters
+			 * and the function name. */
 
 			FunctionNode function = (FunctionNode) statement;
 			for(AstNode param : function.getParams()) {
 				param.visit(visitor);
 			}
+
+			Name name = function.getFunctionName();
+			if(name != null) name.visit(visitor);
+
 		}
 		else {
 			statement.visit(visitor);

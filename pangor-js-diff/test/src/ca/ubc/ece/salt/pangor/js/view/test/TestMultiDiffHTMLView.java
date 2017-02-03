@@ -77,15 +77,22 @@ public class TestMultiDiffHTMLView {
 		String outDst = "./output/create_new.html";
 
 		/* Read the source files. */
+		String srcCode = new String(Files.readAllBytes(Paths.get(src)));
+		String dstCode = new String(Files.readAllBytes(Paths.get(dst)));
+
+		/* Read the source files. */
 		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
 		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
 
 		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false);
 
 		/* Only annotate the destination file. The source file isn't especially useful. */
-		String annotatedDst = HTMLMultiDiffViewer.annotate(dst, alerts, "DESTINATION");
-
+		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, alerts, "DESTINATION");
 		Files.write(Paths.get(outDst), annotatedDst.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+		/* Combine the annotated file with the UnixDiff. */
+		String annotatedCombined = HTMLUnixDiffViewer.annotate(srcCode, dstCode, annotatedDst);
+		Files.write(Paths.get("./output/createDiff.html"), annotatedCombined.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
 	}
 
