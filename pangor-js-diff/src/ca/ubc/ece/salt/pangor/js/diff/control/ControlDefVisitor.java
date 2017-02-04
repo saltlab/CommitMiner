@@ -11,6 +11,7 @@ import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
+import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.TryStatement;
@@ -120,8 +121,14 @@ public class ControlDefVisitor implements NodeVisitor {
 
 		if(node.getChangeType() != ChangeType.UNCHANGED
 				&& node.getChangeType() != ChangeType.UNKNOWN) {
-			this.matches.add(node.getTarget());
-			System.out.println(node.getTarget().toSource());
+			// TODO: Find the rightmost node in the target.
+			AstNode target = node.getTarget();
+			while(target instanceof InfixExpression) {
+				InfixExpression ie = (InfixExpression)target;
+				target = ie.getRight();
+			}
+
+			this.matches.add(target);
 		}
 	}
 

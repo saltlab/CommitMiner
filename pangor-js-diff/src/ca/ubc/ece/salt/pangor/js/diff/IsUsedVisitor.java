@@ -72,8 +72,6 @@ public class IsUsedVisitor implements NodeVisitor {
 		if(node instanceof InfixExpression || node instanceof Name) {
 			if(node.toSource().equals(identity.name)) {
 				/* This idenfier is being used. */
-				System.out.println(node.toSource());
-				System.out.println(node.toSource().length());
 				this.annotations.add(new Annotation(node.getLineno(), node.getAbsolutePosition(), node.toSource().length()));
 			}
 		}
