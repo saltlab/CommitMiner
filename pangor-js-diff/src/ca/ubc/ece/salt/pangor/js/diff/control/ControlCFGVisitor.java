@@ -132,15 +132,18 @@ public class ControlCFGVisitor implements ICFGVisitor {
 			annotation = new Annotation(statement.getLineno(),
 					statement.getAbsolutePosition(),
 					length);
+
+			registerFact(statement, annotation, cle, "CONTROL-DEF");
 		}
 		else {
 			/* Highlight the whole statement. */
 			annotation = new Annotation(statement.getLineno(),
 					statement.getAbsolutePosition(),
 					statement.getLength());
+
+			registerFact(statement, annotation, cle, "CONTROL");
 		}
 
-		registerFact(statement, annotation, cle, "CONTROL");
 
 	}
 
