@@ -12,7 +12,7 @@ var j = "Hello World";
 function bar() {
 	if(a) {
 		return 10; }
-	else {
+	else if(f) {
 		return 0; }
 }
 

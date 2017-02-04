@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.pangor.js.diff.control;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.api.basics.ITuple;
@@ -9,7 +10,10 @@ import org.deri.iris.storage.IRelation;
 import org.deri.iris.storage.IRelationFactory;
 import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.ast.Name;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
@@ -41,7 +45,19 @@ public class ControlCFGVisitor implements ICFGVisitor {
 
 	@Override
 	public void visit(CFGEdge edge) {
+
+		/* If the condition has changed, it is a control flow change def. */
+		if(edge.getCondition() != null) {
+			AstNode condition = (AstNode)edge.getCondition();
+			if(condition.getChangeType() != ChangeType.UNCHANGED
+				&& condition.getChangeType() != ChangeType.UNKNOWN
+				&& condition.getVersion() != null) {
+				registerDefinitionFact(condition);
+			}
+		}
+
 		visit((AstNode) edge.getCondition(), (State)edge.getBeforeState());
+
 	}
 
 	/**
@@ -59,11 +75,34 @@ public class ControlCFGVisitor implements ICFGVisitor {
 	 */
 	private void getObjectFacts(AstNode node, Map<Identifier, Address> props, State state, String prefix) {
 
+		if(node == null || node.getID() == null) return;
+
+		/* Look for control flow change definitions. */
+		Set<AstNode> definitions = ControlDefVisitor.getDefs(node);
+		for(AstNode definition : definitions) {
+			registerDefinitionFact(definition);
+		}
+
 		/* If the branch change set is non-empty, this statement is affected
 		 * by a control flow change. */
 		if(!state.control.conditions.isEmpty()) {
-			registerFact(node, "Change:CHANGED");
+			registerStatementFact(node, "Change:CHANGED");
 		}
+
+	}
+
+	/**
+	 * @param definition The control flow change definition
+	 */
+	private void registerDefinitionFact(AstNode definition) {
+
+		/* Create an annotation for this definition. */
+		Annotation annotation = new Annotation(
+				definition.getLineno(),
+				definition.getAbsolutePosition(),
+				definition.toSource().length());
+
+		registerFact(definition, annotation, "Change:CHANGED", "CONTROL-DEF");
 
 	}
 
@@ -72,13 +111,41 @@ public class ControlCFGVisitor implements ICFGVisitor {
 	 * @param ad The abstract domain of the fact.
 	 * @param cle The change lattice element.
 	 */
-	private void registerFact(AstNode statement, String cle) {
+	private void registerStatementFact(AstNode statement, String cle) {
 
-		if(statement == null || statement.getID() == null) return;
+		Annotation annotation;
 
-		Annotation annotation = new Annotation(statement.getLineno(),
-				statement.getAbsolutePosition(),
-				statement.getLength());
+		if(statement instanceof FunctionNode) {
+			/* If this is a function definition, only highlight the 'function'
+			 * part. */
+			FunctionNode function = (FunctionNode)statement;
+			Name name = function.getFunctionName();
+
+			int length = 8;
+
+			if(name != null) {
+				length = name.getAbsolutePosition()
+						+ function.getFunctionName().length()
+						- statement.getAbsolutePosition();
+			}
+
+			annotation = new Annotation(statement.getLineno(),
+					statement.getAbsolutePosition(),
+					length);
+		}
+		else {
+			/* Highlight the whole statement. */
+			annotation = new Annotation(statement.getLineno(),
+					statement.getAbsolutePosition(),
+					statement.getLength());
+		}
+
+		registerFact(statement, annotation, cle, "CONTROL");
+
+	}
+
+	private void registerFact(AstNode node, Annotation annotation,
+							  String cle, String subType) {
 
 		IPredicate predicate = Factory.BASIC.createPredicate("Control", 8);
 		IRelation relation = facts.get(predicate);
@@ -88,17 +155,15 @@ public class ControlCFGVisitor implements ICFGVisitor {
 			facts.put(predicate, relation);
 		}
 
-		String lines = ControlLineVisitor.getStatementLines(statement);
-
 		/* Add the new tuple to the relation. */
 		ITuple tuple = Factory.BASIC.createTuple(
-				Factory.TERM.createString(statement.getVersion().toString()),
+				Factory.TERM.createString(node.getVersion().toString()),
 				Factory.TERM.createString(sourceCodeFileChange.repairedFile),
 				Factory.TERM.createString(annotation.line.toString()),
 				Factory.TERM.createString(annotation.absolutePosition.toString()),
 				Factory.TERM.createString(annotation.length.toString()),
-				Factory.TERM.createString(String.valueOf(statement.getID())),
-				Factory.TERM.createString("CONTROL"),
+				Factory.TERM.createString(String.valueOf(node.getID())),
+				Factory.TERM.createString(subType),
 				Factory.TERM.createString(cle));
 		relation.add(tuple);
 

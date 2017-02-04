@@ -270,7 +270,7 @@ public class TestMultiDiffHTMLView {
 						tuple.get(3).toString().replace("\'", ""),			// Position
 						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
-						"CONTROL",											// Subtype
+						tuple.get(6).toString().replace("\'", ""),											// Subtype
 						tuple.get(7).toString().replace("\'", ""));			// Description
 		};
 
