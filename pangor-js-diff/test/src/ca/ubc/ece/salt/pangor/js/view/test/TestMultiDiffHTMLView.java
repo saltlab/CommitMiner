@@ -38,11 +38,19 @@ public class TestMultiDiffHTMLView {
 	 * @param args The command line arguments (i.e., old and new file names).
 	 * @throws Exception
 	 */
-	protected List<ClassifierFeatureVector> runTest(List<SourceCodeFileChange> sourceFileChanges,
-						   boolean checkSize) throws Exception {
+	protected void runTest(
+			String src, String dst, String out, boolean checkSize) throws Exception {
+
+		/* Read the source files. */
+		String srcCode = new String(Files.readAllBytes(Paths.get(src)));
+		String dstCode = new String(Files.readAllBytes(Paths.get(dst)));
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
 
 		Commit commit = getCommit();
-		for(SourceCodeFileChange sourceFileChange : sourceFileChanges) {
+		for(SourceCodeFileChange sourceFileChange : sourceCodeFileChanges) {
 			commit.addSourceCodeFileChange(sourceFileChange);
 		}
 
@@ -61,69 +69,57 @@ public class TestMultiDiffHTMLView {
 		dataSet.printDataSet();
 
         /* Return the alerts. */
-		return dataSet.getFeatureVectors();
+		List<ClassifierFeatureVector> alerts = dataSet.getFeatureVectors();
+
+		/* Only annotate the destination file. The source file isn't especially useful. */
+		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, alerts, "DESTINATION");
+
+		/* Combine the annotated file with the UnixDiff. */
+		String annotatedCombined = HTMLUnixDiffViewer.annotate(srcCode, dstCode, annotatedDst);
+		Files.write(Paths.get(out), annotatedCombined.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
 	}
 
 	@Test
 	public void testCreate() throws Exception {
 
-		/* The test files. */
 		String src = "./test/input/diff/create_old.js";
 		String dst = "./test/input/diff/create_new.js";
+		String out = "./output/create.html";
 
-		/* The output file. */
-		String outSrc = "./output/create_old.html";
-		String outDst = "./output/create_new.html";
-
-		/* Read the source files. */
-		String srcCode = new String(Files.readAllBytes(Paths.get(src)));
-		String dstCode = new String(Files.readAllBytes(Paths.get(dst)));
-
-		/* Read the source files. */
-		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
-		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
-
-		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false);
-
-		/* Only annotate the destination file. The source file isn't especially useful. */
-		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, alerts, "DESTINATION");
-		Files.write(Paths.get(outDst), annotatedDst.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-
-		/* Combine the annotated file with the UnixDiff. */
-		String annotatedCombined = HTMLUnixDiffViewer.annotate(srcCode, dstCode, annotatedDst);
-		Files.write(Paths.get("./output/createDiff.html"), annotatedCombined.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+		runTest(src, dst, out, false);
 
 	}
 
 	@Test
 	public void testHelpSearch() throws Exception {
 
-		/* The test files. */
 		String src = "./test/input/diff/help-search_old.js";
 		String dst = "./test/input/diff/help-search_new.js";
+		String out = "./output/help-search.html";
 
-		/* The output file. */
-		String outSrc = "./output/help-search.multidiffSRC";
-		String outDst = "./output/help-search.multidiffDST";
+		runTest(src, dst, out, false);
+	}
 
-		/* Read the source files. */
-		String srcCode = new String(Files.readAllBytes(Paths.get(src)));
-		String dstCode = new String(Files.readAllBytes(Paths.get(dst)));
+	@Test
+	public void testSails() throws Exception {
 
-		/* Read the source files. */
-		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
-		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+		String src = "./test/input/eval/sails-074841dfa62f23a66113aa56f710e874149e35bf_old.js";
+		String dst = "./test/input/eval/sails-074841dfa62f23a66113aa56f710e874149e35bf_new.js";
+		String out = "./output/sails.html";
 
-		List<ClassifierFeatureVector> alerts = this.runTest(sourceCodeFileChanges, false);
+		runTest(src, dst, out, false);
 
-		/* Only annotate the destination file. The source file isn't especially useful. */
-		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, alerts, "DESTINATION");
-		Files.write(Paths.get(outDst), annotatedDst.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+	}
 
-		/* Combine the annotated file with the UnixDiff. */
-		String annotatedCombined = HTMLUnixDiffViewer.annotate(srcCode, dstCode, annotatedDst);
-		Files.write(Paths.get("./output/unixDiff.html"), annotatedCombined.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+	@Test
+	public void testBower() throws Exception {
+
+		String src = "./test/input/eval/bower-fd472403c1f9992b57e15b4ff745732677b64ee1_old.js";
+		String dst = "./test/input/eval/bower-fd472403c1f9992b57e15b4ff745732677b64ee1_new.js";
+		String out = "./output/bower.html";
+
+		runTest(src, dst, out, false);
 
 	}
 

@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.pangor.js.diff.value;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,7 +55,7 @@ public class ValueCFGVisitor implements ICFGVisitor {
 	 * identifier protection.
 	 */
 	private void visit(AstNode node, State state) {
-		if(state != null) getObjectFacts(node, state.env.environment, state, null);
+		if(state != null) getObjectFacts(node, state.env.environment, state, null, new HashSet<Address>());
 	}
 
 	/**
@@ -62,10 +63,15 @@ public class ValueCFGVisitor implements ICFGVisitor {
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
-	private void getObjectFacts(AstNode node, Map<Identifier, Address> props, State state, String prefix) {
+	private void getObjectFacts(AstNode node, Map<Identifier, Address> props, State state, String prefix, Set<Address> visited) {
 		for(Identifier prop : props.keySet()) {
 
 			Address addr = props.get(prop);
+
+			/* Avoid circular references. */
+			if(visited.contains(addr)) continue;
+			visited.add(addr);
+
 			String identifier;
 			if(prefix == null) identifier = prop.name;
 			else identifier = prefix + "." + prop.name;
@@ -88,7 +94,7 @@ public class ValueCFGVisitor implements ICFGVisitor {
 			if(val.addressAD.le == LatticeElement.TOP) continue;
 			for(Address propAddr : val.addressAD.addresses) {
 				Obj propObj = state.store.getObj(propAddr);
-				getObjectFacts(node, propObj.externalProperties, state, identifier);
+				getObjectFacts(node, propObj.externalProperties, state, identifier, visited);
 			}
 
 		}

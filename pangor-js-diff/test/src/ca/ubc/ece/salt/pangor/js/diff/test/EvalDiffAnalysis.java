@@ -81,11 +81,11 @@ public class EvalDiffAnalysis {
 	}
 
 	@Test
-	public void testBowerTypeError() throws Exception {
+	public void testBower() throws Exception {
 
 		/* The test files. */
-		String src = "./test/input/eval/mediacenterjs-6005eac33810363e398a31eb6a6d7f0a8318eaa4_old.js";
-		String dst = "./test/input/eval/mediacenterjs-6005eac33810363e398a31eb6a6d7f0a8318eaa4_new.js";
+		String src = "./test/input/eval/bower-fd472403c1f9992b57e15b4ff745732677b64ee1_old.js";
+		String dst = "./test/input/eval/bower-fd472403c1f9992b57e15b4ff745732677b64ee1_new.js";
 
 		/* Read the source files. */
 		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
@@ -137,11 +137,11 @@ public class EvalDiffAnalysis {
 		Pair<IQuery, Transformer> valueQuery = getValueQuery();
 		queries.put(valueQuery.getLeft(), valueQuery.getRight());
 
-//		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
-//		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
+		Pair<IQuery, Transformer> environmentQuery = getEnvironmentQuery();
+		queries.put(environmentQuery.getLeft(), environmentQuery.getRight());
 
-//		Pair<IQuery, Transformer> controlQuery = getControlQuery();
-//		queries.put(controlQuery.getLeft(), controlQuery.getRight());
+		Pair<IQuery, Transformer> controlQuery = getControlQuery();
+		queries.put(controlQuery.getLeft(), controlQuery.getRight());
 
 //		Pair<IQuery, Transformer> astQuery = getAstQuery();
 //		queries.put(astQuery.getLeft(), astQuery.getRight());
@@ -163,7 +163,7 @@ public class EvalDiffAnalysis {
 	private static Pair<IQuery, Transformer> getValueQuery() throws ParserException {
 
 		String qs = "";
-		qs += "?- Value(?Version,?File,?Line,?StatementID,?Identifier,?ValChange)";
+		qs += "?- Value(?Version,?File,?Line,?Pos,?Len,?StatementID,?Identifier,?ValChange)";
 		qs += ", NOT_EQUAL(?ValChange, 'Change:UNCHANGED')";
 		qs += ", NOT_EQUAL(?ValChange, 'Change:BOTTOM').";
 
@@ -177,12 +177,14 @@ public class EvalDiffAnalysis {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
+						tuple.get(5).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						tuple.get(3).toString().replace("\'", ""),			// Position
+						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
-						"VAL",											// Subtype
-						tuple.get(4).toString().replace("\'", "")
-							+ "_" + tuple.get(5).toString().replace("\'", ""));	// Description
+						"VAL",												// Subtype
+						tuple.get(6).toString().replace("\'", "")
+							+ "_" + tuple.get(7).toString().replace("\'", ""));	// Description
 		};
 
 		return Pair.of(query, transformer);
@@ -196,7 +198,7 @@ public class EvalDiffAnalysis {
 	private static Pair<IQuery, Transformer> getEnvironmentQuery() throws ParserException {
 
 		String qs = "";
-		qs += "?- Environment(?Version,?File,?Line,?StatementID,?Identifier,?Type,?EnvChange)";
+		qs += "?- Environment(?Version,?File,?Line,?Position,?Length,?StatementID,?Identifier,?Type,?EnvChange)";
 		qs += ", EQUAL(?EnvChange, 'Change:CHANGED').";
 
 		/* The query that produces the results. */
@@ -209,13 +211,15 @@ public class EvalDiffAnalysis {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
+						tuple.get(5).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						tuple.get(3).toString().replace("\'", ""),			// Position
+						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
 						"ENV",												// Subtype
-						tuple.get(4).toString().replace("\'", "")
-							+ "_" + tuple.get(5).toString().replace("\'", "")
-							+ "_" + tuple.get(6).toString().replace("\'", ""));	// Description
+						tuple.get(6).toString().replace("\'", "")
+							+ "_" + tuple.get(7).toString().replace("\'", "")
+							+ "_" + tuple.get(8).toString().replace("\'", ""));	// Description
 		};
 
 		return Pair.of(query, transformer);
@@ -229,7 +233,7 @@ public class EvalDiffAnalysis {
 	private static Pair<IQuery, Transformer> getControlQuery() throws ParserException {
 
 		String qs = "";
-		qs += "?- Control(?Version,?File,?Line,?StatementID,?Type,?Change)";
+		qs += "?- Control(?Version,?File,?Line,?Position,?Length,?StatementID,?Type,?Change)";
 		qs += ", EQUAL(?Change, 'Change:CHANGED').";
 
 		/* The query that produces the results. */
@@ -242,11 +246,13 @@ public class EvalDiffAnalysis {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
+						tuple.get(5).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						tuple.get(3).toString().replace("\'", ""),			// Position
+						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
-						"CONTROL",											// Subtype
-						tuple.get(5).toString().replace("\'", ""));			// Description
+						tuple.get(6).toString().replace("\'", ""),											// Subtype
+						tuple.get(7).toString().replace("\'", ""));			// Description
 		};
 
 		return Pair.of(query, transformer);

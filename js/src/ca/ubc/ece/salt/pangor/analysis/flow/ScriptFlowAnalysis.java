@@ -1,8 +1,10 @@
 package ca.ubc.ece.salt.pangor.analysis.flow;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.deri.iris.api.basics.IPredicate;
@@ -66,7 +68,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		/* Analyze the publicly accessible methods that weren't analyzed in
 		 * the main analysis.
 		 * NOTE: Only one level deep. Does not recursively check constructors. */
-		analyzePublic(state, state.env.environment, state.selfAddr, cfgMap);
+		analyzePublic(state, state.env.environment, state.selfAddr, cfgMap, new HashSet<Address>());
 
 		/* Generate facts from the results of the analysis. */
 		for(CFG cfg : cfgs) {
@@ -82,12 +84,18 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 	 * analyzed. This is currently not done recursively, because we would have
 	 * to decide whether or not to run the function as a constructor.
 	 * @param state The end state of the parent function.
+	 * @param visited Prevent circular lookups.
 	 */
-	private void analyzePublic(State state, Map<Identifier, Address> props, Address selfAddr, Map<AstNode, CFG> cfgMap) {
+	private void analyzePublic(State state, Map<Identifier, Address> props, Address selfAddr, Map<AstNode, CFG> cfgMap, Set<Address> visited) {
 
 		for(Identifier var : props.keySet()) {
+
 			Address addr = props.get(var);
 			BValue val = state.store.apply(addr);
+
+			/* Avoid circular references. */
+			if(visited.contains(addr)) continue;
+			visited.add(addr);
 
 			for(Address objAddr : val.addressAD.addresses) {
 				Obj obj = state.store.getObj(objAddr);
@@ -124,7 +132,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 				}
 
 				/* Recursively look for object properties that are functions. */
-				analyzePublic(state, obj.externalProperties, props.get(var), cfgMap);
+				analyzePublic(state, obj.externalProperties, props.get(var), cfgMap, visited);
 
 			}
 		}

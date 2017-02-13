@@ -18,9 +18,9 @@ R:S:I:var:i+R:A_RHS:I:this:1,self,lib/hooks/pubsub/index.js,https://github.com/b
 R:S:I:var:i+R:A_RHS:I:this:1,self,lib/winston/transports/file.js,https://github.com/winstonjs/winston/commit/0b05c48eb21c3c8b3734e17ca7713554c5650718,https://github.com/winstonjs/winston/commit/4efdf874a34da40d51a7a3fb6e914a563699fda3
 
 /* Missing binding context for method call. */
-R:A:I:this,this,glob.js,https://github.com/isaacs/node-glob/commit/8315c2d576f9f3092cdc2f2cc41a398bc656035a,https://github.com/isaacs/node-glob/commit/42982b423eac351a2a7484908fd80d1851a67e9a
-R:A:I:this,this,lib/hooks/pubsub/index.js,https://github.com/balderdashy/sails/commit/67d80e7c696a31408fcf22d965bef1d3b6dc8893,https://github.com/balderdashy/sails/commit/8ed67bab52d74e0f7c61035a41cab69614e4e1b9
-R:A:I:this,this,lib/hooks/pubsub/index.js,https://github.com/balderdashy/sails/commit/d8d699d12cfbc869d235ff0399ef656dadd53183,https://github.com/balderdashy/sails/commit/98d97fbe24e80d8be58c47211cc4ae14c076123e
+R:A:I:this,this,glob.js,https://github.com/isaacs/node-glob/commit/8315c2d576f9f3092cdc2f2cc41a398bc656035a,https://github.com/isaacs/node-glob/commit/42982b423eac351a2a7484908fd80d1851a67e9a ==> TOO BIG
+R:A:I:this,this,lib/hooks/pubsub/index.js,https://github.com/balderdashy/sails/commit/67d80e7c696a31408fcf22d965bef1d3b6dc8893,https://github.com/balderdashy/sails/commit/8ed67bab52d74e0f7c61035a41cab69614e4e1b9 ==> TOO BIG
+R:A:I:this,this,lib/hooks/pubsub/index.js,https://github.com/balderdashy/sails/commit/d8d699d12cfbc869d235ff0399ef656dadd53183,https://github.com/balderdashy/sails/commit/074841dfa62f23a66113aa56f710e874149e35bf ==> NEED TO IMPROVE ANALYSIS TO ANALYZE FUNCTIONS DEFINED IN OBJECT LITERALS
 
 /* Missing binding this in callback. */
 R:A:I:this:1+M:MC:I:bind:1,bind,lib/core/package.js,https://github.com/bower/bower/commit/b9304d219be05b40c92ae50e74643fe166fea1cd,https://github.com/bower/bower/commit/fd472403c1f9992b57e15b4ff745732677b64ee1

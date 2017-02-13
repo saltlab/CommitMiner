@@ -1,12 +1,12 @@
-var a = require('foo'); // VAR = TOP (require could return a new value, although we can't see)
-var b = 10;             // VAR = CHANGED (it is a new value)
-var c = b;              // VAR = CHANGED (it is a new value)
-var d = bar();          // VAR = TOP (bar could return a new value)
-var e = gat();          // VAR = TOP (gat returns a new integer)
-var f = module;         // VAR = UNCHANGED (we assume module is unchanged)
-var g = module.exports; // VAR = UNCHANGED (we assume module.exports is unchanged)
-var h = module;         // VAR = UNCHANGED (we assume module is unchanged)
-var i = module.exports; // VAR = UNCHANGED (we assume module.exports is unchanged)
+var a = require('foo');
+var b = 10;
+var c = b;
+var d = bar();
+var e = gat();
+var f = module;
+var g = module.exports;
+var h = module;
+var i = module.exports;
 var j = "Hello World";
 
 function bar() {
