@@ -116,5 +116,5 @@ module.exports = function cookieSession(options){
   };
 };
 
-var fun = module.exports();
-fun();
+/*var fun = module.exports();
+fun();*/

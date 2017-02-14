@@ -11,6 +11,7 @@ var j = "Hello World";
 var k = { x: 5, y: "6",
 	z:	function(one, two) {
 				foo();	
+				console.log(j);
 			}
 	};
 
@@ -27,4 +28,14 @@ function gat() {
 
 function foo() {
 	return j;
+}
+
+function hip() {
+	return function isp() {
+		var o = "No one calls this!";
+		var p = bar();
+		console.log(p);
+		var q = f;
+		console.log(q);
+	}
 }

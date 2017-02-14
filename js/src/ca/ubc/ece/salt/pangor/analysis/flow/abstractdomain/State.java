@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
@@ -40,6 +41,8 @@ public class State implements IState {
 	public Scratchpad scratch;
 	public Trace trace;
 	public Control control;
+
+	public Queue<Address> declaredFunctions;
 
 	public Address selfAddr;
 
@@ -406,6 +409,13 @@ public class State implements IState {
 		BValue oldVal = this.scratch.apply(Scratch.RETVAL);
 		if(oldVal != null)
 			retVal = retVal.join(oldVal);
+
+		/* Make a fake var in the environment and point it to the value so that
+		 * if it contains a function, it will be analyzed during the
+		 * 'accessible function' phase of the analysis. */
+		Address address = this.trace.makeAddr(rs.getID(), "");
+		this.env.strongUpdateNoCopy(new Identifier("~retval~"), address);
+		this.store = this.store.alloc(address, retVal);
 
 		/* Update the return value on the scratchpad. */
 		this.scratch = this.scratch.strongUpdate(Scratch.RETVAL, retVal);

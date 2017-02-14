@@ -258,4 +258,97 @@ public class Helpers {
 
 	}
 
+	/**
+	 * Analyze publicly accessible functions that have not already been
+	 * analyzed. This is currently not done recursively, because we would have
+	 * to decide whether or not to run the function as a constructor.
+	 * @param state The end state of the parent function.
+	 * @param visited Prevent circular lookups.
+	 */
+	public static void analyzePublic(State state, Map<Identifier, Address> props, Address selfAddr, Map<AstNode, CFG> cfgMap, Set<Address> visited) {
+
+		for(Identifier var : props.keySet()) {
+
+			Address addr = props.get(var);
+			BValue val = state.store.apply(addr);
+
+			/* Avoid circular references. */
+			if(visited.contains(addr)) continue;
+			visited.add(addr);
+
+			for(Address objAddr : val.addressAD.addresses) {
+				Obj obj = state.store.getObj(objAddr);
+
+				/* We may need to analyze this function. */
+				if(obj.internalProperties.klass == JSClass.CFunction) {
+
+					InternalFunctionProperties ifp = (InternalFunctionProperties)obj.internalProperties;
+					FunctionClosure fc = (FunctionClosure)ifp.closure;
+
+					if(ifp.closure instanceof FunctionClosure &&
+							fc.cfg.getEntryNode().getBeforeState() == null) {
+
+						/* Create the argument object. */
+						Address argAddr = createTopArgObject(state, (FunctionNode)fc.cfg.getEntryNode().getStatement());
+
+						/* Create the control domain. */
+						Control control = state.control;
+						AstNode node = (AstNode)fc.cfg.getEntryNode().getStatement();
+						if(Change.conv(node).le == Change.LatticeElement.CHANGED) {
+							control = state.control.clone();
+							control.conditions.add(node); // Mark all as control flow modified
+						}
+
+						/* Analyze the function. Use a fresh call stack because we don't have any knowledge of it. */
+						ifp.closure.run(selfAddr, argAddr, state.store,
+										state.scratch, state.trace, control,
+										new Stack<Address>());
+
+						/* Check the function object. */
+						// TODO: We ignore this for now. We would have to assume the function is being run as a constructor.
+
+					}
+				}
+
+				/* Recursively look for object properties that are functions. */
+				analyzePublic(state, obj.externalProperties, props.get(var), cfgMap, visited);
+
+			}
+		}
+	}
+
+	/**
+	 * Creates an arg object where each argument corresponds to a parameter
+	 * and each argument value is BValue.TOP.
+	 * @param state
+	 * @param f The function
+	 * @return
+	 */
+	public static Address createTopArgObject(State state, FunctionNode f) {
+
+		/* Create the argument object. */
+		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
+
+		int i = 0;
+		for(AstNode param : f.getParams()) {
+
+			BValue argVal = BValue.top(Change.convU(param), Change.u());
+			state.store = Helpers.addProp(f.getID(), String.valueOf(i), argVal,
+										  ext, state.store, state.trace);
+
+			i++;
+		}
+
+		InternalObjectProperties internal = new InternalObjectProperties(
+				Address.inject(StoreFactory.Arguments_Addr, Change.convU(f), Change.u()), JSClass.CObject);
+		Obj argObj = new Obj(ext, internal);
+
+		/* Add the argument object to the store. */
+		Address argAddr = state.trace.makeAddr(f.getID(), "");
+		state.store = state.store.alloc(argAddr, argObj);
+
+		return argAddr;
+
+	}
+
 }

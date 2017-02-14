@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Stack;
 
@@ -143,8 +144,15 @@ public class FunctionClosure extends Closure {
 		/* Create the initial state for the function call. */
 		State state = new State(store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
 
-		/* Run the analysis on the CFG. */
-		return Helpers.run(cfg, state);
+		/* Perform the initial analysis and get the publicly accessible methods. */
+		state = Helpers.run(cfg, state);
+
+		/* Analyze the publicly accessible methods that weren't analyzed in
+		 * the main analysis. */
+		Helpers.analyzePublic(state, state.env.environment, state.selfAddr, cfgs, new HashSet<Address>());
+
+		return state;
+
 	}
 
 }

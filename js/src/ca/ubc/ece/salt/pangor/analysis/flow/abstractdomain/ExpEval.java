@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -394,7 +395,7 @@ public class ExpEval {
 	 * TODO: make sure we don't get into a circular loop
 	 * @return The list of functions pointed to by the value.
 	 */
-	private List<Address> extractFunctions(BValue val, List<Address> functionAddrs) {
+	private List<Address> extractFunctions(BValue val, List<Address> functionAddrs, Set<Address> visited) {
 
 		for(Address objAddr : val.addressAD.addresses) {
 			Obj obj = state.store.getObj(objAddr);
@@ -408,7 +409,12 @@ public class ExpEval {
 
 			/* Recursively look for object properties that are functions. */
 			for(Address addr : obj.externalProperties.values()) {
-				extractFunctions(state.store.apply(addr), functionAddrs);
+
+				/* Avoid circular references. */
+				if(visited.contains(addr)) continue;
+				visited.add(addr);
+
+				extractFunctions(state.store.apply(addr), functionAddrs, visited);
 			}
 
 		}
@@ -454,7 +460,7 @@ public class ExpEval {
 			}
 
 			/* TODO: We somehow need to execute all functions in their appropriate context. */
-			callbacks.addAll(extractFunctions(argVal, new LinkedList<Address>()));
+			callbacks.addAll(extractFunctions(argVal, new LinkedList<Address>(), new HashSet<Address>()));
 			state.store = Helpers.addProp(fc.getID(), String.valueOf(i), argVal,
 							ext, state.store, state.trace);
 			i++;
