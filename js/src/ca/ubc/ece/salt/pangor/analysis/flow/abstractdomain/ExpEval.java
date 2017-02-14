@@ -391,20 +391,26 @@ public class ExpEval {
 	}
 
 	/**
+	 * TODO: make sure we don't get into a circular loop
 	 * @return The list of functions pointed to by the value.
 	 */
-	private List<Address> extractFunctions(BValue val) {
-
-		List<Address> functionAddrs = new LinkedList<Address>();
+	private List<Address> extractFunctions(BValue val, List<Address> functionAddrs) {
 
 		for(Address objAddr : val.addressAD.addresses) {
 			Obj obj = state.store.getObj(objAddr);
+
 			if(obj.internalProperties.klass == JSClass.CFunction) {
 				InternalFunctionProperties ifp = (InternalFunctionProperties) obj.internalProperties;
 				if(ifp.closure instanceof FunctionClosure) {
 					functionAddrs.add(objAddr);
 				}
 			}
+
+			/* Recursively look for object properties that are functions. */
+			for(Address addr : obj.externalProperties.values()) {
+				extractFunctions(state.store.apply(addr), functionAddrs);
+			}
+
 		}
 
 		return functionAddrs;
@@ -427,6 +433,8 @@ public class ExpEval {
 		//		 arguments or the return value. After the function has been
 		//		 analyzed, we will 'analyze public functions which have not
 		//		 been analyzed'.
+		// TODO: We need to store a "this" pointer as well
+
 		List<Address> callbacks = new LinkedList<Address>();
 
 		/* Create the argument object. */
@@ -446,7 +454,7 @@ public class ExpEval {
 			}
 
 			/* TODO: We somehow need to execute all functions in their appropriate context. */
-			callbacks.addAll(extractFunctions(argVal));
+			callbacks.addAll(extractFunctions(argVal, new LinkedList<Address>()));
 			state.store = Helpers.addProp(fc.getID(), String.valueOf(i), argVal,
 							ext, state.store, state.trace);
 			i++;

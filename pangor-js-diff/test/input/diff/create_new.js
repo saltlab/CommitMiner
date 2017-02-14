@@ -8,7 +8,11 @@ var g = module.exports;
 var h = call({ v: 0, w: 1});
 var i = module.exports;
 var j = "Hello World";
-var k = { x: 5, y: "6" };
+var k = { x: 5, y: "6",
+	z:	function(one, two) {
+				foo();	
+			}
+	};
 
 function bar() {
 	if(a) {
