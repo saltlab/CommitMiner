@@ -86,14 +86,6 @@ public class Helpers {
 		 * S{emaphore} Map. */
 		Map<CFGNode, Integer> iesMap = new HashMap<CFGNode, Integer>();
 
-		/* TODO: We need to do two things:
-		 * 	1. Compute the number of incoming edges for each node in the CFG...
-		 * 	   which we probably don't want to do here.
-		 * 	2. Change to a breadth-first traversal (probably more efficient in
-		 * 	   practice).
-		 * 	3. Do not transfer over a node if the semaphore for the node != 0.
-		 */
-
 		/* Initialize the stack for a depth-first traversal. */
 		Stack<PathState> stack = new Stack<PathState>();
 		for(CFGEdge edge : cfg.getEntryNode().getEdges()) {

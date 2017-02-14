@@ -123,6 +123,17 @@ public class TestMultiDiffHTMLView {
 
 	}
 
+	@Test
+	public void testConnect() throws Exception {
+
+		String src = "./test/input/eval/connect-08337a38445b16f84192b40b74458bcea36f9a32_old.js";
+		String dst = "./test/input/eval/connect-08337a38445b16f84192b40b74458bcea36f9a32_new.js";
+		String out = "./output/connect.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */

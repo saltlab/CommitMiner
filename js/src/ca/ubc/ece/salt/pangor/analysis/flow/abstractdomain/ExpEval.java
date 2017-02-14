@@ -422,13 +422,30 @@ public class ExpEval {
 		State newState = null;
 
 		/* Keep track of callback functions. */
+		// TODO: Instead of executing callbacks, we need to create dummy local
+		// 		 variables that store object literals and functions passed as
+		//		 arguments or the return value. After the function has been
+		//		 analyzed, we will 'analyze public functions which have not
+		//		 been analyzed'.
 		List<Address> callbacks = new LinkedList<Address>();
 
 		/* Create the argument object. */
 		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
 		int i = 0;
 		for(AstNode arg : fc.getArguments()) {
+
+			/* Get the value of the object. It could be a function, object literal, etc. */
 			BValue argVal = eval(arg);
+
+			if(arg instanceof ObjectLiteral) {
+				/* If this is an object literal, make a fake var in the
+				 * environment and point it to the object literal. */
+				Address address = state.trace.makeAddr(arg.getID(), "");
+				state.env.strongUpdateNoCopy(new Identifier(arg.getID().toString()), address);
+				state.store = state.store.alloc(address, argVal);
+			}
+
+			/* TODO: We somehow need to execute all functions in their appropriate context. */
 			callbacks.addAll(extractFunctions(argVal));
 			state.store = Helpers.addProp(fc.getID(), String.valueOf(i), argVal,
 							ext, state.store, state.trace);

@@ -5,9 +5,10 @@ var d = bar();
 var e = gat();
 var f = module;
 var g = module.exports;
-var h = module;
+var h = call({ v: 0, w: 1});
 var i = module.exports;
 var j = "Hello World";
+var k = { x: 5, y: "6" };
 
 function bar() {
 	if(a) {
