@@ -13,9 +13,9 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
 
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Change;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
@@ -47,13 +47,13 @@ public class ControlCFGVisitor implements ICFGVisitor {
 	public void visit(CFGEdge edge) {
 
 		/* If the condition has changed, it is a control flow change def. */
-		if(edge.getCondition() != null) {
-			AstNode condition = (AstNode)edge.getCondition();
-			if(condition.getChangeType() != ChangeType.UNCHANGED
-				&& condition.getChangeType() != ChangeType.UNKNOWN
-				&& condition.getVersion() != null) {
-				registerDefinitionFact(condition);
-			}
+		if(edge.getCondition() != null
+				&& edge.getCondition().getVersion() != null
+				&& Change.convU(edge.getCondition()).le ==
+								Change.LatticeElement.CHANGED) {
+
+				registerDefinitionFact((AstNode)edge.getCondition());
+
 		}
 
 		visit((AstNode) edge.getCondition(), (State)edge.getBeforeState());

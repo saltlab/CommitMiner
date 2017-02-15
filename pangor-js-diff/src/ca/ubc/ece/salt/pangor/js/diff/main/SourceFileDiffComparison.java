@@ -26,4 +26,12 @@ public class SourceFileDiffComparison {
 	public int valAstSubtraction;
 	public int multiAstSubtraction;
 
+	@Override
+	public boolean equals(Object o) {
+		SourceFileDiffComparison a = this;
+		SourceFileDiffComparison b = (SourceFileDiffComparison)o;
+		if(a.url.equals(b.url)) return true;
+		return false;
+	}
+
 }
