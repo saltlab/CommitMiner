@@ -55,7 +55,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		/* Analyze the publicly accessible methods that weren't analyzed in
 		 * the main analysis.
 		 * NOTE: Only one level deep. Does not recursively check constructors. */
-		Helpers.analyzePublic(state, state.env.environment, state.selfAddr, cfgMap, new HashSet<Address>());
+		Helpers.analyzePublic(state, state.env.environment, state.selfAddr, cfgMap, new HashSet<Address>(), null);
 
 		/* Generate facts from the results of the analysis. */
 		for(CFG cfg : cfgs) {

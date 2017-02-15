@@ -2,7 +2,9 @@ package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.mozilla.javascript.ast.AstNode;
@@ -117,6 +119,11 @@ public class FunctionClosure extends Closure {
 		trace = trace.update(environment, store, selfAddr, argArrayAddr,
 							 (ScriptNode)cfg.getEntryNode().getStatement());
 
+		/* We'll use this later when executing unanalyzed functions. */
+		List<Name> localVarNames = VariableLiftVisitor.getVariableDeclarations((ScriptNode)cfg.getEntryNode().getStatement());
+		Set<String> localVars = new HashSet<String>();
+		for(Name localVarName : localVarNames) localVars.add(localVarName.toSource());
+
 		/* Lift local variables and function declarations into the environment. */
 		Environment env = this.environment.clone();
 		store = Helpers.lift(env, store,
@@ -165,7 +172,7 @@ public class FunctionClosure extends Closure {
 
 		/* Analyze the publicly accessible methods that weren't analyzed in
 		 * the main analysis. */
-		Helpers.analyzePublic(state, state.env.environment, state.selfAddr, cfgs, new HashSet<Address>());
+		Helpers.analyzePublic(state, state.env.environment, state.selfAddr, cfgs, new HashSet<Address>(), localVars);
 
 		return state;
 

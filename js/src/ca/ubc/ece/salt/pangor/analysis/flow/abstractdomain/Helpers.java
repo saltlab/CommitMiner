@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
@@ -226,7 +227,7 @@ public class Helpers {
 										  Store store,
 										  ScriptNode function,
 										  Map<AstNode, CFG> cfgs,
-										  Trace trace ) {
+										  Trace trace) {
 
 		/* Lift variables into the function's environment and initialize to undefined. */
 		List<Name> localVars = VariableLiftVisitor.getVariableDeclarations(function);
@@ -265,18 +266,24 @@ public class Helpers {
 	 * @param state The end state of the parent function.
 	 * @param visited Prevent circular lookups.
 	 */
-	public static void analyzePublic(State state, Map<Identifier, Address> props, Address selfAddr, Map<AstNode, CFG> cfgMap, Set<Address> visited) {
+	public static void analyzePublic(State state,
+			Map<Identifier, Address> props,
+			Address selfAddr,
+			Map<AstNode, CFG> cfgMap,
+			Set<Address> visited,
+			Set<String> localvars) {
 
 		for(Identifier var : props.keySet()) {
 
 			Address addr = props.get(var);
 			BValue val = state.store.apply(addr);
 
-			if(addr == null) {
-				for(Identifier prop : props.keySet()){
-					System.out.println(prop.name);
-				}
-			}
+			/* Do not visit local variables which were declared at a higher
+			 * level, and therefore can be analyzed later. */
+			if(localvars != null
+					&& !localvars.contains(var.name)
+					&& !var.name.equals("~retval~")
+					&& !StringUtils.isNumeric(var.name)) continue;
 
 			/* Avoid circular references. */
 			if(visited.contains(addr)) continue;
@@ -317,7 +324,7 @@ public class Helpers {
 				}
 
 				/* Recursively look for object properties that are functions. */
-				analyzePublic(state, obj.externalProperties, props.get(var), cfgMap, visited);
+				analyzePublic(state, obj.externalProperties, props.get(var), cfgMap, visited, null);
 
 			}
 		}
