@@ -272,6 +272,12 @@ public class Helpers {
 			Address addr = props.get(var);
 			BValue val = state.store.apply(addr);
 
+			if(addr == null) {
+				for(Identifier prop : props.keySet()){
+					System.out.println(prop.name);
+				}
+			}
+
 			/* Avoid circular references. */
 			if(visited.contains(addr)) continue;
 			visited.add(addr);
@@ -292,7 +298,7 @@ public class Helpers {
 						Address argAddr = createTopArgObject(state, (FunctionNode)fc.cfg.getEntryNode().getStatement());
 
 						/* Create the control domain. */
-						Control control = state.control;
+						Control control = new Control();
 						AstNode node = (AstNode)fc.cfg.getEntryNode().getStatement();
 						if(Change.conv(node).le == Change.LatticeElement.CHANGED) {
 							control = state.control.clone();

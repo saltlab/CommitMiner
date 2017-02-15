@@ -91,6 +91,7 @@ public class FunctionClosure extends Closure {
 			Stack<Address> callStack) {
 
 		/* If this has already been analyzed, we can short-circuit. */
+		System.out.println(((AstNode)this.cfg.getEntryNode().getStatement()).toSource());
 		boolean runAnalysis = this.runAnalysis(control, argArrayAddr, store);
 		if(!runAnalysis) {
 
@@ -131,6 +132,21 @@ public class FunctionClosure extends Closure {
 				if(param instanceof Name) {
 					Name paramName = (Name) param;
 					Address argAddr = argObj.externalProperties.get(new Identifier(String.valueOf(i), Change.u()));
+					if(argAddr == null) {
+
+						/* No argument was given for this parameter. Create a
+						 * dummy value. */
+
+						/* Add the argument address to the argument object. */
+						BValue argVal = BValue.top(Change.convU(param), Change.u());
+						store = Helpers.addProp(function.getID(), String.valueOf(i), argVal,
+										  argObj.externalProperties, store, trace);
+
+						/* Add the argument object to the store. */
+						argAddr = trace.makeAddr(function.getID(), String.valueOf(i));
+						store = store.alloc(argAddr, argObj);
+
+					}
 					Identifier identity = new Identifier(paramName.toSource(), Change.conv(paramName));
 					env = env.strongUpdate(identity, argAddr);
 				}

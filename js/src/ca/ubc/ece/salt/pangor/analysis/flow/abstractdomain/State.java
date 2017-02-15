@@ -413,8 +413,9 @@ public class State implements IState {
 		/* Make a fake var in the environment and point it to the value so that
 		 * if it contains a function, it will be analyzed during the
 		 * 'accessible function' phase of the analysis. */
+		// TODO: In some situations, retval is not being allocated to the store
 		Address address = this.trace.makeAddr(rs.getID(), "");
-		this.env.strongUpdateNoCopy(new Identifier("~retval~"), address);
+		this.env = this.env.strongUpdate(new Identifier("~retval~"), address);
 		this.store = this.store.alloc(address, retVal);
 
 		/* Update the return value on the scratchpad. */
