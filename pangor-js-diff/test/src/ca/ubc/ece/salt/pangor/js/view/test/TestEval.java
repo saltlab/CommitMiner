@@ -91,6 +91,61 @@ public class TestEval {
 
 	}
 
+	@Test
+	public void test_tagspaces() throws Exception {
+
+		String src = "./test/input/20/tagspaces-615f9bd55ca805eb5865e5a9ff0f82d75240e89b_old.js";
+		String dst = "./test/input/20/tagspaces-615f9bd55ca805eb5865e5a9ff0f82d75240e89b_new.js";
+		String out = "./output/20/tagspaces-615f9bd55ca805eb5865e5a9ff0f82d75240e89b.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
+	@Test
+	public void test_moment() throws Exception {
+
+		String src = "./test/input/20/moment-3866df1baec8600e0f861a24acf6bffd443cd75a_old.js";
+		String dst = "./test/input/20/moment-3866df1baec8600e0f861a24acf6bffd443cd75a_new.js";
+		String out = "./output/20/moment-3866df1baec8600e0f861a24acf6bffd443cd75a.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
+	@Test
+	public void test_generator() throws Exception {
+
+		String src = "./test/input/20/generator-f3a63f7a71cda9f977f66a11736858d43418b074_old.js";
+		String dst = "./test/input/20/generator-f3a63f7a71cda9f977f66a11736858d43418b074_new.js";
+		String out = "./output/20/generator-f3a63f7a71cda9f977f66a11736858d43418b074.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
+
+	@Test
+	public void test_cheerio() throws Exception {
+
+		String src = "./test/input/20/cheerio-e65ad72cad8fb696e0f3475b127c93492feca04d_old.js";
+		String dst = "./test/input/20/cheerio-e65ad72cad8fb696e0f3475b127c93492feca04d_new.js";
+		String out = "./output/20/cheerio-e65ad72cad8fb696e0f3475b127c93492feca04d.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
+	@Test
+	public void test_pm2() throws Exception {
+
+		String src = "./test/input/20/pm2-966fcc35a4925eb2d446a3dd12c84036d1615c8c_old.js";
+		String dst = "./test/input/20/pm2-966fcc35a4925eb2d446a3dd12c84036d1615c8c_new.js";
+		String out = "./output/20/pm2-966fcc35a4925eb2d446a3dd12c84036d1615c8c.html";
+
+		runTest(src, dst, out, false);
+
+	}
 	/**
 	 * @return A dummy commit for testing.
 	 */

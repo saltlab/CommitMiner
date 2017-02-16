@@ -72,8 +72,9 @@ public class DiffSearchMain {
 			destination.astChanges = sfp.destination.getFactSize(DiffType.AST);
 			destinationComparisons.add(destination);
 
-			Integer cnt = sem.get(destination.url);
+			Integer cnt = sem.get(destination);
 			if(cnt == null) cnt = 1;
+			else cnt = cnt + 1;
 			sem.put(destination, cnt);
 
 //			if(destination.project.equals("pm2")) {
@@ -81,6 +82,8 @@ public class DiffSearchMain {
 //			}
 
 		}
+
+		System.out.println("START");
 
 		for(Map.Entry<SourceFileDiffComparison, Integer> entry : sem.entrySet()) {
 			if(entry.getValue() == 1 && entry.getKey().lineChanges > 10 && entry.getKey().lineChanges < 30) {

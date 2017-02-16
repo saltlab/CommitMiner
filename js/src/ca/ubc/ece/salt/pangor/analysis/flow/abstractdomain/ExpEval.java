@@ -564,7 +564,7 @@ public class ExpEval {
 				}
 
 				/* Is this function being called recursively? If so abort. */
-				if(state.callStack.contains(addr)) return state;
+				if(state.callStack.contains(addr)) continue;
 
 				/* Push this function onto the call stack. */
 				state.callStack.push(addr);

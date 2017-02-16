@@ -1,3 +1,5 @@
+// Fixed #118 plus a bunch of jshint fixes
+// Restart fails when running coffee with the --debug option #118
 var path = require('path'),
     utils = require('../utils');
 
