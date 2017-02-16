@@ -146,6 +146,51 @@ public class TestEval {
 		runTest(src, dst, out, false);
 
 	}
+
+	@Test
+	public void test_popcorndesktop() throws Exception {
+
+		String src = "./test/input/20/popcorn-desktop-db90cb014dc349c5587422c288c471f6de88f9f9_old.js";
+		String dst = "./test/input/20/popcorn-desktop-db90cb014dc349c5587422c288c471f6de88f9f9_new.js";
+		String out = "./output/20/popcorn-desktop-db90cb014dc349c5587422c288c471f6de88f9f9.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
+	@Test
+	public void test_npm() throws Exception {
+
+		String src = "./test/input/20/npm-f35aa933e136228a89e3fcfdebe8c7cc4f1e7c00_old.js";
+		String dst = "./test/input/20/npm-f35aa933e136228a89e3fcfdebe8c7cc4f1e7c00_new.js";
+		String out = "./output/20/npm-f35aa933e136228a89e3fcfdebe8c7cc4f1e7c00.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
+	@Test
+	public void test_karma() throws Exception {
+
+		String src = "./test/input/20/karma-82f1c1207b34955602b7590a34f8bf50b1a5ba6a_old.js";
+		String dst = "./test/input/20/karma-82f1c1207b34955602b7590a34f8bf50b1a5ba6a_new.js";
+		String out = "./output/20/karma-82f1c1207b34955602b7590a34f8bf50b1a5ba6a.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
+	@Test
+	public void test_pawnee() throws Exception {
+
+		String src = "./test/input/20/pawnee-104bd8bfa9802ef68b418f000d0899f3c459c70f_old.js";
+		String dst = "./test/input/20/pawnee-104bd8bfa9802ef68b418f000d0899f3c459c70f_new.js";
+		String out = "./output/20/pawnee-104bd8bfa9802ef68b418f000d0899f3c459c70f.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */
