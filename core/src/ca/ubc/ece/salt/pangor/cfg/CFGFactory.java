@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import com.github.gumtreediff.gen.TreeGenerator;
+
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import fr.labri.gumtree.io.TreeGenerator;
 
 /**
  * Builds a CFG given some AST.

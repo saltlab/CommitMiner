@@ -3,12 +3,12 @@ package ca.ubc.ece.salt.pangor.analysis.simple;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.github.gumtreediff.gen.TreeGenerator;
+import com.github.gumtreediff.gen.js.RhinoTreeGenerator;
+
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
-import fr.labri.gumtree.gen.jdt.JdtTreeGenerator;
-import fr.labri.gumtree.gen.js.RhinoTreeGenerator;
-import fr.labri.gumtree.io.TreeGenerator;
 
 /**
  * A CFG factory for Java.
@@ -32,8 +32,8 @@ public class SimpleCFGFactory implements CFGFactory {
 	public TreeGenerator getTreeGenerator(String extension) {
 
 		switch(extension) {
-		case "java":
-			return new JdtTreeGenerator();
+//		case "java":
+//			return new JdtTreeGenerator();
 		case "js":
 			return new RhinoTreeGenerator();
 		default:

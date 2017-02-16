@@ -7,9 +7,9 @@ import org.junit.Test;
 import org.mozilla.javascript.Parser;
 import org.mozilla.javascript.ast.AstRoot;
 
-import ca.ubc.ece.salt.sdjsb.ast.ConditionalPreProcessor;
-import ca.ubc.ece.salt.sdjsb.ast.ShortCircuitPreProcessor;
-import ca.ubc.ece.salt.sdjsb.ast.VarPreProcessor;
+import ca.ubc.ece.salt.gumtree.gen.js.ConditionalPreProcessor;
+import ca.ubc.ece.salt.gumtree.gen.js.ShortCircuitPreProcessor;
+import ca.ubc.ece.salt.gumtree.gen.js.VarPreProcessor;
 import junit.framework.TestCase;
 
 public class TestASTPreProcessing extends TestCase {

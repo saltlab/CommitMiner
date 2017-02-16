@@ -9,19 +9,20 @@ import java.util.Map;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import com.github.gumtreediff.actions.RootAndLeavesClassifier;
+import com.github.gumtreediff.actions.TreeClassifier;
+import com.github.gumtreediff.gen.TreeGenerator;
+import com.github.gumtreediff.matchers.MappingStore;
+import com.github.gumtreediff.matchers.Matcher;
+import com.github.gumtreediff.matchers.Matchers;
+import com.github.gumtreediff.tree.ITree;
+import com.github.gumtreediff.tree.TreeContext;
+
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.cfg.diff.CFGDifferencing;
-import fr.labri.gumtree.actions.RootAndLeavesClassifier;
-import fr.labri.gumtree.actions.TreeClassifier;
-import fr.labri.gumtree.client.DiffOptions;
-import fr.labri.gumtree.io.TreeGenerator;
-import fr.labri.gumtree.matchers.MappingStore;
-import fr.labri.gumtree.matchers.Matcher;
-import fr.labri.gumtree.matchers.MatcherFactories;
-import fr.labri.gumtree.tree.Tree;
 
 /**
  * A control class for performing control flow differencing and running a flow
@@ -106,29 +107,29 @@ public class ControlFlowDifferencing {
 	public static CFDContext setup(CFGFactory cfgFactory, DiffOptions options, String srcSourceCode, String dstSourceCode) throws Exception {
 
         /* Create the abstract GumTree representations of the ASTs. */
-        Tree src = null;
-        Tree dst = null;
+        TreeContext src = null;
+        TreeContext dst = null;
         if(srcSourceCode == null) src = ControlFlowDifferencing.createGumTree(cfgFactory, options.getSrc(), options.getPreProcess());
         else src = ControlFlowDifferencing.createGumTree(cfgFactory, srcSourceCode, options.getSrc(), options.getPreProcess());
         if(dstSourceCode == null) dst = ControlFlowDifferencing.createGumTree(cfgFactory, options.getDst(), options.getPreProcess());
         else dst = ControlFlowDifferencing.createGumTree(cfgFactory, dstSourceCode, options.getDst(), options.getPreProcess());
 
 		/* Match the source tree nodes to the destination tree nodes. */
-        Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src, dst);
+        Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src.getRoot(), dst.getRoot());
 
         /* Apply change classifications to nodes in the GumTrees. */
         ControlFlowDifferencing.classifyTreeNodes(src, dst, matcher);
 
 		/* Create the CFGs. */
-		List<CFG> srcCFGs = cfgFactory.createCFGs(src.getClassifiedASTNode());
-		List<CFG> dstCFGs = cfgFactory.createCFGs(dst.getClassifiedASTNode());
+		List<CFG> srcCFGs = cfgFactory.createCFGs(src.getRoot().getClassifiedASTNode());
+		List<CFG> dstCFGs = cfgFactory.createCFGs(dst.getRoot().getClassifiedASTNode());
 
 		/* Compute changes to CFG elements (nodes, edges and edge labels). */
 		ControlFlowDifferencing.computeCFGChanges(srcCFGs, dstCFGs);
 
 		/* Return the set up results (the context for a CFD analysis) */
-		ClassifiedASTNode srcRoot = src.getClassifiedASTNode();
-		ClassifiedASTNode dstRoot = dst.getClassifiedASTNode();
+		ClassifiedASTNode srcRoot = src.getRoot().getClassifiedASTNode();
+		ClassifiedASTNode dstRoot = dst.getRoot().getClassifiedASTNode();
 		return new CFDContext(srcRoot, dstRoot, srcCFGs, dstCFGs);
 
 	}
@@ -170,9 +171,9 @@ public class ControlFlowDifferencing {
 	 * @return The GumTree (AST) representation of the source file.
 	 * @throws IOException When something goes wrong reading the source file.
 	 */
-	public static Tree createGumTree(CFGFactory cfgFactory, String path, boolean preProcess) throws IOException {
+	public static TreeContext createGumTree(CFGFactory cfgFactory, String path, boolean preProcess) throws IOException {
 
-		Tree tree = null;
+		TreeContext tree = null;
 
 		/* Guess the language from the file extension. */
 		String extension = getSourceCodeFileExtension(path);
@@ -180,7 +181,7 @@ public class ControlFlowDifferencing {
 		/* Use the TreeGenerator from the CFGFactory. */
 		if(extension != null) {
 			TreeGenerator treeGenerator = cfgFactory.getTreeGenerator(extension);
-			tree = treeGenerator.fromFile(path, preProcess);
+			tree = treeGenerator.generateFromFile(path, preProcess);
 		}
 
         return tree;
@@ -201,9 +202,9 @@ public class ControlFlowDifferencing {
 	 * @return The GumTree (AST) representation of the source file.
 	 * @throws IOException When something goes wrong reading the source file.
 	 */
-	public static Tree createGumTree(CFGFactory cfgFactory, String source, String path, boolean preProcess) throws IOException {
+	public static TreeContext createGumTree(CFGFactory cfgFactory, String source, String path, boolean preProcess) throws IOException {
 
-		Tree tree = null;
+		TreeContext tree = null;
 
 		/* Guess the language from the file extension. */
 		String extension = getSourceCodeFileExtension(path);
@@ -211,7 +212,7 @@ public class ControlFlowDifferencing {
 		/* Use the TreeGenerator from the CFGFactory. */
 		if(extension != null) {
 			TreeGenerator treeGenerator = cfgFactory.getTreeGenerator(extension);
-			tree = treeGenerator.fromSource(source, path, preProcess);
+			tree = treeGenerator.generateFromString(source, preProcess);
 		}
 
         return tree;
@@ -228,8 +229,8 @@ public class ControlFlowDifferencing {
 	 * @param dst The destination GumTree (AST).
 	 * @return The data structure containing GumTree node mappings.
 	 */
-	public static Matcher matchTreeNodes(Tree src, Tree dst) {
-		Matcher matcher = MatcherFactories.newMatcher(src, dst);
+	public static Matcher matchTreeNodes(ITree src, ITree dst) {
+		Matcher matcher = Matchers.getInstance().getMatcher(src, dst);
 		matcher.match();
 		return matcher;
 	}
@@ -246,7 +247,7 @@ public class ControlFlowDifferencing {
 	 * @return The ASTClassifier so the CFGFactory can assign IDs to any new nodes it creates.
 	 * @throws InvalidClassException If GumTree Tree nodes are generated from a parser other than Mozilla Rhino.
 	 */
-	public static void classifyTreeNodes(Tree src, Tree dst, Matcher matcher) throws InvalidClassException {
+	public static void classifyTreeNodes(TreeContext src, TreeContext dst, Matcher matcher) throws InvalidClassException {
 
 		/* Classify the GumTree (Tree) nodes. */
 		TreeClassifier classifier = new RootAndLeavesClassifier(src, dst, matcher);

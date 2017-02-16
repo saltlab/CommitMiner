@@ -35,14 +35,15 @@ import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
+import com.github.gumtreediff.gen.TreeGenerator;
+import com.github.gumtreediff.gen.js.RhinoTreeGenerator;
+
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
-import fr.labri.gumtree.gen.js.RhinoTreeGenerator;
-import fr.labri.gumtree.io.TreeGenerator;
 
 /**
  * A CFG factory for JavaScript

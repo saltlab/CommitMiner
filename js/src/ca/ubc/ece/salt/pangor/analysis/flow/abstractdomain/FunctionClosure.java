@@ -93,7 +93,6 @@ public class FunctionClosure extends Closure {
 			Stack<Address> callStack) {
 
 		/* If this has already been analyzed, we can short-circuit. */
-		System.out.println(((AstNode)this.cfg.getEntryNode().getStatement()).toSource());
 		boolean runAnalysis = this.runAnalysis(control, argArrayAddr, store);
 		if(!runAnalysis) {
 
