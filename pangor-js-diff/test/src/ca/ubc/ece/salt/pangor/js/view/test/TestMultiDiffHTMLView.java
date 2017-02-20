@@ -92,6 +92,17 @@ public class TestMultiDiffHTMLView {
 	}
 
 	@Test
+	public void testTutorial() throws Exception {
+
+		String src = "./test/input/diff/tutorial_old.js";
+		String dst = "./test/input/diff/tutorial_new.js";
+		String out = "./output/tutorial.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
+	@Test
 	public void testHelpSearch() throws Exception {
 
 		String src = "./test/input/diff/help-search_old.js";
