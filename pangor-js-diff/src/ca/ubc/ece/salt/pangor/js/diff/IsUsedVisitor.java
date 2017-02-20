@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.pangor.js.diff;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.DoLoop;
@@ -29,14 +30,17 @@ public class IsUsedVisitor implements NodeVisitor {
 
 	/** The identifier to look for. **/
 	private Identifier identity;
+	
+	/** Are we looking for variables? **/
+	private boolean variable;
 
 	/**
 	 * Detects uses of the identifier.
 	 * @return the set of nodes where the identifier is used.
 	 */
-	public static Set<Annotation> isUsed(AstNode statement, Identifier identity) {
-		IsUsedVisitor visitor = new IsUsedVisitor(statement, identity);
-
+	public static Set<Annotation> isUsed(AstNode statement, Identifier identity, boolean variable) {
+		IsUsedVisitor visitor = new IsUsedVisitor(statement, identity, variable);
+		
 		if(statement instanceof AstRoot) {
 			/* This is the root. Nothing should be flagged. */
 			return visitor.annotations;
@@ -61,9 +65,10 @@ public class IsUsedVisitor implements NodeVisitor {
 		return visitor.annotations;
 	}
 
-	public IsUsedVisitor(AstNode statement, Identifier identity) {
+	public IsUsedVisitor(AstNode statement, Identifier identity, boolean variable) {
 		this.annotations = new HashSet<Annotation>();
 		this.identity = identity;
+		this.variable = variable;
 	}
 
 	@Override
@@ -71,8 +76,15 @@ public class IsUsedVisitor implements NodeVisitor {
 
 		if(node instanceof InfixExpression || node instanceof Name) {
 			if(node.toSource().equals(identity.name)) {
-				/* This idenfier is being used. */
-				this.annotations.add(new Annotation(node.getLineno(), node.getAbsolutePosition(), node.toSource().length()));
+
+				if(!this.variable || node.getParent() != null
+					&& !(node.getParent().getType()== Token.GETPROP
+					|| node.getParent().getType()== Token.GETPROPNOWARN)) {
+
+					/* This idenfier is being used. */
+					this.annotations.add(new Annotation(node.getLineno(), node.getAbsolutePosition(), node.toSource().length()));
+
+				}
 			}
 		}
 		/* Ignore the body of loops, ifs and functions. */

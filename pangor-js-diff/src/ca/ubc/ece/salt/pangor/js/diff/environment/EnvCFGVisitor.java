@@ -9,7 +9,9 @@ import org.deri.iris.factory.Factory;
 import org.deri.iris.storage.IRelation;
 import org.deri.iris.storage.IRelationFactory;
 import org.deri.iris.storage.simple.SimpleRelationFactory;
+import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.InfixExpression;
 
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
@@ -67,6 +69,8 @@ public class EnvCFGVisitor implements ICFGVisitor {
 			if(node != null) {
 				Set<Annotation> annotations = isUsed(node, prop);
 				for(Annotation annotation : annotations) {
+					System.out.println(node.getType());
+					System.out.println(node.toSource());
 					registerFact(node, prop.name, "ENV", prop.change.toString(), annotation);
 				}
 			}
@@ -80,7 +84,7 @@ public class EnvCFGVisitor implements ICFGVisitor {
 	 * @return the serialized list of lines where the var/prop is used in the statement.
 	 */
 	private Set<Annotation> isUsed(AstNode statement, Identifier identity) {
-		return IsUsedVisitor.isUsed(statement, identity);
+		return IsUsedVisitor.isUsed(statement, identity, true);
 	}
 
 	/**

@@ -106,7 +106,7 @@ public class ValueCFGVisitor implements ICFGVisitor {
 	 * @return the serialized list of lines where the var/prop is used in the statement.
 	 */
 	private Set<Annotation> isUsed(AstNode statement, Identifier identity) {
-		return IsUsedVisitor.isUsed(statement, identity);
+		return IsUsedVisitor.isUsed(statement, identity, false);
 	}
 
 	/**
