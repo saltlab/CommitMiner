@@ -191,6 +191,17 @@ public class TestEval {
 
 	}
 
+	@Test
+	public void test_superagent() throws Exception {
+
+		String src = "./test/input/20/superagent-25bc045ea4ee298e550f617fef7b481919be6991_old.js";
+		String dst = "./test/input/20/superagent-25bc045ea4ee298e550f617fef7b481919be6991_new.js";
+		String out = "./output/20/superagent-25bc045ea4ee298e550f617fef7b481919be6991.html";
+
+		runTest(src, dst, out, false);
+
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */
@@ -334,7 +345,7 @@ public class TestEval {
 						tuple.get(3).toString().replace("\'", ""),			// Position
 						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
-						tuple.get(6).toString().replace("\'", ""),											// Subtype
+						tuple.get(6).toString().replace("\'", ""),			// Subtype
 						tuple.get(7).toString().replace("\'", ""));			// Description
 		};
 

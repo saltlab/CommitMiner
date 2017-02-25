@@ -195,8 +195,8 @@ public class DiffAnalysisMain {
 		Pair<IQuery, Transformer> controlQuery = getControlQuery();
 		queries.put(controlQuery.getLeft(), controlQuery.getRight());
 
-		Pair<IQuery, Transformer> typeErrorQuery = getTypeErrorQuery();
-		queries.put(typeErrorQuery.getLeft(), typeErrorQuery.getRight());
+//		Pair<IQuery, Transformer> typeErrorQuery = getTypeErrorQuery();
+//		queries.put(typeErrorQuery.getLeft(), typeErrorQuery.getRight());
 
 		Pair<IQuery, Transformer> astQuery = getAstQuery();
 		queries.put(astQuery.getLeft(), astQuery.getRight());
@@ -218,7 +218,7 @@ public class DiffAnalysisMain {
 	private static Pair<IQuery, Transformer> getValueQuery() throws ParserException {
 
 		String qs = "";
-		qs += "?- Value(?Version,?File,?Line,?StatementID,?Identifier,?ValChange)";
+		qs += "?- Value(?Version,?File,?Line,?Position,?Length,?StatementID,?Identifier,?ValChange)";
 		qs += ", NOT_EQUAL(?ValChange, 'Change:UNCHANGED')";
 		qs += ", NOT_EQUAL(?ValChange, 'Change:BOTTOM').";
 
@@ -232,12 +232,14 @@ public class DiffAnalysisMain {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
+						tuple.get(5).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						tuple.get(3).toString().replace("\'", ""),			// Position
+						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
-						"VAL",											// Subtype
-						tuple.get(4).toString().replace("\'", "")
-							+ "_" + tuple.get(5).toString().replace("\'", ""));	// Description
+						"VAL",												// Subtype
+						tuple.get(6).toString().replace("\'", "")
+							+ "_" + tuple.get(7).toString().replace("\'", ""));	// Description
 		};
 
 		return Pair.of(query, transformer);
@@ -251,7 +253,7 @@ public class DiffAnalysisMain {
 	private static Pair<IQuery, Transformer> getEnvironmentQuery() throws ParserException {
 
 		String qs = "";
-		qs += "?- Environment(?Version,?File,?Line,?StatementID,?Identifier,?Type,?EnvChange)";
+		qs += "?- Environment(?Version,?File,?Line,?Position,?Length,?StatementID,?Identifier,?Type,?EnvChange)";
 		qs += ", EQUAL(?EnvChange, 'Change:CHANGED').";
 
 		/* The query that produces the results. */
@@ -264,13 +266,15 @@ public class DiffAnalysisMain {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
+						tuple.get(5).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						tuple.get(3).toString().replace("\'", ""),			// Position
+						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
 						"ENV",												// Subtype
-						tuple.get(4).toString().replace("\'", "")
-							+ "_" + tuple.get(5).toString().replace("\'", "")
-							+ "_" + tuple.get(6).toString().replace("\'", ""));	// Description
+						tuple.get(6).toString().replace("\'", "")
+							+ "_" + tuple.get(7).toString().replace("\'", "")
+							+ "_" + tuple.get(8).toString().replace("\'", ""));	// Description
 		};
 
 		return Pair.of(query, transformer);
@@ -284,7 +288,7 @@ public class DiffAnalysisMain {
 	private static Pair<IQuery, Transformer> getControlQuery() throws ParserException {
 
 		String qs = "";
-		qs += "?- Control(?Version,?File,?Line,?StatementID,?Type,?Change)";
+		qs += "?- Control(?Version,?File,?Line,?Position,?Length,?StatementID,?Type,?Change)";
 		qs += ", EQUAL(?Change, 'Change:CHANGED').";
 
 		/* The query that produces the results. */
@@ -297,47 +301,49 @@ public class DiffAnalysisMain {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
 						tuple.get(1).toString().replace("\'", ""), 			// Class
-						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
+						tuple.get(5).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						tuple.get(3).toString().replace("\'", ""),			// Position
+						tuple.get(4).toString().replace("\'", ""),			// Length
 						"DIFF",												// Type
-						"CONTROL",											// Subtype
-						tuple.get(5).toString().replace("\'", ""));			// Description
+						tuple.get(6).toString().replace("\'", ""),			// Subtype
+						tuple.get(7).toString().replace("\'", ""));			// Description
 		};
 
 		return Pair.of(query, transformer);
 
 	}
 
-	/**
-	 * @return The query for extracting type-error-diff alerts.
-	 * @throws ParserException for incorrect query strings.
-	 */
-	private static Pair<IQuery, Transformer> getTypeErrorQuery() throws ParserException {
-
-		String qs = "";
-		qs += "?- Type('SOURCE',?File,?LineA,?StatementID,?Identifier,'undef','BOTTOM')";
-		qs += ", Type('DESTINATION',?File,?LineB,?StatementID,?Identifier,'undef','TOP').";
-
-		/* The query that produces the results. */
-		Parser parser = new Parser();
-		parser.parse(qs);
-		IQuery query = parser.getQueries().get(0);
-
-		/* Transforms the query results to a ClassifierFeatureVector. */
-		Transformer transformer = (commit, tuple) -> {
-				return new ClassifierFeatureVector(commit,
-						"DESTINATION",										// Version
-						tuple.get(0).toString().replace("\'", ""), 			// Class
-						tuple.get(1).toString().replace("\'",  ""),			// AST Node ID
-						tuple.get(4).toString().replace("\'", ""),			// Line
-						"DIFF",												// Type
-						"TypeError",										// Subtype
-						tuple.get(2).toString().replace("\'", ""));			// Description
-		};
-
-		return Pair.of(query, transformer);
-
-	}
+//	/**
+//	 * @return The query for extracting type-error-diff alerts.
+//	 * @throws ParserException for incorrect query strings.
+//	 */
+//	private static Pair<IQuery, Transformer> getTypeErrorQuery() throws ParserException {
+//
+//		String qs = "";
+//		qs += "?- Type('SOURCE',?File,?LineA,?StatementID,?Identifier,'undef','BOTTOM')";
+//		qs += ", Type('DESTINATION',?File,?LineB,?StatementID,?Identifier,'undef','TOP').";
+//
+//		/* The query that produces the results. */
+//		Parser parser = new Parser();
+//		parser.parse(qs);
+//		IQuery query = parser.getQueries().get(0);
+//
+//		/* Transforms the query results to a ClassifierFeatureVector. */
+//		Transformer transformer = (commit, tuple) -> {
+//				return new ClassifierFeatureVector(commit,
+//						"DESTINATION",										// Version
+//						tuple.get(0).toString().replace("\'", ""), 			// Class
+//						tuple.get(1).toString().replace("\'",  ""),			// AST Node ID
+//						tuple.get(4).toString().replace("\'", ""),			// Line
+//						"DIFF",												// Type
+//						"TypeError",										// Subtype
+//						tuple.get(2).toString().replace("\'", ""));			// Description
+//		};
+//
+//		return Pair.of(query, transformer);
+//
+//	}
 
 	/**
 	 * @return The query for extracting AST-diff alerts.
@@ -361,6 +367,8 @@ public class DiffAnalysisMain {
 						tuple.get(1).toString().replace("\'", ""), 			// Class
 						tuple.get(3).toString().replace("\'",  ""),			// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						"NA",
+						"NA",
 						"DIFF",												// Type
 						"AST",												// Subtype
 						tuple.get(4).toString().replace("\'", ""));			// Description
@@ -390,6 +398,8 @@ public class DiffAnalysisMain {
 						tuple.get(1).toString().replace("\'", ""), 			// Class
 						"NA",												// Method
 						"NA",												// Line
+						"NA",
+						"NA",
 						"DIFF",												// Type
 						"TOTAL_LINES",										// Subtype
 						tuple.get(2).toString().replace("\'", ""));			// Description
@@ -421,6 +431,8 @@ public class DiffAnalysisMain {
 						tuple.get(1).toString().replace("\'", ""), 			// Class
 						"NA",												// AST Node ID
 						tuple.get(2).toString().replace("\'", ""),			// Line
+						"NA",
+						"NA",
 						"DIFF",												// Type
 						"LINE",												// Subtype
 						tuple.get(3).toString().replace("\'", ""));			// Description

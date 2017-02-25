@@ -144,6 +144,17 @@ public class TestMultiDiffHTMLView {
 		runTest(src, dst, out, false);
 
 	}
+	
+	@Test
+	public void testPM2() throws Exception {
+	
+		String src = "./test/input/diff/pm2_cli_old.js";
+		String dst = "./test/input/diff/pm2_cli_new.js";
+		String out = "./output/pm2.html";
+
+		runTest(src, dst, out, false);
+		
+	}
 
 	/**
 	 * @return A dummy commit for testing.
