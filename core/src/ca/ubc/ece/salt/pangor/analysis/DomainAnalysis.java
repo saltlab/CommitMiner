@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.pangor.analysis;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.EvaluatorException;
@@ -55,6 +56,10 @@ public class DomainAnalysis {
 	 * @throws Exception when an error occurs during domain analysis.
 	 */
 	public void analyze(Commit commit, Map<IPredicate, IRelation> facts) throws Exception {
+		
+//		System.out.println("Starting analysis of commit" + commit.url);
+		StopWatch commitTimer = new StopWatch();
+		commitTimer.start();
 
 		/* Analyze the commit before the files are analyzed. */
 		if(!preAnalysis(commit, facts)) return;
@@ -62,11 +67,22 @@ public class DomainAnalysis {
 		/* Iterate through the files in the commit and run the
 		 * SourceCodeFileAnalysis on each of them. */
 		for(SourceCodeFileChange sourceCodeFileChange : commit.sourceCodeFileChanges) {
+//			System.out.println("Starting analysis of file " + commit.url + " " + sourceCodeFileChange.repairedFile);
+			StopWatch fileTimer = new StopWatch();
+			fileTimer.start();
+
 			this.analyzeFile(sourceCodeFileChange, facts);
+
+			fileTimer.stop();
+			System.out.println("File:" + fileTimer.getNanoTime());
 		}
 
 		/* Analyze the commit after the files are analyzed. */
 		postAnalysis(commit, facts);
+		
+		/* Stop the commit analysis timer. */
+		commitTimer.stop();
+		System.out.println("Commit:" + commitTimer.getNanoTime());
 
 	}
 

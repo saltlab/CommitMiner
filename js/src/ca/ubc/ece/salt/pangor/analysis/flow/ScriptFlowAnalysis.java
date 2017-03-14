@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
@@ -25,6 +26,9 @@ import ca.ubc.ece.salt.pangor.cfg.ICFGVisitorFactory;
  * source code file.
  */
 public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
+	
+	/** Not thread safe. Use only for runtime experiments right now. */
+	public static StopWatch stopWatch = new StopWatch();
 
 	private List<ICFGVisitorFactory> cfgVisitorFactories;
 
@@ -39,6 +43,9 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 	public void analyze(SourceCodeFileChange sourceCodeFileChange,
 			Map<IPredicate, IRelation> facts, ClassifiedASTNode root,
 			List<CFG> cfgs) throws Exception {
+		
+		/* Start the stopwatch. We don't want to run forever. */
+		ScriptFlowAnalysis.stopWatch.start();
 
 		/* Build a map of AstNodes to CFGs. Used for inter-proc CFA. */
 		Map<AstNode, CFG> cfgMap = new HashMap<AstNode, CFG>();
@@ -56,6 +63,10 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		 * the main analysis.
 		 * NOTE: Only one level deep. Does not recursively check constructors. */
 		Helpers.analyzePublic(state, state.env.environment, state.selfAddr, cfgMap, new HashSet<Address>(), null);
+		
+		/* Reset the stopwatch for the next run. */
+		ScriptFlowAnalysis.stopWatch.stop();
+		ScriptFlowAnalysis.stopWatch.reset();
 
 		/* Generate facts from the results of the analysis. */
 		for(CFG cfg : cfgs) {

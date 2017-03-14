@@ -92,10 +92,10 @@ public class Environment {
 			 * keep left and emit a warning. */
 			if(joined.environment.get(entry.getKey()) != entry.getValue()) {
 
-				System.out.println("Warning: Merging unequal environments.");
-				System.out.println("\tVariable name = " + entry.getKey().name);
-				System.out.println("\tChange type = " + entry.getKey().change);
-				System.out.println("\tAddress = " + entry.getValue());
+//				System.out.println("Warning: Merging unequal environments.");
+//				System.out.println("\tVariable name = " + entry.getKey().name);
+//				System.out.println("\tChange type = " + entry.getKey().change);
+//				System.out.println("\tAddress = " + entry.getValue());
 
 			}
 

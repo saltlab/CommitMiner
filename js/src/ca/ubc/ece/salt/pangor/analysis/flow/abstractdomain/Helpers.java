@@ -103,7 +103,7 @@ public class Helpers {
 			PathState pathState = stack.pop();
 			edgesVisited++;
 
-			System.out.println(pathState.edge.toString());
+//			System.out.println(pathState.edge.toString());
 
 			/* Join the lattice elements from the current edge and 'from'
 			 * node. */

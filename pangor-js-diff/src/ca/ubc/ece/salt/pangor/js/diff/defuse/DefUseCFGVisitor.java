@@ -1,5 +1,6 @@
-package ca.ubc.ece.salt.pangor.js.diff.environment;
+package ca.ubc.ece.salt.pangor.js.diff.defuse;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,13 +10,14 @@ import org.deri.iris.factory.Factory;
 import org.deri.iris.storage.IRelation;
 import org.deri.iris.storage.IRelationFactory;
 import org.deri.iris.storage.simple.SimpleRelationFactory;
-import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.InfixExpression;
 
 import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Addresses.LatticeElement;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.BValue;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Identifier;
+import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Obj;
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.State;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -26,14 +28,14 @@ import ca.ubc.ece.salt.pangor.js.diff.IsUsedVisitor;
 /**
  * Extracts facts from a flow analysis.
  */
-public class EnvCFGVisitor implements ICFGVisitor {
+public class DefUseCFGVisitor implements ICFGVisitor {
 
 	private SourceCodeFileChange sourceCodeFileChange;
 
 	/* The fact database we will populate. */
 	private Map<IPredicate, IRelation> facts;
 
-	public EnvCFGVisitor(SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts) {
+	public DefUseCFGVisitor(SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts) {
 		this.sourceCodeFileChange = sourceCodeFileChange;
 		this.facts = facts;
 	}
@@ -53,7 +55,7 @@ public class EnvCFGVisitor implements ICFGVisitor {
 	 * identifier protection.
 	 */
 	private void visit(AstNode node, State state) {
-		if(state != null) getObjectFacts(node, state.env.environment, state, null);
+		if(state != null) getObjectFacts(node, state.env.environment, state, null, new HashSet<Address>());
 	}
 
 	/**
@@ -61,16 +63,40 @@ public class EnvCFGVisitor implements ICFGVisitor {
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
-	private void getObjectFacts(AstNode node, Map<Identifier, Address> props, State state, String prefix) {
+	private void getObjectFacts(AstNode node, Map<Identifier, Address> props, State state, String prefix, Set<Address> visited) {
 		for(Identifier prop : props.keySet()) {
+
+			Address addr = props.get(prop);
+
+			/* Avoid circular references. */
+			if(visited.contains(addr)) continue;
+			visited.add(addr);
+
+			String identifier;
+			if(prefix == null) identifier = prop.name;
+			else identifier = prefix + "." + prop.name;
+
+			if(identifier.equals("this")) continue;
+			if(addr == null) continue;
+
+			BValue val = state.store.apply(addr);
 
 			/* Get the environment changes. No need to recurse since
 			 * properties (currently) do not change. */
 			if(node != null) {
 				Set<Annotation> annotations = isUsed(node, prop);
 				for(Annotation annotation : annotations) {
-					registerFact(node, prop.name, "ENV", prop.change.toString(), annotation);
+					for(Address address : val.addressAD.addresses) {
+						registerFact(node, prop.name, val.change.toString(), annotation);
+					}
 				}
+			}
+
+			/* Recursively check property values. */
+			if(val.addressAD.le == LatticeElement.TOP) continue;
+			for(Address propAddr : val.addressAD.addresses) {
+				Obj propObj = state.store.getObj(propAddr);
+				getObjectFacts(node, propObj.externalProperties, state, identifier, visited);
 			}
 
 		}
@@ -82,20 +108,21 @@ public class EnvCFGVisitor implements ICFGVisitor {
 	 * @return the serialized list of lines where the var/prop is used in the statement.
 	 */
 	private Set<Annotation> isUsed(AstNode statement, Identifier identity) {
-		return IsUsedVisitor.isUsed(statement, identity, true);
+		return IsUsedVisitor.isUsed(statement, identity, false);
 	}
 
 	/**
 	 * @param statement The statement for which we are registering a fact.
 	 * @param identifier The identifier for which we are registering a fact.
-	 * @param ad The abstract domain of the fact.
-	 * @param cle The change lattice element.
+	 * @param annotation details about the 
 	 */
-	private void registerFact(AstNode statement, String identifier, String ad, String cle, Annotation annotation) {
+	private void registerFact(AstNode statement,
+							  Address address,
+							  Annotation annotation) {
 
 		if(statement == null || statement.getID() == null) return;
 
-		IPredicate predicate = Factory.BASIC.createPredicate("Environment", 9);
+		IPredicate predicate = Factory.BASIC.createPredicate("Value", 8);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 			IRelationFactory relationFactory = new SimpleRelationFactory();
@@ -112,11 +139,8 @@ public class EnvCFGVisitor implements ICFGVisitor {
 				Factory.TERM.createString(annotation.length.toString()),
 				Factory.TERM.createString(String.valueOf(statement.getID())),
 				Factory.TERM.createString(identifier),
-				Factory.TERM.createString(ad),
 				Factory.TERM.createString(cle));
 		relation.add(tuple);
-
-//		facts.put(predicate,  relation);
 
 	}
 

@@ -12,6 +12,7 @@ import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.pangor.analysis.flow.ScriptFlowAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
@@ -77,6 +78,11 @@ public class FunctionClosure extends Closure {
 		/* Run the analysis on the function if it has not yet run. */
 		if(initState == null) return true;
 
+		// Don't do any new analysis if the runtime has exceeded 30 seconds
+//		if(ScriptFlowAnalysis.stopWatch.getTime() > 30000) {
+//			return false;
+//		}
+		
 		/* Re-run the analysis if there are control changes from the caller
 		 * state, but not in the initial state. */
 		if(!control.conditions.isEmpty() && initState.control.conditions.isEmpty()) return true;
@@ -84,7 +90,7 @@ public class FunctionClosure extends Closure {
 		/* Re-run the analysis if there are value changes in the arg list. */
 		Obj argObj = store.getObj(argArrayAddr);
 		return hasValueChanges(argObj.externalProperties.values(), store);
-
+		
 	}
 
 	@Override
