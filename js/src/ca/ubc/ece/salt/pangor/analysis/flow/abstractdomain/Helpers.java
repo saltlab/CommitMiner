@@ -68,7 +68,6 @@ public class Helpers {
 				closure,
 				JSClass.CFunction);
 		
-		System.out.println("Allocating function " + function.getName() + " at " + address);
 		registerDefFact(facts, function.getVersion(), address, function.getAbsolutePosition(), "function".length());
 
 		store = store.alloc(address, new Obj(external, internal));

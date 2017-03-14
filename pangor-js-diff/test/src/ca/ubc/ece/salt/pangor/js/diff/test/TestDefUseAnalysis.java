@@ -137,6 +137,9 @@ public class TestDefUseAnalysis {
 		Pair<IQuery, Transformer> defQuery = getDefQuery();
 		queries.put(defQuery.getLeft(), defQuery.getRight());
 
+		Pair<IQuery, Transformer> useQuery = getUseQuery();
+		queries.put(useQuery.getLeft(), useQuery.getRight());
+
 		return queries;
 
 	}
@@ -166,6 +169,38 @@ public class TestDefUseAnalysis {
 						tuple.get(3).toString().replace("\'", ""),			// Length
 						"POINTS-TO",										// Type
 						"DEF",												// Subtype
+						"NA");												// Description
+		};
+
+		return Pair.of(query, transformer);
+
+	}
+
+	/**
+	 * @return The query for extracting USE alerts.
+	 * @throws ParserException for incorrect query strings.
+	 */
+	private static Pair<IQuery, Transformer> getUseQuery() throws ParserException {
+
+		String qs = "";
+		qs += "?- Use(?Version,?File,?Address,?Position,?Length).";
+
+		/* The query that produces the results. */
+		Parser parser = new Parser();
+		parser.parse(qs);
+		IQuery query = parser.getQueries().get(0);
+
+		/* Transforms the query results to a ClassifierFeatureVector. */
+		Transformer transformer = (commit, tuple) -> {
+				return new ClassifierFeatureVector(commit,
+						tuple.get(0).toString().replace("\'", ""),			// Version
+						tuple.get(1).toString().replace("\'", ""), 												// Class
+						"NA",												// AST Node ID
+						tuple.get(2).toString().replace("\'", ""),			// Address
+						tuple.get(3).toString().replace("\'", ""),			// Position
+						tuple.get(4).toString().replace("\'", ""),			// Length
+						"POINTS-TO",										// Type
+						"USE",												// Subtype
 						"NA");												// Description
 		};
 

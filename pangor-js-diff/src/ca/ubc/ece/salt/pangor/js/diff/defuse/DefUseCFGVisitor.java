@@ -57,11 +57,10 @@ public class DefUseCFGVisitor implements ICFGVisitor {
 	 */
 	private void visit(AstNode node, State state) {
 		if(node != null && state != null) {
-			Set<DefUseAnnotation> defAnnotations = DefASTVisitor.getDefAnnotations(state, node);
-			for(DefUseAnnotation defAnnotation : defAnnotations) {
-				/* Register each definition as a fact. */
-				registerFact(node.getVersion(), defAnnotation);
-				System.out.println(defAnnotation);
+			Set<DefUseAnnotation> useAnnotations = UseASTVisitor.getUseAnnotations(state, node);
+			for (DefUseAnnotation useAnnotation : useAnnotations) {
+				/* Register each use as a fact. */
+				registerFact(node.getVersion(), useAnnotation);
 			}
 		}
 	}
@@ -73,7 +72,7 @@ public class DefUseCFGVisitor implements ICFGVisitor {
 	 */
 	private void registerFact(Version version, DefUseAnnotation defAnnotation) {
 
-		IPredicate predicate = Factory.BASIC.createPredicate("Def", 5);
+		IPredicate predicate = Factory.BASIC.createPredicate("Use", 5);
 		IRelation relation = facts.get(predicate);
 		if(relation == null) {
 			IRelationFactory relationFactory = new SimpleRelationFactory();
