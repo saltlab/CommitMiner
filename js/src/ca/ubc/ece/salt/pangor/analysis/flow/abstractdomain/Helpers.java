@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
@@ -51,15 +53,17 @@ public class Helpers {
 	 * @param closures The closure for the function.
 	 * @return The function object.
 	 */
-	public static Store createFunctionObj(Closure closure, Store store, Trace trace, Address address, int id) {
+	public static Store createFunctionObj(Closure closure, Store store, Trace trace, Address address, FunctionNode function) {
 
 		Map<Identifier, Address> external = new HashMap<Identifier, Address>();
-		store = addProp(id, "length", Num.inject(Num.top(Change.u()), Change.u()), external, store, trace);
+		store = addProp(function.getID(), "length", Num.inject(Num.top(Change.u()), Change.u()), external, store, trace);
 
 		InternalFunctionProperties internal = new InternalFunctionProperties(
 				Address.inject(StoreFactory.Function_proto_Addr, Change.u(), Change.u()),
 				closure,
 				JSClass.CFunction);
+		
+		System.out.println("Allocating function " + function.getName() + " at " + address);
 
 		store = store.alloc(address, new Obj(external, internal));
 
@@ -171,7 +175,8 @@ public class Helpers {
 	 * @param trace The trace at the caller.
 	 * @return The final state of the closure.
 	 */
-	public static State applyClosure(BValue funVal, Address selfAddr, Address args,
+	public static State applyClosure(Map<IPredicate, IRelation> facts, 
+							  BValue funVal, Address selfAddr, Address args,
 							  Store store, Scratchpad sp, Trace trace, Control control,
 							  Stack<Address> callStack) {
 
@@ -198,7 +203,7 @@ public class Helpers {
 			callStack.push(address);
 
 			/* Run the function. */
-			State endState = ifp.closure.run(selfAddr, args, store, sp, trace, control, callStack);
+			State endState = ifp.closure.run(facts, selfAddr, args, store, sp, trace, control, callStack);
 
 			/* Pop this function off the call stack. */
 			callStack.pop();
@@ -251,7 +256,7 @@ public class Helpers {
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
-			store = createFunctionObj(closure, store, trace, address, child.getID());
+			store = createFunctionObj(closure, store, trace, address, child);
 
 		}
 
@@ -266,7 +271,9 @@ public class Helpers {
 	 * @param state The end state of the parent function.
 	 * @param visited Prevent circular lookups.
 	 */
-	public static void analyzePublic(State state,
+	public static void analyzePublic(
+			Map<IPredicate, IRelation> facts,
+			State state,
 			Map<Identifier, Address> props,
 			Address selfAddr,
 			Map<AstNode, CFG> cfgMap,
@@ -313,7 +320,7 @@ public class Helpers {
 						}
 
 						/* Analyze the function. Use a fresh call stack because we don't have any knowledge of it. */
-						ifp.closure.run(selfAddr, argAddr, state.store,
+						ifp.closure.run(facts, selfAddr, argAddr, state.store,
 										state.scratch, state.trace, control,
 										new Stack<Address>());
 
@@ -324,7 +331,7 @@ public class Helpers {
 				}
 
 				/* Recursively look for object properties that are functions. */
-				analyzePublic(state, obj.externalProperties, props.get(var), cfgMap, visited, null);
+				analyzePublic(facts, state, obj.externalProperties, props.get(var), cfgMap, visited, null);
 
 			}
 		}

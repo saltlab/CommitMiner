@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
@@ -41,11 +43,12 @@ public class ArgumentsFactory {
 
 		NativeClosure closure = new NativeClosure() {
 				@Override
-				public State run(Address selfAddr, Address argArrayAddr,
+				public State run(Map<IPredicate, IRelation> facts, 
+								 Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace, Control control,
 								 Stack<Address> callStack) {
-					return new State(store, null, scratchpad, trace, control,
+					return new State(facts, store, null, scratchpad, trace, control,
 									 selfAddr, cfgs, callStack);
 				}
 			};

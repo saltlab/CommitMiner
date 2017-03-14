@@ -85,7 +85,7 @@ public class ExpEval {
 		Closure closure = new FunctionClosure(state.cfgs.get(f), state.env, state.cfgs);
 		Address addr = state.trace.makeAddr(f.getID(), "");
 		addr = state.trace.modAddr(addr, JSClass.CFunction);
-		state.store = Helpers.createFunctionObj(closure, state.store, state.trace, addr, f.getID());
+		state.store = Helpers.createFunctionObj(closure, state.store, state.trace, addr, f);
 		String a = f.toSource();
 		return Address.inject(addr, Change.convU(f), Change.convU(f));
 	}
@@ -496,7 +496,7 @@ public class ExpEval {
 			}
 
 			/* Call the function and get a join of the new states. */
-			newState = Helpers.applyClosure(funVal, objAddr, argAddr, state.store,
+			newState = Helpers.applyClosure(state.facts, funVal, objAddr, argAddr, state.store,
 												  new Scratchpad(), state.trace, control,
 												  state.callStack);
 		}
@@ -515,7 +515,8 @@ public class ExpEval {
 					? BValue.top(Change.top(), Change.u())
 					: BValue.top(Change.u(), Change.u());
 			state.scratch = state.scratch.strongUpdate(Scratch.RETVAL, value);
-			newState = new State(state.store, state.env, state.scratch,
+			newState = new State(state.facts,
+								 state.store, state.env, state.scratch,
 								 state.trace, state.control, state.selfAddr,
 								 state.cfgs, state.callStack);
 
@@ -571,7 +572,7 @@ public class ExpEval {
 				state.callStack.push(addr);
 
 				/* Analyze the function. */
-				ifp.closure.run(state.selfAddr, argAddr, state.store,
+				ifp.closure.run(state.facts, state.selfAddr, argAddr, state.store,
 								state.scratch, state.trace, control,
 								state.callStack);
 

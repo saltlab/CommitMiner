@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain.Address;
@@ -69,12 +71,13 @@ public class FunctionFactory {
 
 		Closure closure = new NativeClosure() {
 				@Override
-				public State run(Address selfAddr, Address argArrayAddr,
+				public State run(Map<IPredicate, IRelation> facts,
+								 Address selfAddr, Address argArrayAddr,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace, Control control,
 								 Stack<Address> callStack) {
 					scratchpad.strongUpdate(Scratch.RETVAL, retVal);
-					return new State(store, new Environment(), scratchpad,
+					return new State(facts, store, new Environment(), scratchpad,
 									 trace, control, selfAddr, cfgs, callStack);
 				}
 			};

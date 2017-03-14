@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
@@ -94,7 +96,8 @@ public class FunctionClosure extends Closure {
 	}
 
 	@Override
-	public State run(Address selfAddr, Address argArrayAddr, Store store,
+	public State run(Map<IPredicate, IRelation> facts, 
+			Address selfAddr, Address argArrayAddr, Store store,
 			Scratchpad scratchpad, Trace trace, Control control,
 			Stack<Address> callStack) {
 
@@ -170,14 +173,14 @@ public class FunctionClosure extends Closure {
 		env = env.strongUpdate(new Identifier("this", Change.u()), selfAddr);
 
 		/* Create the initial state for the function call. */
-		State state = new State(store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
+		State state = new State(facts, store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
 
 		/* Perform the initial analysis and get the publicly accessible methods. */
 		state = Helpers.run(cfg, state);
 
 		/* Analyze the publicly accessible methods that weren't analyzed in
 		 * the main analysis. */
-		Helpers.analyzePublic(state, state.env.environment, state.selfAddr, cfgs, new HashSet<Address>(), localVars);
+		Helpers.analyzePublic(facts, state, state.env.environment, state.selfAddr, cfgs, new HashSet<Address>(), localVars);
 
 		return state;
 

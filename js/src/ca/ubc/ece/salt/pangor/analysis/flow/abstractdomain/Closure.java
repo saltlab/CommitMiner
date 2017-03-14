@@ -1,6 +1,10 @@
 package ca.ubc.ece.salt.pangor.analysis.flow.abstractdomain;
 
+import java.util.Map;
 import java.util.Stack;
+
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.storage.IRelation;
 
 import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 
@@ -11,6 +15,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.trace.Trace;
 public abstract class Closure {
 
 	/**
+	 * @param facts The fact database for facts generated during analysis.
 	 * @param selfAddr The value of the 'this' variable (a set of objects).
 	 * @param argArrayAddr The address of the argument array object.
 	 * @param store Main memory.
@@ -20,7 +25,8 @@ public abstract class Closure {
 	 * @param callStack Tracks the current call stack.
 	 * @return The new state after executing the function.
 	 */
-	public abstract State run(Address selfAddr, Address argArrayAddr,
+	public abstract State run(Map<IPredicate, IRelation> facts,
+							  Address selfAddr, Address argArrayAddr,
 							  Store store, Scratchpad scratchpad,
 							  Trace trace, Control control,
 							  Stack<Address> callStack);
