@@ -85,7 +85,7 @@ public class ExpEval {
 		Closure closure = new FunctionClosure(state.cfgs.get(f), state.env, state.cfgs);
 		Address addr = state.trace.makeAddr(f.getID(), "");
 		addr = state.trace.modAddr(addr, JSClass.CFunction);
-		state.store = Helpers.createFunctionObj(closure, state.store, state.trace, addr, f);
+		state.store = Helpers.createFunctionObj(state.facts, closure, state.store, state.trace, addr, f);
 		String a = f.toSource();
 		return Address.inject(addr, Change.convU(f), Change.convU(f));
 	}

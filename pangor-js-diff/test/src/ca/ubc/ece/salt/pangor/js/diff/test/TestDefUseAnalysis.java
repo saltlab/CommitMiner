@@ -148,7 +148,7 @@ public class TestDefUseAnalysis {
 	private static Pair<IQuery, Transformer> getDefQuery() throws ParserException {
 
 		String qs = "";
-		qs += "?- Def(?Version,?File,?Address,?Position,?Length).";
+		qs += "?- Def(?Version,?Address,?Position,?Length).";
 
 		/* The query that produces the results. */
 		Parser parser = new Parser();
@@ -159,11 +159,11 @@ public class TestDefUseAnalysis {
 		Transformer transformer = (commit, tuple) -> {
 				return new ClassifierFeatureVector(commit,
 						tuple.get(0).toString().replace("\'", ""),			// Version
-						tuple.get(1).toString().replace("\'", ""), 			// Class
+						"NA", 												// Class
 						"NA",												// AST Node ID
-						tuple.get(2).toString().replace("\'", ""),			// Address
-						tuple.get(3).toString().replace("\'", ""),			// Position
-						tuple.get(4).toString().replace("\'", ""),			// Length
+						tuple.get(1).toString().replace("\'", ""),			// Address
+						tuple.get(2).toString().replace("\'", ""),			// Position
+						tuple.get(3).toString().replace("\'", ""),			// Length
 						"POINTS-TO",										// Type
 						"DEF",												// Subtype
 						"NA");												// Description

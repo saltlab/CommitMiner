@@ -3,6 +3,8 @@ package ca.ubc.ece.salt.pangor.analysis.flow.factories;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
@@ -33,9 +35,9 @@ public class EnvironmentFactory {
 	 * @param trace The trace, which should be empty initially.
 	 * @return The initial ρ ∈ Environment
 	 */
-	public static Pair<Environment, Store> createInitialEnvironment(ScriptNode script, Store store, Map<AstNode, CFG> cfgs, Trace trace) {
+	public static Pair<Environment, Store> createInitialEnvironment(Map<IPredicate, IRelation> facts, ScriptNode script, Store store, Map<AstNode, CFG> cfgs, Trace trace) {
 		Environment env = createBaseEnvironment();
-		store = Helpers.lift(env, store, script, cfgs, trace);
+		store = Helpers.lift(facts, env, store, script, cfgs, trace);
 		return Pair.of(env,  store);
 	}
 

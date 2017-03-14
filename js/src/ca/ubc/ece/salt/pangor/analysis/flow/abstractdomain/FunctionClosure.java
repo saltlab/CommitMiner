@@ -134,7 +134,7 @@ public class FunctionClosure extends Closure {
 
 		/* Lift local variables and function declarations into the environment. */
 		Environment env = this.environment.clone();
-		store = Helpers.lift(env, store,
+		store = Helpers.lift(facts, env, store,
 							 (ScriptNode)cfg.getEntryNode().getStatement(),
 							 cfgs, trace);
 
