@@ -89,6 +89,7 @@ public class UseASTVisitor implements NodeVisitor {
 			
 			for(Address address : addresses) {
 				BValue val = store.apply(address);
+				if(val == null) continue;
 				for(Address objAddr : val.addressAD.addresses) {
 					Obj obj = store.getObj(objAddr);
 					

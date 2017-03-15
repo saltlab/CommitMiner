@@ -111,7 +111,11 @@ public class HTMLUnixDiffViewer {
 		}
 
 		out += "</tbody>\n";
-		out += "</table></body></html>";
+		out += "</table>\n";
+		out += "<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>\n";
+		out += "<script type='text/javascript' src='./resources/deffuse.js'></script>\n";
+		out += "</body>\n";
+		out += "</html>";
 
 		return out;
 

@@ -88,7 +88,7 @@ public class HTMLMultiDiffViewer {
 				Iterator<ClassifierFeatureVector> it = openTags.descendingIterator();
 				while(it.hasNext()) {
 					ClassifierFeatureVector openTag = it.next();
-					out = out.concat("<span class='" + openTag.subtype + "-tag'>");
+					out = out.concat("<span class='" + openTag.subtype + "-tag' data-address='" + openTag.line + "'>");
 				}
 			}
 
@@ -100,7 +100,7 @@ public class HTMLMultiDiffViewer {
 			while(current != null && Integer.parseInt(current.absolutePosition) == i) {
 
 				/* Open the tag. */
-				out = out.concat("<span class='" + current.subtype + "-tag'>");
+				out = out.concat("<span class='" + current.subtype + "-tag' data-address='" + current.line + "'>");
 				openTags.push(current);
 
 				/* Set the close tag position. */

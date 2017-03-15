@@ -1,7 +1,11 @@
-package ca.ubc.ece.salt.pangor.js.diff.test;
+package ca.ubc.ece.salt.pangor.js.view.test;
+
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +17,6 @@ import org.deri.iris.api.basics.IQuery;
 import org.deri.iris.api.basics.IRule;
 import org.deri.iris.compiler.Parser;
 import org.deri.iris.compiler.ParserException;
-import org.junit.Assert;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.pangor.analysis.Commit;
@@ -26,20 +29,29 @@ import ca.ubc.ece.salt.pangor.classify.analysis.ClassifierFeatureVector;
 import ca.ubc.ece.salt.pangor.classify.analysis.Transformer;
 import ca.ubc.ece.salt.pangor.js.diff.DiffCommitAnalysisFactory;
 import ca.ubc.ece.salt.pangor.js.diff.defuse.DefUseCommitAnalysisFactory;
+import ca.ubc.ece.salt.pangor.js.diff.view.HTMLMultiDiffViewer;
+import ca.ubc.ece.salt.pangor.js.diff.view.HTMLUnixDiffViewer;
 
-public class TestDefUseAnalysis {
+public class TestDefUseHTMLView {
 
 	/**
 	 * Tests data mining data set construction.
 	 * @param args The command line arguments (i.e., old and new file names).
 	 * @throws Exception
 	 */
-	protected void runTest(List<SourceCodeFileChange> sourceFileChanges,
-						  List<ClassifierFeatureVector> expected,
-						   boolean checkSize) throws Exception {
+	protected void runTest(
+			String src, String dst, String out, boolean checkSize) throws Exception {
+
+		/* Read the source files. */
+		String srcCode = new String(Files.readAllBytes(Paths.get(src)));
+		String dstCode = new String(Files.readAllBytes(Paths.get(dst)));
+
+		/* Read the source files. */
+		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
+		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
 
 		Commit commit = getCommit();
-		for(SourceCodeFileChange sourceFileChange : sourceFileChanges) {
+		for(SourceCodeFileChange sourceFileChange : sourceCodeFileChanges) {
 			commit.addSourceCodeFileChange(sourceFileChange);
 		}
 
@@ -57,45 +69,37 @@ public class TestDefUseAnalysis {
         /* Print the data set. */
 		dataSet.printDataSet();
 
-        /* Verify the expected feature vectors match the actual feature vectors. */
-		List<ClassifierFeatureVector> actual = dataSet.getFeatureVectors();
-		if(checkSize) Assert.assertTrue(actual.size() == expected.size());
-        for(ClassifierFeatureVector fv : expected) {
-        	Assert.assertTrue(contains(actual,fv));
-        }
-	}
+        /* Return the alerts. */
+		List<ClassifierFeatureVector> alerts = dataSet.getFeatureVectors();
 
-	private static boolean contains(List<ClassifierFeatureVector> fvs, ClassifierFeatureVector test) {
-		for(ClassifierFeatureVector fv : fvs) {
-			if(fv.commit.equals(test.commit)
-					&& fv.version.equals(test.version)
-					&& fv.klass.equals(test.klass)
-					&& fv.line.equals(test.line)
-					&& fv.type.equals(test.type)
-					&& fv.subtype.equals(test.subtype)
-					&& fv.description.equals(test.description)) {
-				return true;
-			}
-		}
-		return false;
+		/* Only annotate the destination file. The source file isn't especially useful. */
+		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, alerts, "DESTINATION");
+
+		/* Combine the annotated file with the UnixDiff. */
+		String annotatedCombined = HTMLUnixDiffViewer.annotate(srcCode, dstCode, annotatedDst);
+		Files.write(Paths.get(out), annotatedCombined.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
 	}
 
 	@Test
-	public void testTutorial() throws Exception {
+	public void test_tutorial() throws Exception {
 
-		/* The test files. */
 		String src = "./test/input/diff/tutorial_old.js";
 		String dst = "./test/input/diff/tutorial_new.js";
+		String out = "./output/tutorial.html";
 
-		/* Read the source files. */
-		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
-		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+		runTest(src, dst, out, false);
 
-		/* Build the expected feature vectors. */
-		Commit commit = getCommit();
-		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
+	}
 
-		this.runTest(sourceCodeFileChanges, expected, false);
+	@Test
+	public void test_querygenerator_cve20151369() throws Exception {
+
+		String src = "./test/input/vic/sequelize-4827513fe6b9071ef49052d6203e331ba1971755_old.js";
+		String dst = "./test/input/vic/sequelize-4827513fe6b9071ef49052d6203e331ba1971755_new.js";
+		String out = "./output/sequelize-4827513fe6b9071ef49052d6203e331ba1971755.html";
+
+		runTest(src, dst, out, false);
 
 	}
 
@@ -139,6 +143,7 @@ public class TestDefUseAnalysis {
 
 		Pair<IQuery, Transformer> useQuery = getUseQuery();
 		queries.put(useQuery.getLeft(), useQuery.getRight());
+
 
 		return queries;
 
