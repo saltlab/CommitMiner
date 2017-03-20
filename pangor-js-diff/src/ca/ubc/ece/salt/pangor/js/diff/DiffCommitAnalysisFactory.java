@@ -11,6 +11,7 @@ import ca.ubc.ece.salt.pangor.analysis.flow.FlowDomainAnalysisFactory;
 import ca.ubc.ece.salt.pangor.cfg.ICFGVisitorFactory;
 import ca.ubc.ece.salt.pangor.diff.ast.AstDomainAnalysisFactory;
 import ca.ubc.ece.salt.pangor.js.diff.control.ControlCFGVisitorFactory;
+import ca.ubc.ece.salt.pangor.js.diff.defuse.DefUseCFGVisitorFactory;
 import ca.ubc.ece.salt.pangor.js.diff.environment.EnvCFGVisitorFactory;
 import ca.ubc.ece.salt.pangor.js.diff.line.LineDomainAnalysisFactory;
 import ca.ubc.ece.salt.pangor.js.diff.value.ValueCFGVisitorFactory;
@@ -32,13 +33,8 @@ public class DiffCommitAnalysisFactory implements ICommitAnalysisFactory {
 		cfgVisitorFactories.add(new ControlCFGVisitorFactory());
 		cfgVisitorFactories.add(new EnvCFGVisitorFactory());
 		cfgVisitorFactories.add(new ValueCFGVisitorFactory());
+		cfgVisitorFactories.add(new DefUseCFGVisitorFactory());
 
-		/* We have three domains to extract diffs from:
-		 * 	1. Flow-diffs. Performs the three CommitMiner diffs: value-diff,
-		 * 	   environment-diff and control-flow-diff.
-		 * 	2. Line-diff. Performs the Unix-diff.
-		 *  3. Ast-diff. Performs the Gumtree-diff.
-		 */
 		List<IDomainAnalysisFactory> domainFactories = new LinkedList<IDomainAnalysisFactory>();
 		domainFactories.add(new FlowDomainAnalysisFactory(cfgVisitorFactories));
 		domainFactories.add(new LineDomainAnalysisFactory());

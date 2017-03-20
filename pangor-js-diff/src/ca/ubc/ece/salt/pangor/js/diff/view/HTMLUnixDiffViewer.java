@@ -91,7 +91,11 @@ public class HTMLUnixDiffViewer {
 		String[] srcRows = outSrc.split("\n");
 		String[] dstRows = outDst.split("\n");
 
-		String out = "<html><head><link type='text/css' href='./resources/multidiff.css' rel='stylesheet'></head><body>\n";
+		String out = "<html>\n";
+		out += "<head>\n";
+		out += "<link type='text/css' href='./resources/multidiff.css' rel='stylesheet'>\n";
+		out += "</head>\n";
+		out += "<body>\n";
 		out += "<table border='0'>\n";
 		out += "<colgroup>\n";
 		out += "<col width='44'>\n";
