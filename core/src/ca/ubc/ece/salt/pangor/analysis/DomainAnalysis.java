@@ -57,7 +57,6 @@ public class DomainAnalysis {
 	 */
 	public void analyze(Commit commit, Map<IPredicate, IRelation> facts) throws Exception {
 		
-//		System.out.println("Starting analysis of commit" + commit.url);
 		StopWatch commitTimer = new StopWatch();
 		commitTimer.start();
 
@@ -67,14 +66,13 @@ public class DomainAnalysis {
 		/* Iterate through the files in the commit and run the
 		 * SourceCodeFileAnalysis on each of them. */
 		for(SourceCodeFileChange sourceCodeFileChange : commit.sourceCodeFileChanges) {
-//			System.out.println("Starting analysis of file " + commit.url + " " + sourceCodeFileChange.repairedFile);
 			StopWatch fileTimer = new StopWatch();
 			fileTimer.start();
 
 			this.analyzeFile(sourceCodeFileChange, facts);
 
 			fileTimer.stop();
-			System.out.println("File:" + fileTimer.getNanoTime());
+			System.out.println("Time to analyze file (milliseconds):" + Math.round(fileTimer.getNanoTime()/Math.pow(10, 6)));
 		}
 
 		/* Analyze the commit after the files are analyzed. */
@@ -82,7 +80,7 @@ public class DomainAnalysis {
 		
 		/* Stop the commit analysis timer. */
 		commitTimer.stop();
-		System.out.println("Commit:" + commitTimer.getNanoTime());
+		System.out.println("Time to analyze commit (milliseconds):" + Math.round(commitTimer.getNanoTime()/Math.pow(10, 6)));
 
 	}
 

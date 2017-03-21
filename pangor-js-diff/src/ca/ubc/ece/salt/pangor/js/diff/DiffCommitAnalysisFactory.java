@@ -37,8 +37,8 @@ public class DiffCommitAnalysisFactory implements ICommitAnalysisFactory {
 
 		List<IDomainAnalysisFactory> domainFactories = new LinkedList<IDomainAnalysisFactory>();
 		domainFactories.add(new FlowDomainAnalysisFactory(cfgVisitorFactories));
-		domainFactories.add(new LineDomainAnalysisFactory());
-		domainFactories.add(new AstDomainAnalysisFactory());
+//		domainFactories.add(new LineDomainAnalysisFactory());
+//		domainFactories.add(new AstDomainAnalysisFactory());
 		return new CommitAnalysis(dataSet, domainFactories);
 	}
 
