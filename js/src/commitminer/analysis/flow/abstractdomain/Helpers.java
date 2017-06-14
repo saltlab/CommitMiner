@@ -273,7 +273,7 @@ public class Helpers {
 		for(Name localVar : localVars) {
 			Change change = Change.convU(localVar);
 			Address address = trace.makeAddr(localVar.getID(), "");
-			env.strongUpdateNoCopy(new Identifier(localVar.toSource(), Change.convU(localVar)), address);
+			env.strongUpdateNoCopy(new Identifier(localVar.toSource(), Change.convU(localVar)), new Addresses(address, Change.u()));
 			store = store.alloc(address, Undefined.inject(Undefined.top(change), Change.u()));
 		}
 
@@ -285,7 +285,7 @@ public class Helpers {
 			address = trace.modAddr(address, JSClass.CFunction);
 
 			/* The function name variable points to our new function. */
-			env.strongUpdateNoCopy(new Identifier(child.getName(), Change.convU(child.getFunctionName())), address); // Env update with env change type
+			env.strongUpdateNoCopy(new Identifier(child.getName(), Change.convU(child.getFunctionName())), new Addresses(address, Change.u())); // Env update with env change type
 			store = store.alloc(address, Address.inject(address, Change.convU(child), Change.convU(child))); // Store update with value change type
 
 			/* Create a function object. */
@@ -299,13 +299,35 @@ public class Helpers {
 	}
 
 	/**
-	 * Analyze publicly accessible functions that have not already been
-	 * analyzed. This is currently not done recursively, because we would have
-	 * to decide whether or not to run the function as a constructor.
+	 * Analyze functions which are reachable from the environment and that have not
+	 * already been analyzed.
 	 * @param state The end state of the parent function.
 	 * @param visited Prevent circular lookups.
 	 */
-	public static void analyzePublic(
+	public static void analyzeEnvReachable(
+			Map<IPredicate, IRelation> facts,
+			State state,
+			Map<Identifier, Addresses> vars,
+			Address selfAddr,
+			Map<AstNode, CFG> cfgMap,
+			Set<Address> visited,
+			Set<String> localvars) {
+		
+		for(Map.Entry<Identifier, Addresses> entry : vars.entrySet()) {
+			for(Address addr : entry.getValue().addresses) {
+				analyzePublic(facts, state, entry.getKey(), addr, selfAddr, cfgMap, visited, localvars);
+			}
+		}
+
+	}
+
+	/**
+	 * Analyze functions which are reachable from an object property and that have
+	 * not already been analyzed.
+	 * @param state The end state of the parent function.
+	 * @param visited Prevent circular lookups.
+	 */
+	private static void analyzeObjReachable(
 			Map<IPredicate, IRelation> facts,
 			State state,
 			Map<Identifier, Address> props,
@@ -314,63 +336,84 @@ public class Helpers {
 			Set<Address> visited,
 			Set<String> localvars) {
 
-		for(Identifier var : props.keySet()) {
-
-			Address addr = props.get(var);
-			BValue val = state.store.apply(addr);
-
-			/* Do not visit local variables which were declared at a higher
-			 * level, and therefore can be analyzed later. */
-			if(localvars != null
-					&& !localvars.contains(var.name)
-					&& !var.name.equals("~retval~")
-					&& !StringUtils.isNumeric(var.name)) continue;
-
-			/* Avoid circular references. */
-			if(visited.contains(addr)) continue;
-			visited.add(addr);
-
-			for(Address objAddr : val.addressAD.addresses) {
-				Obj obj = state.store.getObj(objAddr);
-
-				/* We may need to analyze this function. */
-				if(obj.internalProperties.klass == JSClass.CFunction) {
-
-					InternalFunctionProperties ifp = (InternalFunctionProperties)obj.internalProperties;
-					FunctionClosure fc = (FunctionClosure)ifp.closure;
-
-					if(ifp.closure instanceof FunctionClosure &&
-							fc.cfg.getEntryNode().getBeforeState() == null) {
-
-						/* Create the argument object. */
-						Address argAddr = createTopArgObject(state, (FunctionNode)fc.cfg.getEntryNode().getStatement());
-
-						/* Create the control domain. */
-						Control control = new Control();
-						AstNode node = (AstNode)fc.cfg.getEntryNode().getStatement();
-						if(Change.conv(node).le == Change.LatticeElement.CHANGED) {
-							control = state.control.clone();
-							control.conditions.add(node); // Mark all as control flow modified
-						}
-
-						/* Analyze the function. Use a fresh call stack because we don't have any knowledge of it. */
-						ifp.closure.run(facts, selfAddr, argAddr, state.store,
-										state.scratch, state.trace, control,
-										new Stack<Address>());
-
-						/* Check the function object. */
-						// TODO: We ignore this for now. We would have to assume the function is being run as a constructor.
-
-					}
-				}
-
-				/* Recursively look for object properties that are functions. */
-				analyzePublic(facts, state, obj.externalProperties, props.get(var), cfgMap, visited, null);
-
-			}
+		for(Map.Entry<Identifier, Address> entry : props.entrySet()) {
+			analyzePublic(facts, state, entry.getKey(), entry.getValue(), selfAddr, cfgMap, visited, localvars);
 		}
+		
 	}
 
+	/**
+	 * Analyze functions which are reachable from an object property and that have
+	 * not already been analyzed.
+	 * @param state The end state of the parent function.
+	 * @param var The name of the property or variable
+	 * @param addr The address pointed to by the property or variable.
+	 * @param visited Prevent circular lookups.
+	 */
+	private static void analyzePublic(
+			Map<IPredicate, IRelation> facts,
+			State state,
+			Identifier var,
+			Address addr,
+			Address selfAddr,
+			Map<AstNode, CFG> cfgMap,
+			Set<Address> visited,
+			Set<String> localvars) {
+
+		BValue val = state.store.apply(addr);
+
+		/* Do not visit local variables which were declared at a higher
+		 * level, and therefore can be analyzed later. */
+		if(localvars != null
+				&& !localvars.contains(var.name)
+				&& !var.name.equals("~retval~")
+				&& !StringUtils.isNumeric(var.name)) return;
+
+		/* Avoid circular references. */
+		if(visited.contains(addr)) return;
+		visited.add(addr);
+
+		for(Address objAddr : val.addressAD.addresses) {
+			Obj obj = state.store.getObj(objAddr);
+
+			/* We may need to analyze this function. */
+			if(obj.internalProperties.klass == JSClass.CFunction) {
+
+				InternalFunctionProperties ifp = (InternalFunctionProperties)obj.internalProperties;
+				FunctionClosure fc = (FunctionClosure)ifp.closure;
+
+				if(ifp.closure instanceof FunctionClosure &&
+						fc.cfg.getEntryNode().getBeforeState() == null) {
+
+					/* Create the argument object. */
+					Address argAddr = createTopArgObject(state, (FunctionNode)fc.cfg.getEntryNode().getStatement());
+
+					/* Create the control domain. */
+					Control control = new Control();
+					AstNode node = (AstNode)fc.cfg.getEntryNode().getStatement();
+					if(Change.conv(node).le == Change.LatticeElement.CHANGED) {
+						control = state.control.clone();
+						control.conditions.add(node); // Mark all as control flow modified
+					}
+
+					/* Analyze the function. Use a fresh call stack because we don't have any knowledge of it. */
+					ifp.closure.run(facts, selfAddr, argAddr, state.store,
+									state.scratch, state.trace, control,
+									new Stack<Address>());
+
+					/* Check the function object. */
+					// TODO: We ignore this for now. We would have to assume the function is being run as a constructor.
+
+				}
+			}
+
+			/* Recursively look for object properties that are functions. */
+			analyzeObjReachable(facts, state, obj.externalProperties, addr, cfgMap, visited, null);
+
+		}
+		
+	}
+		
 	/**
 	 * Creates an arg object where each argument corresponds to a parameter
 	 * and each argument value is BValue.TOP.

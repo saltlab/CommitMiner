@@ -448,7 +448,7 @@ public class ExpEval {
 				/* If this is an object literal, make a fake var in the
 				 * environment and point it to the object literal. */
 				Address address = state.trace.makeAddr(arg.getID(), "");
-				state.env.strongUpdateNoCopy(new Identifier(arg.getID().toString()), address);
+				state.env.strongUpdateNoCopy(new Identifier(arg.getID().toString()), new Addresses(address, Change.u()));
 				state.store = state.store.alloc(address, argVal);
 			}
 

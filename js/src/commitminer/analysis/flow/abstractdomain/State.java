@@ -422,7 +422,7 @@ public class State implements IState {
 		 * 'accessible function' phase of the analysis. */
 		// TODO: In some situations, retval is not being allocated to the store
 		Address address = this.trace.makeAddr(rs.getID(), "");
-		this.env = this.env.strongUpdate(new Identifier("~retval~"), address);
+		this.env = this.env.strongUpdate(new Identifier("~retval~"), new Addresses(address, Change.u()));
 		this.store = this.store.alloc(address, retVal);
 
 		/* Update the return value on the scratchpad. */
@@ -500,17 +500,17 @@ public class State implements IState {
 
 		Set<Address> result = new HashSet<Address>();
 
-		Address addr = env.apply(new Identifier(node.toSource()));
-		if(addr == null) {
+		Addresses addrs = env.apply(new Identifier(node.toSource()));
+		if(addrs == null) {
 			/* Assume the variable exists in the environment (ie. not a TypeError)
 			 * and add it to the environment/store as BValue.TOP since we know
 			 * nothing about it. */
-			addr = trace.makeAddr(node.getID(), "");
-			env = env.strongUpdate(new Identifier(node.toSource(), Change.bottom()), addr);
+			Address addr = trace.makeAddr(node.getID(), "");
+			env = env.strongUpdate(new Identifier(node.toSource(), Change.bottom()), new Addresses(addr, Change.u()));
 			store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom()));
 		}
 
-		result.add(addr);
+		result.addAll(addrs.addresses);
 		return result;
 
 	}
