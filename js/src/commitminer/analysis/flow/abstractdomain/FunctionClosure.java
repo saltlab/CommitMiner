@@ -33,6 +33,12 @@ public class FunctionClosure extends Closure {
 	/** The CFGs in the script. **/
 	public Map<AstNode, CFG> cfgs;
 
+	/**
+	 * @param cfg The control flow graph for the function.
+	 * @param environment The environment of the parent closure. Does not yet
+	 * 					  contain local variables of this function.
+	 * @param cfgs All control flow graphs in the program.
+	 */
 	public FunctionClosure(CFG cfg, Environment environment, Map<AstNode, CFG> cfgs) {
 		this.cfg = cfg;
 		this.environment = environment;
@@ -74,6 +80,11 @@ public class FunctionClosure extends Closure {
 	 * @return true if the analysis needs to be (re-)run on the function
 	 */
 	private boolean runAnalysis(Control control, Address argArrayAddr, Store store) {
+		
+		// TODO: Compare the old initial state to the new initial state. We 
+		//		 can implement it two ways: (1) compare entire state, (2) 
+		//		 compare potential change propagation. #2 risks alias issues...
+		//		 less if we consider parameters and ignore the entire state.
 
 		State initState = (State) cfg.getEntryNode().getBeforeState();
 
@@ -133,6 +144,30 @@ public class FunctionClosure extends Closure {
 		for(Name localVarName : localVarNames) localVars.add(localVarName.toSource());
 
 		/* Lift local variables and function declarations into the environment. */
+		Environment env = initEnvironment(facts, selfAddr, argArrayAddr, store, trace);
+				
+		/* Create the initial state for the function call. */
+		State state = new State(facts, store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
+
+		/* Perform the initial analysis and get the publicly accessible methods. */
+		state = Helpers.run(cfg, state);
+
+		/* Analyze the publicly accessible methods that weren't analyzed in
+		 * the main analysis. */
+		Helpers.analyzePublic(facts, state, state.env.environment, state.selfAddr, cfgs, new HashSet<Address>(), localVars);
+
+		return state;
+
+	}
+	
+	/**
+	 * @return The environment for the closure, including parameters and {@code this}.
+	 */
+	private Environment initEnvironment(Map<IPredicate, IRelation> facts, 
+			Address selfAddr, Address argArrayAddr, Store store,
+			Trace trace) {
+
+		/* Lift local variables and function declarations into the environment. */
 		Environment env = this.environment.clone();
 		store = Helpers.lift(facts, env, store,
 							 (ScriptNode)cfg.getEntryNode().getStatement(),
@@ -157,7 +192,7 @@ public class FunctionClosure extends Closure {
 						store = Helpers.addProp(function.getID(), String.valueOf(i), argVal,
 										  argObj.externalProperties, store, trace);
 
-						/* Add the argument object to the store. */
+						/* Add or update the argument object to the store. */
 						argAddr = trace.makeAddr(function.getID(), String.valueOf(i));
 						store = store.alloc(argAddr, argObj);
 
@@ -168,22 +203,12 @@ public class FunctionClosure extends Closure {
 				i++;
 			}
 		}
-
+		
 		/* Add 'this' to environment (points to caller's object or new object). */
 		env = env.strongUpdate(new Identifier("this", Change.u()), selfAddr);
-
-		/* Create the initial state for the function call. */
-		State state = new State(facts, store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
-
-		/* Perform the initial analysis and get the publicly accessible methods. */
-		state = Helpers.run(cfg, state);
-
-		/* Analyze the publicly accessible methods that weren't analyzed in
-		 * the main analysis. */
-		Helpers.analyzePublic(facts, state, state.env.environment, state.selfAddr, cfgs, new HashSet<Address>(), localVars);
-
-		return state;
-
+		
+		return env;
+		
 	}
 
 }

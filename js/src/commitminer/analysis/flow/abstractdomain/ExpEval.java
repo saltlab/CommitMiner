@@ -393,7 +393,6 @@ public class ExpEval {
 	}
 
 	/**
-	 * TODO: make sure we don't get into a circular loop
 	 * @return The list of functions pointed to by the value.
 	 */
 	private List<Address> extractFunctions(BValue val, List<Address> functionAddrs, Set<Address> visited) {
@@ -435,13 +434,6 @@ public class ExpEval {
 		State newState = null;
 
 		/* Keep track of callback functions. */
-		// TODO: Instead of executing callbacks, we need to create dummy local
-		// 		 variables that store object literals and functions passed as
-		//		 arguments or the return value. After the function has been
-		//		 analyzed, we will 'analyze public functions which have not
-		//		 been analyzed'.
-		// TODO: We need to store a "this" pointer as well
-
 		List<Address> callbacks = new LinkedList<Address>();
 
 		/* Create the argument object. */
@@ -460,7 +452,6 @@ public class ExpEval {
 				state.store = state.store.alloc(address, argVal);
 			}
 
-			/* TODO: We somehow need to execute all functions in their appropriate context. */
 			callbacks.addAll(extractFunctions(argVal, new LinkedList<Address>(), new HashSet<Address>()));
 			state.store = Helpers.addProp(fc.getID(), String.valueOf(i), argVal,
 							ext, state.store, state.trace);
@@ -475,7 +466,7 @@ public class ExpEval {
 		Address argAddr = state.trace.makeAddr(fc.getID(), "");
 		state.store = state.store.alloc(argAddr, argObj);
 
-		/* Attempt to resolve the function and it's parent object. */
+		/* Attempt to resolve the function and its parent object. */
 		BValue funVal = resolveValue(fc.getTarget());
 		BValue objVal = resolveSelf(fc.getTarget());
 
