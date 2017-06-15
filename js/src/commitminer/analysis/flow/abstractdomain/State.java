@@ -508,6 +508,7 @@ public class State implements IState {
 			Address addr = trace.makeAddr(node.getID(), "");
 			env = env.strongUpdate(new Identifier(node.toSource(), Change.bottom()), new Addresses(addr, Change.u()));
 			store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom()));
+			addrs = new Addresses(addr, Change.u());
 		}
 
 		result.addAll(addrs.addresses);

@@ -154,6 +154,7 @@ public class FunctionClosure extends Closure {
 
 		/* Analyze the publicly accessible methods that weren't analyzed in
 		 * the main analysis. */
+		state.env.toString();
 		Helpers.analyzeEnvReachable(facts, state, state.env.environment, state.selfAddr, cfgs, new HashSet<Address>(), localVars);
 
 		return state;

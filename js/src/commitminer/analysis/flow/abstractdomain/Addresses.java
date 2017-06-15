@@ -34,6 +34,7 @@ public class Addresses {
 	public Addresses(Address address, Change change) {
 		this.addresses = new HashSet<Address>();
 		this.addresses.add(address);
+		this.le = LatticeElement.SET;
 		this.change = change;
 	}
 
