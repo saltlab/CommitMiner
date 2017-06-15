@@ -198,14 +198,16 @@ public class FunctionClosure extends Closure {
 
 					}
 					Identifier identity = new Identifier(paramName.toSource(), Change.conv(paramName));
-					env = env.strongUpdate(identity, argAddr);
+					// TODO: should be weak update
+					env = env.strongUpdate(identity, new Addresses(argAddr, Change.u()));
 				}
 				i++;
 			}
 		}
 		
 		/* Add 'this' to environment (points to caller's object or new object). */
-		env = env.strongUpdate(new Identifier("this", Change.u()), selfAddr);
+		// TODO: should be weak update
+		env = env.strongUpdate(new Identifier("this", Change.u()), new Addresses(selfAddr, Change.u()));
 		
 		return env;
 		

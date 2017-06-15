@@ -12,6 +12,7 @@ import org.mozilla.javascript.ast.AstNode;
 
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.flow.abstractdomain.Address;
+import commitminer.analysis.flow.abstractdomain.Addresses;
 import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Bool;
 import commitminer.analysis.flow.abstractdomain.Identifier;
@@ -59,44 +60,64 @@ public class ProtectedCFGVisitor implements ICFGVisitor {
 		//		 analyzed... for example a function that is passed as an
 		//		 argument to an un-resolvable function. We need to handle
 		//		 these.
-		if(state != null) getObjectFacts(node, state.env.environment, state, null);
+		if(state != null) getEnvironmentFacts(node, state.env.environment, state, null);
+	}
+	
+	/**
+	 * Visits variables in the environment and extracts facts.
+	 * @param node The statement or condition at the program point.
+	 * @param props The environment or object properties.
+	 */
+	private void getEnvironmentFacts(AstNode node, Map<Identifier, Addresses> props, State state, String prefix) {
+		for(Map.Entry<Identifier, Addresses> entry : props.entrySet()) {
+			for(Address addr : entry.getValue().addresses) {
+				getPropertyFacts(node, entry.getKey(), addr, state, prefix);
+			}
+		}
 	}
 
 	/**
-	 * Recursively visits objects and extracts facts about identifier
-	 * protection.
+	 * Visits objects in the store and extracts facts.
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
 	private void getObjectFacts(AstNode node, Map<Identifier, Address> props, State state, String prefix) {
-		for(Identifier prop : props.keySet()) {
-
-			Address addr = props.get(prop);
-			String identifier;
-			if(prefix == null) identifier = prop.name;
-			else identifier = prefix + "." + prop;
-
-			BValue val = state.store.apply(addr);
-			if(val.nullAD.le == Null.LatticeElement.BOTTOM)
-				registerFact(node, identifier, "NULL", val.nullAD.le.toString(), val.nullAD.change.toString());
-			if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM)
-				registerFact(node, identifier, "UNDEFINED", val.undefinedAD.le.toString(), val.undefinedAD.change.toString());
-			if(Str.notBlank(val.stringAD))
-				registerFact(node, identifier, "BLANK", val.stringAD.toString(), val.stringAD.change.toString());
-			if(Num.notZero(val.numberAD))
-				registerFact(node, identifier, "ZERO", val.numberAD.toString(), val.numberAD.change.toString());
-			if(Num.notNaN(val.numberAD))
-				registerFact(node, identifier, "NAN", val.numberAD.toString(), val.numberAD.change.toString());
-			if(Bool.notFalse(val.booleanAD))
-				registerFact(node, identifier, "FALSE", val.booleanAD.toString(), val.booleanAD.change.toString());
-
-			/* Recursively check property values. */
-			if(val.addressAD.le == LatticeElement.TOP) continue;
-			for(Address objAddr : val.addressAD.addresses) {
-				getObjectFacts(node, state.store.getObj(objAddr).externalProperties, state, identifier);
-			}
-
+		for(Map.Entry<Identifier, Address> entry : props.entrySet()) {
+			getPropertyFacts(node, entry.getKey(), entry.getValue(), state, prefix);
 		}
+	}
+
+	/**
+	 * Recursively extracts facts from objects.
+	 * @param node The statement or condition at the program point.
+	 * @param props The environment or object properties.
+	 */
+	private void getPropertyFacts(AstNode node, Identifier prop, Address addr, State state, String prefix) {
+			
+		String identifier;
+		if(prefix == null) identifier = prop.name;
+		else identifier = prefix + "." + prop;
+
+		BValue val = state.store.apply(addr);
+		if(val.nullAD.le == Null.LatticeElement.BOTTOM)
+			registerFact(node, identifier, "NULL", val.nullAD.le.toString(), val.nullAD.change.toString());
+		if(val.undefinedAD.le == Undefined.LatticeElement.BOTTOM)
+			registerFact(node, identifier, "UNDEFINED", val.undefinedAD.le.toString(), val.undefinedAD.change.toString());
+		if(Str.notBlank(val.stringAD))
+			registerFact(node, identifier, "BLANK", val.stringAD.toString(), val.stringAD.change.toString());
+		if(Num.notZero(val.numberAD))
+			registerFact(node, identifier, "ZERO", val.numberAD.toString(), val.numberAD.change.toString());
+		if(Num.notNaN(val.numberAD))
+			registerFact(node, identifier, "NAN", val.numberAD.toString(), val.numberAD.change.toString());
+		if(Bool.notFalse(val.booleanAD))
+			registerFact(node, identifier, "FALSE", val.booleanAD.toString(), val.booleanAD.change.toString());
+
+		/* Recursively check property values. */
+		if(val.addressAD.le == LatticeElement.TOP) return;
+		for(Address objAddr : val.addressAD.addresses) {
+			getObjectFacts(node, state.store.getObj(objAddr).externalProperties, state, identifier);
+		}
+
 	}
 
 	/**

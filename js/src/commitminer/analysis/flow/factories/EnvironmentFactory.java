@@ -8,6 +8,7 @@ import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import commitminer.analysis.flow.abstractdomain.Addresses;
 import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.Environment;
 import commitminer.analysis.flow.abstractdomain.Helpers;
@@ -46,7 +47,7 @@ public class EnvironmentFactory {
 	 */
 	private static Environment createBaseEnvironment() {
 		Environment env = new Environment();
-		env = env.strongUpdate(new Identifier("this", Change.u()), StoreFactory.global_binding_Addr);
+		env = env.strongUpdate(new Identifier("this", Change.u()), new Addresses(StoreFactory.global_binding_Addr, Change.u()));
 		return env;
 	}
 

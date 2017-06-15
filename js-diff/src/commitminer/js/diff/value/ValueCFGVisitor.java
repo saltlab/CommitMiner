@@ -14,6 +14,7 @@ import org.mozilla.javascript.ast.AstNode;
 
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.flow.abstractdomain.Address;
+import commitminer.analysis.flow.abstractdomain.Addresses;
 import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Identifier;
 import commitminer.analysis.flow.abstractdomain.Obj;
@@ -55,49 +56,69 @@ public class ValueCFGVisitor implements ICFGVisitor {
 	 * identifier protection.
 	 */
 	private void visit(AstNode node, State state) {
-		if(state != null) getObjectFacts(node, state.env.environment, state, null, new HashSet<Address>());
+		if(state != null) getEnvironmentFacts(node, state.env.environment, state, null, new HashSet<Address>());
 	}
 
 	/**
-	 * Recursively visits objects and extracts facts about environment changes.
+	 * Visits variables in the environment and extracts facts.
+	 * @param node The statement or condition at the program point.
+	 * @param props The environment or object properties.
+	 */
+	private void getEnvironmentFacts(AstNode node, Map<Identifier, Addresses> props, State state, String prefix, Set<Address> visited) {
+		for(Map.Entry<Identifier, Addresses> entry : props.entrySet()) {
+			for(Address addr : entry.getValue().addresses) {
+				getPropertyFacts(node, entry.getKey(), addr, state, prefix, visited);
+			}
+		}
+	}
+
+	/**
+	 * Visits objects in the store and extracts facts.
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
 	private void getObjectFacts(AstNode node, Map<Identifier, Address> props, State state, String prefix, Set<Address> visited) {
-		for(Identifier prop : props.keySet()) {
-
-			Address addr = props.get(prop);
-
-			/* Avoid circular references. */
-			if(visited.contains(addr)) continue;
-			visited.add(addr);
-
-			String identifier;
-			if(prefix == null) identifier = prop.name;
-			else identifier = prefix + "." + prop.name;
-
-			if(identifier.equals("this")) continue;
-			if(addr == null) continue;
-
-			BValue val = state.store.apply(addr);
-
-			/* Get the environment changes. No need to recurse since
-			 * properties (currently) do not change. */
-			if(node != null) {
-				Set<Annotation> annotations = isUsed(node, prop);
-				for(Annotation annotation : annotations) {
-					registerFact(node, prop.name, val.change.toString(), annotation);
-				}
-			}
-
-			/* Recursively check property values. */
-			if(val.addressAD.le == LatticeElement.TOP) continue;
-			for(Address propAddr : val.addressAD.addresses) {
-				Obj propObj = state.store.getObj(propAddr);
-				getObjectFacts(node, propObj.externalProperties, state, identifier, visited);
-			}
-
+		for(Map.Entry<Identifier, Address> entry : props.entrySet()) {
+			getPropertyFacts(node, entry.getKey(), entry.getValue(), state, prefix, visited);
 		}
+	}
+
+	/**
+	 * Recursively extracts facts from objects.
+	 * @param node The statement or condition at the program point.
+	 * @param props The environment or object properties.
+	 */
+	private void getPropertyFacts(AstNode node, Identifier prop, Address addr, State state, String prefix, Set<Address> visited) {
+
+		/* Avoid circular references. */
+		if(visited.contains(addr)) return;
+		visited.add(addr);
+
+		String identifier;
+		if(prefix == null) identifier = prop.name;
+		else identifier = prefix + "." + prop.name;
+
+		if(identifier.equals("this")) return;
+		if(addr == null) return;
+
+		BValue val = state.store.apply(addr);
+
+		/* Get the environment changes. No need to recurse since
+		 * properties (currently) do not change. */
+		if(node != null) {
+			Set<Annotation> annotations = isUsed(node, prop);
+			for(Annotation annotation : annotations) {
+				registerFact(node, prop.name, val.change.toString(), annotation);
+			}
+		}
+
+		/* Recursively check property values. */
+		if(val.addressAD.le == LatticeElement.TOP) return;
+		for(Address propAddr : val.addressAD.addresses) {
+			Obj propObj = state.store.getObj(propAddr);
+			getObjectFacts(node, propObj.externalProperties, state, identifier, visited);
+		}
+
 	}
 
 	/**
