@@ -93,7 +93,7 @@ public class ValueCFGVisitor implements ICFGVisitor {
 		if(addr == null) return;
 
 		BValue val = state.store.apply(addr);
-
+		
 		/* Get the environment changes. No need to recurse since
 		 * properties (currently) do not change. */
 		registerFact(node, prop.name, val.change.toString());

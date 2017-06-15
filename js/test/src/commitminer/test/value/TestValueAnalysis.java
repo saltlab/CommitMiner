@@ -91,7 +91,7 @@ public class TestValueAnalysis {
 		/* Build the expected feature vectors. */
 		Commit commit = getCommit();
 		List<ClassifierFeatureVector> expected = new LinkedList<ClassifierFeatureVector>();
-		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/pm2_new.js", "MethodNA", "1672", "TST", "VAL", "semver_Change:CHANGED"));
+		expected.add(new ClassifierFeatureVector(commit, "DESTINATION", "./test/input/interproc/pm2_new.js", "MethodNA", "1672", "TST", "VAL", "semver_Change:TOP"));
 
 		this.runTest(sourceCodeFileChange, expected, true);
 	}
@@ -187,7 +187,8 @@ public class TestValueAnalysis {
 
 		String qs = "";
 		qs += "?- Value(?Version,?File,?Line,?StatementID,?Identifier,?ValChange)";
-		qs += ", EQUAL(?ValChange, 'Change:CHANGED').";
+		qs += ", NOT_EQUAL(?ValChange, 'Change:UNCHANGED')";
+		qs += ", NOT_EQUAL(?ValChange, 'Change:BOTTOM').";
 
 		/* The query that produces the results. */
 		Parser parser = new Parser();
