@@ -138,8 +138,16 @@ public class Addresses {
 
 	@Override
 	public String toString() {
-		if(this.le != LatticeElement.SET) return "Addr:" + this.le.toString();
-		else return "Addr:" + this.addresses.size();
+		if(this.le != LatticeElement.SET) {
+			return "Addr:" + this.le.toString();
+		}
+		else {
+			String addrs = "Addrs: {";
+			for(Address addr : this.addresses) {
+				addrs += "Addr:" + addr + ",";
+			}
+			return addrs.substring(0, addrs.length() - 1) + "}";
+		}
 	}
 
 

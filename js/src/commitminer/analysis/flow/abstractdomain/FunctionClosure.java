@@ -143,18 +143,15 @@ public class FunctionClosure extends Closure {
 		Set<String> localVars = new HashSet<String>();
 		for(Name localVarName : localVarNames) localVars.add(localVarName.toSource());
 
-		/* Lift local variables and function declarations into the environment. */
-		Environment env = initEnvironment(facts, selfAddr, argArrayAddr, store, trace);
-				
-		/* Create the initial state for the function call. */
-		State state = new State(facts, store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
+		/* Create the initial state for the function call by lifting local 
+		 * vars and functions into the environment. */
+		State state = initState(facts, selfAddr, argArrayAddr, store, scratchpad, trace, control, callStack);
 
 		/* Perform the initial analysis and get the publicly accessible methods. */
 		state = Helpers.run(cfg, state);
 
 		/* Analyze the publicly accessible methods that weren't analyzed in
 		 * the main analysis. */
-		state.env.toString();
 		Helpers.analyzeEnvReachable(facts, state, state.env.environment, state.selfAddr, cfgs, new HashSet<Address>(), localVars);
 
 		return state;
@@ -162,11 +159,14 @@ public class FunctionClosure extends Closure {
 	}
 	
 	/**
+	 * Lift local variables and function declarations into the environment and 
+	 * create the initial state for the function call.
 	 * @return The environment for the closure, including parameters and {@code this}.
 	 */
-	private Environment initEnvironment(Map<IPredicate, IRelation> facts, 
+	private State initState(Map<IPredicate, IRelation> facts, 
 			Address selfAddr, Address argArrayAddr, Store store,
-			Trace trace) {
+			Scratchpad scratchpad, Trace trace, Control control,
+			Stack<Address> callStack) {
 
 		/* Lift local variables and function declarations into the environment. */
 		Environment env = this.environment.clone();
@@ -210,7 +210,8 @@ public class FunctionClosure extends Closure {
 		// TODO: should be weak update
 		env = env.strongUpdate(new Identifier("this", Change.u()), new Addresses(selfAddr, Change.u()));
 		
-		return env;
+		/* Create the initial state for the function call. */
+		return new State(facts, store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
 		
 	}
 
