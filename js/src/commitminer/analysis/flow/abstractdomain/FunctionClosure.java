@@ -269,7 +269,10 @@ public class FunctionClosure extends Closure {
 		for(Addresses addrs : s1.env.environment.values()) {
 			BValue b1 = s1.store.apply(addrs);
 			BValue b2 = s2.store.apply(addrs);
-			if(!b1.equals(b2)) return false;
+			System.out.println(b1);	// z = BOT here
+			System.out.println(b2); // z = 10 here
+			if(!b1.equals(b2)) 
+				return false;
 			// TODO: Recursively check the objects reachable from the addresses.
 		}
 		

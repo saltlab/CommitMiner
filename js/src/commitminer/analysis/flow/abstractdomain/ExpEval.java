@@ -67,6 +67,7 @@ public class ExpEval {
 		else if(node instanceof FunctionCall) {
 			State endState = this.evalFunctionCall((FunctionCall) node);
 			this.state.store = endState.store;
+			this.state.store = Helpers.gc(this.state.env, this.state.store);
 			return endState.scratch.applyReturn();
 		}
 

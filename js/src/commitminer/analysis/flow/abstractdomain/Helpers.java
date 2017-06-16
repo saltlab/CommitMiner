@@ -411,5 +411,74 @@ public class Helpers {
 		}
 		
 	}
+	
+	/**
+	 * Collect garbage (ie. values and objects on the store that are not 
+	 * reachable from the environment).
+	 * @param env
+	 * @param store
+	 */
+	public static Store gc(Environment env, Store store) {
+		
+		/* The clean memory values and objects. */
+		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>();
+		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
+		
+		for(Addresses addrs : env.environment.values()) {
+			for(Address addr : addrs.addresses) {
+				
+				BValue value = store.apply(addr);
+				
+				/* Put the value on the store. */
+				bValueStore.put(addr, value);
+				
+				/* Put the objects on the store. */
+				gcObjectProperty(value.addressAD, store, 
+								 bValueStore, objectStore);
+
+			}
+		}
+		
+		return new Store(bValueStore, objectStore);
+
+	}
+	
+	/**
+	 * Retain objects in the store that are accessible from objects.
+	 * @param addrs Addresses that point to accessible objects.
+	 */
+	private static void gcObjectProperty(Addresses addrs, Store store, 
+								  Map<Address, BValue> bValueStore, 
+								  Map<Address, Obj> objectStore) {
+
+		/* Put the objects on the store. */
+		for(Address objAddr : addrs.addresses) {
+
+			Obj obj = store.getObj(objAddr);
+			
+			/* Prevent infinite loops when objects point to themselves. */
+			if(!objectStore.containsKey(objAddr)) {
+
+				objectStore.put(objAddr, obj);
+				
+				/* Put the object's property values on the store. */
+				for(Address addr : obj.externalProperties.values()) {
+
+					BValue value = store.apply(addr);
+
+					/* Put the value on the store. */
+					bValueStore.put(addr, value);
+					
+					/* Put the objects on the store. */
+					gcObjectProperty(value.addressAD, store, 
+									 bValueStore, objectStore);
+					
+				}
+				
+			}
+
+		}
+		
+	}
 		
 }
