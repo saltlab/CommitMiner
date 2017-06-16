@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.api.basics.ITuple;
 import org.deri.iris.factory.Factory;
@@ -419,11 +420,11 @@ public class Helpers {
 	 * @param store
 	 */
 	public static Store gc(Environment env, Store store) {
-		
+
 		/* The clean memory values and objects. */
 		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>();
 		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
-		
+
 		for(Addresses addrs : env.environment.values()) {
 			for(Address addr : addrs.addresses) {
 				

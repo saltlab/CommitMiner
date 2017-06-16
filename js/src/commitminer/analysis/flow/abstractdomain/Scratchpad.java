@@ -66,12 +66,15 @@ public class Scratchpad {
 		BValue[] args = new BValue[arglen];
 
 		for(int i = 0; i < args.length; i++) {
-			if(this.args[i] != null && pad.args[i] != null) 
-				args[i] = this.args[i].join(pad.args[i]);
-			else if(this.args[i] != null)
-				args[i] = this.args[i];
-			else
+			if(i >= this.args.length) {
 				args[i] = pad.args[i];
+			}
+			else if(i >= pad.args.length) {
+				args[i] = this.args[i];
+			}
+			else {
+				args[i] = this.args[i].join(pad.args[i]);
+			}
 		}
 
 		return new Scratchpad(retVal, args);
