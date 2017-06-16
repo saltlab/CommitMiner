@@ -1,13 +1,12 @@
 
-var a = 5;
-var b = 10;
+var a = { l: 5, r: 10 };
 
-function A(x, y) {
+function A(x) {
 	var z = 10; 
-	console.log((x*z + y*z));
+	console.log((x.l*z + x.r*z));
 }
 
-A(a,b);
-A(a,b);
-A(a,b);
+A(a);
+a.r = 5;
+A(a);
 

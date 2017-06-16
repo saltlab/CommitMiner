@@ -113,5 +113,17 @@ public class Obj {
 			extProp += prop.name + "|";
 		return "Obj:" + this.externalProperties.size() + "|" + extProp;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Obj)) return false;
+		Obj obj = (Obj)o;
+		if(this.externalProperties.size() != obj.externalProperties.size()) return false;
+		for(Map.Entry<Identifier, Address> entry : this.externalProperties.entrySet()) {
+			if(!obj.externalProperties.containsKey(entry.getKey())) return false;
+			if(!obj.externalProperties.get(entry.getKey()).equals(entry.getValue())) return false;
+		}
+		return true;
+	}
 
 }
