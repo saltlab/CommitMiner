@@ -124,6 +124,7 @@ public class Environment {
 	public boolean equals(Object o) {
 		if(!(o instanceof Environment)) return false;
 		Environment env = (Environment)o;
+		if(this.environment.keySet().size() != env.environment.keySet().size()) return false;
 		for(Map.Entry<Identifier, Addresses> entry : env.environment.entrySet()) {
 			if(!this.environment.containsKey(entry.getKey())) return false;
 			if(!this.environment.get(entry.getKey()).equals(entry.getValue())) return false;

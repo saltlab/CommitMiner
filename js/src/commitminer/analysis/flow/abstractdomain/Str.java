@@ -188,7 +188,8 @@ public class Str {
 		if(!(o instanceof Str)) return false;
 		Str str = (Str)o;
 		if(this.le != str.le) return false;
-		if(!this.val.equals(str.val)) return false;
+		if(this.val == null ^ this.val == null) return false;
+		if(this.val != null && !this.val.equals(str.val)) return false;
 		if(!this.change.equals(str.change)) return false;
 		return true;
 	}

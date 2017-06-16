@@ -182,7 +182,8 @@ public class Num {
 		if(!(o instanceof Num)) return false;
 		Num num = (Num)o;
 		if(this.le != num.le) return false;
-		if(!this.val.equals(num.val)) return false;
+		if(this.val == null ^ this.val == null) return false;
+		if(this.val != null && !this.val.equals(num.val)) return false;
 		if(!this.change.equals(num.change)) return false;
 		return true;
 	}
