@@ -1,6 +1,7 @@
 package commitminer.analysis.flow.abstractdomain;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import commitminer.analysis.flow.ScriptFlowAnalysis;
+import commitminer.analysis.flow.factories.StoreFactory;
 import commitminer.analysis.flow.trace.Trace;
 import commitminer.cfg.CFG;
 import commitminer.cfg.CFGNode;
@@ -108,18 +110,18 @@ public class FunctionClosure extends Closure {
 
 	@Override
 	public State run(Map<IPredicate, IRelation> facts, 
-			Address selfAddr, Obj argObj, Store store,
+			Address selfAddr, Store store,
 			Scratchpad scratchpad, Trace trace, Control control,
 			Stack<Address> callStack) {
 
 		/* Advance the trace. */
-		trace = trace.update(environment, store, selfAddr, argObj,
+		trace = trace.update(environment, store, selfAddr, 
 							 (ScriptNode)cfg.getEntryNode().getStatement());
 		
 		/* Create the initial state if needed. */
 		State newState = null;
 		State oldState = (State) cfg.getEntryNode().getBeforeState();
-		State primeState = initState(facts, selfAddr, argObj, store, scratchpad, trace, control, callStack);
+		State primeState = initState(facts, selfAddr, store, scratchpad, trace, control, callStack);
 		State exitState = null;
 		
 		if(oldState == null) {
@@ -181,7 +183,7 @@ public class FunctionClosure extends Closure {
 	 * @return The environment for the closure, including parameters and {@code this}.
 	 */
 	private State initState(Map<IPredicate, IRelation> facts, 
-			Address selfAddr, Obj argObj, Store store,
+			Address selfAddr, Store store,
 			Scratchpad scratchpad, Trace trace, Control control,
 			Stack<Address> callStack) {
 
@@ -195,11 +197,25 @@ public class FunctionClosure extends Closure {
 		if(this.cfg.getEntryNode().getStatement() instanceof FunctionNode) {
 			FunctionNode function = (FunctionNode)this.cfg.getEntryNode().getStatement();
 
+			/* Create the arguments object. */
+			Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
+			int i = 0;
+			for(BValue argVal : scratchpad.applyArgs()) {
+
+				store = Helpers.addProp(function.getID(), String.valueOf(i), argVal,
+								ext, store, trace);
+				i++;
+			}
+
+			InternalObjectProperties internal = new InternalObjectProperties(
+					Address.inject(StoreFactory.Arguments_Addr, Change.u(), Change.u()), JSClass.CObject);
+			Obj argObj = new Obj(ext, internal);
+
 			/* Put the argument object on the store. */
 			Address argAddr = trace.makeAddr(function.getID(), "");
 			store = store.alloc(argAddr, argObj);
 
-			int i = 0;
+			i = 0;
 			for(AstNode param : function.getParams()) {
 				if(param instanceof Name) {
 					Name paramName = (Name) param;

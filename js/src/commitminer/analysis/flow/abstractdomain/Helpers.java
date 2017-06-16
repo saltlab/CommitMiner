@@ -203,14 +203,13 @@ public class Helpers {
 	/**
 	 * @param funVal The address(es) of the function object to execute.
 	 * @param selfAddr The value of the 'this' identifier (a set of objects).
-	 * @param args The address of the arguments object.
 	 * @param store The store at the caller.
 	 * @param sp Scratchpad memory.
 	 * @param trace The trace at the caller.
 	 * @return The final state of the closure.
 	 */
 	public static State applyClosure(Map<IPredicate, IRelation> facts, 
-							  BValue funVal, Address selfAddr, Obj argObj,
+							  BValue funVal, Address selfAddr, 
 							  Store store, Scratchpad sp, Trace trace, Control control,
 							  Stack<Address> callStack) {
 
@@ -237,7 +236,7 @@ public class Helpers {
 			callStack.push(address);
 
 			/* Run the function. */
-			State endState = ifp.closure.run(facts, selfAddr, argObj, store, sp, trace, control, callStack);
+			State endState = ifp.closure.run(facts, selfAddr, store, sp, trace, control, callStack);
 
 			/* Pop this function off the call stack. */
 			callStack.pop();
@@ -385,9 +384,6 @@ public class Helpers {
 				if(ifp.closure instanceof FunctionClosure &&
 						fc.cfg.getEntryNode().getBeforeState() == null) {
 
-					/* Create the argument object. */
-					Obj argObj = createTopArgObject(state, (FunctionNode)fc.cfg.getEntryNode().getStatement());
-
 					/* Create the control domain. */
 					Control control = new Control();
 					AstNode node = (AstNode)fc.cfg.getEntryNode().getStatement();
@@ -395,10 +391,12 @@ public class Helpers {
 						control = state.control.clone();
 						control.conditions.add(node); // Mark all as control flow modified
 					}
+					
+					Scratchpad scratch = new Scratchpad(state.scratch.applyReturn(), new BValue[0]);
 
 					/* Analyze the function. Use a fresh call stack because we don't have any knowledge of it. */
-					ifp.closure.run(facts, selfAddr, argObj, state.store,
-									state.scratch, state.trace, control,
+					ifp.closure.run(facts, selfAddr, state.store,
+									scratch, state.trace, control,
 									new Stack<Address>());
 
 					/* Check the function object. */
@@ -414,34 +412,4 @@ public class Helpers {
 		
 	}
 		
-	/**
-	 * Creates an arg object where each argument corresponds to a parameter
-	 * and each argument value is BValue.TOP.
-	 * @param state
-	 * @param f The function
-	 * @return
-	 */
-	public static Obj createTopArgObject(State state, FunctionNode f) {
-
-		/* Create the argument object. */
-		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
-
-		int i = 0;
-		for(AstNode param : f.getParams()) {
-
-			BValue argVal = BValue.top(Change.convU(param), Change.u());
-			state.store = Helpers.addProp(f.getID(), String.valueOf(i), argVal,
-										  ext, state.store, state.trace);
-
-			i++;
-		}
-
-		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Arguments_Addr, Change.convU(f), Change.u()), JSClass.CObject);
-		Obj argObj = new Obj(ext, internal);
-
-		return argObj;
-
-	}
-
 }

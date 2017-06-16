@@ -26,7 +26,7 @@ public abstract class Closure {
 	 * @return The new state after executing the function.
 	 */
 	public abstract State run(Map<IPredicate, IRelation> facts,
-							  Address selfAddr, Obj argObj,
+							  Address selfAddr, 
 							  Store store, Scratchpad scratchpad,
 							  Trace trace, Control control,
 							  Stack<Address> callStack);

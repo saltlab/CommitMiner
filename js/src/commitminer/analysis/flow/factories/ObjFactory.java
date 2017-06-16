@@ -61,7 +61,7 @@ public class ObjFactory {
 		NativeClosure closure = new NativeClosure() {
 				@Override
 				public State run(Map<IPredicate, IRelation> facts, 
-								 Address selfAddr, Obj argObj,
+								 Address selfAddr, 
 								 Store store, Scratchpad scratchpad,
 								 Trace trace, Control control,
 								 Stack<Address> callStack) {

@@ -24,7 +24,6 @@ import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
 import commitminer.analysis.flow.IState;
-import commitminer.analysis.flow.abstractdomain.Scratchpad.Scratch;
 import commitminer.analysis.flow.trace.Trace;
 import commitminer.cfg.CFG;
 import commitminer.cfg.CFGEdge;
@@ -413,7 +412,7 @@ public class State implements IState {
 		}
 
 		/* Join the values if a return value allready exists on the path. */
-		BValue oldVal = this.scratch.apply(Scratch.RETVAL);
+		BValue oldVal = this.scratch.applyReturn();
 		if(oldVal != null)
 			retVal = retVal.join(oldVal);
 
@@ -426,7 +425,7 @@ public class State implements IState {
 		this.store = this.store.alloc(address, retVal);
 
 		/* Update the return value on the scratchpad. */
-		this.scratch = this.scratch.strongUpdate(Scratch.RETVAL, retVal);
+		this.scratch = this.scratch.strongUpdate(retVal, null);
 
 	}
 

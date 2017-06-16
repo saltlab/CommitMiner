@@ -22,7 +22,6 @@ import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.UnaryExpression;
 
-import commitminer.analysis.flow.abstractdomain.Scratchpad.Scratch;
 import commitminer.analysis.flow.factories.StoreFactory;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 
@@ -68,7 +67,7 @@ public class ExpEval {
 		else if(node instanceof FunctionCall) {
 			State endState = this.evalFunctionCall((FunctionCall) node);
 			this.state.store = endState.store;
-			return endState.scratch.apply(Scratch.RETVAL);
+			return endState.scratch.applyReturn();
 		}
 
 		/* We could not evaluate the expression. Return top. */
@@ -436,8 +435,8 @@ public class ExpEval {
 		/* Keep track of callback functions. */
 		List<Address> callbacks = new LinkedList<Address>();
 
-		/* Create the argument object. */
-		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
+		/* Create the argument values. */
+		BValue[] args = new BValue[fc.getArguments().size()];
 		int i = 0;
 		for(AstNode arg : fc.getArguments()) {
 
@@ -451,20 +450,14 @@ public class ExpEval {
 				state.env.strongUpdateNoCopy(new Identifier(arg.getID().toString()), new Addresses(address, Change.u()));
 				state.store = state.store.alloc(address, argVal);
 			}
-
+			
+			args[i] = argVal;
 			callbacks.addAll(extractFunctions(argVal, new LinkedList<Address>(), new HashSet<Address>()));
-			state.store = Helpers.addProp(fc.getID(), String.valueOf(i), argVal,
-							ext, state.store, state.trace);
 			i++;
+
 		}
-
-		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Arguments_Addr, Change.u(), Change.u()), JSClass.CObject);
-		Obj argObj = new Obj(ext, internal);
-
-//		/* Add the argument object to the state.store. */
-//		Address argAddr = state.trace.makeAddr(fc.getID(), "");
-//		state.store = state.store.alloc(argAddr, argObj);
+		
+		Scratchpad scratch = new Scratchpad(null, args);
 
 		/* Attempt to resolve the function and its parent object. */
 		BValue funVal = resolveValue(fc.getTarget());
@@ -487,8 +480,8 @@ public class ExpEval {
 			}
 
 			/* Call the function and get a join of the new states. */
-			newState = Helpers.applyClosure(state.facts, funVal, objAddr, argObj, state.store,
-												  new Scratchpad(), state.trace, control,
+			newState = Helpers.applyClosure(state.facts, funVal, objAddr, state.store,
+												  scratch, state.trace, control,
 												  state.callStack);
 		}
 
@@ -505,7 +498,7 @@ public class ExpEval {
 			BValue value = callChange
 					? BValue.top(Change.top(), Change.u())
 					: BValue.top(Change.u(), Change.u());
-			state.scratch = state.scratch.strongUpdate(Scratch.RETVAL, value);
+			state.scratch = state.scratch.strongUpdate(value, null);
 			newState = new State(state.facts,
 								 state.store, state.env, state.scratch,
 								 state.trace, state.control, state.selfAddr,
@@ -513,20 +506,20 @@ public class ExpEval {
 
 			/* Create the return value. */
 			BValue retVal =  BValue.top(Change.convU(fc), Change.u());
-			newState.scratch.strongUpdate(Scratch.RETVAL, retVal);
+			newState.scratch.strongUpdate(retVal, null);
 		}
 		else {
 
-			BValue retVal =  newState.scratch.apply(Scratch.RETVAL);
+			BValue retVal =  newState.scratch.applyReturn();
 			if(retVal == null) {
 				/* Functions with no return statement return undefined. */
 				retVal = Undefined.inject(Undefined.top(Change.convU(fc)), Change.u());
-				newState.scratch = newState.scratch.strongUpdate(Scratch.RETVAL, retVal);
+				newState.scratch = newState.scratch.strongUpdate(retVal, null);
 			}
 
 			/* This could be a new value if the call is new. */
 			if(callChange) {
-				newState.scratch.apply(Scratch.RETVAL).change = Change.top();
+				newState.scratch.applyReturn().change = Change.top();
 			}
 
 		}
@@ -546,7 +539,7 @@ public class ExpEval {
 //			if(closure.cfg.getEntryNode().getBeforeState() == null) {
 
 				/* Create the argument object. */
-				argObj = createTopArgObject((FunctionNode)closure.cfg.getEntryNode().getStatement());
+				scratch = new Scratchpad(null, new BValue[0]);
 
 				/* Create the control domain. */
 				Control control = state.control;
@@ -563,7 +556,7 @@ public class ExpEval {
 				state.callStack.push(addr);
 
 				/* Analyze the function. */
-				ifp.closure.run(state.facts, state.selfAddr, argObj, state.store,
+				ifp.closure.run(state.facts, state.selfAddr, state.store,
 								state.scratch, state.trace, control,
 								state.callStack);
 
@@ -591,36 +584,6 @@ public class ExpEval {
 			else value = value.join(state.store.apply(addr));
 		}
 		return value;
-	}
-
-	/**
-	 * Creates an arg object where each argument corresponds to a parameter
-	 * and each argument value is BValue.TOP.
-	 * @param state
-	 * @param f The function
-	 * @return
-	 */
-	private Obj createTopArgObject(FunctionNode f) {
-
-		/* Create the argument object. */
-		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
-
-		int i = 0;
-		for(AstNode param : f.getParams()) {
-
-			BValue argVal = BValue.top(Change.convU(param), Change.u());
-			state.store = Helpers.addProp(f.getID(), String.valueOf(i), argVal,
-										  ext, state.store, state.trace);
-			i++;
-
-		}
-
-		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Arguments_Addr, Change.convU(f), Change.u()), JSClass.CObject);
-		Obj argObj = new Obj(ext, internal);
-
-		return argObj;
-
 	}
 
 	/**

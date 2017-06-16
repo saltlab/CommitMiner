@@ -8,44 +8,49 @@ package commitminer.analysis.flow.abstractdomain;
 public class Scratchpad {
 
 	/** The scratch memory. **/
-	private BValue[] scratchMem;
+	private BValue returnValue;
+	private BValue[] args;
 
 	public Scratchpad() {
-		this.scratchMem = new BValue[Scratch.values().length];
+		this.returnValue = BValue.bottom(Change.bottom(), Change.bottom());
+		this.args = new BValue[0];
 	}
 
-	private Scratchpad(BValue[] scratchMem) {
-		this.scratchMem = scratchMem;
+	public Scratchpad(BValue returnValue, BValue[] args) {
+		this.returnValue = returnValue == null ? BValue.bottom(Change.bottom(), Change.bottom()) : returnValue;
+		this.args = args == null ? new BValue[0] : args;
 	}
 
-	public Scratchpad(Scratch loc, BValue retVal) {
-		this.scratchMem = new BValue[Scratch.values().length];
-		this.scratchMem[loc.val] = retVal;
+	public Scratchpad(Scratchpad scratch) {
+		this.returnValue = scratch.returnValue;
+		this.args = scratch.args;
 	}
-
+	
 	@Override
 	public Scratchpad clone() {
-		return new Scratchpad(scratchMem);
+		return new Scratchpad(this);
 	}
 
 	/**
-	 * @return The value at the location is scratchpad memory.
+	 * @return The return value.
 	 */
-	public BValue apply(Scratch loc) {
-		return this.scratchMem[loc.val];
+	public BValue applyReturn() {
+		return this.returnValue;
+	}
+	
+	/**
+	 * @return The argument values.
+	 */
+	public BValue[] applyArgs() {
+		return this.args;
 	}
 
 	/**
 	 * Performs a strong update.
-	 * @param loc The location in scratchpad memory.
-	 * @param value The value to update.
 	 * @return The updated scratchpad.
 	 */
-	public Scratchpad strongUpdate(Scratch loc, BValue retVal) {
-		BValue[] scratchMem = new BValue[this.scratchMem.length];
-		for(int i = 0; i < scratchMem.length; i++) scratchMem[i] = this.scratchMem[i];
-		scratchMem[loc.val] = retVal;
-		return new Scratchpad(scratchMem);
+	public Scratchpad strongUpdate(BValue returnValue, BValue[] args) {
+		return new Scratchpad(returnValue, args);
 	}
 
 	/**
@@ -54,30 +59,23 @@ public class Scratchpad {
 	 * @return The union of the scratchpads.
 	 */
 	public Scratchpad join(Scratchpad pad) {
+		
+		BValue retVal = this.returnValue.join(pad.returnValue);
+		
+		int arglen = this.args.length > pad.args.length ? this.args.length : pad.args.length;
+		BValue[] args = new BValue[arglen];
 
-		BValue[] scratchMem = new BValue[Scratch.values().length];
-
-		for(int i = 0; i < this.scratchMem.length; i++) {
-			if(this.scratchMem[i] == null) scratchMem[i] = pad.scratchMem[i];
-			else if(pad.scratchMem[i] == null) scratchMem[i] = this.scratchMem[i];
-			else scratchMem[i] = this.scratchMem[i].join(pad.scratchMem[i]);
+		for(int i = 0; i < args.length; i++) {
+			if(this.args[i] != null && pad.args[i] != null) 
+				args[i] = this.args[i].join(pad.args[i]);
+			else if(this.args[i] != null)
+				args[i] = this.args[i];
+			else
+				args[i] = pad.args[i];
 		}
 
-		return new Scratchpad(scratchMem);
+		return new Scratchpad(retVal, args);
 
-	}
-
-	/**
-	 * The types of values we can store in scratch memory and their locations.
-	 */
-	public enum Scratch {
-		RETVAL(0); 					// A return valu
-
-		private int val;
-
-		private Scratch(int val) {
-			this.val = val;
-		}
 	}
 
 }

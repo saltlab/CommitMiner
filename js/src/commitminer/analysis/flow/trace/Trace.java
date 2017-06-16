@@ -32,7 +32,7 @@ public abstract class Trace {
 
 	/** Update for function call. **/
 	public abstract Trace update(Environment env, Store store, Address selfAddr,
-								 Obj argObj, AstNode statement);
+								 AstNode statement);
 
 	/** Update for function return. Default implementation is stack-based. **/
 	public Trace update(Trace trace) {

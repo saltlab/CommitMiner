@@ -25,7 +25,6 @@ import commitminer.analysis.flow.abstractdomain.Scratchpad;
 import commitminer.analysis.flow.abstractdomain.State;
 import commitminer.analysis.flow.abstractdomain.Store;
 import commitminer.analysis.flow.abstractdomain.Str;
-import commitminer.analysis.flow.abstractdomain.Scratchpad.Scratch;
 import commitminer.analysis.flow.trace.Trace;
 import commitminer.cfg.CFG;
 
@@ -72,11 +71,11 @@ public class FunctionFactory {
 		Closure closure = new NativeClosure() {
 				@Override
 				public State run(Map<IPredicate, IRelation> facts,
-								 Address selfAddr, Obj argObj,
+								 Address selfAddr, 
 								 Store store, Scratchpad scratchpad,
 								 Trace trace, Control control,
 								 Stack<Address> callStack) {
-					scratchpad.strongUpdate(Scratch.RETVAL, retVal);
+					scratchpad.strongUpdate(retVal, null);
 					return new State(facts, store, new Environment(), scratchpad,
 									 trace, control, selfAddr, cfgs, callStack);
 				}
