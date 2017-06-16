@@ -15,6 +15,9 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import commitminer.analysis.flow.factories.StoreFactory;
+import commitminer.analysis.flow.statecomparator.StandardStateComparator;
+import commitminer.analysis.flow.statecomparator.StateComparator;
+import commitminer.analysis.flow.statecomparator.StateComparatorFactory;
 import commitminer.analysis.flow.trace.Trace;
 import commitminer.cfg.CFG;
 import commitminer.cfg.CFGNode;
@@ -32,6 +35,9 @@ public class FunctionClosure extends Closure {
 
 	/** The CFGs in the script. **/
 	public Map<AstNode, CFG> cfgs;
+	
+	/** The object which will compare states. */
+	private StateComparator stateComparator;
 
 	/**
 	 * @param cfg The control flow graph for the function.
@@ -70,7 +76,9 @@ public class FunctionClosure extends Closure {
 			/* If newState does not change initState, we do not need to re-analyze the function. */
 			newState = oldState.join(primeState);
 			
-			if(equalState(oldState, newState)) {
+			StateComparator comparator = StateComparatorFactory.instance(oldState, newState);
+			
+			if(comparator.isEqual()) {
 
 				exitState = null;
 
