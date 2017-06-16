@@ -220,5 +220,19 @@ public class BValue {
 	public String toString() {
 		return this.nullAD.toString() + "|" + this.undefinedAD.toString() + "|" + this.booleanAD.toString() + "|" + this.numberAD.toString() + "|" + this.stringAD.toString() + "|" + this.addressAD.toString() + "|" + this.change.toString();
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof BValue)) return false;
+		BValue v = (BValue)o;
+		if(!this.stringAD.equals(v.stringAD)) return false;
+		if(!this.numberAD.equals(v.numberAD)) return false;
+		if(!this.booleanAD.equals(v.booleanAD)) return false;
+		if(!this.nullAD.equals(v.nullAD)) return false;
+		if(!this.undefinedAD.equals(v.undefinedAD)) return false;
+		if(!this.addressAD.equals(v.addressAD)) return false;
+		if(!this.change.equals(v.change)) return false;
+		return true;
+	}
 
 }

@@ -17,7 +17,7 @@ public abstract class Closure {
 	/**
 	 * @param facts The fact database for facts generated during analysis.
 	 * @param selfAddr The value of the 'this' variable (a set of objects).
-	 * @param argArrayAddr The address of the argument array object.
+	 * @param arbObj The argument array object.
 	 * @param store Main memory.
 	 * @param scratchpad Scratchpad memory.
 	 * @param trace The execution trace.
@@ -26,7 +26,7 @@ public abstract class Closure {
 	 * @return The new state after executing the function.
 	 */
 	public abstract State run(Map<IPredicate, IRelation> facts,
-							  Address selfAddr, Address argArrayAddr,
+							  Address selfAddr, Obj argObj,
 							  Store store, Scratchpad scratchpad,
 							  Trace trace, Control control,
 							  Stack<Address> callStack);

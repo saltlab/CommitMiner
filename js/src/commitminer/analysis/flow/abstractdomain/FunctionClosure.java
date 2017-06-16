@@ -108,53 +108,70 @@ public class FunctionClosure extends Closure {
 
 	@Override
 	public State run(Map<IPredicate, IRelation> facts, 
-			Address selfAddr, Address argArrayAddr, Store store,
+			Address selfAddr, Obj argObj, Store store,
 			Scratchpad scratchpad, Trace trace, Control control,
 			Stack<Address> callStack) {
 
-		/* If this has already been analyzed, we can short-circuit. */
-		boolean runAnalysis = this.runAnalysis(control, argArrayAddr, store);
-		if(!runAnalysis) {
-
-			State exitState = null;
-
-			for(CFGNode exitNode : cfg.getExitNodes()) {
-				/* Merge all exit states, because we can only return one. */
-				State s = (State)exitNode.getAfterState();
-				if(exitState == null) exitState = s;
-				else if(s != null) exitState = exitState.join(s);
-			}
-
-			if(exitState != null) {
-				/* Finally, merge the store from the exit state with the
-				 * store from the entry state. */
-				exitState.store = exitState.store.join(store);
-				return exitState;
-			}
-
-		}
-
 		/* Advance the trace. */
-		trace = trace.update(environment, store, selfAddr, argArrayAddr,
+		trace = trace.update(environment, store, selfAddr, argObj,
 							 (ScriptNode)cfg.getEntryNode().getStatement());
+		
+		/* Create the initial state if needed. */
+		State newState = null;
+		State oldState = (State) cfg.getEntryNode().getBeforeState();
+		State primeState = initState(facts, selfAddr, argObj, store, scratchpad, trace, control, callStack);
+		State exitState = null;
+		
+		if(oldState == null) {
+			/* Create the initial state for the function call by lifting local 
+			 * vars and functions into the environment. */
+			newState = primeState;
+		}
+		else {
+			/* If newState does not change initState, we do not need to re-analyze the function. */
+			newState = oldState.join(primeState);
+			
+			if(equalState(oldState, newState)) {
+
+				exitState = null;
+
+				for(CFGNode exitNode : cfg.getExitNodes()) {
+					/* Merge all exit states, because we can only return one. */
+					State s = (State)exitNode.getAfterState();
+					if(exitState == null) exitState = s;
+					else if(s != null) exitState = exitState.join(s);
+				}
+
+				if(exitState != null) {
+					/* Finally, merge the store from the exit state with the
+					 * store from the entry state. */
+					exitState.store = exitState.store.join(store);
+					return exitState;
+				}
+				
+			}
+			else {
+				/* We have a new initial state for the function. */
+				cfg.getEntryNode().setBeforeState(newState);
+			}
+			
+		}
+		
+		System.out.println("Analyzing " + ((AstNode)this.cfg.getEntryNode().getStatement()).toSource());
 
 		/* We'll use this later when executing unanalyzed functions. */
 		List<Name> localVarNames = VariableLiftVisitor.getVariableDeclarations((ScriptNode)cfg.getEntryNode().getStatement());
 		Set<String> localVars = new HashSet<String>();
 		for(Name localVarName : localVarNames) localVars.add(localVarName.toSource());
 
-		/* Create the initial state for the function call by lifting local 
-		 * vars and functions into the environment. */
-		State state = initState(facts, selfAddr, argArrayAddr, store, scratchpad, trace, control, callStack);
-
 		/* Perform the initial analysis and get the publicly accessible methods. */
-		state = Helpers.run(cfg, state);
+		exitState = Helpers.run(cfg, newState);
 
 		/* Analyze the publicly accessible methods that weren't analyzed in
 		 * the main analysis. */
-		Helpers.analyzeEnvReachable(facts, state, state.env.environment, state.selfAddr, cfgs, new HashSet<Address>(), localVars);
+		Helpers.analyzeEnvReachable(facts, exitState, exitState.env.environment, exitState.selfAddr, cfgs, new HashSet<Address>(), localVars);
 
-		return state;
+		return exitState;
 
 	}
 	
@@ -164,7 +181,7 @@ public class FunctionClosure extends Closure {
 	 * @return The environment for the closure, including parameters and {@code this}.
 	 */
 	private State initState(Map<IPredicate, IRelation> facts, 
-			Address selfAddr, Address argArrayAddr, Store store,
+			Address selfAddr, Obj argObj, Store store,
 			Scratchpad scratchpad, Trace trace, Control control,
 			Stack<Address> callStack) {
 
@@ -175,14 +192,18 @@ public class FunctionClosure extends Closure {
 							 cfgs, trace);
 
 		/* Match parameters with arguments. */
-		Obj argObj = store.getObj(argArrayAddr);
 		if(this.cfg.getEntryNode().getStatement() instanceof FunctionNode) {
 			FunctionNode function = (FunctionNode)this.cfg.getEntryNode().getStatement();
+
+			/* Put the argument object on the store. */
+			Address argAddr = trace.makeAddr(function.getID(), "");
+			store = store.alloc(argAddr, argObj);
+
 			int i = 0;
 			for(AstNode param : function.getParams()) {
 				if(param instanceof Name) {
 					Name paramName = (Name) param;
-					Address argAddr = argObj.externalProperties.get(new Identifier(String.valueOf(i), Change.u()));
+					argAddr = argObj.externalProperties.get(new Identifier(String.valueOf(i), Change.u()));
 					if(argAddr == null) {
 
 						/* No argument was given for this parameter. Create a
@@ -199,8 +220,7 @@ public class FunctionClosure extends Closure {
 
 					}
 					Identifier identity = new Identifier(paramName.toSource(), Change.conv(paramName));
-					// TODO: should be weak update
-					env = env.strongUpdate(identity, new Addresses(argAddr, Change.u()));
+					env = env.weakUpdate(identity, new Addresses(argAddr, Change.u()));
 				}
 				i++;
 			}
@@ -208,11 +228,39 @@ public class FunctionClosure extends Closure {
 		
 		/* Add 'this' to environment (points to caller's object or new object). */
 		// TODO: should be weak update
-		env = env.strongUpdate(new Identifier("this", Change.u()), new Addresses(selfAddr, Change.u()));
+		env = env.weakUpdate(new Identifier("this", Change.u()), new Addresses(selfAddr, Change.u()));
 		
 		/* Create the initial state for the function call. */
 		return new State(facts, store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
 		
 	}
+	
+	/**
+	 * @param s1
+	 * @param s2
+	 * @return true if the states are the equivalent with respect to environment and store.
+	 */
+	private static boolean equalState(State s1, State s2) {
 
+		System.out.println(s1.env);
+		System.out.println(s2.env);
+		
+		/* Check the initial environment. */
+		if(!s1.env.equals(s2.env))
+			return false;
+		
+		/* Check the reachable values in the store. */
+		for(Addresses addrs : s1.env.environment.values()) {
+			BValue b1 = s1.store.apply(addrs);
+			BValue b2 = s2.store.apply(addrs);
+			if(!b1.equals(b2)) return false;
+			// TODO: Recursively check the objects reachable from the addresses.
+		}
+		
+		// TODO: Check for control flow changes as well.
+		
+		return true;
+
+	}
+	
 }

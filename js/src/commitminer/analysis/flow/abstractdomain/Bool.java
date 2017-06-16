@@ -95,6 +95,14 @@ public class Bool {
 	public String toString() {
 		return "Bool:" + this.le.toString();
 	}
-
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Bool)) return false;
+		Bool bool = (Bool)o;
+		if(this.le != bool.le) return false;
+		if(!this.change.equals(bool.change)) return false;
+		return true;
+	}
 
 }

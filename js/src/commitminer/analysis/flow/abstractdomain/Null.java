@@ -92,6 +92,14 @@ public class Null {
 	public String toString() {
 		return "Null:" + this.le.toString();
 	}
-
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Null)) return false;
+		Null n = (Null)o;
+		if(this.le != n.le) return false;
+		if(!this.change.equals(n.change)) return false;
+		return true;
+	}
 
 }

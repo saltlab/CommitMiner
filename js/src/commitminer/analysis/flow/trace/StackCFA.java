@@ -8,6 +8,7 @@ import org.mozilla.javascript.ast.AstNode;
 
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.Environment;
+import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.Store;
 
 /**
@@ -42,7 +43,7 @@ public class StackCFA extends Trace {
 	}
 
 	@Override
-	public Trace update(Environment env, Store store, Address selfAddr, Address args,
+	public Trace update(Environment env, Store store, Address selfAddr, Obj argObj,
 			AstNode call) {
 		Queue<Integer> trp = new LinkedList<Integer>(this.tr);
 		trp.add(call.getID());

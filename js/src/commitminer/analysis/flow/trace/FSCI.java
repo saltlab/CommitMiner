@@ -6,6 +6,7 @@ import org.mozilla.javascript.ast.AstNode;
 
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.Environment;
+import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.Store;
 
 /**
@@ -29,7 +30,7 @@ public class FSCI extends Trace {
 	}
 
 	@Override
-	public Trace update(Environment env, Store store, Address selfAddr, Address args,
+	public Trace update(Environment env, Store store, Address selfAddr, Obj argObj,
 			AstNode call) {
 		// Context insensitive
 		return new FSCI(call.getID());

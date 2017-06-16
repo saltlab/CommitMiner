@@ -182,5 +182,15 @@ public class Str {
 		if(this.val != null) return "Str:" + this.val;
 		return "Str:" + this.le.toString();
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Str)) return false;
+		Str str = (Str)o;
+		if(this.le != str.le) return false;
+		if(!this.val.equals(str.val)) return false;
+		if(!this.change.equals(str.change)) return false;
+		return true;
+	}
 
 }

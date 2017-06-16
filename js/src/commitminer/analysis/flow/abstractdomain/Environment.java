@@ -75,8 +75,11 @@ public class Environment {
 	 * @return The updated environment.
 	 */
 	public Environment weakUpdate(Identifier variable, Addresses addresses) {
-		// TODO
-		return null;
+		Map<Identifier, Addresses> map = new HashMap<Identifier, Addresses>(this.environment);
+		// TODO: Do we need to merge the variables as well? We shouldn't need to
+		// during flow analysis, but we do this for strongUpdate...
+		map.put(variable, map.get(variable).join(addresses));
+		return new Environment(map);
 	}
 
 	/**
@@ -115,6 +118,17 @@ public class Environment {
 			str += entry.getKey().name.toString() + "_" + entry.getKey().change.toString() + ": " + entry.getValue().toString() + "\n";
 		}
 		return str;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Environment)) return false;
+		Environment env = (Environment)o;
+		for(Map.Entry<Identifier, Addresses> entry : env.environment.entrySet()) {
+			if(!this.environment.containsKey(entry.getKey())) return false;
+			if(!this.environment.get(entry.getKey()).equals(entry.getValue())) return false;
+		}
+		return true;
 	}
 
 }

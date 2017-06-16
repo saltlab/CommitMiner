@@ -462,9 +462,9 @@ public class ExpEval {
 				Address.inject(StoreFactory.Arguments_Addr, Change.u(), Change.u()), JSClass.CObject);
 		Obj argObj = new Obj(ext, internal);
 
-		/* Add the argument object to the state.store. */
-		Address argAddr = state.trace.makeAddr(fc.getID(), "");
-		state.store = state.store.alloc(argAddr, argObj);
+//		/* Add the argument object to the state.store. */
+//		Address argAddr = state.trace.makeAddr(fc.getID(), "");
+//		state.store = state.store.alloc(argAddr, argObj);
 
 		/* Attempt to resolve the function and its parent object. */
 		BValue funVal = resolveValue(fc.getTarget());
@@ -487,7 +487,7 @@ public class ExpEval {
 			}
 
 			/* Call the function and get a join of the new states. */
-			newState = Helpers.applyClosure(state.facts, funVal, objAddr, argAddr, state.store,
+			newState = Helpers.applyClosure(state.facts, funVal, objAddr, argObj, state.store,
 												  new Scratchpad(), state.trace, control,
 												  state.callStack);
 		}
@@ -546,7 +546,7 @@ public class ExpEval {
 //			if(closure.cfg.getEntryNode().getBeforeState() == null) {
 
 				/* Create the argument object. */
-				argAddr = createTopArgObject((FunctionNode)closure.cfg.getEntryNode().getStatement());
+				argObj = createTopArgObject((FunctionNode)closure.cfg.getEntryNode().getStatement());
 
 				/* Create the control domain. */
 				Control control = state.control;
@@ -563,7 +563,7 @@ public class ExpEval {
 				state.callStack.push(addr);
 
 				/* Analyze the function. */
-				ifp.closure.run(state.facts, state.selfAddr, argAddr, state.store,
+				ifp.closure.run(state.facts, state.selfAddr, argObj, state.store,
 								state.scratch, state.trace, control,
 								state.callStack);
 
@@ -600,7 +600,7 @@ public class ExpEval {
 	 * @param f The function
 	 * @return
 	 */
-	private Address createTopArgObject(FunctionNode f) {
+	private Obj createTopArgObject(FunctionNode f) {
 
 		/* Create the argument object. */
 		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
@@ -619,11 +619,7 @@ public class ExpEval {
 				Address.inject(StoreFactory.Arguments_Addr, Change.convU(f), Change.u()), JSClass.CObject);
 		Obj argObj = new Obj(ext, internal);
 
-		/* Add the argument object to the store. */
-		Address argAddr = state.trace.makeAddr(f.getID(), "");
-		state.store = state.store.alloc(argAddr, argObj);
-
-		return argAddr;
+		return argObj;
 
 	}
 

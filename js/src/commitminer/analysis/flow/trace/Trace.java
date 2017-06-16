@@ -11,6 +11,7 @@ import org.mozilla.javascript.ast.AstNode;
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.Environment;
 import commitminer.analysis.flow.abstractdomain.JSClass;
+import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.Store;
 
 public abstract class Trace {
@@ -31,7 +32,7 @@ public abstract class Trace {
 
 	/** Update for function call. **/
 	public abstract Trace update(Environment env, Store store, Address selfAddr,
-								 Address args, AstNode statement);
+								 Obj argObj, AstNode statement);
 
 	/** Update for function return. Default implementation is stack-based. **/
 	public Trace update(Trace trace) {

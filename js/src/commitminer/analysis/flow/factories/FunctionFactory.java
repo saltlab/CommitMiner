@@ -72,7 +72,7 @@ public class FunctionFactory {
 		Closure closure = new NativeClosure() {
 				@Override
 				public State run(Map<IPredicate, IRelation> facts,
-								 Address selfAddr, Address argArrayAddr,
+								 Address selfAddr, Obj argObj,
 								 Store store, Scratchpad scratchpad,
 								 Trace trace, Control control,
 								 Stack<Address> callStack) {

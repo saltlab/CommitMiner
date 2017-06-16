@@ -8,7 +8,7 @@ import java.util.Set;
  */
 public class Addresses {
 
-	private static final int MAX_SIZE = 3;
+	private static final int MAX_SIZE = 10;
 
 	public LatticeElement le;
 	public Change change;
@@ -77,9 +77,7 @@ public class Addresses {
 		if(this.le == LatticeElement.TOP || a.le == LatticeElement.TOP)
 			return new Addresses(LatticeElement.TOP, jc);
 
-		/* We set a limit on the number of addresses so that there is a finite
-		 * address space. This is in lieu of abstracting the abstract machine. */
-		if(this.addresses.size() + a.addresses.size() > 3)
+		if(this.addresses.size() + a.addresses.size() > MAX_SIZE)
 			return new Addresses(LatticeElement.TOP, jc);
 
 		/* Join the two address sets. */
@@ -149,6 +147,16 @@ public class Addresses {
 			return addrs.substring(0, addrs.length() - 1) + "}";
 		}
 	}
-
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Addresses)) return false;
+		Addresses addrs = (Addresses)o;
+		if(this.le != addrs.le || !this.change.equals(addrs.change)) return false;
+		for(Address addr : this.addresses) {
+			if(!addrs.addresses.contains(addr)) return false;
+		}
+		return true;
+	}
 
 }

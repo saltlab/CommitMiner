@@ -210,7 +210,7 @@ public class Helpers {
 	 * @return The final state of the closure.
 	 */
 	public static State applyClosure(Map<IPredicate, IRelation> facts, 
-							  BValue funVal, Address selfAddr, Address args,
+							  BValue funVal, Address selfAddr, Obj argObj,
 							  Store store, Scratchpad sp, Trace trace, Control control,
 							  Stack<Address> callStack) {
 
@@ -237,7 +237,7 @@ public class Helpers {
 			callStack.push(address);
 
 			/* Run the function. */
-			State endState = ifp.closure.run(facts, selfAddr, args, store, sp, trace, control, callStack);
+			State endState = ifp.closure.run(facts, selfAddr, argObj, store, sp, trace, control, callStack);
 
 			/* Pop this function off the call stack. */
 			callStack.pop();
@@ -386,7 +386,7 @@ public class Helpers {
 						fc.cfg.getEntryNode().getBeforeState() == null) {
 
 					/* Create the argument object. */
-					Address argAddr = createTopArgObject(state, (FunctionNode)fc.cfg.getEntryNode().getStatement());
+					Obj argObj = createTopArgObject(state, (FunctionNode)fc.cfg.getEntryNode().getStatement());
 
 					/* Create the control domain. */
 					Control control = new Control();
@@ -397,7 +397,7 @@ public class Helpers {
 					}
 
 					/* Analyze the function. Use a fresh call stack because we don't have any knowledge of it. */
-					ifp.closure.run(facts, selfAddr, argAddr, state.store,
+					ifp.closure.run(facts, selfAddr, argObj, state.store,
 									state.scratch, state.trace, control,
 									new Stack<Address>());
 
@@ -421,7 +421,7 @@ public class Helpers {
 	 * @param f The function
 	 * @return
 	 */
-	public static Address createTopArgObject(State state, FunctionNode f) {
+	public static Obj createTopArgObject(State state, FunctionNode f) {
 
 		/* Create the argument object. */
 		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
@@ -440,11 +440,7 @@ public class Helpers {
 				Address.inject(StoreFactory.Arguments_Addr, Change.convU(f), Change.u()), JSClass.CObject);
 		Obj argObj = new Obj(ext, internal);
 
-		/* Add the argument object to the store. */
-		Address argAddr = state.trace.makeAddr(f.getID(), "");
-		state.store = state.store.alloc(argAddr, argObj);
-
-		return argAddr;
+		return argObj;
 
 	}
 

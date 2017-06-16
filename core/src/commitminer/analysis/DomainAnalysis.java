@@ -148,11 +148,11 @@ public class DomainAnalysis {
 			CFDContext cfdContext = cfd.getContext();
 
 			/* Build the analyzers with reflection. */
-			SourceCodeFileAnalysis srcAnalysis = this.srcAnalysisFactory.newInstance();
+//			SourceCodeFileAnalysis srcAnalysis = this.srcAnalysisFactory.newInstance();
 			SourceCodeFileAnalysis dstAnalysis = this.srcAnalysisFactory.newInstance();
 
 			/* Run the analysis. */
-			srcAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
+//			srcAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.srcScript, cfdContext.srcCFGs);
 			dstAnalysis.analyze(sourceCodeFileChange, facts, cfdContext.dstScript, cfdContext.dstCFGs);
 
 		}

@@ -114,5 +114,13 @@ public class Change {
 	public String toString() {
 		return "Change:" + this.le.toString();
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Change)) return false;
+		Change change = (Change)o;
+		if(this.le == change.le) return true;
+		return false;
+	}
 
 }

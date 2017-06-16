@@ -176,5 +176,15 @@ public class Num {
 	public String toString() {
 		return "Num:" + this.le.toString();
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Num)) return false;
+		Num num = (Num)o;
+		if(this.le != num.le) return false;
+		if(!this.val.equals(num.val)) return false;
+		if(!this.change.equals(num.change)) return false;
+		return true;
+	}
 
 }

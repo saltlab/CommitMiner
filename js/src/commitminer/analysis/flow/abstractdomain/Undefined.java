@@ -71,5 +71,14 @@ public class Undefined {
 	public String toString() {
 		return "Undef:" + this.le.toString();
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Undefined)) return false;
+		Undefined u = (Undefined)o;
+		if(this.le != u.le) return false;
+		if(!this.change.equals(u.change)) return false;
+		return true;
+	}
 
 }
