@@ -9,4 +9,5 @@ function A(x, y) {
 
 A(a,b);
 A(a,b);
+A(a,b);
 

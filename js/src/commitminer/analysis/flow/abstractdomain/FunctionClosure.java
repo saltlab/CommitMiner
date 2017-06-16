@@ -1,6 +1,5 @@
 package commitminer.analysis.flow.abstractdomain;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +14,6 @@ import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
-import commitminer.analysis.flow.ScriptFlowAnalysis;
 import commitminer.analysis.flow.factories.StoreFactory;
 import commitminer.analysis.flow.trace.Trace;
 import commitminer.cfg.CFG;
@@ -45,67 +43,6 @@ public class FunctionClosure extends Closure {
 		this.cfg = cfg;
 		this.environment = environment;
 		this.cfgs = cfgs;
-	}
-
-	private boolean hasValueChanges(Collection<Address> bvalAddrs, Store store) {
-
-		/* Look for changes to each value. */
-		for(Address bvalAddr : bvalAddrs) {
-
-			BValue value = store.apply(bvalAddr);
-
-			/* Check for changes. */
-			switch(value.change.le) {
-			case CHANGED:
-			case TOP:
-				return true;
-			default:
-				break;
-			}
-
-			/* Recursively look at objects. */
-			for(Address objAddr : value.addressAD.addresses) {
-				Obj obj = store.getObj(objAddr);
-				boolean recursiveChanged = hasValueChanges(obj.externalProperties.values(), store);
-				if(recursiveChanged)
-					return true;
-			}
-
-		}
-
-		/* No changes found. */
-		return false;
-
-	}
-
-	/**
-	 * @return true if the analysis needs to be (re-)run on the function
-	 */
-	private boolean runAnalysis(Control control, Address argArrayAddr, Store store) {
-		
-		// TODO: Compare the old initial state to the new initial state. We 
-		//		 can implement it two ways: (1) compare entire state, (2) 
-		//		 compare potential change propagation. #2 risks alias issues...
-		//		 less if we consider parameters and ignore the entire state.
-
-		State initState = (State) cfg.getEntryNode().getBeforeState();
-
-		/* Run the analysis on the function if it has not yet run. */
-		if(initState == null) return true;
-
-		// Don't do any new analysis if the runtime has exceeded 30 seconds
-//		if(ScriptFlowAnalysis.stopWatch.getTime() > 30000) {
-//			return false;
-//		}
-		
-		/* Re-run the analysis if there are control changes from the caller
-		 * state, but not in the initial state. */
-		if(!control.conditions.isEmpty() && initState.control.conditions.isEmpty()) return true;
-
-		/* Re-run the analysis if there are value changes in the arg list. */
-		Obj argObj = store.getObj(argArrayAddr);
-		return hasValueChanges(argObj.externalProperties.values(), store);
-		
 	}
 
 	@Override
@@ -236,15 +173,14 @@ public class FunctionClosure extends Closure {
 
 					}
 					Identifier identity = new Identifier(paramName.toSource(), Change.conv(paramName));
-					env = env.weakUpdate(identity, new Addresses(argAddr, Change.u()));
+					env = env.strongUpdate(identity, new Addresses(argAddr, Change.u()));
 				}
 				i++;
 			}
 		}
 		
 		/* Add 'this' to environment (points to caller's object or new object). */
-		// TODO: should be weak update
-		env = env.weakUpdate(new Identifier("this", Change.u()), new Addresses(selfAddr, Change.u()));
+		env = env.strongUpdate(new Identifier("this", Change.u()), new Addresses(selfAddr, Change.u()));
 		
 		/* Create the initial state for the function call. */
 		return new State(facts, store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
@@ -269,14 +205,16 @@ public class FunctionClosure extends Closure {
 		for(Addresses addrs : s1.env.environment.values()) {
 			BValue b1 = s1.store.apply(addrs);
 			BValue b2 = s2.store.apply(addrs);
-			System.out.println(b1);	// z = BOT here
-			System.out.println(b2); // z = 10 here
 			if(!b1.equals(b2)) 
 				return false;
 			// TODO: Recursively check the objects reachable from the addresses.
 		}
 		
-		// TODO: Check for control flow changes as well.
+		/* Control change AD is not equal if: 
+		 * 	there are NO control changes in the old state
+		 * 	AND 
+		 * there are control changes in the new state. */
+		if(s1.control.conditions.isEmpty() && !s2.control.conditions.isEmpty()) return false;
 		
 		return true;
 
