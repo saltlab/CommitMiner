@@ -384,7 +384,7 @@ public class State implements IState {
 			ExpEval expEval = new ExpEval(this);
 			State endState = expEval.evalFunctionCall((FunctionCall) node);
 			this.store = endState.store;
-			this.store = Helpers.gc(this.env, this.store);
+//			this.store = Helpers.gc(this.env, this.store); TODO: Helpers.gc needs to account for all environments in the call stack
 		}
 		else if(node instanceof Assignment) {
 			interpretAssignment((Assignment)node);

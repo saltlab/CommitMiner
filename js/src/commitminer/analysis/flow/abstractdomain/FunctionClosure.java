@@ -195,4 +195,9 @@ public class FunctionClosure extends Closure {
 		
 	}
 	
+	@Override
+	public String toString() {
+		return this.cfg.getEntryNode().getStatement().toString();
+	}
+	
 }

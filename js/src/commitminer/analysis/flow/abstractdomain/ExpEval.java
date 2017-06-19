@@ -67,7 +67,8 @@ public class ExpEval {
 		else if(node instanceof FunctionCall) {
 			State endState = this.evalFunctionCall((FunctionCall) node);
 			this.state.store = endState.store;
-			this.state.store = Helpers.gc(this.state.env, this.state.store);
+//			this.state.store = Helpers.gc(this.state.env, this.state.store); TODO: Helpers.gc needs to account for all environments in the call stack
+ 
 			return endState.scratch.applyReturn();
 		}
 
@@ -430,10 +431,13 @@ public class ExpEval {
 	 */
 	public State evalFunctionCall(FunctionCall fc) {
 		
+		System.out.println("Evaluating " + fc.getTarget().toSource());
+		
 		/* The state after the function call. */
 		State newState = null;
 
 		/* Keep track of callback functions. */
+		// TODO: We shouldn't need to do this... they are reachable in Helpers.analyzeEnvReachable
 		List<Address> callbacks = new LinkedList<Address>();
 
 		/* Create the argument values. */

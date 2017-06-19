@@ -396,6 +396,7 @@ public class Helpers {
 					Scratchpad scratch = new Scratchpad(state.scratch.applyReturn(), new BValue[0]);
 
 					/* Analyze the function. Use a fresh call stack because we don't have any knowledge of it. */
+					System.out.println("Running closure " + fc.cfg.getEntryNode().getStatement().toString());
 					ifp.closure.run(facts, selfAddr, state.store,
 									scratch, state.trace, control,
 									new Stack<Address>());
