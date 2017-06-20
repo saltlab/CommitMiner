@@ -431,8 +431,6 @@ public class ExpEval {
 	 */
 	public State evalFunctionCall(FunctionCall fc) {
 		
-		System.out.println("Evaluating " + fc.getTarget().toSource());
-		
 		/* The state after the function call. */
 		State newState = null;
 

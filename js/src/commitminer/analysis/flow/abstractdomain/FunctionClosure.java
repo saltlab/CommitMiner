@@ -104,8 +104,6 @@ public class FunctionClosure extends Closure {
 			
 		}
 		
-		System.out.println("Analyzing " + ((AstNode)this.cfg.getEntryNode().getStatement()).toSource());
-
 		/* We'll use this later when executing unanalyzed functions. */
 		List<Name> localVarNames = VariableLiftVisitor.getVariableDeclarations((ScriptNode)cfg.getEntryNode().getStatement());
 		Set<String> localVars = new HashSet<String>();

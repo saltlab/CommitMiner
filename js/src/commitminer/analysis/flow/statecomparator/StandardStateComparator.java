@@ -24,14 +24,10 @@ public class StandardStateComparator extends StateComparator {
 	}
 
 	/**
-	 * @return true if the states are the equivalent with respect to environment and store.
+	 * @return true if the states are equivalent with respect to environment and store.
 	 */
 	private boolean equalState() {
 
-		/* TODO: Some debug logging. */
-		System.out.println(s1.env);
-		System.out.println(s2.env);
-		
 		/* Check the initial environment. */
 		if(!s1.env.equals(s2.env))
 			return false;

@@ -6,6 +6,7 @@ public class StateComparatorFactory {
 
 	public static StateComparator instance(State s1, State s2) {
 		return new StandardStateComparator(s1, s2);
+//		return new ChangeStateComparator(s1, s2);
 	}
 
 }
