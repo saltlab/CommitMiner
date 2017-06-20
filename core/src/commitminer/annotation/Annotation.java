@@ -1,5 +1,8 @@
-package commitminer.js.diff;
+package commitminer.annotation;
 
+/**
+ * Stores the location of a source file annotation.
+ */
 public class Annotation {
 
 	public Integer line;

@@ -20,10 +20,10 @@ import commitminer.analysis.flow.abstractdomain.Identifier;
 import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.State;
 import commitminer.analysis.flow.abstractdomain.Addresses.LatticeElement;
+import commitminer.annotation.Annotation;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
-import commitminer.js.diff.Annotation;
 import commitminer.js.diff.IsUsedVisitor;
 
 /**

@@ -18,10 +18,10 @@ import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.Addresses;
 import commitminer.analysis.flow.abstractdomain.Identifier;
 import commitminer.analysis.flow.abstractdomain.State;
+import commitminer.annotation.Annotation;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
-import commitminer.js.diff.Annotation;
 import commitminer.js.diff.IsUsedVisitor;
 
 /**
