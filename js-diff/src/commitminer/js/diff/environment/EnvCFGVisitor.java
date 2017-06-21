@@ -3,25 +3,15 @@ package commitminer.js.diff.environment;
 import java.util.Map;
 import java.util.Set;
 
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.api.basics.ITuple;
-import org.deri.iris.factory.Factory;
-import org.deri.iris.storage.IRelation;
-import org.deri.iris.storage.IRelationFactory;
-import org.deri.iris.storage.simple.SimpleRelationFactory;
-import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.InfixExpression;
 
-import commitminer.analysis.SourceCodeFileChange;
-import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.Addresses;
 import commitminer.analysis.flow.abstractdomain.Identifier;
 import commitminer.analysis.flow.abstractdomain.State;
-import commitminer.annotation.Annotation;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
+import commitminer.factbase.Annotation;
 import commitminer.js.diff.IsUsedVisitor;
 
 /**
@@ -29,14 +19,11 @@ import commitminer.js.diff.IsUsedVisitor;
  */
 public class EnvCFGVisitor implements ICFGVisitor {
 
-	private SourceCodeFileChange sourceCodeFileChange;
-
 	/* The fact database we will populate. */
-	private Map<IPredicate, IRelation> facts;
+	private EnvFactBase factBase;
 
-	public EnvCFGVisitor(SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts) {
-		this.sourceCodeFileChange = sourceCodeFileChange;
-		this.facts = facts;
+	public EnvCFGVisitor(EnvFactBase factBase) {
+		this.factBase = factBase;
 	}
 
 	@Override
@@ -70,7 +57,7 @@ public class EnvCFGVisitor implements ICFGVisitor {
 			if(node != null) {
 				Set<Annotation> annotations = isUsed(node, prop);
 				for(Annotation annotation : annotations) {
-					registerFact(node, prop.name, "ENV", prop.change.toString(), annotation);
+					factBase.registerVariableChangeDependency(prop, annotation);
 				}
 			}
 
@@ -84,41 +71,6 @@ public class EnvCFGVisitor implements ICFGVisitor {
 	 */
 	private Set<Annotation> isUsed(AstNode statement, Identifier identity) {
 		return IsUsedVisitor.isUsed(statement, identity, true);
-	}
-
-	/**
-	 * @param statement The statement for which we are registering a fact.
-	 * @param identifier The identifier for which we are registering a fact.
-	 * @param ad The abstract domain of the fact.
-	 * @param cle The change lattice element.
-	 */
-	private void registerFact(AstNode statement, String identifier, String ad, String cle, Annotation annotation) {
-
-		if(statement == null || statement.getID() == null) return;
-
-		IPredicate predicate = Factory.BASIC.createPredicate("Environment", 9);
-		IRelation relation = facts.get(predicate);
-		if(relation == null) {
-			IRelationFactory relationFactory = new SimpleRelationFactory();
-			relation = relationFactory.createRelation();
-			facts.put(predicate, relation);
-		}
-
-		/* Add the new tuple to the relation. */
-		ITuple tuple = Factory.BASIC.createTuple(
-				Factory.TERM.createString(statement.getVersion().toString()),
-				Factory.TERM.createString(sourceCodeFileChange.repairedFile),
-				Factory.TERM.createString(annotation.line.toString()),
-				Factory.TERM.createString(annotation.absolutePosition.toString()),
-				Factory.TERM.createString(annotation.length.toString()),
-				Factory.TERM.createString(String.valueOf(statement.getID())),
-				Factory.TERM.createString(identifier),
-				Factory.TERM.createString(ad),
-				Factory.TERM.createString(cle));
-		relation.add(tuple);
-
-//		facts.put(predicate,  relation);
-
 	}
 
 }

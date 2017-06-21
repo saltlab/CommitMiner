@@ -18,7 +18,7 @@ public class Helpers {
 	public static Store addProp(String prop, BValue propVal, Map<Identifier, Address> ext, Store store) {
 		Address propAddr = Address.createBuiltinAddr(prop);
 		store = store.alloc(propAddr, propVal);
-		ext.put(new Identifier(prop, Change.u()), propAddr);
+		ext.put(new Identifier(null, prop, Change.u()), propAddr);
 		return store;
 	}
 

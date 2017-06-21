@@ -108,7 +108,7 @@ public class ExpEval {
 			BValue propVal = this.eval(property.getRight());
 			Address propAddr = state.trace.makeAddr(property.getID(), "");
 			state.store = state.store.alloc(propAddr, propVal);
-			if(propName != null) ext.put(new Identifier(propName, Change.u()), propAddr);
+			if(propName != null) ext.put(new Identifier(property.getID(), propName, Change.u()), propAddr);
 		}
 
 		Obj obj = new Obj(ext, in);
@@ -449,7 +449,7 @@ public class ExpEval {
 				/* If this is an object literal, make a fake var in the
 				 * environment and point it to the object literal. */
 				Address address = state.trace.makeAddr(arg.getID(), "");
-				state.env.strongUpdateNoCopy(new Identifier(arg.getID().toString()), new Addresses(address, Change.u()));
+				state.env.strongUpdateNoCopy(new Identifier(arg.getID(), arg.getID().toString()), new Addresses(address, Change.u()));
 				state.store = state.store.alloc(address, argVal);
 			}
 			

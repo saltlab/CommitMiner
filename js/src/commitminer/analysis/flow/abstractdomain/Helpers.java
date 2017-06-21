@@ -50,7 +50,7 @@ public class Helpers {
 	public static Store addProp(int propID, String prop, BValue propVal, Map<Identifier, Address> ext, Store store, Trace trace) {
 		Address propAddr = trace.makeAddr(propID, prop);
 		store = store.alloc(propAddr, propVal);
-		ext.put(new Identifier(prop, Change.u()), propAddr);
+		ext.put(new Identifier(propID, prop, Change.u()), propAddr);
 		return store;
 	}
 
@@ -273,7 +273,7 @@ public class Helpers {
 		for(Name localVar : localVars) {
 			Change change = Change.convU(localVar);
 			Address address = trace.makeAddr(localVar.getID(), "");
-			env.strongUpdateNoCopy(new Identifier(localVar.toSource(), Change.convU(localVar)), new Addresses(address, Change.u()));
+			env.strongUpdateNoCopy(new Identifier(localVar.getID(), localVar.toSource(), Change.convU(localVar)), new Addresses(address, Change.u()));
 			store = store.alloc(address, Undefined.inject(Undefined.top(change), Change.u()));
 		}
 
@@ -285,7 +285,7 @@ public class Helpers {
 			address = trace.modAddr(address, JSClass.CFunction);
 
 			/* The function name variable points to our new function. */
-			env.strongUpdateNoCopy(new Identifier(child.getName(), Change.convU(child.getFunctionName())), new Addresses(address, Change.u())); // Env update with env change type
+			env.strongUpdateNoCopy(new Identifier(child.getID(), child.getName(), Change.convU(child.getFunctionName())), new Addresses(address, Change.u())); // Env update with env change type
 			store = store.alloc(address, Address.inject(address, Change.convU(child), Change.convU(child))); // Store update with value change type
 
 			/* Create a function object. */

@@ -47,7 +47,7 @@ public class EnvironmentFactory {
 	 */
 	private static Environment createBaseEnvironment() {
 		Environment env = new Environment();
-		env = env.strongUpdate(new Identifier("this", Change.u()), new Addresses(StoreFactory.global_binding_Addr, Change.u()));
+		env = env.strongUpdate(new Identifier(-1, "this", Change.u()), new Addresses(StoreFactory.global_binding_Addr, Change.u()));
 		return env;
 	}
 

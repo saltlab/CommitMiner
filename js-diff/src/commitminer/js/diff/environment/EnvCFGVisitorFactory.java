@@ -14,7 +14,7 @@ public class EnvCFGVisitorFactory implements ICFGVisitorFactory {
 	@Override
 	public ICFGVisitor newInstance(SourceCodeFileChange sourceCodeFileChange,
 			Map<IPredicate, IRelation> facts) {
-		return new EnvCFGVisitor(sourceCodeFileChange, facts);
+		return new EnvCFGVisitor(new EnvFactBase(facts, sourceCodeFileChange));
 	}
 
 }

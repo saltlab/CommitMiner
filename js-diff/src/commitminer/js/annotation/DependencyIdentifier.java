@@ -1,4 +1,4 @@
-package commitminer.annotation;
+package commitminer.js.annotation;
 
 /**
  * An identifier for linking criterion and dependencies in an abstract slice.

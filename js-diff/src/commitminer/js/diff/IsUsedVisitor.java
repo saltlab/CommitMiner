@@ -19,7 +19,7 @@ import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
 import commitminer.analysis.flow.abstractdomain.Identifier;
-import commitminer.annotation.Annotation;
+import commitminer.factbase.Annotation;
 
 public class IsUsedVisitor implements NodeVisitor {
 

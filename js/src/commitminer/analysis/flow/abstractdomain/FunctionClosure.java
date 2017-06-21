@@ -162,7 +162,7 @@ public class FunctionClosure extends Closure {
 			for(AstNode param : function.getParams()) {
 				if(param instanceof Name) {
 					Name paramName = (Name) param;
-					argAddr = argObj.externalProperties.get(new Identifier(String.valueOf(i), Change.u()));
+					argAddr = argObj.externalProperties.get(new Identifier(null, String.valueOf(i), Change.u()));
 					if(argAddr == null) {
 
 						/* No argument was given for this parameter. Create a
@@ -178,7 +178,7 @@ public class FunctionClosure extends Closure {
 						store = store.alloc(argAddr, argObj);
 
 					}
-					Identifier identity = new Identifier(paramName.toSource(), Change.conv(paramName));
+					Identifier identity = new Identifier(paramName.getID(), paramName.toSource(), Change.conv(paramName));
 					env = env.strongUpdate(identity, new Addresses(argAddr, Change.u()));
 				}
 				i++;
@@ -186,7 +186,7 @@ public class FunctionClosure extends Closure {
 		}
 		
 		/* Add 'this' to environment (points to caller's object or new object). */
-		env = env.strongUpdate(new Identifier("this", Change.u()), new Addresses(selfAddr, Change.u()));
+		env = env.strongUpdate(new Identifier(cfg.getEntryNode().getId(), "this", Change.u()), new Addresses(selfAddr, Change.u()));
 		
 		/* Create the initial state for the function call. */
 		return new State(facts, store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);

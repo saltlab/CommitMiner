@@ -1,11 +1,13 @@
 package commitminer.analysis.flow.abstractdomain;
 
+import commitminer.js.annotation.DependencyIdentifier;
 
 /**
  * A variable identifier combined with a change lattice.
  */
-public class Identifier {
+public class Identifier implements DependencyIdentifier {
 
+	public Integer definerID;
 	public String name;
 	public Change change;
 
@@ -13,7 +15,8 @@ public class Identifier {
 	 * Use for standard lookup operations when the change type does not matter.
 	 * @param name The name of the identifier to inject.
 	 */
-	public Identifier(String name) {
+	public Identifier(Integer definerID, String name) {
+		this.definerID = definerID;
 		this.name = name;
 		this.change = Change.bottom();
 	}
@@ -23,7 +26,8 @@ public class Identifier {
 	 * @param name The name of the identifier to inject.
 	 * @param change How the identifier was changed.
 	 */
-	public Identifier(String name, Change change) {
+	public Identifier(Integer definerID, String name, Change change) {
+		this.definerID = definerID;
 		this.name = name;
 		this.change = change;
 	}
@@ -39,6 +43,11 @@ public class Identifier {
 		if(!(o instanceof Identifier)) return false;
 		Identifier right = (Identifier)o;
 		return this.name.equals(right.name);
+	}
+
+	@Override
+	public String getAddress() {
+		return definerID.toString();
 	}
 
 }

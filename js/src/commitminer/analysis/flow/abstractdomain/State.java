@@ -34,6 +34,10 @@ import commitminer.cfg.CFGNode;
  */
 public class State implements IState {
 	
+	/* For cases where a variable has not been defined (it could be a global which
+	* is undefined or be a global which is defined elsewhere). */
+	private static final Integer UNDEFINED_ENV_ID = -1;
+	
 	/* Some facts are easier to generate during analysis. */
 	Map<IPredicate, IRelation> facts;
 
@@ -422,7 +426,7 @@ public class State implements IState {
 		 * 'accessible function' phase of the analysis. */
 		// TODO: In some situations, retval is not being allocated to the store
 		Address address = this.trace.makeAddr(rs.getID(), "");
-		this.env = this.env.strongUpdate(new Identifier("~retval~"), new Addresses(address, Change.u()));
+		this.env = this.env.strongUpdate(new Identifier(null, "~retval~"), new Addresses(address, Change.u()));
 		this.store = this.store.alloc(address, retVal);
 
 		/* Update the return value on the scratchpad. */
@@ -500,13 +504,13 @@ public class State implements IState {
 
 		Set<Address> result = new HashSet<Address>();
 
-		Addresses addrs = env.apply(new Identifier(node.toSource()));
+		Addresses addrs = env.apply(new Identifier(null, node.toSource()));
 		if(addrs == null) {
 			/* Assume the variable exists in the environment (ie. not a TypeError)
 			 * and add it to the environment/store as BValue.TOP since we know
 			 * nothing about it. */
 			Address addr = trace.makeAddr(node.getID(), "");
-			env = env.strongUpdate(new Identifier(node.toSource(), Change.bottom()), new Addresses(addr, Change.u()));
+			env = env.strongUpdate(new Identifier(UNDEFINED_ENV_ID, node.toSource(), Change.bottom()), new Addresses(addr, Change.u()));
 			store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom()));
 			addrs = new Addresses(addr, Change.u());
 		}
@@ -562,7 +566,7 @@ public class State implements IState {
 				Obj obj = store.getObj(objAddr);
 
 				/* Look up the property. */
-				Address propAddr = obj.externalProperties.get(new Identifier(ie.getRight().toSource()));
+				Address propAddr = obj.externalProperties.get(new Identifier(null, ie.getRight().toSource()));
 
 				if(propAddr != null) {
 					result.add(propAddr);
@@ -584,7 +588,7 @@ public class State implements IState {
 
 					/* Add the property to the external properties of the object. */
 					Map<Identifier, Address> ext = new HashMap<Identifier, Address>(obj.externalProperties);
-					ext.put(new Identifier(ie.getRight().toSource(), Change.u()), propAddr);
+					ext.put(new Identifier(null, ie.getRight().toSource(), Change.u()), propAddr);
 
 					/* We need to create a new object so that the previous
 					 * states are not affected by this update. */
