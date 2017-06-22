@@ -12,26 +12,26 @@ import java.util.Map;
 public class Environment {
 
 	/** The possible memory address for each identifier. **/
-	public Map<Identifier, Addresses> environment;
+	public Map<String, Identifier> environment;
 
 	/**
 	 * Creates an empty environment.
 	 */
 	public Environment() {
-		this.environment = new HashMap<Identifier, Addresses>();
+		this.environment = new HashMap<String, Identifier>();
 	}
 
 	/**
 	 * Creates an environment from an existing set of addresses.
 	 * @param env The environment to replicate.
 	 */
-	private Environment(Map<Identifier, Addresses> env) {
+	private Environment(Map<String, Identifier> env) {
 		this.environment = env;
 	}
 
 	@Override
 	public Environment clone() {
-		Map<Identifier, Addresses> map = new HashMap<Identifier, Addresses>(this.environment);
+		Map<String, Identifier> map = new HashMap<String, Identifier>(this.environment);
 		return new Environment(map);
 	}
 
@@ -41,7 +41,7 @@ public class Environment {
 	 * @return The store addresses of the var.
 	 */
 	public Addresses apply(Identifier x) {
-		return this.environment.get(x);
+		return this.environment.get(x).addresses;
 	}
 
 	/**
@@ -50,10 +50,9 @@ public class Environment {
 	 * @param addresses The addresses for the variable.
 	 * @return The updated environment.
 	 */
-	public Environment strongUpdate(Identifier variable, Addresses addresses) {
-		Map<Identifier, Addresses> map = new HashMap<Identifier, Addresses>(this.environment);
-		map.remove(variable); // We must remove the old variable to update the change LE.
-		map.put(variable, addresses);
+	public Environment strongUpdate(String variable, Identifier id) {
+		Map<String, Identifier> map = new HashMap<String, Identifier>(this.environment);
+		map.put(variable, id);
 		return new Environment(map);
 	}
 
@@ -64,8 +63,9 @@ public class Environment {
 	 * @param addresses The addresses for the variable.
 	 * @return The updated environment.
 	 */
-	public void strongUpdateNoCopy(Identifier variable, Addresses addresses) {
-		this.environment.put(variable,  addresses);
+	public void strongUpdateNoCopy(String variable, Identifier id) {
+		Identifier old = this.environment.get(variable);
+		this.environment.put(variable, id);
 	}
 
 	/**
@@ -74,11 +74,9 @@ public class Environment {
 	 * @param addresses The addresses for the variable.
 	 * @return The updated environment.
 	 */
-	public Environment weakUpdate(Identifier variable, Addresses addresses) {
-		Map<Identifier, Addresses> map = new HashMap<Identifier, Addresses>(this.environment);
-		// TODO: Do we need to merge the variables as well? We shouldn't need to
-		// during flow analysis, but we do this for strongUpdate...
-		map.put(variable, map.get(variable).join(addresses));
+	public Environment weakUpdate(String variable, Identifier id) {
+		Map<String, Identifier> map = new HashMap<String, Identifier>(this.environment);
+		map.put(variable, map.get(variable).join(id));
 		return new Environment(map);
 	}
 

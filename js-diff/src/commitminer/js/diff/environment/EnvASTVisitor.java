@@ -1,4 +1,4 @@
-package commitminer.js.diff;
+package commitminer.js.diff.environment;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,29 +18,26 @@ import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
+import commitminer.analysis.flow.abstractdomain.Environment;
 import commitminer.analysis.flow.abstractdomain.Identifier;
 import commitminer.js.annotation.Annotation;
 
-public class IsUsedVisitor implements NodeVisitor {
+public class EnvASTVisitor implements NodeVisitor {
 
 	/**
-	 * The set of uses found in the statement, identified by line number,
-	 * absolute position and string length.
+	 * The set of changed variable annotations found in the statement.
 	 **/
 	public Set<Annotation> annotations;
 
-	/** The identifier to look for. **/
-	private Identifier identity;
-	
-	/** Are we looking for variables? **/
-	private boolean variable;
+	/** The abstract environment. **/
+	private Environment env;
 
 	/**
 	 * Detects uses of the identifier.
 	 * @return the set of nodes where the identifier is used.
 	 */
-	public static Set<Annotation> isUsed(AstNode statement, Identifier identity, boolean variable) {
-		IsUsedVisitor visitor = new IsUsedVisitor(statement, identity, variable);
+	public static Set<Annotation> getAnnotations(Environment env, AstNode statement) {
+		EnvASTVisitor visitor = new EnvASTVisitor(env);
 		
 		if(statement instanceof AstRoot) {
 			/* This is the root. Nothing should be flagged. */
@@ -66,16 +63,25 @@ public class IsUsedVisitor implements NodeVisitor {
 		return visitor.annotations;
 	}
 
-	public IsUsedVisitor(AstNode statement, Identifier identity, boolean variable) {
+	public EnvASTVisitor(Environment env) {
 		this.annotations = new HashSet<Annotation>();
-		this.identity = identity;
-		this.variable = variable;
+		this.env = env;
 	}
 
 	@Override
 	public boolean visit(AstNode node) {
 
+		if(node instanceof Name) {
+
+			if(env.apply(new Identifier(null, node.toSource())) != null) {
+				// TODO: Check if this variable is changed. If it is, register a fact.
+			}
+
+		}
 		if(node instanceof InfixExpression || node instanceof Name) {
+			
+
+			
 			if(node.toSource().equals(identity.name)) {
 
 				if(!this.variable || node.getParent() != null

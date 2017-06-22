@@ -11,7 +11,8 @@ import commitminer.analysis.flow.abstractdomain.State;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
-import commitminer.factbase.Annotation;
+import commitminer.js.annotation.Annotation;
+import commitminer.js.annotation.AnnotationFactBase;
 import commitminer.js.diff.IsUsedVisitor;
 
 /**
@@ -20,9 +21,9 @@ import commitminer.js.diff.IsUsedVisitor;
 public class EnvCFGVisitor implements ICFGVisitor {
 
 	/* The fact database we will populate. */
-	private EnvFactBase factBase;
+	private AnnotationFactBase factBase;
 
-	public EnvCFGVisitor(EnvFactBase factBase) {
+	public EnvCFGVisitor(AnnotationFactBase factBase) {
 		this.factBase = factBase;
 	}
 
@@ -57,7 +58,7 @@ public class EnvCFGVisitor implements ICFGVisitor {
 			if(node != null) {
 				Set<Annotation> annotations = isUsed(node, prop);
 				for(Annotation annotation : annotations) {
-					factBase.registerVariableChangeDependency(prop, annotation);
+					factBase.registerAnnotationFact(annotation);
 				}
 			}
 

@@ -9,11 +9,11 @@ import org.deri.iris.compiler.ParserException;
 import org.deri.iris.storage.IRelation;
 
 import commitminer.analysis.SourceCodeFileChange;
+import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.classify.ClassifierFeatureVector;
 import commitminer.classify.Transformer;
 import commitminer.factbase.Annotation;
 import commitminer.js.annotation.AnnotationFactBase;
-import commitminer.js.annotation.DependencyIdentifier;
 
 /**
  * Registers facts related to navigating the criterion and dependencies of the

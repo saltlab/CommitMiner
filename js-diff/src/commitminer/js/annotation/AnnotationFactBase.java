@@ -38,7 +38,7 @@ public abstract class AnnotationFactBase extends FactBase {
 	 * 
 	 * The annotation is assumed to be on the destination file.
 	 */
-	protected void registerAnnotationFact(Annotation annotation) {
+	public void registerAnnotationFact(Annotation annotation) {
 		annotations.add(annotation);
 	}
 	
