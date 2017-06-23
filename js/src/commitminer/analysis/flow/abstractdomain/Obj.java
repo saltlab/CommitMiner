@@ -13,7 +13,7 @@ import java.util.Map.Entry;
 public class Obj {
 
 	/** Programmer-visible object properties. **/
-	public Map<Identifier, Address> externalProperties;
+	public Map<String, Property> externalProperties;
 
 	/** Interpreter-only properties which are invisible to the programmer. **/
 	public InternalObjectProperties internalProperties;
@@ -29,7 +29,7 @@ public class Obj {
 	 * @param definitelyPresentProperties Properties which are definitely
 	 * 									  present in the object.
 	 */
-	public Obj(Map<Identifier, Address> ext,
+	public Obj(Map<String, Property> ext,
 					InternalObjectProperties internalProperties) {
 		this.externalProperties = ext;
 		this.internalProperties = internalProperties;
@@ -64,7 +64,7 @@ public class Obj {
 	 * @return A property or null if it does not exist.
 	 */
 	public Address apply(String property) {
-		return this.externalProperties.get(property);
+		return this.externalProperties.get(property).address;
 	}
 
 	/**
@@ -74,17 +74,15 @@ public class Obj {
 	 * @return A new Obj with this Obj joined with the Obj parameter.
 	 */
 	public Obj join(Obj right, Map<Address, BValue> bValueMap) {
-//		if(this.internalProperties.klass != right.internalProperties.klass) TODO: Ignore this for diff analysis. We dynamically create objects and type does not matter.
-//			throw new Error("Cannot join classes of different types.");
 
-		Map<Identifier, Address> ext = new HashMap<Identifier, Address>(this.externalProperties);
+		Map<String, Property> ext = new HashMap<String, Property>(this.externalProperties);
 
-		for(Entry<Identifier, Address> entry : right.externalProperties.entrySet()) {
+		for(Entry<String, Property> entry : right.externalProperties.entrySet()) {
 			if(!ext.containsKey(entry.getKey()))
 				ext.put(entry.getKey(), entry.getValue());
 			else {
-				Address lAddr = ext.get(entry.getKey());
-				Address rAddr = entry.getValue();
+				Address lAddr = ext.get(entry.getKey()).address;
+				Address rAddr = entry.getValue().address;
 
 				BValue bvl = bValueMap.get(lAddr);
 				BValue bvr = bValueMap.get(rAddr);
@@ -109,8 +107,8 @@ public class Obj {
 	@Override
 	public String toString() {
 		String extProp = "";
-		for(Identifier prop : this.externalProperties.keySet())
-			extProp += prop.name + "|";
+		for(String prop : this.externalProperties.keySet())
+			extProp += prop + "|";
 		return "Obj:" + this.externalProperties.size() + "|" + extProp;
 	}
 	
@@ -119,7 +117,7 @@ public class Obj {
 		if(!(o instanceof Obj)) return false;
 		Obj obj = (Obj)o;
 		if(this.externalProperties.size() != obj.externalProperties.size()) return false;
-		for(Map.Entry<Identifier, Address> entry : this.externalProperties.entrySet()) {
+		for(Map.Entry<String, Property> entry : this.externalProperties.entrySet()) {
 			if(!obj.externalProperties.containsKey(entry.getKey())) return false;
 			if(!obj.externalProperties.get(entry.getKey()).equals(entry.getValue())) return false;
 		}

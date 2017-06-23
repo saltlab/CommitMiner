@@ -17,12 +17,13 @@ import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.Addresses;
 import commitminer.analysis.flow.abstractdomain.Change;
-import commitminer.analysis.flow.abstractdomain.Identifier;
+import commitminer.analysis.flow.abstractdomain.Property;
 import commitminer.analysis.flow.abstractdomain.State;
+import commitminer.analysis.flow.abstractdomain.Variable;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
-import commitminer.factbase.Annotation;
+import commitminer.js.annotation.Annotation;
 
 /**
  * Extracts facts from a flow analysis.
@@ -72,9 +73,9 @@ public class ControlCFGVisitor implements ICFGVisitor {
 	/**
 	 * Recursively visits objects and extracts facts about environment changes.
 	 * @param node The statement or condition at the program point.
-	 * @param props The environment or object properties.
+	 * @param vars The environment or object properties.
 	 */
-	private void getObjectFacts(AstNode node, Map<Identifier, Addresses> props, State state, String prefix) {
+	private void getObjectFacts(AstNode node, Map<String, Variable> vars, State state, String prefix) {
 
 		if(node == null || node.getID() == null) return;
 
@@ -99,6 +100,8 @@ public class ControlCFGVisitor implements ICFGVisitor {
 
 		/* Create an annotation for this definition. */
 		Annotation annotation = new Annotation(
+				"CONTROL-DEF",
+				null,
 				definition.getLineno(),
 				definition.getAbsolutePosition(),
 				definition.toSource().length());
@@ -130,7 +133,10 @@ public class ControlCFGVisitor implements ICFGVisitor {
 						- statement.getAbsolutePosition();
 			}
 
-			annotation = new Annotation(statement.getLineno(),
+			annotation = new Annotation(
+					"CONTROL-DEF",
+					null,
+					statement.getLineno(),
 					statement.getAbsolutePosition(),
 					length);
 
@@ -138,7 +144,10 @@ public class ControlCFGVisitor implements ICFGVisitor {
 		}
 		else {
 			/* Highlight the whole statement. */
-			annotation = new Annotation(statement.getLineno(),
+			annotation = new Annotation(
+					"CONTROL-USE",
+					null,
+					statement.getLineno(),
 					statement.getAbsolutePosition(),
 					statement.getLength());
 

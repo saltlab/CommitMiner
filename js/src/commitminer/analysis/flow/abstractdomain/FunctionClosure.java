@@ -15,7 +15,6 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import commitminer.analysis.flow.factories.StoreFactory;
-import commitminer.analysis.flow.statecomparator.StandardStateComparator;
 import commitminer.analysis.flow.statecomparator.StateComparator;
 import commitminer.analysis.flow.statecomparator.StateComparatorFactory;
 import commitminer.analysis.flow.trace.Trace;
@@ -35,9 +34,6 @@ public class FunctionClosure extends Closure {
 
 	/** The CFGs in the script. **/
 	public Map<AstNode, CFG> cfgs;
-	
-	/** The object which will compare states. */
-	private StateComparator stateComparator;
 
 	/**
 	 * @param cfg The control flow graph for the function.
@@ -141,7 +137,7 @@ public class FunctionClosure extends Closure {
 			FunctionNode function = (FunctionNode)this.cfg.getEntryNode().getStatement();
 
 			/* Create the arguments object. */
-			Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
+			Map<String, Property> ext = new HashMap<String, Property>();
 			int i = 0;
 			for(BValue argVal : scratchpad.applyArgs()) {
 
@@ -162,8 +158,8 @@ public class FunctionClosure extends Closure {
 			for(AstNode param : function.getParams()) {
 				if(param instanceof Name) {
 					Name paramName = (Name) param;
-					argAddr = argObj.externalProperties.get(new Identifier(null, String.valueOf(i), Change.u()));
-					if(argAddr == null) {
+					Property prop = argObj.externalProperties.get(String.valueOf(i));
+					if(prop == null) {
 
 						/* No argument was given for this parameter. Create a
 						 * dummy value. */
@@ -178,15 +174,15 @@ public class FunctionClosure extends Closure {
 						store = store.alloc(argAddr, argObj);
 
 					}
-					Identifier identity = new Identifier(paramName.getID(), paramName.toSource(), Change.conv(paramName));
-					env = env.strongUpdate(identity, new Addresses(argAddr, Change.u()));
+					Variable identity = new Variable(paramName.getID(), paramName.toSource(), Change.conv(paramName), new Addresses(argAddr, Change.u()));
+					env = env.strongUpdate(paramName.toSource(), identity);
 				}
 				i++;
 			}
 		}
 		
 		/* Add 'this' to environment (points to caller's object or new object). */
-		env = env.strongUpdate(new Identifier(cfg.getEntryNode().getId(), "this", Change.u()), new Addresses(selfAddr, Change.u()));
+		env = env.strongUpdate("this", new Variable(cfg.getEntryNode().getId(), "this", Change.u(), new Addresses(selfAddr, Change.u())));
 		
 		/* Create the initial state for the function call. */
 		return new State(facts, store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);

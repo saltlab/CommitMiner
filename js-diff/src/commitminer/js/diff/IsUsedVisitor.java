@@ -1,6 +1,8 @@
 package commitminer.js.diff;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.mozilla.javascript.Token;
@@ -18,7 +20,8 @@ import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
-import commitminer.analysis.flow.abstractdomain.Identifier;
+import commitminer.analysis.annotation.DependencyIdentifier;
+import commitminer.analysis.flow.abstractdomain.Property;
 import commitminer.js.annotation.Annotation;
 
 public class IsUsedVisitor implements NodeVisitor {
@@ -30,7 +33,7 @@ public class IsUsedVisitor implements NodeVisitor {
 	public Set<Annotation> annotations;
 
 	/** The identifier to look for. **/
-	private Identifier identity;
+	private String identity;
 	
 	/** Are we looking for variables? **/
 	private boolean variable;
@@ -39,7 +42,7 @@ public class IsUsedVisitor implements NodeVisitor {
 	 * Detects uses of the identifier.
 	 * @return the set of nodes where the identifier is used.
 	 */
-	public static Set<Annotation> isUsed(AstNode statement, Identifier identity, boolean variable) {
+	public static Set<Annotation> isUsed(AstNode statement, String identity, boolean variable) {
 		IsUsedVisitor visitor = new IsUsedVisitor(statement, identity, variable);
 		
 		if(statement instanceof AstRoot) {
@@ -66,7 +69,7 @@ public class IsUsedVisitor implements NodeVisitor {
 		return visitor.annotations;
 	}
 
-	public IsUsedVisitor(AstNode statement, Identifier identity, boolean variable) {
+	public IsUsedVisitor(AstNode statement, String identity, boolean variable) {
 		this.annotations = new HashSet<Annotation>();
 		this.identity = identity;
 		this.variable = variable;
@@ -76,14 +79,15 @@ public class IsUsedVisitor implements NodeVisitor {
 	public boolean visit(AstNode node) {
 
 		if(node instanceof InfixExpression || node instanceof Name) {
-			if(node.toSource().equals(identity.name)) {
+			if(node.toSource().equals(identity)) {
 
 				if(!this.variable || node.getParent() != null
 					&& !(node.getParent().getType()== Token.GETPROP
 					|| node.getParent().getType()== Token.GETPROPNOWARN)) {
 
 					/* This idenfier is being used. */
-					this.annotations.add(new Annotation(node.getLineno(), node.getAbsolutePosition(), node.toSource().length()));
+					List<DependencyIdentifier> placeholder = new LinkedList<DependencyIdentifier>();
+					this.annotations.add(new Annotation(identity, placeholder, node.getLineno(), node.getAbsolutePosition(), node.toSource().length()));
 
 				}
 			}

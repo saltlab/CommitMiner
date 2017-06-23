@@ -15,14 +15,13 @@ import org.mozilla.javascript.ast.AstNode;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.BValue;
-import commitminer.analysis.flow.abstractdomain.Identifier;
+import commitminer.analysis.flow.abstractdomain.Property;
 import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.State;
 import commitminer.analysis.flow.abstractdomain.Addresses.LatticeElement;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
-import commitminer.factbase.Annotation;
 import commitminer.js.diff.IsUsedVisitor;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.Version;
 

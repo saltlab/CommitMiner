@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
 import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.api.basics.ITuple;
 import org.deri.iris.factory.Factory;
@@ -47,10 +46,10 @@ public class Helpers {
 	 * @param propID The node id of the property being added to the object.
 	 * @param propVal The value of the property.
 	 */
-	public static Store addProp(int propID, String prop, BValue propVal, Map<Identifier, Address> ext, Store store, Trace trace) {
+	public static Store addProp(int propID, String prop, BValue propVal, Map<String, Property> ext, Store store, Trace trace) {
 		Address propAddr = trace.makeAddr(propID, prop);
 		store = store.alloc(propAddr, propVal);
-		ext.put(new Identifier(propID, prop, Change.u()), propAddr);
+		ext.put(prop, new Property(propID, prop, Change.u(), propAddr));
 		return store;
 	}
 
@@ -61,7 +60,7 @@ public class Helpers {
 	 */
 	public static Store createFunctionObj(Map<IPredicate, IRelation> facts, Closure closure, Store store, Trace trace, Address address, FunctionNode function) {
 
-		Map<Identifier, Address> external = new HashMap<Identifier, Address>();
+		Map<String, Property> external = new HashMap<String, Property>();
 		store = addProp(function.getID(), "length", Num.inject(Num.top(Change.u()), Change.u()), external, store, trace);
 
 		InternalFunctionProperties internal = new InternalFunctionProperties(
@@ -273,7 +272,7 @@ public class Helpers {
 		for(Name localVar : localVars) {
 			Change change = Change.convU(localVar);
 			Address address = trace.makeAddr(localVar.getID(), "");
-			env.strongUpdateNoCopy(new Identifier(localVar.getID(), localVar.toSource(), Change.convU(localVar)), new Addresses(address, Change.u()));
+			env.strongUpdateNoCopy(localVar.toSource(), new Variable(localVar.getID(), localVar.toSource(), Change.convU(localVar), new Addresses(address, Change.u())));
 			store = store.alloc(address, Undefined.inject(Undefined.top(change), Change.u()));
 		}
 
@@ -285,7 +284,7 @@ public class Helpers {
 			address = trace.modAddr(address, JSClass.CFunction);
 
 			/* The function name variable points to our new function. */
-			env.strongUpdateNoCopy(new Identifier(child.getID(), child.getName(), Change.convU(child.getFunctionName())), new Addresses(address, Change.u())); // Env update with env change type
+			env.strongUpdateNoCopy(child.getName(), new Variable(child.getID(), child.getName(), Change.convU(child.getFunctionName()), new Addresses(address, Change.u()))); // Env update with env change type
 			store = store.alloc(address, Address.inject(address, Change.convU(child), Change.convU(child))); // Store update with value change type
 
 			/* Create a function object. */
@@ -307,14 +306,14 @@ public class Helpers {
 	public static void analyzeEnvReachable(
 			Map<IPredicate, IRelation> facts,
 			State state,
-			Map<Identifier, Addresses> vars,
+			Map<String, Variable> vars,
 			Address selfAddr,
 			Map<AstNode, CFG> cfgMap,
 			Set<Address> visited,
 			Set<String> localvars) {
 		
-		for(Map.Entry<Identifier, Addresses> entry : vars.entrySet()) {
-			for(Address addr : entry.getValue().addresses) {
+		for(Map.Entry<String, Variable> entry : vars.entrySet()) {
+			for(Address addr : entry.getValue().addresses.addresses) {
 				analyzePublic(facts, state, entry.getKey(), addr, selfAddr, cfgMap, visited, localvars);
 			}
 		}
@@ -330,14 +329,14 @@ public class Helpers {
 	private static void analyzeObjReachable(
 			Map<IPredicate, IRelation> facts,
 			State state,
-			Map<Identifier, Address> props,
+			Map<String, Property> props,
 			Address selfAddr,
 			Map<AstNode, CFG> cfgMap,
 			Set<Address> visited,
 			Set<String> localvars) {
 
-		for(Map.Entry<Identifier, Address> entry : props.entrySet()) {
-			analyzePublic(facts, state, entry.getKey(), entry.getValue(), selfAddr, cfgMap, visited, localvars);
+		for(Map.Entry<String, Property> entry : props.entrySet()) {
+			analyzePublic(facts, state, entry.getKey(), entry.getValue().address, selfAddr, cfgMap, visited, localvars);
 		}
 		
 	}
@@ -353,7 +352,7 @@ public class Helpers {
 	private static void analyzePublic(
 			Map<IPredicate, IRelation> facts,
 			State state,
-			Identifier var,
+			String name,
 			Address addr,
 			Address selfAddr,
 			Map<AstNode, CFG> cfgMap,
@@ -365,9 +364,9 @@ public class Helpers {
 		/* Do not visit local variables which were declared at a higher
 		 * level, and therefore can be analyzed later. */
 		if(localvars != null
-				&& !localvars.contains(var.name)
-				&& !var.name.equals("~retval~")
-				&& !StringUtils.isNumeric(var.name)) return;
+				&& !localvars.contains(name)
+				&& !name.equals("~retval~")
+				&& !StringUtils.isNumeric(name)) return;
 
 		/* Avoid circular references. */
 		if(visited.contains(addr)) return;
@@ -425,8 +424,8 @@ public class Helpers {
 		Map<Address, BValue> bValueStore = new HashMap<Address, BValue>();
 		Map<Address, Obj> objectStore = new HashMap<Address, Obj>();
 
-		for(Addresses addrs : env.environment.values()) {
-			for(Address addr : addrs.addresses) {
+		for(Variable var : env.environment.values()) {
+			for(Address addr : var.addresses.addresses) {
 				
 				BValue value = store.apply(addr);
 				
@@ -463,12 +462,12 @@ public class Helpers {
 				objectStore.put(objAddr, obj);
 				
 				/* Put the object's property values on the store. */
-				for(Address addr : obj.externalProperties.values()) {
+				for(Property prop : obj.externalProperties.values()) {
 
-					BValue value = store.apply(addr);
+					BValue value = store.apply(prop.address);
 
 					/* Put the value on the store. */
-					bValueStore.put(addr, value);
+					bValueStore.put(prop.address, value);
 					
 					/* Put the objects on the store. */
 					gcObjectProperty(value.addressAD, store, 

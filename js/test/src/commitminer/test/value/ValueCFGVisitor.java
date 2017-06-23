@@ -14,9 +14,10 @@ import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.Addresses;
 import commitminer.analysis.flow.abstractdomain.BValue;
-import commitminer.analysis.flow.abstractdomain.Identifier;
+import commitminer.analysis.flow.abstractdomain.Property;
 import commitminer.analysis.flow.abstractdomain.State;
 import commitminer.analysis.flow.abstractdomain.Addresses.LatticeElement;
+import commitminer.analysis.flow.abstractdomain.Variable;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
@@ -59,9 +60,9 @@ public class ValueCFGVisitor implements ICFGVisitor {
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
-	private void getEnvironmentFacts(AstNode node, Map<Identifier, Addresses> props, State state, String prefix) {
-		for(Map.Entry<Identifier, Addresses> entry : props.entrySet()) {
-			for(Address addr : entry.getValue().addresses) {
+	private void getEnvironmentFacts(AstNode node, Map<String, Variable> vars, State state, String prefix) {
+		for(Map.Entry<String, Variable> entry : vars.entrySet()) {
+			for(Address addr : entry.getValue().addresses.addresses) {
 				getPropertyFacts(node, entry.getKey(), addr, state, prefix);
 			}
 		}
@@ -72,9 +73,9 @@ public class ValueCFGVisitor implements ICFGVisitor {
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
-	private void getObjectFacts(AstNode node, Map<Identifier, Address> props, State state, String prefix) {
-		for(Map.Entry<Identifier, Address> entry : props.entrySet()) {
-			getPropertyFacts(node, entry.getKey(), entry.getValue(), state, prefix);
+	private void getObjectFacts(AstNode node, Map<String, Property> props, State state, String prefix) {
+		for(Map.Entry<String, Property> entry : props.entrySet()) {
+			getPropertyFacts(node, entry.getKey(), entry.getValue().address, state, prefix);
 		}
 	}
 
@@ -83,11 +84,11 @@ public class ValueCFGVisitor implements ICFGVisitor {
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
-	private void getPropertyFacts(AstNode node, Identifier prop, Address addr, State state, String prefix) {
+	private void getPropertyFacts(AstNode node, String prop, Address addr, State state, String prefix) {
 
 		String identifier;
-		if(prefix == null) identifier = prop.name;
-		else identifier = prefix + "." + prop.name;
+		if(prefix == null) identifier = prop;
+		else identifier = prefix + "." + prop;
 
 		if(identifier.equals("this")) return;
 		if(addr == null) return;
@@ -96,7 +97,7 @@ public class ValueCFGVisitor implements ICFGVisitor {
 		
 		/* Get the environment changes. No need to recurse since
 		 * properties (currently) do not change. */
-		registerFact(node, prop.name, val.change.toString());
+		registerFact(node, prop, val.change.toString());
 
 		/* Recursively check property values. */
 		if(val.addressAD.le == LatticeElement.TOP) return;

@@ -26,7 +26,7 @@ import org.mozilla.javascript.ast.WithStatement;
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Environment;
-import commitminer.analysis.flow.abstractdomain.Identifier;
+import commitminer.analysis.flow.abstractdomain.Property;
 import commitminer.analysis.flow.abstractdomain.InternalFunctionProperties;
 import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.State;

@@ -14,7 +14,7 @@ import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.Closure;
 import commitminer.analysis.flow.abstractdomain.Control;
 import commitminer.analysis.flow.abstractdomain.Environment;
-import commitminer.analysis.flow.abstractdomain.Identifier;
+import commitminer.analysis.flow.abstractdomain.Property;
 import commitminer.analysis.flow.abstractdomain.InternalFunctionProperties;
 import commitminer.analysis.flow.abstractdomain.InternalObjectProperties;
 import commitminer.analysis.flow.abstractdomain.JSClass;
@@ -40,11 +40,11 @@ public class FunctionFactory {
 	}
 
 	public Obj Function_proto_Obj() {
-		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
-		store = Helpers.addProp("external", Num.inject(Num.top(Change.u()), Change.u()), ext, store);
-		store = Helpers.addProp("apply", Address.inject(StoreFactory.Function_proto_apply_Addr, Change.u(), Change.u()), ext, store);
-		store = Helpers.addProp("call", Address.inject(StoreFactory.Function_proto_call_Addr, Change.u(), Change.u()), ext, store);
-		store = Helpers.addProp("toString", Address.inject(StoreFactory.Function_proto_toString_Addr, Change.u(), Change.u()), ext, store);
+		Map<String, Property> ext = new HashMap<String, Property>();
+		store = Helpers.addProp("external", -41, Num.inject(Num.top(Change.u()), Change.u()), ext, store);
+		store = Helpers.addProp("apply", -42, Address.inject(StoreFactory.Function_proto_apply_Addr, Change.u(), Change.u()), ext, store);
+		store = Helpers.addProp("call", -43, Address.inject(StoreFactory.Function_proto_call_Addr, Change.u(), Change.u()), ext, store);
+		store = Helpers.addProp("toString", -44, Address.inject(StoreFactory.Function_proto_toString_Addr, Change.u(), Change.u()), ext, store);
 
 		InternalObjectProperties internal = new InternalObjectProperties(
 				Address.inject(StoreFactory.Function_proto_Addr, Change.u(), Change.u()),
@@ -66,7 +66,7 @@ public class FunctionFactory {
 	 */
 	public Obj constFunctionObj(BValue retVal) {
 
-		Map<Identifier, Address> external = new HashMap<Identifier, Address>();
+		Map<String, Property> external = new HashMap<String, Property>();
 
 		Closure closure = new NativeClosure() {
 				@Override

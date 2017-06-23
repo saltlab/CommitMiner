@@ -12,7 +12,7 @@ import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.Closure;
 import commitminer.analysis.flow.abstractdomain.Control;
-import commitminer.analysis.flow.abstractdomain.Identifier;
+import commitminer.analysis.flow.abstractdomain.Property;
 import commitminer.analysis.flow.abstractdomain.InternalFunctionProperties;
 import commitminer.analysis.flow.abstractdomain.InternalObjectProperties;
 import commitminer.analysis.flow.abstractdomain.JSClass;
@@ -27,6 +27,8 @@ import commitminer.cfg.CFG;
 
 
 public class ArgumentsFactory {
+	
+	private static final Integer ARG_DEFINER_ID = -2;
 
 	Store store;
 	Map<AstNode, CFG> cfgs;
@@ -37,9 +39,9 @@ public class ArgumentsFactory {
 	}
 
 	public Obj Arguments_Obj() {
-		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
-		store = Helpers.addProp("prototype", Address.inject(StoreFactory.Object_proto_Addr, Change.u(), Change.u()), ext, store);
-		store = Helpers.addProp("length", Num.inject(Num.top(Change.u()), Change.u()), ext, store);
+		Map<String, Property> ext = new HashMap<String, Property>();
+		store = Helpers.addProp("prototype", ARG_DEFINER_ID, Address.inject(StoreFactory.Object_proto_Addr, Change.u(), Change.u()), ext, store);
+		store = Helpers.addProp("length", ARG_DEFINER_ID, Num.inject(Num.top(Change.u()), Change.u()), ext, store);
 
 		NativeClosure closure = new NativeClosure() {
 				@Override

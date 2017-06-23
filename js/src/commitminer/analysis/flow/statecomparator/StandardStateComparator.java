@@ -4,10 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import commitminer.analysis.flow.abstractdomain.Address;
-import commitminer.analysis.flow.abstractdomain.Addresses;
 import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Obj;
+import commitminer.analysis.flow.abstractdomain.Property;
 import commitminer.analysis.flow.abstractdomain.State;
+import commitminer.analysis.flow.abstractdomain.Variable;
 
 public class StandardStateComparator extends StateComparator {
 	
@@ -33,8 +34,8 @@ public class StandardStateComparator extends StateComparator {
 			return false;
 		
 		/* Check the reachable values in the store. */
-		for(Addresses addrs : s1.env.environment.values()) {
-			for(Address addr : addrs.addresses) {
+		for(Variable var : s1.env.environment.values()) {
+			for(Address addr : var.addresses.addresses) {
 
 				/* Check the values are the same. */
 				if(!equalVal(addr)) return false;
@@ -77,8 +78,8 @@ public class StandardStateComparator extends StateComparator {
 			if(!s1Obj.equals(s2Obj)) return false;
 			
 			/* Check that the object properties are the same. */
-			for(Address propAddr : s1Obj.externalProperties.values()) {
-				if(!equalVal(propAddr)) return false;
+			for(Property prop : s1Obj.externalProperties.values()) {
+				if(!equalVal(prop.address)) return false;
 			}
 		}
 		

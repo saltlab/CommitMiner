@@ -1,9 +1,10 @@
 package commitminer.js.diff.environment;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
-import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.DoLoop;
@@ -11,15 +12,17 @@ import org.mozilla.javascript.ast.ForInLoop;
 import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
-import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
+import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
+import commitminer.analysis.annotation.DependencyIdentifier;
+import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.Environment;
-import commitminer.analysis.flow.abstractdomain.Identifier;
+import commitminer.analysis.flow.abstractdomain.Variable;
 import commitminer.js.annotation.Annotation;
 
 public class EnvASTVisitor implements NodeVisitor {
@@ -73,26 +76,22 @@ public class EnvASTVisitor implements NodeVisitor {
 
 		if(node instanceof Name) {
 
-			if(env.apply(new Identifier(null, node.toSource())) != null) {
+			Variable var = env.environment.get(node.toSource());
+			if(var != null) {
 				// TODO: Check if this variable is changed. If it is, register a fact.
+				if(var.change.le == Change.LatticeElement.CHANGED) {
+					List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+					ids.add(var);
+					this.annotations.add(new Annotation("ENV-USE", ids, node.getLineno(), node.getAbsolutePosition(), node.getLength()));
+				}
 			}
 
 		}
-		if(node instanceof InfixExpression || node instanceof Name) {
-			
-
-			
-			if(node.toSource().equals(identity.name)) {
-
-				if(!this.variable || node.getParent() != null
-					&& !(node.getParent().getType()== Token.GETPROP
-					|| node.getParent().getType()== Token.GETPROPNOWARN)) {
-
-					/* This idenfier is being used. */
-					this.annotations.add(new Annotation(node.getLineno(), node.getAbsolutePosition(), node.toSource().length()));
-
-				}
-			}
+		/* Inspect the variable part of a property access. */
+		if(node instanceof PropertyGet) {
+			PropertyGet pg = (PropertyGet) node;
+			pg.getLeft().visit(this);
+			return false;
 		}
 		/* Ignore the body of loops, ifs and functions. */
 		else if(node instanceof IfStatement) {

@@ -12,8 +12,8 @@ import commitminer.analysis.flow.abstractdomain.Addresses;
 import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.Environment;
 import commitminer.analysis.flow.abstractdomain.Helpers;
-import commitminer.analysis.flow.abstractdomain.Identifier;
 import commitminer.analysis.flow.abstractdomain.Store;
+import commitminer.analysis.flow.abstractdomain.Variable;
 import commitminer.analysis.flow.trace.Trace;
 import commitminer.cfg.CFG;
 
@@ -21,6 +21,8 @@ import commitminer.cfg.CFG;
  * Initializes the environment from a JavaScript file AST.
  */
 public class EnvironmentFactory {
+
+	private static final Integer GLOBAL_DEFINER_ID = -1;
 
 	/**
 	 * Creates an initial environment for a function by lifting local variables
@@ -47,7 +49,7 @@ public class EnvironmentFactory {
 	 */
 	private static Environment createBaseEnvironment() {
 		Environment env = new Environment();
-		env = env.strongUpdate(new Identifier(-1, "this", Change.u()), new Addresses(StoreFactory.global_binding_Addr, Change.u()));
+		env = env.strongUpdate("this", new Variable(GLOBAL_DEFINER_ID, "this", Change.u(), new Addresses(StoreFactory.global_binding_Addr, Change.u())));
 		return env;
 	}
 

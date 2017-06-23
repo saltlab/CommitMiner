@@ -86,7 +86,6 @@ public class ExpEval {
 		Address addr = state.trace.makeAddr(f.getID(), "");
 		addr = state.trace.modAddr(addr, JSClass.CFunction);
 		state.store = Helpers.createFunctionObj(state.facts, closure, state.store, state.trace, addr, f);
-		String a = f.toSource();
 		return Address.inject(addr, Change.convU(f), Change.convU(f));
 	}
 
@@ -96,7 +95,7 @@ public class ExpEval {
 	 * @return A BValue that points to the new object literal.
 	 */
 	public BValue evalObjectLiteral(ObjectLiteral ol) {
-		Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
+		Map<String, Property> ext = new HashMap<String, Property>();
 		InternalObjectProperties in = new InternalObjectProperties();
 
 		for(ObjectProperty property : ol.getElements()) {
@@ -108,7 +107,7 @@ public class ExpEval {
 			BValue propVal = this.eval(property.getRight());
 			Address propAddr = state.trace.makeAddr(property.getID(), "");
 			state.store = state.store.alloc(propAddr, propVal);
-			if(propName != null) ext.put(new Identifier(property.getID(), propName, Change.u()), propAddr);
+			if(propName != null) ext.put(propName, new Property(property.getID(), propName, Change.u(), propAddr));
 		}
 
 		Obj obj = new Obj(ext, in);
@@ -408,13 +407,13 @@ public class ExpEval {
 			}
 
 			/* Recursively look for object properties that are functions. */
-			for(Address addr : obj.externalProperties.values()) {
-
+			for(Property property : obj.externalProperties.values()) {
+				
 				/* Avoid circular references. */
-				if(visited.contains(addr)) continue;
-				visited.add(addr);
+				if(visited.contains(property.address)) continue;
+				visited.add(property.address);
 
-				extractFunctions(state.store.apply(addr), functionAddrs, visited);
+				extractFunctions(state.store.apply(property.address), functionAddrs, visited);
 			}
 
 		}
@@ -449,7 +448,7 @@ public class ExpEval {
 				/* If this is an object literal, make a fake var in the
 				 * environment and point it to the object literal. */
 				Address address = state.trace.makeAddr(arg.getID(), "");
-				state.env.strongUpdateNoCopy(new Identifier(arg.getID(), arg.getID().toString()), new Addresses(address, Change.u()));
+				state.env.strongUpdateNoCopy(arg.getID().toString(), new Variable(arg.getID(), arg.getID().toString(), new Addresses(address, Change.u())));
 				state.store = state.store.alloc(address, argVal);
 			}
 			

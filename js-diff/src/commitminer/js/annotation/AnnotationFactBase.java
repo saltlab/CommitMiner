@@ -1,6 +1,7 @@
 package commitminer.js.annotation;
 
 import java.util.Comparator;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -13,11 +14,11 @@ import commitminer.factbase.FactBase;
  * An analysis should extend this class to register concrete predicates that 
  * will be used to annotate the source code file (e.g., NavigationFactBase).
  */
-public abstract class AnnotationFactBase extends FactBase {
+public class AnnotationFactBase extends FactBase {
 
 	SortedSet<Annotation> annotations;
 	
-	protected AnnotationFactBase(SourceCodeFileChange sourceCodeFileChange) {
+	public AnnotationFactBase(SourceCodeFileChange sourceCodeFileChange) {
 
 		super(sourceCodeFileChange);
 
@@ -39,7 +40,11 @@ public abstract class AnnotationFactBase extends FactBase {
 	 * The annotation is assumed to be on the destination file.
 	 */
 	public void registerAnnotationFact(Annotation annotation) {
-		annotations.add(annotation);
+		this.annotations.add(annotation);
+	}
+	
+	public void registerAnnotationFacts(Set<Annotation> annotations) {
+		this.annotations.addAll(annotations);
 	}
 	
 	/* Def/use facts. */

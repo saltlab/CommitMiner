@@ -424,9 +424,8 @@ public class State implements IState {
 		/* Make a fake var in the environment and point it to the value so that
 		 * if it contains a function, it will be analyzed during the
 		 * 'accessible function' phase of the analysis. */
-		// TODO: In some situations, retval is not being allocated to the store
 		Address address = this.trace.makeAddr(rs.getID(), "");
-		this.env = this.env.strongUpdate(new Identifier(null, "~retval~"), new Addresses(address, Change.u()));
+		this.env = this.env.strongUpdate("~retval~", new Variable(rs.getID(), "~retval~", new Addresses(address, Change.u())));
 		this.store = this.store.alloc(address, retVal);
 
 		/* Update the return value on the scratchpad. */
@@ -504,13 +503,13 @@ public class State implements IState {
 
 		Set<Address> result = new HashSet<Address>();
 
-		Addresses addrs = env.apply(new Identifier(null, node.toSource()));
+		Addresses addrs = env.apply(node.toSource());
 		if(addrs == null) {
 			/* Assume the variable exists in the environment (ie. not a TypeError)
 			 * and add it to the environment/store as BValue.TOP since we know
 			 * nothing about it. */
 			Address addr = trace.makeAddr(node.getID(), "");
-			env = env.strongUpdate(new Identifier(UNDEFINED_ENV_ID, node.toSource(), Change.bottom()), new Addresses(addr, Change.u()));
+			env = env.strongUpdate(node.toSource(), new Variable(UNDEFINED_ENV_ID, node.toSource(), Change.bottom(), new Addresses(addr, Change.u())));
 			store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom()));
 			addrs = new Addresses(addr, Change.u());
 		}
@@ -552,7 +551,7 @@ public class State implements IState {
 			/* We may need to create a dummy object if 'val' doesn't point
 			 * to any objects. */
 			if(val.addressAD.addresses.size() == 0) {
-				Map<Identifier, Address> ext = new HashMap<Identifier, Address>();
+				Map<String, Property> ext = new HashMap<String, Property>();
 				Obj dummy = new Obj(ext, new InternalObjectProperties());
 				Address addr = trace.makeAddr(ie.getID(), "");
 				store = store.alloc(addr, dummy);
@@ -566,7 +565,7 @@ public class State implements IState {
 				Obj obj = store.getObj(objAddr);
 
 				/* Look up the property. */
-				Address propAddr = obj.externalProperties.get(new Identifier(null, ie.getRight().toSource()));
+				Address propAddr = obj.apply(ie.getRight().toSource());
 
 				if(propAddr != null) {
 					result.add(propAddr);
@@ -587,8 +586,8 @@ public class State implements IState {
 					store = store.alloc(propAddr, propVal);
 
 					/* Add the property to the external properties of the object. */
-					Map<Identifier, Address> ext = new HashMap<Identifier, Address>(obj.externalProperties);
-					ext.put(new Identifier(null, ie.getRight().toSource(), Change.u()), propAddr);
+					Map<String, Property> ext = new HashMap<String, Property>(obj.externalProperties);
+					ext.put(ie.getRight().toSource(), new Property(ie.getRight().getID(), ie.getRight().toSource(), Change.u(), propAddr));
 
 					/* We need to create a new object so that the previous
 					 * states are not affected by this update. */

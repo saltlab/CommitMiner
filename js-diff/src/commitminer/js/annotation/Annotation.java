@@ -15,7 +15,7 @@ public class Annotation {
 	public Integer absolutePosition;
 	public Integer length;
 
-	protected Annotation(String label, 
+	public Annotation(String label, 
 					  List<DependencyIdentifier> dependencyIDs,
 					  int line, int absolutePosition, int length) {
 		this.label = label;

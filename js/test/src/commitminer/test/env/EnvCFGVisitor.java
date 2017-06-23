@@ -11,10 +11,8 @@ import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.ast.AstNode;
 
 import commitminer.analysis.SourceCodeFileChange;
-import commitminer.analysis.flow.abstractdomain.Address;
-import commitminer.analysis.flow.abstractdomain.Addresses;
-import commitminer.analysis.flow.abstractdomain.Identifier;
 import commitminer.analysis.flow.abstractdomain.State;
+import commitminer.analysis.flow.abstractdomain.Variable;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
@@ -57,12 +55,12 @@ public class EnvCFGVisitor implements ICFGVisitor {
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
-	private void getObjectFacts(AstNode node, Map<Identifier, Addresses> props, State state, String prefix) {
-		for(Identifier prop : props.keySet()) {
+	private void getObjectFacts(AstNode node, Map<String, Variable> vars, State state, String prefix) {
+		for(Variable var : vars.values()) {
 
 			/* Get the environment changes. No need to recurse since
 			 * properties (currently) do not change. */
-			registerFact(node, prop.name, "ENV", prop.change.toString());
+			registerFact(node, var.name, "ENV", var.change.toString());
 
 		}
 	}

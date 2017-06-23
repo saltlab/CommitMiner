@@ -11,10 +11,8 @@ import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.ast.AstNode;
 
 import commitminer.analysis.SourceCodeFileChange;
-import commitminer.analysis.flow.abstractdomain.Address;
-import commitminer.analysis.flow.abstractdomain.Addresses;
-import commitminer.analysis.flow.abstractdomain.Identifier;
 import commitminer.analysis.flow.abstractdomain.State;
+import commitminer.analysis.flow.abstractdomain.Variable;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
@@ -57,7 +55,7 @@ public class ControlCFGVisitor implements ICFGVisitor {
 	 * @param node The statement or condition at the program point.
 	 * @param props The environment or object properties.
 	 */
-	private void getObjectFacts(AstNode node, Map<Identifier, Addresses> props, State state, String prefix) {
+	private void getObjectFacts(AstNode node, Map<String, Variable> props, State state, String prefix) {
 
 		/* If the branch change set is non-empty, this statement is affected
 		 * by a control flow change. */
