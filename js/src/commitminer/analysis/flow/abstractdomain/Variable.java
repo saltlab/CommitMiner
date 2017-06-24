@@ -49,6 +49,11 @@ public class Variable implements DependencyIdentifier {
 
 		return new Variable(definerID, name, change.join(id.change), addresses.join(id.addresses));
 	}
+	
+	@Override
+	public String toString() {
+		return "<" + this.name + "," + this.change + "," + this.addresses + ">";
+	}
 
 	@Override
 	public int hashCode() {

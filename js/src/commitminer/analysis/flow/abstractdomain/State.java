@@ -159,7 +159,6 @@ public class State implements IState {
 
 	private void interpretAddrsFalsey(Set<Address> addrs, Change change) {
 
-
 		/* Update the value(s) to be falsey. */
 		for(Address addr : addrs) {
 

@@ -41,7 +41,9 @@ public class Environment {
 	 * @return The store addresses of the var.
 	 */
 	public Addresses apply(String x) {
-		return this.environment.get(x).addresses;
+		Variable var = environment.get(x);
+		if(var == null) return null;
+		return var.addresses;
 	}
 
 	/**
