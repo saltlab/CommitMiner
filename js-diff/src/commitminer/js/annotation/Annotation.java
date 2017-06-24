@@ -46,6 +46,17 @@ public class Annotation {
 	}
 	
 	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Annotation)) return false;
+		Annotation a = (Annotation)o;
+		if(label == a.label 
+				&& absolutePosition == a.absolutePosition 
+				&& length == a.length)
+			return true;
+		return false;
+	}
+	
+	@Override
 	public String toString() {
 		String str = "Annotation: <" + label + "|" + line + "," + absolutePosition + "," + length + ",{";
 		for(DependencyIdentifier id : dependencyIDs) {

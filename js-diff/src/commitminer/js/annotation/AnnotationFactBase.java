@@ -16,7 +16,7 @@ import commitminer.factbase.FactBase;
  */
 public class AnnotationFactBase extends FactBase {
 
-	SortedSet<Annotation> annotations;
+	private SortedSet<Annotation> annotations;
 	
 	public AnnotationFactBase(SourceCodeFileChange sourceCodeFileChange) {
 
@@ -43,8 +43,20 @@ public class AnnotationFactBase extends FactBase {
 		this.annotations.add(annotation);
 	}
 	
+	/**
+	 * Register an annotation with the fact database.
+	 * 
+	 * The annotation is assumed to be on the destination file.
+	 */
 	public void registerAnnotationFacts(Set<Annotation> annotations) {
 		this.annotations.addAll(annotations);
+	}
+	
+	/**
+	 * @return The ordered set of annotations in the fact base.
+	 */
+	public SortedSet<Annotation> getAnnotations() {
+		return this.annotations;
 	}
 	
 	/* Def/use facts. */

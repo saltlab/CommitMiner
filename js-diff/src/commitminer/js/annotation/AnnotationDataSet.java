@@ -24,5 +24,11 @@ public class AnnotationDataSet extends DataSet {
 	public AnnotationFactBase getAnnotationFactBase() {
 		return factBase;
 	}
+	
+	public void printDataSet() {
+		for(Annotation annotation : factBase.getAnnotations()) {
+			System.out.println(annotation.toString());
+		}
+	}
 
 }
