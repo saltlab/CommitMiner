@@ -16,6 +16,8 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.TryStatement;
+import org.mozilla.javascript.ast.VariableDeclaration;
+import org.mozilla.javascript.ast.VariableInitializer;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
@@ -78,11 +80,20 @@ public class EnvASTVisitor implements NodeVisitor {
 
 			Variable var = env.environment.get(node.toSource());
 			if(var != null) {
-				// TODO: Check if this variable is changed. If it is, register a fact.
 				if(var.change.le == Change.LatticeElement.CHANGED) {
 					List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 					ids.add(var);
-					this.annotations.add(new Annotation("ENV-USE", ids, node.getLineno(), node.getAbsolutePosition(), node.getLength()));
+					
+					/* Distinguish between definitions and uses of variables. */
+					if(node.getParent() instanceof VariableDeclaration 
+							|| node.getParent() instanceof VariableInitializer
+							|| node.getParent() instanceof FunctionNode) {
+						this.annotations.add(new Annotation("ENV-DEF", ids, node.getLineno(), node.getAbsolutePosition(), node.getLength()));
+					}
+					else {
+						this.annotations.add(new Annotation("ENV-USE", ids, node.getLineno(), node.getAbsolutePosition(), node.getLength()));
+					}
+					
 				}
 			}
 
