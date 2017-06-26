@@ -168,11 +168,12 @@ public class FunctionClosure extends Closure {
 
 						/* Add the argument address to the argument object. */
 						BValue argVal = BValue.top(Change.convU(param), Change.u());
-						store = Helpers.addProp(function.getID(), String.valueOf(i), argVal,
+						store = Helpers.addProp(param.getID(), String.valueOf(i), argVal,
 										  argObj.externalProperties, store, trace);
+						prop = argObj.externalProperties.get(String.valueOf(i));
 
 						/* Add or update the argument object to the store. */
-						argAddr = trace.makeAddr(function.getID(), String.valueOf(i));
+						argAddr = trace.makeAddr(param.getID(), String.valueOf(i));
 						store = store.alloc(argAddr, argObj);
 
 					}

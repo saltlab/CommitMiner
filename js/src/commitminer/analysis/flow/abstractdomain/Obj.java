@@ -64,7 +64,9 @@ public class Obj {
 	 * @return A property or null if it does not exist.
 	 */
 	public Address apply(String property) {
-		return this.externalProperties.get(property).address;
+		Property prop = externalProperties.get(property);
+		if(prop == null) return null;
+		return prop.address;
 	}
 
 	/**
