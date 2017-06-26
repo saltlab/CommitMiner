@@ -157,8 +157,10 @@ public class FunctionClosure extends Closure {
 			i = 0;
 			for(AstNode param : function.getParams()) {
 				if(param instanceof Name) {
+
 					Name paramName = (Name) param;
 					Property prop = argObj.externalProperties.get(String.valueOf(i));
+
 					if(prop == null) {
 
 						/* No argument was given for this parameter. Create a
@@ -174,7 +176,7 @@ public class FunctionClosure extends Closure {
 						store = store.alloc(argAddr, argObj);
 
 					}
-					Variable identity = new Variable(paramName.getID(), paramName.toSource(), Change.conv(paramName), new Addresses(argAddr, Change.u()));
+					Variable identity = new Variable(paramName.getID(), paramName.toSource(), Change.conv(paramName), new Addresses(prop.address, Change.u()));
 					env = env.strongUpdate(paramName.toSource(), identity);
 				}
 				i++;
