@@ -59,7 +59,7 @@ public class EnvASTVisitor implements NodeVisitor {
 			if(name != null) name.visit(visitor);
 
 		}
-		else {
+		else if(statement != null){
 			statement.visit(visitor);
 		}
 
