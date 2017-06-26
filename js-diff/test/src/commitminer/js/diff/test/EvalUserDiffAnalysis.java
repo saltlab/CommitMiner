@@ -1,22 +1,12 @@
 package commitminer.js.diff.test;
 
-
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.deri.iris.api.basics.IQuery;
-import org.deri.iris.api.basics.IRule;
-import org.deri.iris.compiler.Parser;
-import org.deri.iris.compiler.ParserException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,9 +15,6 @@ import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
-import commitminer.classify.ClassifierDataSet;
-import commitminer.classify.ClassifierFeatureVector;
-import commitminer.classify.Transformer;
 import commitminer.js.annotation.Annotation;
 import commitminer.js.annotation.AnnotationDataSet;
 import commitminer.js.annotation.AnnotationFactBase;
@@ -48,7 +35,7 @@ public class EvalUserDiffAnalysis {
 		commit.addSourceCodeFileChange(sourceFileChange);
 
 		/* Builds the data set with our custom queries. */
-		AnnotationDataSet dataSet = new AnnotationDataSet(new AnnotationFactBase(sourceFileChange));
+		AnnotationDataSet dataSet = new AnnotationDataSet( AnnotationFactBase.getInstance(sourceFileChange));
 
 		/* Set up the analysis. */
 		ICommitAnalysisFactory commitFactory = new DiffCommitAnalysisFactory(dataSet);

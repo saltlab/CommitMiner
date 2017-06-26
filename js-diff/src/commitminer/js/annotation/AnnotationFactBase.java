@@ -1,6 +1,8 @@
 package commitminer.js.annotation;
 
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -15,10 +17,24 @@ import commitminer.factbase.FactBase;
  * will be used to annotate the source code file (e.g., NavigationFactBase).
  */
 public class AnnotationFactBase extends FactBase {
+	
+	private static Map<SourceCodeFileChange, AnnotationFactBase> instances = new HashMap<SourceCodeFileChange, AnnotationFactBase>();
 
 	private SortedSet<Annotation> annotations;
 	
-	public AnnotationFactBase(SourceCodeFileChange sourceCodeFileChange) {
+	/**
+	 * @return The AnnotationFactBase for the given {@code SourceCodeFileChange}.
+	 */
+	public static AnnotationFactBase getInstance(SourceCodeFileChange sourceCodeFileChange) {
+		AnnotationFactBase instance = instances.get(sourceCodeFileChange);
+		if(instance == null) {
+			instance = new AnnotationFactBase(sourceCodeFileChange);
+			instances.put(sourceCodeFileChange, instance);
+		}
+		return instance;
+	}
+	
+	private AnnotationFactBase(SourceCodeFileChange sourceCodeFileChange) {
 
 		super(sourceCodeFileChange);
 

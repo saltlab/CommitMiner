@@ -7,7 +7,6 @@ import org.deri.iris.storage.IRelation;
 
 import commitminer.analysis.SourceCodeFileChange;
 
-
 /**
  * Builds new instances of a domain analysis.
  */
