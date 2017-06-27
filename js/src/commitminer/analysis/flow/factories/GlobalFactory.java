@@ -5,6 +5,7 @@ import java.util.Map;
 
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.Change;
+import commitminer.analysis.flow.abstractdomain.DefinerIDs;
 import commitminer.analysis.flow.abstractdomain.Property;
 import commitminer.analysis.flow.abstractdomain.InternalObjectProperties;
 import commitminer.analysis.flow.abstractdomain.Obj;
@@ -27,8 +28,8 @@ public class GlobalFactory {
 
 	public Obj Global_Obj() {
 		Map<String, Property> ext = new HashMap<String, Property>();
-		store = Helpers.addProp("Object", OBJECT_DEFINER_ID, Address.inject(StoreFactory.Object_Addr, Change.u(), Change.u()), ext, store);
-		store = Helpers.addProp("undefined", UNDEFINED_DEFINER_ID, Undefined.inject(Undefined.top(Change.u()), Change.u()), ext, store);
+		store = Helpers.addProp("Object", OBJECT_DEFINER_ID, Address.inject(StoreFactory.Object_Addr, Change.u(), Change.u(), DefinerIDs.bottom()), ext, store);
+		store = Helpers.addProp("undefined", UNDEFINED_DEFINER_ID, Undefined.inject(Undefined.top(Change.u()), Change.u(), DefinerIDs.bottom()), ext, store);
 
 		InternalObjectProperties internal = new InternalObjectProperties();
 		return new Obj(ext, internal);

@@ -117,7 +117,7 @@ public class Num {
 	 * @param number The number lattice element to inject.
 	 * @return The base value tuple with injected number.
 	 */
-	public static BValue inject(Num number, Change valChange) {
+	public static BValue inject(Num number, Change valChange, DefinerIDs definerIDs) {
 		return new BValue(
 				Str.bottom(number.change),
 				number,
@@ -125,7 +125,8 @@ public class Num {
 				Null.bottom(number.change),
 				Undefined.bottom(number.change),
 				Addresses.bottom(number.change),
-				valChange);
+				valChange,
+				definerIDs);
 	}
 
 	/**

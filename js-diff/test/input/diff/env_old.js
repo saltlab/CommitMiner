@@ -2,9 +2,13 @@ function test(cb) {
 	cb();
 }
 
-function foo(x) { }
+function foo(x) { 
+	console.log(x);
+}
 
-function bar(x) { }
+function bar(x) { 
+	console.log(x);
+}
 
 test(foo);
-test(bar); // TODO: Why doesn't the analysis re-analyze test here?
+test(bar);

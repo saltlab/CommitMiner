@@ -8,13 +8,14 @@ import org.deri.iris.storage.IRelation;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.cfg.ICFGVisitor;
 import commitminer.cfg.ICFGVisitorFactory;
+import commitminer.js.annotation.AnnotationFactBase;
 
 public class ValueCFGVisitorFactory implements ICFGVisitorFactory {
 
 	@Override
 	public ICFGVisitor newInstance(SourceCodeFileChange sourceCodeFileChange,
 			Map<IPredicate, IRelation> facts) {
-		return new ValueCFGVisitor(sourceCodeFileChange, facts);
+		return new ValueCFGVisitor(AnnotationFactBase.getInstance(sourceCodeFileChange));
 	}
 
 }

@@ -49,7 +49,7 @@ public class Annotation {
 	public boolean equals(Object o) {
 		if(!(o instanceof Annotation)) return false;
 		Annotation a = (Annotation)o;
-		if(label == a.label 
+		if(label.equals(a.label)
 				&& absolutePosition == a.absolutePosition 
 				&& length == a.length)
 			return true;

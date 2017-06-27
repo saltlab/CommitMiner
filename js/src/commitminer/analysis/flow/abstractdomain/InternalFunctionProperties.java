@@ -33,7 +33,7 @@ public class InternalFunctionProperties extends InternalObjectProperties {
 	 * @param jsclass The type of object being created.
 	 */
 	public InternalFunctionProperties(Stack<Closure> closures, JSClass jsclass) {
-		super(Address.inject(StoreFactory.Function_proto_Addr, Change.u(), Change.u()), jsclass);
+		super(Address.inject(StoreFactory.Function_proto_Addr, Change.u(), Change.u(), DefinerIDs.bottom()), jsclass);
 	}
 
 	@Override

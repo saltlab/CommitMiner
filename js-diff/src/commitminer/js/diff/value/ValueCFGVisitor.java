@@ -1,45 +1,26 @@
 package commitminer.js.diff.value;
 
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.api.basics.ITuple;
-import org.deri.iris.factory.Factory;
-import org.deri.iris.storage.IRelation;
-import org.deri.iris.storage.IRelationFactory;
-import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.ast.AstNode;
 
-import commitminer.analysis.SourceCodeFileChange;
-import commitminer.analysis.flow.abstractdomain.Address;
-import commitminer.analysis.flow.abstractdomain.Addresses;
-import commitminer.analysis.flow.abstractdomain.BValue;
-import commitminer.analysis.flow.abstractdomain.Property;
-import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.State;
-import commitminer.analysis.flow.abstractdomain.Addresses.LatticeElement;
-import commitminer.analysis.flow.abstractdomain.Variable;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
 import commitminer.js.annotation.Annotation;
-import commitminer.js.diff.IsUsedVisitor;
+import commitminer.js.annotation.AnnotationFactBase;
 
 /**
  * Extracts facts from a flow analysis.
  */
 public class ValueCFGVisitor implements ICFGVisitor {
 
-	private SourceCodeFileChange sourceCodeFileChange;
-
 	/* The fact database we will populate. */
-	private Map<IPredicate, IRelation> facts;
+	private AnnotationFactBase factBase;
 
-	public ValueCFGVisitor(SourceCodeFileChange sourceCodeFileChange, Map<IPredicate, IRelation> facts) {
-		this.sourceCodeFileChange = sourceCodeFileChange;
-		this.facts = facts;
+	public ValueCFGVisitor(AnnotationFactBase factBase) {
+		this.factBase = factBase;
 	}
 
 	@Override
@@ -57,112 +38,10 @@ public class ValueCFGVisitor implements ICFGVisitor {
 	 * identifier protection.
 	 */
 	private void visit(AstNode node, State state) {
-		if(state != null) getEnvironmentFacts(node, state.env.environment, state, null, new HashSet<Address>());
-	}
-
-	/**
-	 * Visits variables in the environment and extracts facts.
-	 * @param node The statement or condition at the program point.
-	 * @param props The environment or object properties.
-	 */
-	private void getEnvironmentFacts(AstNode node, Map<String, Variable> vars, State state, String prefix, Set<Address> visited) {
-		for(Map.Entry<String, Variable> entry : vars.entrySet()) {
-			for(Address addr : entry.getValue().addresses.addresses) {
-				getPropertyFacts(node, entry.getKey(), addr, state, prefix, visited);
-			}
+		if(state != null) {
+			Set<Annotation> annotations = ValueASTVisitor.getAnnotations(state, node);
+			factBase.registerAnnotationFacts(annotations);
 		}
-	}
-
-	/**
-	 * Visits objects in the store and extracts facts.
-	 * @param node The statement or condition at the program point.
-	 * @param props The environment or object properties.
-	 */
-	private void getObjectFacts(AstNode node, Map<String, Property> props, State state, String prefix, Set<Address> visited) {
-		for(Map.Entry<String, Property> entry : props.entrySet()) {
-			getPropertyFacts(node, entry.getKey(), entry.getValue().address, state, prefix, visited);
-		}
-	}
-
-	/**
-	 * Recursively extracts facts from objects.
-	 * @param node The statement or condition at the program point.
-	 * @param props The environment or object properties.
-	 */
-	private void getPropertyFacts(AstNode node, String prop, Address addr, State state, String prefix, Set<Address> visited) {
-
-		/* Avoid circular references. */
-		if(visited.contains(addr)) return;
-		visited.add(addr);
-
-		String identifier;
-		if(prefix == null) identifier = prop;
-		else identifier = prefix + "." + prop;
-
-		if(identifier.equals("this")) return;
-		if(addr == null) return;
-
-		BValue val = state.store.apply(addr);
-
-		/* Get the environment changes. No need to recurse since
-		 * properties (currently) do not change. */
-		if(node != null) {
-			Set<Annotation> annotations = isUsed(node, prop);
-			for(Annotation annotation : annotations) {
-				registerFact(node, prop, val.change.toString(), annotation);
-			}
-		}
-
-		/* Recursively check property values. */
-		if(val.addressAD.le == LatticeElement.TOP) return;
-		for(Address propAddr : val.addressAD.addresses) {
-			Obj propObj = state.store.getObj(propAddr);
-			getObjectFacts(node, propObj.externalProperties, state, identifier, visited);
-		}
-
-	}
-
-	/**
-	 * @param node The statement in which the var/prop may be used.
-	 * @param identity The var/prop to look for in the statement.
-	 * @return the serialized list of lines where the var/prop is used in the statement.
-	 */
-	private Set<Annotation> isUsed(AstNode statement, String identity) {
-		return IsUsedVisitor.isUsed(statement, identity, false);
-	}
-
-	/**
-	 * @param statement The statement for which we are registering a fact.
-	 * @param identifier The identifier for which we are registering a fact.
-	 * @param cle The change lattice element.
-	 */
-	private void registerFact(AstNode statement,
-							  String identifier,
-							  String cle,
-							  Annotation annotation) {
-
-		if(statement == null || statement.getID() == null) return;
-
-		IPredicate predicate = Factory.BASIC.createPredicate("Value", 8);
-		IRelation relation = facts.get(predicate);
-		if(relation == null) {
-			IRelationFactory relationFactory = new SimpleRelationFactory();
-			relation = relationFactory.createRelation();
-			facts.put(predicate, relation);
-		}
-
-		/* Add the new tuple to the relation. */
-		ITuple tuple = Factory.BASIC.createTuple(
-				Factory.TERM.createString(statement.getVersion().toString()),
-				Factory.TERM.createString(sourceCodeFileChange.repairedFile),
-				Factory.TERM.createString(annotation.line.toString()),
-				Factory.TERM.createString(annotation.absolutePosition.toString()),
-				Factory.TERM.createString(annotation.length.toString()),
-				Factory.TERM.createString(String.valueOf(statement.getID())),
-				Factory.TERM.createString(identifier),
-				Factory.TERM.createString(cle));
-		relation.add(tuple);
-
 	}
 
 }

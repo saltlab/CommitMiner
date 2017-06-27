@@ -44,7 +44,7 @@ public class AnnotationFactBase extends FactBase {
 			public int compare(Annotation a1, Annotation a2) {
 				if(a1.absolutePosition < a2.absolutePosition) return -1;
 				if(a1.absolutePosition > a2.absolutePosition) return 1;
-				return 0;
+				return(a1.label.compareTo(a2.label));
 			}
 		});
 

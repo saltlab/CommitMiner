@@ -165,12 +165,13 @@ public class State implements IState {
 			/* Keep the BValue change LE (the value does not change). */
 			BValue oldVal = store.apply(addr);
 
-			BValue val = Undefined.inject(Undefined.top(change), oldVal.change)
-					.join(Null.inject(Null.top(change), oldVal.change))
-					.join(Str.inject(new Str(Str.LatticeElement.SBLANK, change), oldVal.change))
-					.join(Num.inject(new Num(Num.LatticeElement.NAN_ZERO, change), oldVal.change))
-					.join(Bool.inject(new Bool(Bool.LatticeElement.FALSE, change), oldVal.change));
+			BValue val = Undefined.inject(Undefined.top(change), oldVal.change, oldVal.definerIDs)
+					.join(Null.inject(Null.top(change), oldVal.change, oldVal.definerIDs))
+					.join(Str.inject(new Str(Str.LatticeElement.SBLANK, change), oldVal.change, DefinerIDs.bottom()))
+					.join(Num.inject(new Num(Num.LatticeElement.NAN_ZERO, change), oldVal.change, DefinerIDs.bottom()))
+					.join(Bool.inject(new Bool(Bool.LatticeElement.FALSE, change), oldVal.change, DefinerIDs.bottom()));
 			store.strongUpdate(addr, val);
+
 		}
 
 	}
@@ -248,21 +249,21 @@ public class State implements IState {
 		if(BValue.isUndefined(rhsVal) || BValue.isNull(rhsVal))
 			for(Address lhsAddr : lhsAddrs) {
 				BValue oldVal = store.apply(lhsAddr);
-				rhsVal = Undefined.inject(Undefined.top(change), oldVal.change)
-						.join(Null.inject(Null.top(change), oldVal.change));
+				rhsVal = Undefined.inject(Undefined.top(change), oldVal.change, oldVal.definerIDs)
+						.join(Null.inject(Null.top(change), oldVal.change, oldVal.definerIDs));
 				store.strongUpdate(lhsAddr, rhsVal);
 			}
 		if(BValue.isBlank(rhsVal) || BValue.isZero(rhsVal))
 			for(Address lhsAddr : lhsAddrs) {
 				BValue oldVal = store.apply(lhsAddr);
-				rhsVal = Str.inject(new Str(Str.LatticeElement.SBLANK, change), oldVal.change)
-						.join(Num.inject(new Num(Num.LatticeElement.ZERO, change), oldVal.change));
+				rhsVal = Str.inject(new Str(Str.LatticeElement.SBLANK, change), oldVal.change, oldVal.definerIDs)
+						.join(Num.inject(new Num(Num.LatticeElement.ZERO, change), oldVal.change, oldVal.definerIDs));
 				store.strongUpdate(lhsAddr, rhsVal);
 			}
 		if(BValue.isNaN(rhsVal))
 			for(Address lhsAddr : lhsAddrs) {
 				BValue oldVal = store.apply(lhsAddr);
-				store.strongUpdate(lhsAddr, Num.inject(new Num(Num.LatticeElement.NAN, change), oldVal.change));
+				store.strongUpdate(lhsAddr, Num.inject(new Num(Num.LatticeElement.NAN, change), oldVal.change, oldVal.definerIDs));
 			}
 		if(BValue.isFalse(rhsVal))
 			interpretAddrsFalsey(lhsAddrs, change);
@@ -554,7 +555,7 @@ public class State implements IState {
 				Obj dummy = new Obj(ext, new InternalObjectProperties());
 				Address addr = trace.makeAddr(ie.getID(), "");
 				store = store.alloc(addr, dummy);
-				val = val.join(Address.inject(addr, Change.bottom(), Change.bottom()));
+				val = val.join(Address.inject(addr, Change.bottom(), Change.bottom(), DefinerIDs.bottom()));
 				store = store.strongUpdate(valAddr, val);
 			}
 

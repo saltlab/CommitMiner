@@ -36,7 +36,7 @@ public class Undefined {
 	 * @param undefined The undefined lattice element to inject.
 	 * @return The base value tuple with injected undefined.
 	 */
-	public static BValue inject(Undefined undefined, Change valChange) {
+	public static BValue inject(Undefined undefined, Change valChange, DefinerIDs definerIDs) {
 		return new BValue(
 				Str.bottom(undefined.change),
 				Num.bottom(undefined.change),
@@ -44,7 +44,8 @@ public class Undefined {
 				Null.bottom(undefined.change),
 				undefined,
 				Addresses.bottom(undefined.change),
-				valChange);
+				valChange,
+				definerIDs);
 	}
 
 	/**

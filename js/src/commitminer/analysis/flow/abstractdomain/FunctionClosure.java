@@ -147,7 +147,7 @@ public class FunctionClosure extends Closure {
 			}
 
 			InternalObjectProperties internal = new InternalObjectProperties(
-					Address.inject(StoreFactory.Arguments_Addr, Change.u(), Change.u()), JSClass.CObject);
+					Address.inject(StoreFactory.Arguments_Addr, Change.u(), Change.u(), DefinerIDs.bottom()), JSClass.CObject);
 			Obj argObj = new Obj(ext, internal);
 
 			/* Put the argument object on the store. */

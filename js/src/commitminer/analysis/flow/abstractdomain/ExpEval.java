@@ -86,7 +86,7 @@ public class ExpEval {
 		Address addr = state.trace.makeAddr(f.getID(), "");
 		addr = state.trace.modAddr(addr, JSClass.CFunction);
 		state.store = Helpers.createFunctionObj(state.facts, closure, state.store, state.trace, addr, f);
-		return Address.inject(addr, Change.convU(f), Change.convU(f));
+		return Address.inject(addr, Change.convU(f), Change.convU(f), DefinerIDs.inject(f.getID()));
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class ExpEval {
 		Address objAddr = state.trace.makeAddr(ol.getID(), "");
 		state.store = state.store.alloc(objAddr, obj);
 
-		return Address.inject(objAddr, Change.convU(ol), Change.convU(ol)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
+		return Address.inject(objAddr, Change.convU(ol), Change.convU(ol), DefinerIDs.inject(ol.getID()));
 	}
 
 	/**
@@ -346,7 +346,7 @@ public class ExpEval {
 	 * @return the abstract interpretation of the number literal
 	 */
 	public BValue evalNumberLiteral(NumberLiteral numl) {
-		return Num.inject(new Num(Num.LatticeElement.VAL, numl.getValue(), Change.convU(numl)), Change.convU(numl)); // TODO: The type may not actually have changed. Need to check the old BValue somehow.
+		return Num.inject(new Num(Num.LatticeElement.VAL, numl.getValue(), Change.convU(numl)), Change.convU(numl), DefinerIDs.inject(numl.getID()));
 	}
 
 	/**
@@ -366,7 +366,7 @@ public class ExpEval {
 			str = new Str(Str.LatticeElement.SNOTNUMNORSPLVAL, val, change);
 		}
 
-		return Str.inject(str, change);
+		return Str.inject(str, change, DefinerIDs.inject(strl.getID()));
 
 	}
 
@@ -380,11 +380,11 @@ public class ExpEval {
 		case Token.THIS:
 			return state.store.apply(state.selfAddr);
 		case Token.NULL:
-			return Null.inject(Null.top(change), change);
+			return Null.inject(Null.top(change), change, DefinerIDs.inject(kwl.getID()));
 		case Token.TRUE:
-			return Bool.inject(new Bool(Bool.LatticeElement.TRUE, change), change);
+			return Bool.inject(new Bool(Bool.LatticeElement.TRUE, change), change, DefinerIDs.inject(kwl.getID()));
 		case Token.FALSE:
-			return Bool.inject(new Bool(Bool.LatticeElement.FALSE, change), change);
+			return Bool.inject(new Bool(Bool.LatticeElement.FALSE, change), change, DefinerIDs.inject(kwl.getID()));
 		case Token.DEBUGGER:
 		default:
 			return BValue.bottom(change, change);
@@ -514,7 +514,7 @@ public class ExpEval {
 			BValue retVal =  newState.scratch.applyReturn();
 			if(retVal == null) {
 				/* Functions with no return statement return undefined. */
-				retVal = Undefined.inject(Undefined.top(Change.convU(fc)), Change.u());
+				retVal = Undefined.inject(Undefined.top(Change.convU(fc)), Change.u(), DefinerIDs.bottom());
 				newState.scratch = newState.scratch.strongUpdate(retVal, null);
 			}
 
@@ -605,16 +605,20 @@ public class ExpEval {
 			/* Resolve all the objects in the address list and create a new
 			 * BValue which points to those objects. */
 			Addresses selfAddrs = new Addresses(Addresses.LatticeElement.SET, Change.u());
+			DefinerIDs definerIDs =  DefinerIDs.bottom();
 			for(Address addr : addrs) {
 				BValue val = this.state.store.apply(addr);
 				for(Address objAddr : val.addressAD.addresses) {
 					Obj obj = this.state.store.getObj(objAddr);
-					if(obj != null) selfAddrs.addresses.add(objAddr);
+					if(obj != null) {
+						selfAddrs.addresses.add(objAddr);
+						definerIDs = definerIDs.join(val.definerIDs);
+					}
 				}
 			}
 			if(selfAddrs.addresses.isEmpty()) return BValue.bottom(Change.u(), Change.u());
 
-			return Addresses.inject(selfAddrs, Change.u());
+			return Addresses.inject(selfAddrs, Change.u(), definerIDs);
 		}
 		else {
 			/* Ignore everything else (e.g., method calls) for now. */

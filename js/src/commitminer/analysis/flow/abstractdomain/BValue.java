@@ -1,13 +1,13 @@
 package commitminer.analysis.flow.abstractdomain;
 
-
+import commitminer.analysis.annotation.DependencyIdentifier;
 
 /**
  * The abstract domain for base values. Because the value can be multiple
  * types, the abstract domain is a tuple of lattice elements: one for each
  * base type (string, number, boolean, null, undefined and address).
  */
-public class BValue {
+public class BValue implements DependencyIdentifier {
 
 	/** The abstract domain for strings. **/
 	public Str stringAD;
@@ -26,6 +26,9 @@ public class BValue {
 
 	/** The abstract domain for memory addresses. **/
 	public Addresses addressAD;
+	
+	/** The set of definer IDs this BValue may point to. **/
+	public DefinerIDs definerIDs;
 
 	/** The lattice element for tracking changes to this value. **/
 	public Change change;
@@ -33,7 +36,8 @@ public class BValue {
 	public BValue(Str stringAD, Num numberAD,
 					  Bool booleanAD, Null nullAD,
 					  Undefined undefinedAD, Addresses addressAD,
-					  Change change) {
+					  Change change,
+					  DefinerIDs definerIDs) {
 		this.stringAD = stringAD;
 		this.numberAD = numberAD;
 		this.booleanAD = booleanAD;
@@ -41,6 +45,22 @@ public class BValue {
 		this.undefinedAD = undefinedAD;
 		this.addressAD = addressAD;
 		this.change = change;
+		this.definerIDs = definerIDs;
+	}
+
+	public BValue(Str stringAD, Num numberAD,
+					  Bool booleanAD, Null nullAD,
+					  Undefined undefinedAD, Addresses addressAD,
+					  Change change,
+					  Integer definerID) {
+		this.stringAD = stringAD;
+		this.numberAD = numberAD;
+		this.booleanAD = booleanAD;
+		this.nullAD = nullAD;
+		this.undefinedAD = undefinedAD;
+		this.addressAD = addressAD;
+		this.change = change;
+		this.definerIDs = DefinerIDs.inject(definerID);
 	}
 
 	public BValue join(BValue state) {
@@ -52,7 +72,8 @@ public class BValue {
 				this.nullAD.join(state.nullAD),
 				this.undefinedAD.join(state.undefinedAD),
 				this.addressAD.join(state.addressAD),
-				this.change.join(state.change));
+				this.change.join(state.change),
+				this.definerIDs.join(state.definerIDs));
 
 	}
 
@@ -181,7 +202,8 @@ public class BValue {
 				Null.top(typeChange),
 				Undefined.top(typeChange),
 				Addresses.bottom(typeChange),
-				valChange);
+				valChange,
+				DefinerIDs.bottom());
 	}
 
 	/**
@@ -197,7 +219,8 @@ public class BValue {
 				Null.bottom(typeChange),
 				Undefined.bottom(typeChange),
 				Addresses.bottom(typeChange),
-				valChange);
+				valChange,
+				DefinerIDs.bottom());
 	}
 
 	/**
@@ -213,7 +236,8 @@ public class BValue {
 				Null.top(typeChange),
 				Undefined.top(typeChange),
 				Addresses.bottom(typeChange),
-				valChange);
+				valChange,
+				DefinerIDs.bottom());
 	}
 
 	@Override
@@ -232,7 +256,13 @@ public class BValue {
 		if(!this.undefinedAD.equals(v.undefinedAD)) return false;
 		if(!this.addressAD.equals(v.addressAD)) return false;
 		if(!this.change.equals(v.change)) return false;
+		if(!this.definerIDs.equals(v.definerIDs)) return false;
 		return true;
+	}
+
+	@Override
+	public String getAddress() {
+		return this.definerIDs.toString();
 	}
 
 }

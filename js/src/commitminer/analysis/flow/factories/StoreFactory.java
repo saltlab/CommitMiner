@@ -8,6 +8,7 @@ import org.mozilla.javascript.ast.AstNode;
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Change;
+import commitminer.analysis.flow.abstractdomain.DefinerIDs;
 import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.Store;
 import commitminer.cfg.CFG;
@@ -77,7 +78,7 @@ public class StoreFactory {
 
 		Store store = new Store(bValueStore, objectStore);
 
-		bValueStore.put(global_binding_Addr, Address.inject(global_Addr, Change.u(), Change.u()));
+		bValueStore.put(global_binding_Addr, Address.inject(global_Addr, Change.u(), Change.u(), DefinerIDs.bottom()));
 
 		GlobalFactory gf = new GlobalFactory(store);
 		objectStore.put(global_Addr, gf.Global_Obj());

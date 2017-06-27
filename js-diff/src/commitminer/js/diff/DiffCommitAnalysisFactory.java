@@ -32,7 +32,7 @@ public class DiffCommitAnalysisFactory implements ICommitAnalysisFactory {
 		List<ICFGVisitorFactory> cfgVisitorFactories = new LinkedList<ICFGVisitorFactory>();
 //		cfgVisitorFactories.add(new ControlCFGVisitorFactory());
 		cfgVisitorFactories.add(new EnvCFGVisitorFactory());
-//		cfgVisitorFactories.add(new ValueCFGVisitorFactory());
+		cfgVisitorFactories.add(new ValueCFGVisitorFactory());
 //		cfgVisitorFactories.add(new DefUseCFGVisitorFactory());
 
 		List<IDomainAnalysisFactory> domainFactories = new LinkedList<IDomainAnalysisFactory>();

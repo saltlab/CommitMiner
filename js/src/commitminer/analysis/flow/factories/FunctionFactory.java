@@ -13,6 +13,7 @@ import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.Closure;
 import commitminer.analysis.flow.abstractdomain.Control;
+import commitminer.analysis.flow.abstractdomain.DefinerIDs;
 import commitminer.analysis.flow.abstractdomain.Environment;
 import commitminer.analysis.flow.abstractdomain.Property;
 import commitminer.analysis.flow.abstractdomain.InternalFunctionProperties;
@@ -41,13 +42,13 @@ public class FunctionFactory {
 
 	public Obj Function_proto_Obj() {
 		Map<String, Property> ext = new HashMap<String, Property>();
-		store = Helpers.addProp("external", -41, Num.inject(Num.top(Change.u()), Change.u()), ext, store);
-		store = Helpers.addProp("apply", -42, Address.inject(StoreFactory.Function_proto_apply_Addr, Change.u(), Change.u()), ext, store);
-		store = Helpers.addProp("call", -43, Address.inject(StoreFactory.Function_proto_call_Addr, Change.u(), Change.u()), ext, store);
-		store = Helpers.addProp("toString", -44, Address.inject(StoreFactory.Function_proto_toString_Addr, Change.u(), Change.u()), ext, store);
+		store = Helpers.addProp("external", -41, Num.inject(Num.top(Change.u()), Change.u(), DefinerIDs.bottom()), ext, store);
+		store = Helpers.addProp("apply", -42, Address.inject(StoreFactory.Function_proto_apply_Addr, Change.u(), Change.u(), DefinerIDs.bottom()), ext, store);
+		store = Helpers.addProp("call", -43, Address.inject(StoreFactory.Function_proto_call_Addr, Change.u(), Change.u(), DefinerIDs.bottom()), ext, store);
+		store = Helpers.addProp("toString", -44, Address.inject(StoreFactory.Function_proto_toString_Addr, Change.u(), Change.u(), DefinerIDs.bottom()), ext, store);
 
 		InternalObjectProperties internal = new InternalObjectProperties(
-				Address.inject(StoreFactory.Function_proto_Addr, Change.u(), Change.u()),
+				Address.inject(StoreFactory.Function_proto_Addr, Change.u(), Change.u(), DefinerIDs.bottom()),
 				JSClass.CFunction_prototype_Obj);
 
 		return new Obj(ext, internal);
@@ -55,7 +56,7 @@ public class FunctionFactory {
 
 	// TODO: apply and call need native closures because their behaviour
 	//		 affects the analysis.
-	public Obj Function_proto_toString_Obj() { return constFunctionObj(Str.inject(Str.top(Change.u()), Change.u())); }
+	public Obj Function_proto_toString_Obj() { return constFunctionObj(Str.inject(Str.top(Change.u()), Change.u(), DefinerIDs.bottom())); }
 	public Obj Function_proto_apply_Obj() { return constFunctionObj(BValue.top(Change.u(), Change.u())); }
 	public Obj Function_proto_call_Obj() { return constFunctionObj(BValue.top(Change.u(), Change.u())); }
 
