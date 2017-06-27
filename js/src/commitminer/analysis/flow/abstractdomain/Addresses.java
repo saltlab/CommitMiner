@@ -153,6 +153,7 @@ public class Addresses {
 		if(!(o instanceof Addresses)) return false;
 		Addresses addrs = (Addresses)o;
 		if(this.le != addrs.le || !this.change.equals(addrs.change)) return false;
+		if(this.addresses.size() != addrs.addresses.size()) return false;
 		for(Address addr : this.addresses) {
 			if(!addrs.addresses.contains(addr)) return false;
 		}

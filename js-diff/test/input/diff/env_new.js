@@ -13,4 +13,4 @@ function bar(x) {
 }
 
 test(foo);
-test(bar); // TODO: Why doesn't the analysis re-analyze test here?
+test(bar); // TODO: Why doesn't the analysis re-analyze test here? Do we check for changes to parameters, or only store?
