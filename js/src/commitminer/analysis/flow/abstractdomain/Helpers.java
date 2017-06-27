@@ -241,9 +241,13 @@ public class Helpers {
 			/* Pop this function off the call stack. */
 			callStack.pop();
 
-			/* Join the states. */
 			if(state == null) state = endState;
-			else state = state.join(endState);
+			else {
+				/* Join the store and scratchpad only. Environment, trace 
+				 * and control no longer apply. */
+				state.store = state.store.join(endState.store);
+				state.scratch = state.scratch.join(endState.scratch);
+			}
 
 		}
 

@@ -72,6 +72,40 @@ public class EvalUserDiffAnalysis {
 
 	}
 
+	@Test
+	public void testEnv() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/diff/env_old.js";
+		String dst = "./test/input/diff/env_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Set<Annotation> expected = new HashSet<Annotation>();
+
+		this.runTest(sourceCodeFileChange, expected, false);
+
+	}
+
+	@Test
+	public void testDynProp() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/diff/pm2_old.js";
+		String dst = "./test/input/diff/pm2_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Set<Annotation> expected = new HashSet<Annotation>();
+
+		this.runTest(sourceCodeFileChange, expected, false);
+
+	}
+
 	/**
 	 * @return A dummy commit for testing.
 	 */

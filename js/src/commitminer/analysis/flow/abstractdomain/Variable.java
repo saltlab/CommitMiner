@@ -41,8 +41,10 @@ public class Variable implements DependencyIdentifier {
 	 */
 	public Variable join(Variable id) {
 		
-		if(!definerID.equals(id.definerID) || !name.equals(id.name)) 
-			throw new Error("Identifier::join() -- Cannot join different Identifiers.");
+		if(!definerID.equals(id.definerID) || !name.equals(id.name)) {
+			if(!name.equalsIgnoreCase("~retval~"))
+				throw new Error("Identifier::join() -- Cannot join different Identifiers.");
+		}
 
 		change.join(id.change);
 		addresses.join(id.addresses);
