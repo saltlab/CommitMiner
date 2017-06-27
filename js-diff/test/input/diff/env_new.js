@@ -1,15 +1,15 @@
-var message = "Hello World!";
+var message = { greeting: "Hello World!" };
 
 function test(cb) {
 	cb(message);
 }
 
 function foo(x) { 
-	console.log(x);
+	console.log(x.greeting);
 }
 
 function bar(x) { 
-	console.log(x);
+	console.log(x.greeting);
 }
 
 test(foo);

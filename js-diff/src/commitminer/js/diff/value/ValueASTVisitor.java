@@ -19,7 +19,9 @@ import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import commitminer.analysis.annotation.DependencyIdentifier;
+import commitminer.analysis.annotation.GenericDependencyIdentifier;
 import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.Environment;
@@ -63,6 +65,16 @@ public class ValueASTVisitor implements NodeVisitor {
 
 			Name name = function.getFunctionName();
 			if(name != null) name.visit(visitor);
+
+			/* Register a value-def for the function if needed. */
+			if(function.getChangeType() == ChangeType.INSERTED
+					|| function.getChangeType() == ChangeType.UPDATED) {
+				
+				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+				ids.add(new GenericDependencyIdentifier(function.getID()));
+				visitor.annotations.add(new Annotation("VAL-DEF", ids, function.getLineno(), function.getAbsolutePosition(), 8));
+
+			}
 
 		}
 		else if(statement != null){
@@ -146,7 +158,10 @@ public class ValueASTVisitor implements NodeVisitor {
 			with.getExpression().visit(this);
 			return false;
 		}
-		else if(node instanceof TryStatement || node instanceof FunctionNode) {
+		else if(node instanceof FunctionNode) {
+			return false;
+		}
+		else if(node instanceof TryStatement) {
 			return false;
 		}
 

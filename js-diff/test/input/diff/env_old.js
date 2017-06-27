@@ -3,11 +3,11 @@ function test(cb) {
 }
 
 function foo(x) { 
-	console.log(x);
+	console.log(x.greeting);
 }
 
 function bar(x) { 
-	console.log(x);
+	console.log(x.greeting);
 }
 
 test(foo);
