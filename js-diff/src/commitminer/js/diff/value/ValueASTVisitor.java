@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.mozilla.javascript.Token;
+import org.mozilla.javascript.ast.ArrayLiteral;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.DoLoop;
@@ -12,9 +14,13 @@ import org.mozilla.javascript.ast.ForInLoop;
 import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
+import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
+import org.mozilla.javascript.ast.NumberLiteral;
+import org.mozilla.javascript.ast.ObjectLiteral;
 import org.mozilla.javascript.ast.PropertyGet;
+import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
@@ -123,6 +129,34 @@ public class ValueASTVisitor implements NodeVisitor {
 			pg.getLeft().visit(this);
 
 			return false;
+		}
+		/* Register VAL-DEF annotations for  literals. */
+		else if(node instanceof KeywordLiteral) {
+			KeywordLiteral kwl = (KeywordLiteral)node;
+			if(kwl.getChangeType() == ChangeType.INSERTED
+					|| kwl.getChangeType() == ChangeType.UPDATED) {
+
+				switch(kwl.getType()) {
+				case Token.NULL:
+				case Token.TRUE:
+				case Token.FALSE:
+					List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+					ids.add(new GenericDependencyIdentifier(kwl.getID()));
+					this.annotations.add(new Annotation("VAL-DEF", ids, kwl.getLineno(), kwl.getAbsolutePosition(), kwl.getLength()));
+				}
+				
+			}
+		}
+		else if(node instanceof NumberLiteral 
+				|| node instanceof StringLiteral
+				|| node instanceof ObjectLiteral
+				|| node instanceof ArrayLiteral) {
+			if(node.getChangeType() == ChangeType.INSERTED
+					|| node.getChangeType() == ChangeType.UPDATED) {
+				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+				ids.add(new GenericDependencyIdentifier(node.getID()));
+				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getAbsolutePosition(), node.getLength()));
+			}
 		}
 		/* Ignore the body of loops, ifs and functions. */
 		else if(node instanceof IfStatement) {
