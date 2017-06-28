@@ -19,6 +19,7 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.ObjectLiteral;
+import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.TryStatement;
@@ -28,11 +29,11 @@ import org.mozilla.javascript.ast.WithStatement;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.analysis.annotation.GenericDependencyIdentifier;
+import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Change;
-import commitminer.analysis.flow.abstractdomain.Environment;
+import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.State;
-import commitminer.analysis.flow.abstractdomain.Store;
 import commitminer.analysis.flow.abstractdomain.Variable;
 import commitminer.js.annotation.Annotation;
 
@@ -42,12 +43,9 @@ public class ValueASTVisitor implements NodeVisitor {
 	 * The set of changed variable annotations found in the statement.
 	 **/
 	public Set<Annotation> annotations;
-
-	/** The abstract environment. **/
-	private Environment env;
 	
-	/** The abstract store. **/
-	private Store store;
+	/** The abstract state. **/
+	private State state;
 
 	/**
 	 * Detects uses of the identifier.
@@ -92,19 +90,19 @@ public class ValueASTVisitor implements NodeVisitor {
 
 	public ValueASTVisitor(State state) {
 		this.annotations = new HashSet<Annotation>();
-		this.env = state.env;
-		this.store = state.store;
+		this.state = state;
 	}
 
 	@Override
 	public boolean visit(AstNode node) {
 
+		/* Inspect variables and properties that use changed values. */
 		if(node instanceof Name) {
 
-			Variable var = env.environment.get(node.toSource());
+			Variable var = state.env.environment.get(node.toSource());
 			if(var != null) {
 				
-				BValue val = store.apply(var.addresses);
+				BValue val = state.store.apply(var.addresses);
 				if(val.change.le == Change.LatticeElement.CHANGED
 						|| val.change.le == Change.LatticeElement.TOP) {
 
@@ -117,18 +115,61 @@ public class ValueASTVisitor implements NodeVisitor {
 			}
 
 		}
-		/* Inspect the variable part of a property access. */
 		else if(node instanceof PropertyGet) {
-			// TODO: Change this to look for properties to highlight.
 			
 			PropertyGet pg = (PropertyGet) node;
 			
-			/* TODO: Write a function that can resolve the variable and each
-			 * property, and label each one that has changes. */
+			/* Try to resolve the full property get. */
+			for(Address addr : state.resolveOrCreate(node)) {
+				
+				BValue val = state.store.apply(addr);
+				
+				if(val.change.le == Change.LatticeElement.CHANGED
+						|| val.change.le == Change.LatticeElement.TOP) {
+					List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+					ids.add(val);
+					this.annotations.add(new Annotation("VAL-USE", ids, 
+							pg.getRight().getLineno(), 
+							pg.getRight().getAbsolutePosition(), 
+							pg.getRight().getLength()));
+				}
+
+			}
 			
+			/* Visit the left hand side in case any objects have changed. */
 			pg.getLeft().visit(this);
 
 			return false;
+
+		}
+		else if(node instanceof ObjectProperty) {
+			
+			ObjectProperty op = (ObjectProperty)node;
+			ObjectLiteral ol = (ObjectLiteral)op.getParent();
+			
+			String propName = null;
+			AstNode prop = op.getLeft();
+			if(!(prop instanceof Name)) return true;
+			propName = prop.toSource();
+			
+			/* Get the object from the store, using the  address re-constructed from
+			* Trace. */
+			Address objAddr = state.trace.makeAddr(ol.getID(), "");
+			Obj obj = state.store.getObj(objAddr);
+			
+			Address propAddr = obj.apply(propName);
+			BValue val = state.store.apply(propAddr);
+
+			if(val.change.le == Change.LatticeElement.CHANGED
+					|| val.change.le == Change.LatticeElement.TOP) {
+				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+				ids.add(val);
+				this.annotations.add(new Annotation("VAL-USE", ids, 
+						prop.getLineno(), 
+						prop.getAbsolutePosition(), 
+						prop.getLength()));
+			}
+			
 		}
 		/* Register VAL-DEF annotations for  literals. */
 		else if(node instanceof KeywordLiteral) {
@@ -148,14 +189,21 @@ public class ValueASTVisitor implements NodeVisitor {
 			}
 		}
 		else if(node instanceof NumberLiteral 
-				|| node instanceof StringLiteral
-				|| node instanceof ObjectLiteral
-				|| node instanceof ArrayLiteral) {
+				|| node instanceof StringLiteral) {
 			if(node.getChangeType() == ChangeType.INSERTED
 					|| node.getChangeType() == ChangeType.UPDATED) {
 				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 				ids.add(new GenericDependencyIdentifier(node.getID()));
 				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getAbsolutePosition(), node.getLength()));
+			}
+		}
+		else if(node instanceof ObjectLiteral
+				|| node instanceof ArrayLiteral) {
+			if(node.getChangeType() == ChangeType.INSERTED
+					|| node.getChangeType() == ChangeType.UPDATED) {
+				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+				ids.add(new GenericDependencyIdentifier(node.getID()));
+				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getAbsolutePosition(), 1));
 			}
 		}
 		/* Ignore the body of loops, ifs and functions. */

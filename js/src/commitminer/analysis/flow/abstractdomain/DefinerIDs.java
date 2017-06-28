@@ -65,6 +65,7 @@ public class DefinerIDs {
 		for(Integer definerID : this.definerIDs) {
 			s += definerID + ",";
 		}
+		if(s.isEmpty()) return s;
 		return s.substring(0, s.length() - 1);
 	}
 
