@@ -155,7 +155,7 @@ public class ValueASTVisitor implements NodeVisitor {
 			/* Get the object from the store, using the  address re-constructed from
 			* Trace. */
 			Address objAddr = state.trace.makeAddr(ol.getID(), "");
-			Obj obj = state.store.getObj(objAddr);
+			Obj obj = state.store.getObj(objAddr); // Problem: obj is not in the store
 			
 			Address propAddr = obj.apply(propName);
 			BValue val = state.store.apply(propAddr);

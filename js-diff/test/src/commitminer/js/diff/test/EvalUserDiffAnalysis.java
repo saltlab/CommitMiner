@@ -90,6 +90,23 @@ public class EvalUserDiffAnalysis {
 	}
 
 	@Test
+	public void testTernary() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/diff/ternary_old.js";
+		String dst = "./test/input/diff/ternary_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Set<Annotation> expected = new HashSet<Annotation>();
+
+		this.runTest(sourceCodeFileChange, expected, false);
+
+	}
+
+	@Test
 	public void testDynProp() throws Exception {
 
 		/* The test files. */
