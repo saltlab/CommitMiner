@@ -76,7 +76,7 @@ public class ValueASTVisitor implements NodeVisitor {
 				
 				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 				ids.add(new GenericDependencyIdentifier(function.getID()));
-				visitor.annotations.add(new Annotation("VAL-DEF", ids, function.getLineno(), function.getAbsolutePosition(), 8));
+				visitor.annotations.add(new Annotation("VAL-DEF", ids, function.getLineno(), function.getFixedPosition(), 8));
 
 			}
 
@@ -109,7 +109,7 @@ public class ValueASTVisitor implements NodeVisitor {
 					List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 					ids.add(val);
 
-					this.annotations.add(new Annotation("VAL-USE", ids, node.getLineno(), node.getAbsolutePosition(), node.getLength()));
+					this.annotations.add(new Annotation("VAL-USE", ids, node.getLineno(), node.getFixedPosition(), node.getLength()));
 				}
 				
 			}
@@ -130,7 +130,7 @@ public class ValueASTVisitor implements NodeVisitor {
 					ids.add(val);
 					this.annotations.add(new Annotation("VAL-USE", ids, 
 							pg.getRight().getLineno(), 
-							pg.getRight().getAbsolutePosition(), 
+							pg.getRight().getFixedPosition(), 
 							pg.getRight().getLength()));
 				}
 
@@ -166,7 +166,7 @@ public class ValueASTVisitor implements NodeVisitor {
 				ids.add(val);
 				this.annotations.add(new Annotation("VAL-USE", ids, 
 						prop.getLineno(), 
-						prop.getAbsolutePosition(), 
+						prop.getFixedPosition(), 
 						prop.getLength()));
 			}
 			
@@ -183,7 +183,7 @@ public class ValueASTVisitor implements NodeVisitor {
 				case Token.FALSE:
 					List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 					ids.add(new GenericDependencyIdentifier(kwl.getID()));
-					this.annotations.add(new Annotation("VAL-DEF", ids, kwl.getLineno(), kwl.getAbsolutePosition(), kwl.getLength()));
+					this.annotations.add(new Annotation("VAL-DEF", ids, kwl.getLineno(), kwl.getFixedPosition(), kwl.getLength()));
 				}
 				
 			}
@@ -194,7 +194,7 @@ public class ValueASTVisitor implements NodeVisitor {
 					|| node.getChangeType() == ChangeType.UPDATED) {
 				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 				ids.add(new GenericDependencyIdentifier(node.getID()));
-				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getAbsolutePosition(), node.getLength()));
+				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getFixedPosition(), node.getLength()));
 			}
 		}
 		else if(node instanceof ObjectLiteral
@@ -203,7 +203,7 @@ public class ValueASTVisitor implements NodeVisitor {
 					|| node.getChangeType() == ChangeType.UPDATED) {
 				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 				ids.add(new GenericDependencyIdentifier(node.getID()));
-				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getAbsolutePosition(), 1));
+				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getFixedPosition(), 1));
 			}
 		}
 		/* Ignore the body of loops, ifs and functions. */

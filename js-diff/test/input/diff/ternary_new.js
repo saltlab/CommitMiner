@@ -1,5 +1,5 @@
 function test(cb) {
-	return cb ? cb({success:true}) : null;
+	return cb ? cb({success:false}) : null;
 }
 
 function foo(data) {

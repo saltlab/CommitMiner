@@ -88,10 +88,10 @@ public class EnvASTVisitor implements NodeVisitor {
 					if(node.getParent() instanceof VariableDeclaration 
 							|| node.getParent() instanceof VariableInitializer
 							|| node.getParent() instanceof FunctionNode) {
-						this.annotations.add(new Annotation("ENV-DEF", ids, node.getLineno(), node.getAbsolutePosition(), node.getLength()));
+						this.annotations.add(new Annotation("ENV-DEF", ids, node.getLineno(), node.getFixedPosition(), node.getLength()));
 					}
 					else {
-						this.annotations.add(new Annotation("ENV-USE", ids, node.getLineno(), node.getAbsolutePosition(), node.getLength()));
+						this.annotations.add(new Annotation("ENV-USE", ids, node.getLineno(), node.getFixedPosition(), node.getLength()));
 					}
 					
 				}
