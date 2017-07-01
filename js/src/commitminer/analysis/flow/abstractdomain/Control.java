@@ -1,8 +1,5 @@
 package commitminer.analysis.flow.abstractdomain;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.mozilla.javascript.ast.AstNode;
 
 import commitminer.cfg.CFGEdge;
@@ -12,92 +9,66 @@ import commitminer.cfg.CFGNode;
  * Stores the state of control flow changes.
  */
 public class Control {
-
-	/**
-	 * Tracks control flow changes for each branch. When the negated branch
-	 * condition is encountered, the condition is removed from the set.
-	 */
-	public Set<AstNode> conditions;
-
-	/**
-	 * Tracks control flow changes that have been merged and no longer apply.
-	 */
-	public Set<AstNode> negConditions;
+	
+	private ControlCall call;
+	private ControlCondition condition;
 
 	public Control() {
-		conditions = new HashSet<AstNode>();
-		negConditions = new HashSet<AstNode>();
+		call = new ControlCall();
+		condition = new ControlCondition();
 	}
 
-	public Control(Set<AstNode> conditions, Set<AstNode> negConditions) {
-		this.conditions = conditions;
-		this.negConditions = negConditions;
+	public Control(ControlCall call, ControlCondition condition) {
+		this.call = call;
+		this.condition = condition;
 	}
 
 	@Override
 	public Control clone() {
-		return new Control(new HashSet<AstNode>(conditions),
-						   new HashSet<AstNode>(negConditions));
+		return new Control(call, condition);
 	}
 
 	/**
 	 * Updates the state for the branch conditions exiting the CFGNode.
-	 * @return The new state (ControlFlowChange) after update.
+	 * @return The new control state after update.
 	 */
 	public Control update(CFGEdge edge, CFGNode node) {
+		return new Control(call, condition.update(edge, node));
+	}
+	
+	/**
+	 * Updates the state for a function call.
+	 * @return The new control state after updates.
+	 */
+	public Control update(AstNode fc) {
 
-		Set<AstNode> conditions = new HashSet<AstNode>(this.conditions);
-		Set<AstNode> negConditions = new HashSet<AstNode>(this.negConditions);
+		/* If this is a new function call, we interpret the control of
+		 * the callee as changed. */
+		if(Change.convU(fc).le == Change.LatticeElement.CHANGED)
+			return new Control(call.update(fc.getID()), condition);
 
-		/* Put the current branch condition in the 'conditions' set and all other
-		 * conditions in the 'neg' set since they must be false. */
-
-		if(edge.getCondition() != null
-				&& Change.convU(edge.getCondition()).le ==
-								Change.LatticeElement.CHANGED) {
-
-			conditions.add((AstNode)edge.getCondition());
-
-			for(CFGEdge child : node.getEdges()) {
-				if(child != edge && child.getCondition() != null) {
-					negConditions.add((AstNode)child.getCondition());
-				}
-			}
-
-		}
-
-		/* Check the siblings for neg conditions. */
-		for(CFGEdge child : node.getEdges()) {
-			if(child != edge
-					&& child.getCondition() != null
-					&& Change.convU(child.getCondition()).le ==
-									Change.LatticeElement.CHANGED) {
-				negConditions.add((AstNode)child.getCondition());
-			}
-		}
-
-		return new Control(conditions, negConditions);
+		/* If this is not a new function call, make a fresh (unchanged)
+		 * the control-call lattice is set to bottom. */
+		return new Control(new ControlCall(), condition);
 
 	}
-
+	
 	/**
-	 * Joins two ControlFlowChanges.
+	 * Joins two Control abstract domains.
 	 * @return The new state (ControlFlowChange) after join.
 	 */
 	public Control join(Control right) {
 
-		/* Join the sets. */
-		Set<AstNode> conditions = new HashSet<AstNode>(this.conditions);
-		Set<AstNode> negConditions = new HashSet<AstNode>(this.negConditions);
+		return new Control(call.join(right.call),
+						   condition.join(right.condition));
 
-		conditions.addAll(right.conditions);
-		negConditions.addAll(right.negConditions);
+	}
 
-		/* conditions = conditions - negConditions */
-		conditions.removeAll(negConditions);
-
-		return new Control(conditions, negConditions);
-
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Control)) return false;
+		Control cc = (Control)o;
+		return call.equals(cc.call);
 	}
 
 }

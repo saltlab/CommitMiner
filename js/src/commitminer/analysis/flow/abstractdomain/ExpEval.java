@@ -472,13 +472,10 @@ public class ExpEval {
 
 
 		if(funVal != null) {
-			/* If this is a new function call, we interpret the control of
-			 * the callee as changed. */
+
+			/* Update the control-call domain for the function call. */
 			Control control = state.control;
-			if(Change.convU(fc).le == Change.LatticeElement.CHANGED) {
-				control = control.clone();
-				control.conditions.add(fc); // All statements in the callee will be labeled control changed
-			}
+			control = control.update(fc);
 
 			/* Call the function and get a join of the new states. */
 			newState = Helpers.applyClosure(state.facts, funVal, objAddr, state.store,
@@ -545,10 +542,7 @@ public class ExpEval {
 				/* Create the control domain. */
 				Control control = state.control;
 				AstNode node = (AstNode)closure.cfg.getEntryNode().getStatement();
-				if(Change.conv(node).le == Change.LatticeElement.CHANGED) {
-					control = state.control.clone();
-					control.conditions.add(node); // Mark all as control flow modified
-				}
+				control = control.update(node);
 
 				/* Is this function being called recursively? If so abort. */
 				if(state.callStack.contains(addr)) continue;

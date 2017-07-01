@@ -98,7 +98,7 @@ public class State implements IState {
 		/* Interpret the statement. */
 		interpretCondition(condition, false);
 
-		/* Interpret the control flow changes. */
+		/* Interpret the effect of the edge on control flow. */
 		this.control = this.control.update(edge, edge.getFrom());
 
 		return this;

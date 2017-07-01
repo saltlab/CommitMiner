@@ -391,10 +391,7 @@ public class Helpers {
 					/* Create the control domain. */
 					Control control = new Control();
 					AstNode node = (AstNode)fc.cfg.getEntryNode().getStatement();
-					if(Change.conv(node).le == Change.LatticeElement.CHANGED) {
-						control = state.control.clone();
-						control.conditions.add(node); // Mark all as control flow modified
-					}
+					control = control.update(node);
 					
 					Scratchpad scratch = new Scratchpad(state.scratch.applyReturn(), new BValue[0]);
 

@@ -43,11 +43,9 @@ public class StandardStateComparator extends StateComparator {
 			}
 		}
 		
-		/* Control change AD is not equal if: 
-		 * 	there are NO control changes in the old state
-		 * 	AND 
-		 * there are control changes in the new state. */
-		if(s1.control.conditions.isEmpty() && !s2.control.conditions.isEmpty()) return false;
+		/* Check if there is a control change to propagate. */
+		if(!s1.control.equals(s2.control))
+			return false;
 		
 		return true;
 
