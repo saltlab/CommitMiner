@@ -63,6 +63,14 @@ public class Control {
 						   condition.join(right.condition));
 
 	}
+	
+	public ControlCall getCall() {
+		return call;
+	}
+	
+	public ControlCondition getCondition() {
+		return condition;
+	}
 
 	@Override
 	public boolean equals(Object o) {

@@ -5,13 +5,14 @@ import java.util.Set;
 
 import org.mozilla.javascript.ast.AstNode;
 
+import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 
 /**
  * Stores the state of control flow changes due to changes in branch conditions.
  */
-public class ControlCondition {
+public class ControlCondition implements DependencyIdentifier {
 
 	/**
 	 * Tracks condition changes for each branch. When the negated branch
@@ -98,6 +99,20 @@ public class ControlCondition {
 
 		return new ControlCondition(conditions, negConditions);
 
+	}
+	
+	public boolean isChanged() {
+		return !conditions.isEmpty();
+	}
+
+	@Override
+	public String getAddress() {
+		String id = "";
+		if(conditions.isEmpty()) return "";
+		for(AstNode condition : conditions) {
+			id += condition.getID() + ",";
+		}
+		return id.substring(0, id.length() - 1);
 	}
 
 }

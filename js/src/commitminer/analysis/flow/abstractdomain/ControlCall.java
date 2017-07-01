@@ -3,10 +3,12 @@ package commitminer.analysis.flow.abstractdomain;
 import java.util.HashSet;
 import java.util.Set;
 
+import commitminer.analysis.annotation.DependencyIdentifier;
+
 /**
  * Stores the state of control flow changes due to changes in function calls.
  */
-public class ControlCall {
+public class ControlCall implements DependencyIdentifier {
 	
 	/**
 	 * AST node IDs of modified callsites of this method.
@@ -37,6 +39,10 @@ public class ControlCall {
 		return new ControlCall(callsites);
 	}
 	
+	public boolean isChanged() {
+		return !callsites.isEmpty();
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if(!(o instanceof ControlCall)) return false;
@@ -46,6 +52,16 @@ public class ControlCall {
 			if(!cc.callsites.contains(callsite)) return false;
 		}
 		return false;
+	}
+
+	@Override
+	public String getAddress() {
+		String id = "";
+		if(callsites.isEmpty()) return "";
+		for(Integer callsite : callsites) {
+			id += callsite + ",";
+		}
+		return id.substring(0, id.length() - 1);
 	}
 
 }
