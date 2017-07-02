@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.mozilla.javascript.Token;
-import org.mozilla.javascript.ast.ArrayLiteral;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.DoLoop;
@@ -15,27 +13,16 @@ import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
-import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
-import org.mozilla.javascript.ast.NumberLiteral;
-import org.mozilla.javascript.ast.ObjectLiteral;
-import org.mozilla.javascript.ast.ObjectProperty;
-import org.mozilla.javascript.ast.PropertyGet;
-import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.analysis.annotation.GenericDependencyIdentifier;
-import commitminer.analysis.flow.abstractdomain.Address;
-import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Change;
-import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.State;
-import commitminer.analysis.flow.abstractdomain.Variable;
 import commitminer.js.annotation.Annotation;
 
 public class ControlCallASTVisitor implements NodeVisitor {
@@ -46,6 +33,7 @@ public class ControlCallASTVisitor implements NodeVisitor {
 	public Set<Annotation> annotations;
 	
 	/** The abstract state. **/
+	@SuppressWarnings("unused")
 	private State state;
 
 	/**
@@ -76,7 +64,7 @@ public class ControlCallASTVisitor implements NodeVisitor {
 
 			/* Register CALL-USE annotations for statements at depth 1 from an
 			 * inserted or updated callsite. */
-			if(state.control.getCall().isChanged()) {
+			if(state.control.getCall().isChanged() && statement.getLineno() > 0) {
 				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 				ids.add(state.control.getCall());
 				visitor.annotations.add(new Annotation("CALL-USE", ids, statement.getLineno(), statement.getFixedPosition(), statement.getLength()));

@@ -87,9 +87,9 @@ public class ControlCFGVisitor implements ICFGVisitor {
 
 		/* If the branch change set is non-empty, this statement is affected
 		 * by a control flow change. */
-		if(!state.control.conditions.isEmpty()) {
-			registerStatementFact(node, "Change:CHANGED");
-		}
+//		if(!state.control.conditions.isEmpty()) {
+//			registerStatementFact(node, "Change:CHANGED");
+//		}
 
 	}
 

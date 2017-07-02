@@ -11,6 +11,7 @@ import commitminer.analysis.flow.FlowDomainAnalysisFactory;
 import commitminer.cfg.ICFGVisitorFactory;
 import commitminer.js.diff.ast.AstDomainAnalysisFactory;
 import commitminer.js.diff.control.ControlCFGVisitorFactory;
+import commitminer.js.diff.controlcall.ControlCallCFGVisitorFactory;
 import commitminer.js.diff.defuse.DefUseCFGVisitorFactory;
 import commitminer.js.diff.environment.EnvCFGVisitorFactory;
 import commitminer.js.diff.line.LineDomainAnalysisFactory;
@@ -30,9 +31,11 @@ public class DiffCommitAnalysisFactory implements ICommitAnalysisFactory {
 	@Override
 	public CommitAnalysis newInstance() {
 		List<ICFGVisitorFactory> cfgVisitorFactories = new LinkedList<ICFGVisitorFactory>();
+		cfgVisitorFactories.add(new ControlCallCFGVisitorFactory());
+//		cfgVisitorFactories.add(new EnvCFGVisitorFactory());
+//		cfgVisitorFactories.add(new ValueCFGVisitorFactory());
+
 //		cfgVisitorFactories.add(new ControlCFGVisitorFactory());
-		cfgVisitorFactories.add(new EnvCFGVisitorFactory());
-		cfgVisitorFactories.add(new ValueCFGVisitorFactory());
 //		cfgVisitorFactories.add(new DefUseCFGVisitorFactory());
 
 		List<IDomainAnalysisFactory> domainFactories = new LinkedList<IDomainAnalysisFactory>();

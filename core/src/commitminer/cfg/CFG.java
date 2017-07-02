@@ -34,7 +34,6 @@ public class CFG {
 		this.returnNodes = new LinkedList<CFGNode>();
 	}
 
-
 	/**
 	 * Accept a node visitor. Visit all nodes and edges in the CFG. Nodes and
 	 * edges may be visited in any order.

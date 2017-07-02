@@ -35,7 +35,7 @@ public class ValueCFGVisitor implements ICFGVisitor {
 
 	/**
 	 * Visit an AstNode (a statement or condition) and extract facts about
-	 * identifier protection.
+	 * value changes.
 	 */
 	private void visit(AstNode node, State state) {
 		if(state != null) {
