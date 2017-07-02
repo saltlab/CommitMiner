@@ -13,7 +13,6 @@ import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
-import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.WhileLoop;
@@ -48,17 +47,8 @@ public class ControlCallASTVisitor implements NodeVisitor {
 			return visitor.annotations;
 		}
 		else if(statement instanceof FunctionNode) {
-			/* This is a function declaration, so only check the parameters
-			 * and the function name. */
-
-			FunctionNode function = (FunctionNode) statement;
-			for(AstNode param : function.getParams()) {
-				param.visit(visitor);
-			}
-
-			Name name = function.getFunctionName();
-			if(name != null) name.visit(visitor);
-
+			/* This is a function declaration. Nothing should be flagged. */
+			return visitor.annotations;
 		}
 		else if(statement != null){
 

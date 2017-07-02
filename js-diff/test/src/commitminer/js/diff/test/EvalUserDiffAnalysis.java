@@ -90,6 +90,40 @@ public class EvalUserDiffAnalysis {
 	}
 
 	@Test
+	public void testCall() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/diff/call_old.js";
+		String dst = "./test/input/diff/call_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Set<Annotation> expected = new HashSet<Annotation>();
+
+		this.runTest(sourceCodeFileChange, expected, false);
+
+	}
+
+	@Test
+	public void testCon() throws Exception {
+
+		/* The test files. */
+		String src = "./test/input/diff/con_old.js";
+		String dst = "./test/input/diff/con_new.js";
+
+		/* Read the source files. */
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
+
+		/* Build the expected feature vectors. */
+		Set<Annotation> expected = new HashSet<Annotation>();
+
+		this.runTest(sourceCodeFileChange, expected, false);
+
+	}
+
+	@Test
 	public void testTernary() throws Exception {
 
 		/* The test files. */

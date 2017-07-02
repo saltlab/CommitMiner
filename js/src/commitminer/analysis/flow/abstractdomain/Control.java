@@ -45,11 +45,11 @@ public class Control {
 		/* If this is a new function call, we interpret the control of
 		 * the callee as changed. */
 		if(Change.convU(fc).le == Change.LatticeElement.CHANGED)
-			return new Control(call.update(fc.getID()), condition);
+			return new Control(call.update(fc.getID()), new ControlCondition());
 
 		/* If this is not a new function call, make a fresh (unchanged)
 		 * the control-call lattice is set to bottom. */
-		return new Control(new ControlCall(), condition);
+		return new Control(new ControlCall(), new ControlCondition());
 
 	}
 	

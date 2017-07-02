@@ -3,7 +3,10 @@ package commitminer.analysis.flow.abstractdomain;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.ParenthesizedExpression;
+import org.mozilla.javascript.ast.UnaryExpression;
 
 import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.cfg.CFGEdge;
@@ -110,7 +113,14 @@ public class ControlCondition implements DependencyIdentifier {
 		String id = "";
 		if(conditions.isEmpty()) return "";
 		for(AstNode condition : conditions) {
-			id += condition.getID() + ",";
+			/* Get the ID of the non-negated condition. */
+			if(condition.getID() == null && condition instanceof UnaryExpression) { 
+				UnaryExpression ue = (UnaryExpression)condition;
+				if(ue.getOperator() == Token.NOT) id += ((ParenthesizedExpression)ue.getOperand()).getExpression().getID();
+			}
+			else {
+				id += condition.getID() + ",";
+			}
 		}
 		return id.substring(0, id.length() - 1);
 	}
