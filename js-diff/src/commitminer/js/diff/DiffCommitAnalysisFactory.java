@@ -10,7 +10,6 @@ import commitminer.analysis.factories.IDomainAnalysisFactory;
 import commitminer.analysis.flow.FlowDomainAnalysisFactory;
 import commitminer.cfg.ICFGVisitorFactory;
 import commitminer.js.diff.ast.AstDomainAnalysisFactory;
-import commitminer.js.diff.control.ControlCFGVisitorFactory;
 import commitminer.js.diff.controlcall.ControlCallCFGVisitorFactory;
 import commitminer.js.diff.controlcondition.ControlConditionCFGVisitorFactory;
 import commitminer.js.diff.defuse.DefUseCFGVisitorFactory;
