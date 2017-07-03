@@ -28,7 +28,6 @@ import commitminer.classify.ClassifierDataSet;
 import commitminer.classify.ClassifierFeatureVector;
 import commitminer.classify.Transformer;
 import commitminer.js.diff.DiffCommitAnalysisFactory;
-import commitminer.js.diff.defuse.DefUseCommitAnalysisFactory;
 import commitminer.js.diff.view.HTMLMultiDiffViewer;
 import commitminer.js.diff.view.HTMLUnixDiffViewer;
 
@@ -60,7 +59,7 @@ public class TestDefUseHTMLView {
 				new LinkedList<IRule>(), getUseQueries());
 
 		/* Set up the analysis. */
-		ICommitAnalysisFactory commitFactory = new DefUseCommitAnalysisFactory(dataSet);
+		ICommitAnalysisFactory commitFactory = null;//new DefUseCommitAnalysisFactory(dataSet);
 		CommitAnalysis commitAnalysis = commitFactory.newInstance();
 
 		/* Run the analysis. */
