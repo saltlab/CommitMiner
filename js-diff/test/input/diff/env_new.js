@@ -6,12 +6,12 @@ function test(cb) {
 
 function foo(x) { 
 	if(!x) return;
-	console.log(x.greeting);
+	console.log("Foo says: " + x.greeting);
 }
 
 function bar(x) { 
 	if(!x) return;
-	console.log(x.greeting);
+	console.log("Bar says: " + x.greeting);
 }
 
 test(foo);
