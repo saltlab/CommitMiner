@@ -51,17 +51,9 @@ public class ControlCallASTVisitor implements NodeVisitor {
 			return visitor.annotations;
 		}
 		else if(statement != null){
-
-			/* Register CALL-USE annotations for statements at depth 1 from an
-			 * inserted or updated callsite. */
-			if(state.control.getCall().isChanged() && statement.getLineno() > 0) {
-				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
-				ids.add(state.control.getCall());
-				visitor.annotations.add(new Annotation("CALL-USE", ids, statement.getLineno(), statement.getFixedPosition(), statement.getLength()));
-			}
-			
+			/* Recursively look for modfied function calls to register as 
+			 * CALL-DEFs. */
 			statement.visit(visitor);
-
 		}
 
 		return visitor.annotations;

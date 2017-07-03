@@ -540,9 +540,7 @@ public class ExpEval {
 				scratch = new Scratchpad(null, new BValue[0]);
 
 				/* Create the control domain. */
-				Control control = state.control;
-				AstNode node = (AstNode)closure.cfg.getEntryNode().getStatement();
-				control = control.update(node);
+				Control control = new Control();
 
 				/* Is this function being called recursively? If so abort. */
 				if(state.callStack.contains(addr)) continue;
