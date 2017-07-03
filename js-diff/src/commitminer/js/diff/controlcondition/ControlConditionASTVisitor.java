@@ -49,7 +49,7 @@ public class ControlConditionASTVisitor implements NodeVisitor {
 			if(state.control.getCondition().isChanged() && statement.getLineno() > 0) {
 				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 				ids.add(state.control.getCondition());
-				visitor.annotations.add(new Annotation("COND-USE", ids, statement.getLineno(), statement.getFixedPosition(), statement.getLength()));
+				visitor.annotations.add(new Annotation("CON-USE", ids, statement.getLineno(), statement.getFixedPosition(), statement.getLength()));
 			}
 
 		}
