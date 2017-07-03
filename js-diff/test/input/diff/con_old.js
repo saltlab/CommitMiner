@@ -8,8 +8,8 @@ function bar() {
 }
 
 function foo() {
-	if(bar) {
-		console.log("Hi Bar!");
-		bar();
-	}
+	console.log("Hi Bar!");
+	bar();
 }
+
+foo();

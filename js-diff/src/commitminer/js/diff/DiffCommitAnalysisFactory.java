@@ -32,12 +32,11 @@ public class DiffCommitAnalysisFactory implements ICommitAnalysisFactory {
 	@Override
 	public CommitAnalysis newInstance() {
 		List<ICFGVisitorFactory> cfgVisitorFactories = new LinkedList<ICFGVisitorFactory>();
-//		cfgVisitorFactories.add(new ControlCallCFGVisitorFactory());
+		cfgVisitorFactories.add(new ControlCallCFGVisitorFactory());
 		cfgVisitorFactories.add(new ControlConditionCFGVisitorFactory());
-//		cfgVisitorFactories.add(new EnvCFGVisitorFactory());
-//		cfgVisitorFactories.add(new ValueCFGVisitorFactory());
+		cfgVisitorFactories.add(new EnvCFGVisitorFactory());
+		cfgVisitorFactories.add(new ValueCFGVisitorFactory());
 
-//		cfgVisitorFactories.add(new ControlCFGVisitorFactory());
 //		cfgVisitorFactories.add(new DefUseCFGVisitorFactory());
 
 		List<IDomainAnalysisFactory> domainFactories = new LinkedList<IDomainAnalysisFactory>();

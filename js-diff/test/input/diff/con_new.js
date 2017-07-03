@@ -12,3 +12,5 @@ function foo() {
 	console.log("Hi Bar!");
 	bar();
 }
+
+foo();

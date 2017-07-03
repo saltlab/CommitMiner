@@ -5,10 +5,12 @@ function test(cb) {
 }
 
 function foo(x) { 
+	if(!x) return;
 	console.log(x.greeting);
 }
 
 function bar(x) { 
+	if(!x) return;
 	console.log(x.greeting);
 }
 
