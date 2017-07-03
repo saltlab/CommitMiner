@@ -1,15 +1,13 @@
 package commitminer.js.diff.view;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
-import commitminer.classify.ClassifierFeatureVector;
+import commitminer.js.annotation.Annotation;
+import commitminer.js.annotation.AnnotationFactBase;
 
 /**
  * Prints source code as annotated HTML.
@@ -24,46 +22,11 @@ public class HTMLMultiDiffViewer {
 	 * @throws IOException when files cannot be read or written
 	 */
 	public static String annotate(String source,
-						  List<ClassifierFeatureVector> alerts,
-						  String version) throws IOException {
-
-		LinkedList<ClassifierFeatureVector> filtered = new LinkedList<ClassifierFeatureVector>();
-		for(ClassifierFeatureVector alert : alerts) {
-			if(alert.version.equals(version)) {
-				filtered.add(alert);
-			}
-		}
-
-		Collections.sort(filtered, new Comparator<ClassifierFeatureVector>() {
-
-			@Override
-			public int compare(ClassifierFeatureVector o1,
-					ClassifierFeatureVector o2) {
-
-				/* Annotations are ordered by when they appear in the file */
-
-				Integer i1 = Integer.parseInt(o1.absolutePosition);
-				Integer i2 = Integer.parseInt(o2.absolutePosition);
-
-				if(!i1.equals(i2)) return i1.compareTo(i2);
-
-				/* Since these annotations start at the same spot, we need
-				 * the longer annotation to be printed first. */
-
-				i1 = Integer.parseInt(o1.length);
-				i2 = Integer.parseInt(o2.length);
-
-				return i2.compareTo(i1);
-
-			}
-
-		});
+						  AnnotationFactBase factBase) throws IOException {
 
 		String out = "";
 
-		ClassifierFeatureVector current = null;
-
-		if(!filtered.isEmpty()) current = filtered.pop();
+		Annotation current = factBase.isEmpty() ? null : factBase.pop();
 
 		char[] chars = source.toCharArray();
 
@@ -71,7 +34,7 @@ public class HTMLMultiDiffViewer {
 		Map<Integer,Integer> closeAt = new HashMap<Integer,Integer>();
 
 		/* Track which tags are currently open. */
-		LinkedList<ClassifierFeatureVector> openTags = new LinkedList<ClassifierFeatureVector>();
+		LinkedList<Annotation> openTags = new LinkedList<Annotation>();
 
 		for(int i = 0; i < chars.length; i++) {
 
@@ -85,10 +48,10 @@ public class HTMLMultiDiffViewer {
 
 			/* Re-open all closed tags after a line break. */
 			if(i > 0 && chars[i-1] == '\n') {
-				Iterator<ClassifierFeatureVector> it = openTags.descendingIterator();
+				Iterator<Annotation> it = openTags.descendingIterator();
 				while(it.hasNext()) {
-					ClassifierFeatureVector openTag = it.next();
-					out = out.concat("<span class='" + openTag.subtype + "-tag' data-address='" + openTag.line + "'>");
+					Annotation openTag = it.next();
+					out = out.concat("<span class='" + openTag.label + "' data-address='" + openTag.getDependencyLabel() + "'>");
 				}
 			}
 
@@ -97,21 +60,21 @@ public class HTMLMultiDiffViewer {
 				out = out.concat("</span>");
 
 			/* Open tags where needed. */
-			while(current != null && Integer.parseInt(current.absolutePosition) == i) {
+			while(current != null && current.absolutePosition.equals(i)) {
 
 				/* Open the tag. */
-				out = out.concat("<span class='" + current.subtype + "-tag' data-address='" + current.line + "'>");
+				out = out.concat("<span class='" + current.label + "' data-address='" + current.getDependencyLabel() + "'>");
 				openTags.push(current);
 
 				/* Set the close tag position. */
-				Integer closePosition = Integer.parseInt(current.length) + i;
+				Integer closePosition = current.length + i;
 				Integer count = closeAt.get(closePosition);
 				if(count == null)
 					closeAt.put(closePosition, 1);
 				else
 					closeAt.put(closePosition, count + 1);
 
-				current = filtered.isEmpty() ? null : filtered.pop();
+				current = factBase.isEmpty() ? null : factBase.pop();
 			}
 
 			/* Write the next character in the file. */

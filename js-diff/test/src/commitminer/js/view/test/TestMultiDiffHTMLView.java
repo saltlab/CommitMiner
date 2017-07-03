@@ -7,14 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.deri.iris.api.basics.IQuery;
-import org.deri.iris.api.basics.IRule;
 import org.deri.iris.compiler.Parser;
 import org.deri.iris.compiler.ParserException;
 import org.junit.Test;
@@ -24,9 +21,10 @@ import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
-import commitminer.classify.ClassifierDataSet;
 import commitminer.classify.ClassifierFeatureVector;
 import commitminer.classify.Transformer;
+import commitminer.js.annotation.AnnotationDataSet;
+import commitminer.js.annotation.AnnotationFactBase;
 import commitminer.js.diff.DiffCommitAnalysisFactory;
 import commitminer.js.diff.view.HTMLMultiDiffViewer;
 import commitminer.js.diff.view.HTMLUnixDiffViewer;
@@ -39,24 +37,21 @@ public class TestMultiDiffHTMLView {
 	 * @throws Exception
 	 */
 	protected void runTest(
-			String src, String dst, String out, boolean checkSize) throws Exception {
+			String src, String dst, String out) throws Exception {
 
 		/* Read the source files. */
 		String srcCode = new String(Files.readAllBytes(Paths.get(src)));
 		String dstCode = new String(Files.readAllBytes(Paths.get(dst)));
 
 		/* Read the source files. */
-		List<SourceCodeFileChange> sourceCodeFileChanges = new LinkedList<SourceCodeFileChange>();
-		sourceCodeFileChanges.add(getSourceCodeFileChange(src, dst));
+		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
 
+		/* Build the dummy commit. */
 		Commit commit = getCommit();
-		for(SourceCodeFileChange sourceFileChange : sourceCodeFileChanges) {
-			commit.addSourceCodeFileChange(sourceFileChange);
-		}
+		commit.addSourceCodeFileChange(getSourceCodeFileChange(src, dst));
 
 		/* Builds the data set with our custom queries. */
-		ClassifierDataSet dataSet = new ClassifierDataSet(null,
-				new LinkedList<IRule>(), getUseQueries());
+		AnnotationDataSet dataSet = new AnnotationDataSet( AnnotationFactBase.getInstance(sourceCodeFileChange));
 
 		/* Set up the analysis. */
 		ICommitAnalysisFactory commitFactory = new DiffCommitAnalysisFactory(dataSet);
@@ -68,15 +63,23 @@ public class TestMultiDiffHTMLView {
         /* Print the data set. */
 		dataSet.printDataSet();
 
-        /* Return the alerts. */
-		List<ClassifierFeatureVector> alerts = dataSet.getFeatureVectors();
-
 		/* Only annotate the destination file. The source file isn't especially useful. */
-		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, alerts, "DESTINATION");
+		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, dataSet.getAnnotationFactBase());
 
 		/* Combine the annotated file with the UnixDiff. */
 		String annotatedCombined = HTMLUnixDiffViewer.annotate(srcCode, dstCode, annotatedDst);
 		Files.write(Paths.get(out), annotatedCombined.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+	}
+
+	@Test
+	public void testEnv() throws Exception {
+
+		String src = "./test/input/diff/env_old.js";
+		String dst = "./test/input/diff/env_new.js";
+		String out = "./output/env.html";
+
+		runTest(src, dst, out);
 
 	}
 
@@ -87,7 +90,7 @@ public class TestMultiDiffHTMLView {
 		String dst = "./test/input/diff/create_new.js";
 		String out = "./output/create.html";
 
-		runTest(src, dst, out, false);
+		runTest(src, dst, out);
 
 	}
 
@@ -98,7 +101,7 @@ public class TestMultiDiffHTMLView {
 		String dst = "./test/input/diff/tutorial_new.js";
 		String out = "./output/tutorial.html";
 
-		runTest(src, dst, out, false);
+		runTest(src, dst, out);
 
 	}
 
@@ -109,7 +112,7 @@ public class TestMultiDiffHTMLView {
 		String dst = "./test/input/diff/help-search_new.js";
 		String out = "./output/help-search.html";
 
-		runTest(src, dst, out, false);
+		runTest(src, dst, out);
 	}
 
 	@Test
@@ -119,7 +122,7 @@ public class TestMultiDiffHTMLView {
 		String dst = "./test/input/eval/sails-074841dfa62f23a66113aa56f710e874149e35bf_new.js";
 		String out = "./output/sails.html";
 
-		runTest(src, dst, out, false);
+		runTest(src, dst, out);
 
 	}
 
@@ -130,7 +133,7 @@ public class TestMultiDiffHTMLView {
 		String dst = "./test/input/eval/bower-fd472403c1f9992b57e15b4ff745732677b64ee1_new.js";
 		String out = "./output/bower.html";
 
-		runTest(src, dst, out, false);
+		runTest(src, dst, out);
 
 	}
 
@@ -141,7 +144,7 @@ public class TestMultiDiffHTMLView {
 		String dst = "./test/input/eval/connect-08337a38445b16f84192b40b74458bcea36f9a32_new.js";
 		String out = "./output/connect.html";
 
-		runTest(src, dst, out, false);
+		runTest(src, dst, out);
 
 	}
 	
@@ -152,7 +155,7 @@ public class TestMultiDiffHTMLView {
 		String dst = "./test/input/diff/pm2_cli_new.js";
 		String out = "./output/pm2.html";
 
-		runTest(src, dst, out, false);
+		runTest(src, dst, out);
 		
 	}
 

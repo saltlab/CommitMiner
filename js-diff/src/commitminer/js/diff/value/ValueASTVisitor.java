@@ -204,6 +204,7 @@ public class ValueASTVisitor implements NodeVisitor {
 				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 				ids.add(new GenericDependencyIdentifier(node.getID()));
 				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getFixedPosition(), 1));
+				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getFixedPosition() + node.getLength() - 1, 1));
 			}
 		}
 		/* Ignore the body of loops, ifs and functions. */

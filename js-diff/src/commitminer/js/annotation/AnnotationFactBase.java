@@ -44,6 +44,8 @@ public class AnnotationFactBase extends FactBase {
 			public int compare(Annotation a1, Annotation a2) {
 				if(a1.absolutePosition < a2.absolutePosition) return -1;
 				if(a1.absolutePosition > a2.absolutePosition) return 1;
+				if(a1.length > a2.length) return -1;
+				if(a1.length < a2.length) return 1;
 				return(a1.label.compareTo(a2.label));
 			}
 		});
@@ -75,48 +77,22 @@ public class AnnotationFactBase extends FactBase {
 		return this.annotations;
 	}
 	
-	/* Def/use facts. */
+	/**
+	 * @return true if there are no annotations
+	 */
+	public boolean isEmpty() {
+		return this.annotations.isEmpty();
+	}
 	
-//	public void registerDef(DependencyIdentifier address, Annotation annotation) {
-//		registerAnnotationFact("def", address, annotation);
-//	}
-//
-//	public void registerUse(DependencyIdentifier address, Annotation annotation) {
-//		registerAnnotationFact("use", address, annotation);
-//	}
+	/**
+	 * Pops the first annotation (ie. the one that appears first in the source
+	 * code file).
+	 * @return the {@code Annotation} at the top of the list.
+	 */
+	public Annotation pop() {
+		Annotation annotation =  annotations.first();
+		annotations.remove(annotation);
+		return annotation;
+	}
 	
-	/* Change slicing facts. */
-	
-//	public void registerCallChangeCriterion(DependencyIdentifier address, Annotation annotation) {
-//		registerAnnotationFact("callChangeCriterion", address, annotation);
-//	}
-//	
-//	public void registerCallChangeDependency(DependencyIdentifier address, Annotation annotation) {
-//		registerAnnotationFact("callChangeDependency", address, annotation);
-//	}
-//	
-//	public void registerConditionChangeCriterion(DependencyIdentifier address, Annotation annotation) {
-//		registerAnnotationFact("conditionChangeCriterion", address, annotation);
-//	}
-//
-//	public void registerConditionChangeDependency(DependencyIdentifier address, Annotation annotation) {
-//		registerAnnotationFact("conditionChangeDependency", address, annotation);
-//	}
-//	
-//	public void registerValueChangeCriterion(DependencyIdentifier address, Annotation annotation) {
-//		registerAnnotationFact("valueChangeCriterion", address, annotation);
-//	}
-//
-//	public void registerValueChangeDependency(DependencyIdentifier address, Annotation annotation) {
-//		registerAnnotationFact("valueChangeDependency", address, annotation);
-//	}
-//
-//	public void registerFunctionChangeCriterion(DependencyIdentifier address, Annotation annotation) {
-//		registerAnnotationFact("functionChangeCriterion", address, annotation);
-//	}
-//
-//	public void registerFunctionChangeDependency(DependencyIdentifier address, Annotation annotation) {
-//		registerAnnotationFact("functionChangeDependency", address, annotation);
-//	}
-
 }

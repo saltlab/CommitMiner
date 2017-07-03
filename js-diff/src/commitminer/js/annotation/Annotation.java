@@ -33,6 +33,15 @@ public class Annotation {
 		return dependencyIDs;
 	}
 	
+	public String getDependencyLabel() {
+		String s = "";
+		if(dependencyIDs.isEmpty()) return "";
+		for(DependencyIdentifier id : dependencyIDs) {
+			s += id.getAddress() + ",";
+		}
+		return s.substring(0, s.length() - 1);
+	}
+	
 	public Integer getLine() {
 		return line;
 	}
