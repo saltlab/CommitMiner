@@ -72,6 +72,7 @@ public class Variable implements DependencyIdentifier {
 
 	@Override
 	public String getAddress() {
+		if(definerID == -1) return "";
 		return definerID.toString();
 	}
 

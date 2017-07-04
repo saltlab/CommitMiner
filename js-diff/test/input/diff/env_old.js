@@ -12,3 +12,6 @@ function bar(x) {
 
 test(foo);
 test(bar);
+
+var config = { setting: true };
+console.log(config.setting);
