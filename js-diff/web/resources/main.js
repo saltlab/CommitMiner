@@ -47,6 +47,13 @@ function erase() {
 }
 
 /**
+ * Shows all lines.
+ */
+function unslice() {
+	$('tr').show();
+}
+
+/**
  * Highlights all def/use spans.
  */
 function all(def, use) {
@@ -56,13 +63,10 @@ function all(def, use) {
 }
 
 /**
- * Highlights the selected def/use spans.
+ * Get the IDs for the selected def/use spans.
  */
-function sel(e, def, use) {
+function getIDs(e, def, use) {
 
-	erase();
-
-	/* Find the span with the ENV-* tag. */
 	var ids = null;
 	var current = $(e.target);
 	while(ids === null && current.prop("nodeName") === "SPAN") {
@@ -80,6 +84,17 @@ function sel(e, def, use) {
 		current = current.parent();
 	}
 
+	return ids;
+
+}
+
+/**
+ * Highlights the selected def/use spans.
+ */
+function sel(e, def, use) {
+
+	erase();
+	var ids = getIDs(e, def, use);
 	if(ids === null) return;
 
 	$("span." + use).each(function(index) {
@@ -100,62 +115,50 @@ function sel(e, def, use) {
 
 }
 
-
 /**
- * Highlight all ENV-DEF and ENV-USE spans.
+ * Highlights and slices the selected def/use spans.
  */
-function allVar() {
-	all('ENV-DEF', 'ENV-USE');
+function slice(e, def, use) {
+
+	erase();
+	var ids = getIDs(e, def, use);
+	if(ids === null) return;
+
+	$("tr").hide();
+
+	$("span." + use).each(function(index) {
+		for(var i = 0; i < ids.length; i++) {
+			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
+				$(this).addClass('use');
+				$(this).closest('tr').show();
+			}
+		}
+	});
+
+	$("span." + def).each(function(index) {
+		for(var i = 0; i < ids.length; i++) {
+			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
+				$(this).addClass('def');
+				$(this).closest('tr').show();
+			}
+		}
+	});
+
+
 }
 
-/**
- * Highlight the selected ENV-DEF and ENV-USE spans.
- */
-function selVar(e) {
-	sel(e, "ENV-DEF", "ENV-USE");
-}
-
-/**
- * Highlight all VAL-DEF and VAL-USE spans.
- */
-function allVal() {
-	all('VAL-DEF', 'VAL-USE');
-}
-
-/**
- * Highlight the selected VAL-DEF and VAL-USE spans.
- */
-function selVal(e) {
-	sel(e, "VAL-DEF", "VAL-USE");
-}
-
-/**
- * Highlight all CALL-DEF and CALL-USE spans.
- */
-function allCall() {
-	all('CALL-DEF', 'CALL-USE');
-}
-
-/**
- * Highlight the selected CALL-DEF and CALL-USE spans.
- */
-function selCall(e) {
-	sel(e, "CALL-DEF", "CALL-USE");
-}
-
-/**
- * Highlight all CON-DEF and CON-USE spans.
- */
-function allCon() {
-	all('CON-DEF', 'CON-USE');
-}
-
-/**
- * Highlight the selected CON-DEF and CON-USE spans.
- */
-function selCon(e) {
-	sel(e, "CON-DEF", "CON-USE");
-}
+function allVar() {	all('ENV-DEF', 'ENV-USE'); }
+function selVar(e) { sel(e, "ENV-DEF", "ENV-USE"); }
+function sliVar(e) { slice(e, "ENV-DEF", "ENV-USE"); }
+function allVal() { all('VAL-DEF', 'VAL-USE'); }
+function selVal(e) { sel(e, "VAL-DEF", "VAL-USE"); }
+function sliVal(e) { slice(e, "VAL-DEF", "VAL-USE"); }
+function allCall() { all('CALL-DEF', 'CALL-USE'); }
+function selCall(e) { sel(e, "CALL-DEF", "CALL-USE"); }
+function sliCall(e) { slice(e, "CALL-DEF", "CALL-USE"); }
+function allCon() { all('CON-DEF', 'CON-USE'); }
+function selCon(e) { sel(e, "CON-DEF", "CON-USE"); }
+function sliCon(e) { slice(e, "CON-DEF", "CON-USE"); }
 
 $(function() {
 	$.contextMenu({
@@ -174,11 +177,17 @@ $(function() {
 							case "sel-var":
 							selVar(e);
 							break;
+							case "sli-var":
+							sliVar(e);
+							break;
 							case "all-val":
 							allVal();
 							break;
 							case "sel-val":
 							selVal(e);
+							break;
+							case "sli-val":
+							sliVal(e);
 							break;
 							case "all-call":
 							allCall();
@@ -186,14 +195,23 @@ $(function() {
 							case "sel-call":
 							selCall(e);
 							break;
+							case "sli-call":
+							sliCall(e);
+							break;
 							case "all-con":
 							allCon();
 							break;
 							case "sel-con":
 							selCon(e);
 							break;
+							case "sli-con":
+							sliCon(e);
+							break;
 							case "erase":
 							erase();
+							break;
+							case "unslice":
+							unslice();
 							break;
 						}
 
@@ -209,52 +227,25 @@ $(function() {
 								"all-con": {name: "Conditions", icon: "fa-train"}}},
 						"selected": {
 							name: "Selected Effects",
-							icon: "fa-window-minimize",
+							icon: "fa-i-cursor",
 							items: {
 								"sel-var": {name: "Variables", icon: "fa-bicycle"},
 								"sel-val": {name: "Values", icon: "fa-fighter-jet"},
 								"sel-call": {name: "Callsites", icon: "fa-ship"},
 								"sel-con": {name: "Conditions", icon: "fa-train"}}},
+						"slice": {
+							name: "Sliced Effects",
+							icon: "fa-scissors",
+							items: {
+								"sli-var": {name: "Variables", icon: "fa-bicycle"},
+								"sli-val": {name: "Values", icon: "fa-fighter-jet"},
+								"sli-call": {name: "Callsites", icon: "fa-ship"},
+								"sli-con": {name: "Conditions", icon: "fa-train"}}},
 						"sep1": "---------",
-						"erase": {name: "Remove Highlighting", icon: "fa-eraser"}
+						"erase": {name: "Remove Highlighting", icon: "fa-eraser"},
+						"unslice": {name: "Undo Slice", icon: "fa-undo"}
 					}
 			};
 		}
 	});
 });
-
-//$(function(){
-//    $.contextMenu({
-//        selector: '.context-menu', 
-//        build: function($trigger, e) {
-//            // this callback is executed every time the menu is to be shown
-//            // its results are destroyed every time the menu is hidden
-//            // e is the original contextmenu event, containing e.pageX and e.pageY (amongst other data)
-//            return {
-//                callback: function(key, options) {
-//                    var m = "clicked: " + key;
-//										//m = $(e.target).attr('class').split(' ');
-//										var annotations = e.target.classList;
-//										for(var i = 0; i < annotations.length; i++) {
-//											switch(annotations[i]) {
-//												case "VAL-DEF":
-//												case "VAL-USE":
-//													m = $(e.target).attr('data-address').split(',');
-//													break;
-//											}
-//										}
-//                    window.console && console.log(m) || alert(m); 
-//                },
-//                items: {
-//                    "edit": {name: "Edit", icon: "edit"},
-//                    "cut": {name: "Cut", icon: "cut"},
-//                    "copy": {name: "Copy", icon: "copy"},
-//                    "paste": {name: "Paste", icon: "paste"},
-//                    "delete": {name: "Delete", icon: "delete"},
-//                    "sep1": "---------",
-//                    "quit": {name: "Quit", icon: function($element, key, item){ return 'context-menu-icon context-menu-icon-quit'; }}
-//                }
-//            };
-//        }
-//    });
-//});
