@@ -37,8 +37,12 @@ $('.USE-tag').click(function (event) {
  */
 function erase() {
 	$('.ENV-DEF').removeClass('def');
+	$('.DENV-DEF').removeClass('goto');
+	$('.DENV-USE').removeClass('use');
 	$('.ENV-USE').removeClass('use');
 	$('.VAL-DEF').removeClass('def');
+	$('.DVAL-DEF').removeClass('goto');
+	$('.DVAL-USE').removeClass('use');
 	$('.VAL-USE').removeClass('use');
 	$('.CALL-DEF').removeClass('def');
 	$('.CALL-USE').removeClass('use');
@@ -58,6 +62,7 @@ function unslice() {
  */
 function all(def, use) {
 	erase();
+	unslice();
 	$('.' + def).addClass('def');
 	$('.' + use).addClass('use');
 }
@@ -89,11 +94,37 @@ function getIDs(e, def, use) {
 }
 
 /**
+ * Get the span element for the selected def/use type.
+ */
+function getSpanElement(e, def, use) {
+
+	var ids = null;
+	var current = $(e.target);
+	while(ids === null && current.prop("nodeName") === "SPAN") {
+
+		var annotations = current.attr('class').split(' ');
+		for(var i = 0; i < annotations.length; i++) {
+			switch(annotations[i]) {
+				case def:
+				case use:
+					return current;
+			}
+		}
+
+		current = current.parent();
+	}
+
+	return ids;
+
+}
+
+/**
  * Highlights the selected def/use spans.
  */
 function sel(e, def, use) {
 
 	erase();
+	unslice();
 	var ids = getIDs(e, def, use);
 	if(ids === null) return;
 
@@ -144,6 +175,64 @@ function slice(e, def, use) {
 		}
 	});
 
+}
+
+/**
+ * @return true if all the IDs are the same
+ */
+function checkIDs(elements) {
+	if(elements === null || elements.length <= 1) return true;
+	var l = elements[0].attr('data-address').split(',');
+	for(var i = 1; i < elements.length; i++) {
+		var r = elements[i].attr('data-address').split(',');
+		if(l.length !== r.length) return false;
+		for(var j = 0; j < r.length; j++) {
+			if(l[j] !== r[j]) return false;
+		}
+	}
+	return true;
+}
+
+/**
+ * Highlight and goto the definition of the selected element.
+ */
+function gotoDef(e, def, use) {
+
+	erase();
+	var ids = getIDs(e, def, use);
+	if(ids == null) return;
+
+	var element = getSpanElement(e, def, use);
+	element.addClass('use');
+
+	var elements = [];
+	$("span." + def).each(function(index) {
+		for(var i = 0; i < ids.length; i++) {
+
+			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
+				$(this).removeClass('use');
+				$(this).addClass('goto');
+
+				elements.push($(this));
+			}
+
+		}
+	});
+
+	if(checkIDs(elements)) {
+		/* Scroll to the element. */
+		$('html, body').animate({
+						scrollTop: elements[0].offset().top
+				}, 200);
+	}
+	else if(elements.length > 1 ) {
+		/* Slice the definitions. */
+		$("tr").hide();
+		element.closest('tr').show();
+		for(var i = 0; i < elements.length; i++) {
+			elements[i].closest('tr').show();
+		}
+	}
 
 }
 
@@ -159,6 +248,8 @@ function sliCall(e) { slice(e, "CALL-DEF", "CALL-USE"); }
 function allCon() { all('CON-DEF', 'CON-USE'); }
 function selCon(e) { sel(e, "CON-DEF", "CON-USE"); }
 function sliCon(e) { slice(e, "CON-DEF", "CON-USE"); }
+function gotoVar(e) { gotoDef(e, "DENV-DEF", "DENV-USE"); }
+function gotoVal(e) { gotoDef(e, "DVAL-DEF", "DVAL-USE"); }
 
 $(function() {
 	$.contextMenu({
@@ -207,6 +298,12 @@ $(function() {
 							case "sli-con":
 							sliCon(e);
 							break;
+							case "goto-var":
+							gotoVar(e);
+							break;
+							case "goto-val":
+							gotoVal(e);
+							break;
 							case "erase":
 							erase();
 							break;
@@ -241,6 +338,12 @@ $(function() {
 								"sli-val": {name: "Values", icon: "fa-fighter-jet"},
 								"sli-call": {name: "Callsites", icon: "fa-ship"},
 								"sli-con": {name: "Conditions", icon: "fa-train"}}},
+						"goto": {
+							name: "Goto Def",
+							icon: "fa-sign-in",
+							items: {
+								"goto-var": {name: "Variable Def", icon: "fa-bicycle"},
+								"goto-val": {name: "Value Def", icon: "fa-fighter-jet"}}},
 						"sep1": "---------",
 						"erase": {name: "Remove Highlighting", icon: "fa-eraser"},
 						"unslice": {name: "Undo Slice", icon: "fa-undo"}

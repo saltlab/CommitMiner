@@ -49,6 +49,10 @@ td {
 	background-color: #ffecec;
 }
 
+.goto {
+	background-color: rgba(182, 255, 0, 0.9);
+}
+
 .def {
 	background-color: rgba(33, 195, 255, 0.9);
 }
