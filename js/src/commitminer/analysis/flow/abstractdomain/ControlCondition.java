@@ -116,7 +116,7 @@ public class ControlCondition implements DependencyIdentifier {
 			/* Get the ID of the non-negated condition. */
 			if(condition.getID() == null && condition instanceof UnaryExpression) { 
 				UnaryExpression ue = (UnaryExpression)condition;
-				if(ue.getOperator() == Token.NOT) id += ((ParenthesizedExpression)ue.getOperand()).getExpression().getID();
+				if(ue.getOperator() == Token.NOT) id += ((ParenthesizedExpression)ue.getOperand()).getExpression().getID() + ",";
 			}
 			else {
 				id += condition.getID() + ",";
