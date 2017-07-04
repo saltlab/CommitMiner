@@ -51,7 +51,7 @@ public class HTMLMultiDiffViewer {
 				Iterator<Annotation> it = openTags.descendingIterator();
 				while(it.hasNext()) {
 					Annotation openTag = it.next();
-					out = out.concat("<span class='" + openTag.label + "' data-address='" + openTag.getDependencyLabel() + "'>");
+					out = out.concat("<span class='context-menu " + openTag.label + "' data-address='" + openTag.getDependencyLabel() + "'>");
 				}
 			}
 
@@ -63,7 +63,7 @@ public class HTMLMultiDiffViewer {
 			while(current != null && current.absolutePosition.equals(i)) {
 
 				/* Open the tag. */
-				out = out.concat("<span class='" + current.label + "' data-address='" + current.getDependencyLabel() + "'>");
+				out = out.concat("<span class='context-menu " + current.label + "' data-address='" + current.getDependencyLabel() + "'>");
 				openTags.push(current);
 
 				/* Set the close tag position. */

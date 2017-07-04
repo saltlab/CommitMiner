@@ -94,6 +94,11 @@ public class HTMLUnixDiffViewer {
 		String out = "<html>\n";
 		out += "<head>\n";
 		out += "<link type='text/css' href='./resources/multidiff.css' rel='stylesheet'>\n";
+	    out += "<link href='https://swisnl.github.io/jQuery-contextMenu/dist/jquery.contextMenu.css' rel='stylesheet' type='text/css' />\n";
+	    out += "<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>";
+	    out += "<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>\n";
+	    out += "<script src='https://swisnl.github.io/jQuery-contextMenu/dist/jquery.contextMenu.js' type='text/javascript'></script>\n";
+	    out += "<script src='https://swisnl.github.io/jQuery-contextMenu/dist/jquery.ui.position.min.js' type='text/javascript'></script>\n";
 		out += "</head>\n";
 		out += "<body>\n";
 		out += "<table border='0'>\n";
@@ -116,8 +121,7 @@ public class HTMLUnixDiffViewer {
 
 		out += "</tbody>\n";
 		out += "</table>\n";
-		out += "<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>\n";
-		out += "<script type='text/javascript' src='./resources/deffuse.js'></script>\n";
+		out += "<script type='text/javascript' src='./resources/main.js'></script>\n";
 		out += "</body>\n";
 		out += "</html>";
 
