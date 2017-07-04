@@ -77,7 +77,7 @@ public class TestMultiDiffHTMLView {
 
 		String src = "./test/input/diff/env_old.js";
 		String dst = "./test/input/diff/env_new.js";
-		String out = "./output/env.html";
+		String out = "./web/env.html";
 
 		runTest(src, dst, out);
 

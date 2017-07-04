@@ -123,6 +123,13 @@ function allVal() {
 }
 
 /**
+ * Highlight the selected VAL-DEF and VAL-USE spans.
+ */
+function selVal(e) {
+	sel(e, "VAL-DEF", "VAL-USE");
+}
+
+/**
  * Highlight all CALL-DEF and CALL-USE spans.
  */
 function allCall() {
@@ -130,10 +137,24 @@ function allCall() {
 }
 
 /**
+ * Highlight the selected CALL-DEF and CALL-USE spans.
+ */
+function selCall(e) {
+	sel(e, "CALL-DEF", "CALL-USE");
+}
+
+/**
  * Highlight all CON-DEF and CON-USE spans.
  */
 function allCon() {
 	all('CON-DEF', 'CON-USE');
+}
+
+/**
+ * Highlight the selected CON-DEF and CON-USE spans.
+ */
+function selCon(e) {
+	sel(e, "CON-DEF", "CON-USE");
 }
 
 $(function() {
@@ -156,11 +177,20 @@ $(function() {
 							case "all-val":
 							allVal();
 							break;
+							case "sel-val":
+							selVal(e);
+							break;
 							case "all-call":
 							allCall();
 							break;
+							case "sel-call":
+							selCall(e);
+							break;
 							case "all-con":
 							allCon();
+							break;
+							case "sel-con":
+							selCon(e);
 							break;
 							case "erase":
 							erase();
