@@ -203,15 +203,16 @@ function gotoDef(e, def, use) {
 
 /* Set up def/use highlighting when the user left-clicks on a variable or 
  * value. */
-function defUse(element) {
+function defUse(element, def, use) {
 
 	erase();
 
 	/* Check if this span has a DVAL-DEF or DVAL-USE class. */
+	if($(element).attr('data-address') === '') return;
 	var ids = $(element).attr('data-address').split(',');
 
 	/* Find and highlight the value definitions. */
-	$("span." + "DVAL-DEF").each(function(index) {
+	$("span." + def).each(function(index) {
 		for(var i = 0; i < ids.length; i++) {
 
 			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
@@ -222,7 +223,7 @@ function defUse(element) {
 	});
 
 	/* Find and highlight the value uses. */
-	$("span." + "DVAL-USE").each(function(index) {
+	$("span." + use).each(function(index) {
 		for(var i = 0; i < ids.length; i++) {
 
 			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
@@ -249,7 +250,17 @@ function sliCon(e) { slice(e, "CON-DEF", "CON-USE"); }
 function gotoVar(e) { gotoDef(e, "DENV-DEF", "DENV-USE"); }
 function gotoVal(e) { gotoDef(e, "DVAL-DEF", "DVAL-USE"); }
 
-$("span.DVAL-USE, span.DVAL-DEF").click(function() { defUse(this); });
+$("span.DENV-USE, span.DENV-DEF").click(function(e) { 
+	if(!e.altKey) { 
+		defUse(this, "DENV-DEF", "DENV-USE"); 
+	} 
+});
+
+$("span.DVAL-USE, span.DVAL-DEF").click(function(e) { 
+	if(e.altKey) { 
+		defUse(this, "DVAL-DEF", "DVAL-USE"); 
+	} 
+});
 
 /* Set up the context menu. */
 $(function() {

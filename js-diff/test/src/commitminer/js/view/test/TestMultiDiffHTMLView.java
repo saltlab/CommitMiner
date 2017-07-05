@@ -151,9 +151,9 @@ public class TestMultiDiffHTMLView {
 	@Test
 	public void testPM2() throws Exception {
 	
-		String src = "./test/input/diff/pm2_cli_old.js";
-		String dst = "./test/input/diff/pm2_cli_new.js";
-		String out = "./output/pm2.html";
+		String src = "./test/input/diff/tst_old.js";
+		String dst = "./test/input/diff/tst_new.js";
+		String out = "./web/pm2.html";
 
 		runTest(src, dst, out);
 		
