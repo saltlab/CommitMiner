@@ -1,37 +1,3 @@
-/*
- * MultiDiff
- */
-
-$('.DEF-tag').click(function (event) {
-
-	/* Remove highlighting from all defs/uses. */
-	$('.DEF-tag').removeClass('DEF');
-	$('.USE-tag').removeClass('USE');
-	$('.USE-tag').removeClass('DEF');
-
-	/* Highlight the definition and uses of this function. */
-	var address = $(this).attr('data-address');
-	$(this).addClass('DEF');
-	$(".USE-tag[data-address='" + address + "']").addClass('USE');
-
-});
-
-$('.USE-tag').click(function (event) {
-
-	/* Remove highlighting from all defs/uses. */
-	$('.DEF-tag').removeClass('DEF');
-	$('.USE-tag').removeClass('USE');
-	$('.USE-tag').removeClass('DEF');
-
-	/* Highlight the definition and uses of this function. */
-	var address = $(this).attr('data-address');
-	$(".USE-tag[data-address='" + address + "']").addClass('USE');
-	$(".DEF-tag[data-address='" + address + "']").addClass('DEF');
-	$(this).removeClass('USE');
-	$(this).addClass('DEF');
-
-});
-
 /**
  * Remove all def-use highlighting.
  */
@@ -210,8 +176,7 @@ function gotoDef(e, def, use) {
 		for(var i = 0; i < ids.length; i++) {
 
 			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
-				$(this).removeClass('use');
-				$(this).addClass('goto');
+				$(this).removeClass('use'); $(this).addClass('goto');
 
 				elements.push($(this));
 			}
@@ -236,6 +201,39 @@ function gotoDef(e, def, use) {
 
 }
 
+/* Set up def/use highlighting when the user left-clicks on a variable or 
+ * value. */
+function defUse(element) {
+
+	erase();
+
+	/* Check if this span has a DVAL-DEF or DVAL-USE class. */
+	var ids = $(element).attr('data-address').split(',');
+
+	/* Find and highlight the value definitions. */
+	$("span." + "DVAL-DEF").each(function(index) {
+		for(var i = 0; i < ids.length; i++) {
+
+			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
+				$(this).addClass('goto');
+			}
+
+		}
+	});
+
+	/* Find and highlight the value uses. */
+	$("span." + "DVAL-USE").each(function(index) {
+		for(var i = 0; i < ids.length; i++) {
+
+			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
+				$(this).addClass('use');
+			}
+
+		}
+	});
+
+}
+
 function allVar() {	all('ENV-DEF', 'ENV-USE'); }
 function selVar(e) { sel(e, "ENV-DEF", "ENV-USE"); }
 function sliVar(e) { slice(e, "ENV-DEF", "ENV-USE"); }
@@ -251,6 +249,10 @@ function sliCon(e) { slice(e, "CON-DEF", "CON-USE"); }
 function gotoVar(e) { gotoDef(e, "DENV-DEF", "DENV-USE"); }
 function gotoVal(e) { gotoDef(e, "DVAL-DEF", "DVAL-USE"); }
 
+$("span.DVAL-USE").click(function() { defUse(this); });
+
+
+/* Set up the context menu. */
 $(function() {
 	$.contextMenu({
 		selector: '.context-menu', 
