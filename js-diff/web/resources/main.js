@@ -249,8 +249,7 @@ function sliCon(e) { slice(e, "CON-DEF", "CON-USE"); }
 function gotoVar(e) { gotoDef(e, "DENV-DEF", "DENV-USE"); }
 function gotoVal(e) { gotoDef(e, "DVAL-DEF", "DVAL-USE"); }
 
-$("span.DVAL-USE").click(function() { defUse(this); });
-
+$("span.DVAL-USE, span.DVAL-DEF").click(function() { defUse(this); });
 
 /* Set up the context menu. */
 $(function() {
