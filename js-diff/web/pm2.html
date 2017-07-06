@@ -368,7 +368,7 @@
 <td class='line'>117</td><td>  <span class='context-menu DVAL-DEF' data-address='6080'>function</span> <span class='context-menu DENV-DEF' data-address='6080'><span class='context-menu DVAL-USE' data-address='6080'>processIds</span></span>(<span class='context-menu DENV-DEF' data-address='6112'><span class='context-menu DVAL-USE' data-address=''>ids</span></span>, <span class='context-menu DENV-DEF' data-address='6128'><span class='context-menu DVAL-USE' data-address='5584,3424'><span class='context-menu VAL-USE' data-address='5584,3424'>cb</span></span></span>) {</td>
 </tr><tr class='code'>
 <td class='line'>105</td><td>    Common.printOut(cst.PREFIX_MSG + 'Applying action %s on app [%s](ids: %s)', action_name, process_name, ids);</td>
-<td class='line'>118</td><td>    <span class='context-menu DENV-USE' data-address='1280'><span class='context-menu DVAL-USE' data-address=''>Common</span></span>.<span class='context-menu DVAL-USE' data-address=''>printOut</span>(<span class='context-menu DENV-USE' data-address='1088'><span class='context-menu DVAL-USE' data-address=''>cst</span></span>.<span class='context-menu DVAL-USE' data-address=''>PREFIX_MSG</span> + <span class='context-menu DVAL-DEF' data-address='6304'>'Applying action %s on app [%s](ids: %s)'</span>, <span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address=''>action_name</span></span>, <span class='context-menu DENV-USE' data-address='5360'><span class='context-menu DVAL-USE' data-address=''>process_name</span></span>, <span class='context-menu DENV-USE' data-address='6112'><span class='context-menu DVAL-USE' data-address=''>ids</span></span>);</td>
+<td class='line'>118</td><td>    <span class='context-menu DENV-USE' data-address='1280'><span class='context-menu DVAL-USE' data-address=''>Common</span></span>.<span class='context-menu DVAL-USE' data-address=''>printOut</span>(<span class='context-menu DENV-USE' data-address='1088'><span class='context-menu DVAL-USE' data-address=''>cst</span></span>.<span class='context-menu DVAL-USE' data-address=''>PREFIX_MSG</span> + <span class='context-menu DVAL-DEF' data-address='6304'>'Applying action %s on app [%s](ids: %s)'</span>, <span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address='5024,3392'>action_name</span></span>, <span class='context-menu DENV-USE' data-address='5360'><span class='context-menu DVAL-USE' data-address='3408'>process_name</span></span>, <span class='context-menu DENV-USE' data-address='6112'><span class='context-menu DVAL-USE' data-address=''>ids</span></span>);</td>
 </tr><tr class='code'>
 <td class='line'>106</td><td></td>
 <td class='line'>119</td><td></td>
@@ -383,13 +383,13 @@
 <td class='line'>122</td><td></td>
 </tr><tr class='code'>
 <td class='line'>110</td><td>      if (action_name == 'restartProcessId' ||</td>
-<td class='line'>123</td><td>      if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address=''>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='6704'>'restartProcessId'</span> ||</td>
+<td class='line'>123</td><td>      if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address='5024,3392'>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='6704'>'restartProcessId'</span> ||</td>
 </tr><tr class='code'>
 <td class='line'>111</td><td>          action_name == 'reloadProcessId' ||</td>
-<td class='line'>124</td><td>          <span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address=''>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='6768'>'reloadProcessId'</span> ||</td>
+<td class='line'>124</td><td>          <span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address='5024,3392'>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='6768'>'reloadProcessId'</span> ||</td>
 </tr><tr class='code'>
 <td class='line'>112</td><td>          action_name == 'softReloadProcessId') {</td>
-<td class='line'>125</td><td>          <span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address=''>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='6816'>'softReloadProcessId'</span>) {</td>
+<td class='line'>125</td><td>          <span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address='5024,3392'>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='6816'>'softReloadProcessId'</span>) {</td>
 </tr><tr class='code'>
 <td class='line'>113</td><td>        var new_env = {};</td>
 <td class='line'>126</td><td>        var <span class='context-menu DENV-DEF' data-address='6880'><span class='context-menu DVAL-USE' data-address='6896'>new_env</span></span> = <span class='context-menu DVAL-DEF' data-address='6896'>{</span><span class='context-menu DVAL-DEF' data-address='6896'>}</span>;</td>
@@ -404,10 +404,10 @@
 <td class='line'>129</td><td>          <span class='context-menu DENV-USE' data-address='6880'><span class='context-menu DVAL-USE' data-address=''>new_env</span></span> = <span class='context-menu DENV-USE' data-address='704'><span class='context-menu DVAL-USE' data-address=''>util</span></span>.<span class='context-menu DVAL-USE' data-address=''>_extend</span>(<span class='context-menu DVAL-DEF' data-address='7120'>{</span><span class='context-menu DVAL-DEF' data-address='7120'>}</span>, <span class='context-menu DENV-USE' data-address=''><span class='context-menu DVAL-USE' data-address=''>process</span></span>.<span class='context-menu DVAL-USE' data-address=''>env</span>);</td>
 </tr><tr class='code'>
 <td class='line'>117</td><td>          Object.keys(envs).forEach(function(k) {</td>
-<td class='line'>130</td><td>          <span class='context-menu DENV-USE' data-address=''><span class='context-menu DVAL-USE' data-address=''>Object</span></span>.<span class='context-menu DVAL-USE' data-address=''>keys</span>(<span class='context-menu DENV-USE' data-address='5376'><span class='context-menu DVAL-USE' data-address=''>envs</span></span>).forEach(<span class='context-menu DVAL-DEF' data-address='7328'>function</span>(<span class='context-menu DENV-DEF' data-address='7344'><span class='context-menu DVAL-USE' data-address=''>k</span></span>) {</td>
+<td class='line'>130</td><td>          <span class='context-menu DENV-USE' data-address=''><span class='context-menu DVAL-USE' data-address=''>Object</span></span>.<span class='context-menu DVAL-USE' data-address=''>keys</span>(<span class='context-menu DENV-USE' data-address='5376'><span class='context-menu DVAL-USE' data-address='5824,5584,3424'><span class='context-menu VAL-USE' data-address='5824,5584,3424'>envs</span></span></span>).forEach(<span class='context-menu DVAL-DEF' data-address='7328'>function</span>(<span class='context-menu DENV-DEF' data-address='7344'><span class='context-menu DVAL-USE' data-address=''>k</span></span>) {</td>
 </tr><tr class='code'>
 <td class='line'>118</td><td>            new_env[k] = envs[k];</td>
-<td class='line'>131</td><td>            <span class='context-menu DENV-USE' data-address='6880'><span class='context-menu DVAL-USE' data-address=''>new_env</span></span>[<span class='context-menu DENV-USE' data-address='7344'><span class='context-menu DVAL-USE' data-address=''>k</span></span>] = <span class='context-menu DENV-USE' data-address='5376'><span class='context-menu DVAL-USE' data-address=''>envs</span></span>[<span class='context-menu DENV-USE' data-address='7344'><span class='context-menu DVAL-USE' data-address=''>k</span></span>];</td>
+<td class='line'>131</td><td>            <span class='context-menu DENV-USE' data-address='6880'><span class='context-menu DVAL-USE' data-address=''>new_env</span></span>[<span class='context-menu DENV-USE' data-address='7344'><span class='context-menu DVAL-USE' data-address=''>k</span></span>] = <span class='context-menu DENV-USE' data-address='5376'><span class='context-menu DVAL-USE' data-address='5824,5584,3424'><span class='context-menu VAL-USE' data-address='5824,5584,3424'>envs</span></span></span>[<span class='context-menu DENV-USE' data-address='7344'><span class='context-menu DVAL-USE' data-address=''>k</span></span>];</td>
 </tr><tr class='code'>
 <td class='line'>119</td><td>          });</td>
 <td class='line'>132</td><td>          });</td>
@@ -416,7 +416,7 @@
 <td class='line'>133</td><td>        } else {</td>
 </tr><tr class='code'>
 <td class='line'>121</td><td>          new_env = envs;</td>
-<td class='line'>134</td><td>          <span class='context-menu DENV-USE' data-address='6880'><span class='context-menu DVAL-USE' data-address=''>new_env</span></span> = <span class='context-menu DENV-USE' data-address='5376'><span class='context-menu DVAL-USE' data-address=''>envs</span></span>;</td>
+<td class='line'>134</td><td>          <span class='context-menu DENV-USE' data-address='6880'><span class='context-menu DVAL-USE' data-address='5824,5584,3424'><span class='context-menu VAL-USE' data-address='5824,5584,3424'>new_env</span></span></span> = <span class='context-menu DENV-USE' data-address='5376'><span class='context-menu DVAL-USE' data-address='5824,5584,3424'><span class='context-menu VAL-USE' data-address='5824,5584,3424'>envs</span></span></span>;</td>
 </tr><tr class='code'>
 <td class='line'>122</td><td>        }</td>
 <td class='line'>135</td><td>        }</td>
@@ -431,7 +431,7 @@
 <td class='line'>138</td><td>          <span class='context-menu DENV-USE' data-address='6528'><span class='context-menu DVAL-USE' data-address=''>id</span></span>  : <span class='context-menu DENV-USE' data-address='6528'><span class='context-menu DVAL-USE' data-address=''>id</span></span>,</td>
 </tr><tr class='code'>
 <td class='line'>126</td><td>          env : new_env</td>
-<td class='line'>139</td><td>          <span class='context-menu DVAL-USE' data-address=''>env</span> : <span class='context-menu DENV-USE' data-address='6880'><span class='context-menu DVAL-USE' data-address=''>new_env</span></span></td>
+<td class='line'>139</td><td>          <span class='context-menu DVAL-USE' data-address='5824,5584,3424'><span class='context-menu VAL-USE' data-address='5824,5584,3424'>env</span></span> : <span class='context-menu DENV-USE' data-address='6880'><span class='context-menu DVAL-USE' data-address='5824,5584,3424'><span class='context-menu VAL-USE' data-address='5824,5584,3424'>new_env</span></span></span></td>
 </tr><tr class='code'>
 <td class='line'>127</td><td>        };</td>
 <td class='line'>140</td><td>        <span class='context-menu DVAL-DEF' data-address='7632'>}</span>;</td>
@@ -443,7 +443,7 @@
 <td class='line'>142</td><td></td>
 </tr><tr class='code'>
 <td class='line'>130</td><td>      Satan.executeRemote(action_name, opts, function(err, res) {</td>
-<td class='line'>143</td><td>      <span class='context-menu DENV-USE' data-address='1184'><span class='context-menu DVAL-USE' data-address=''>Satan</span></span>.<span class='context-menu DVAL-USE' data-address=''>executeRemote</span>(<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address=''>action_name</span></span>, <span class='context-menu DENV-USE' data-address='6608'><span class='context-menu DVAL-USE' data-address='7632'>opts</span></span>, <span class='context-menu DVAL-DEF' data-address='7856'>function</span>(<span class='context-menu DENV-DEF' data-address='7872'><span class='context-menu DVAL-USE' data-address=''>err</span></span>, <span class='context-menu DENV-DEF' data-address='7888'><span class='context-menu DVAL-USE' data-address=''>res</span></span>) {</td>
+<td class='line'>143</td><td>      <span class='context-menu DENV-USE' data-address='1184'><span class='context-menu DVAL-USE' data-address=''>Satan</span></span>.<span class='context-menu DVAL-USE' data-address=''>executeRemote</span>(<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address='5024,3392'>action_name</span></span>, <span class='context-menu DENV-USE' data-address='6608'><span class='context-menu DVAL-USE' data-address='7632'>opts</span></span>, <span class='context-menu DVAL-DEF' data-address='7856'>function</span>(<span class='context-menu DENV-DEF' data-address='7872'><span class='context-menu DVAL-USE' data-address=''>err</span></span>, <span class='context-menu DENV-DEF' data-address='7888'><span class='context-menu DVAL-USE' data-address=''>res</span></span>) {</td>
 </tr><tr class='code'>
 <td class='line'>131</td><td>        if (err) {</td>
 <td class='line'>144</td><td>        if (<span class='context-menu DENV-USE' data-address='7872'><span class='context-menu DVAL-USE' data-address=''>err</span></span>) {</td>
@@ -461,31 +461,31 @@
 <td class='line'>148</td><td></td>
 </tr><tr class='code'>
 <td class='line'>136</td><td>        if (action_name == 'restartProcessId') {</td>
-<td class='line'>149</td><td>        if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address=''>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='8256'>'restartProcessId'</span>) {</td>
+<td class='line'>149</td><td>        if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address='5024,3392'>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='8256'>'restartProcessId'</span>) {</td>
 </tr><tr class='code'>
 <td class='line'>137</td><td>          Satan.notifyGod('restart', id);</td>
 <td class='line'>150</td><td>          <span class='context-menu DENV-USE' data-address='1184'><span class='context-menu DVAL-USE' data-address=''>Satan</span></span>.<span class='context-menu DVAL-USE' data-address=''>notifyGod</span>(<span class='context-menu DVAL-DEF' data-address='8368'>'restart'</span>, <span class='context-menu DENV-USE' data-address='6528'><span class='context-menu DVAL-USE' data-address=''>id</span></span>);</td>
 </tr><tr class='code'>
 <td class='line'>138</td><td>        } else if (action_name == 'deleteProcessId') {</td>
-<td class='line'>151</td><td>        } else if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address=''>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='8448'>'deleteProcessId'</span>) {</td>
+<td class='line'>151</td><td>        } else if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address='5024,3392'>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='8448'>'deleteProcessId'</span>) {</td>
 </tr><tr class='code'>
 <td class='line'>139</td><td>          Satan.notifyGod('delete', id);</td>
 <td class='line'>152</td><td>          <span class='context-menu DENV-USE' data-address='1184'><span class='context-menu DVAL-USE' data-address=''>Satan</span></span>.<span class='context-menu DVAL-USE' data-address=''>notifyGod</span>(<span class='context-menu DVAL-DEF' data-address='8560'>'delete'</span>, <span class='context-menu DENV-USE' data-address='6528'><span class='context-menu DVAL-USE' data-address=''>id</span></span>);</td>
 </tr><tr class='code'>
 <td class='line'>140</td><td>        } else if (action_name == 'stopProcessId') {</td>
-<td class='line'>153</td><td>        } else if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address=''>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='8640'>'stopProcessId'</span>) {</td>
+<td class='line'>153</td><td>        } else if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address='5024,3392'>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='8640'>'stopProcessId'</span>) {</td>
 </tr><tr class='code'>
 <td class='line'>141</td><td>          Satan.notifyGod('stop', id);</td>
 <td class='line'>154</td><td>          <span class='context-menu DENV-USE' data-address='1184'><span class='context-menu DVAL-USE' data-address=''>Satan</span></span>.<span class='context-menu DVAL-USE' data-address=''>notifyGod</span>(<span class='context-menu DVAL-DEF' data-address='8752'>'stop'</span>, <span class='context-menu DENV-USE' data-address='6528'><span class='context-menu DVAL-USE' data-address=''>id</span></span>);</td>
 </tr><tr class='code'>
 <td class='line'>142</td><td>        } else if (action_name == 'reloadProcessId') {</td>
-<td class='line'>155</td><td>        } else if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address=''>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='8832'>'reloadProcessId'</span>) {</td>
+<td class='line'>155</td><td>        } else if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address='5024,3392'>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='8832'>'reloadProcessId'</span>) {</td>
 </tr><tr class='code'>
 <td class='line'>143</td><td>          Satan.notifyGod('reload', id);</td>
 <td class='line'>156</td><td>          <span class='context-menu DENV-USE' data-address='1184'><span class='context-menu DVAL-USE' data-address=''>Satan</span></span>.<span class='context-menu DVAL-USE' data-address=''>notifyGod</span>(<span class='context-menu DVAL-DEF' data-address='8944'>'reload'</span>, <span class='context-menu DENV-USE' data-address='6528'><span class='context-menu DVAL-USE' data-address=''>id</span></span>);</td>
 </tr><tr class='code'>
 <td class='line'>144</td><td>        } else if (action_name == 'softReloadProcessId') {</td>
-<td class='line'>157</td><td>        } else if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address=''>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='9024'>'softReloadProcessId'</span>) {</td>
+<td class='line'>157</td><td>        } else if (<span class='context-menu DENV-USE' data-address='5344'><span class='context-menu DVAL-USE' data-address='5024,3392'>action_name</span></span> == <span class='context-menu DVAL-DEF' data-address='9024'>'softReloadProcessId'</span>) {</td>
 </tr><tr class='code'>
 <td class='line'>145</td><td>          Satan.notifyGod('graceful reload', id);</td>
 <td class='line'>158</td><td>          <span class='context-menu DENV-USE' data-address='1184'><span class='context-menu DVAL-USE' data-address=''>Satan</span></span>.<span class='context-menu DVAL-USE' data-address=''>notifyGod</span>(<span class='context-menu DVAL-DEF' data-address='9136'>'graceful reload'</span>, <span class='context-menu DENV-USE' data-address='6528'><span class='context-menu DVAL-USE' data-address=''>id</span></span>);</td>
@@ -512,7 +512,7 @@
 <td class='line'>165</td><td>        <span class='context-menu DENV-USE' data-address='7888'><span class='context-menu DVAL-USE' data-address=''>res</span></span>.<span class='context-menu DVAL-USE' data-address=''>forEach</span>(<span class='context-menu DVAL-DEF' data-address='9440'>function</span>(<span class='context-menu DENV-DEF' data-address='9456'><span class='context-menu DVAL-USE' data-address=''>proc</span></span>) {</td>
 </tr><tr class='code'>
 <td class='line'>153</td><td>          Common.printOut(cst.PREFIX_MSG + '[%s](%d) \u2713', proc.pm2_env ? proc.pm2_env.name : process_name, id);</td>
-<td class='line'>166</td><td>          <span class='context-menu DENV-USE' data-address='1280'><span class='context-menu DVAL-USE' data-address=''>Common</span></span>.<span class='context-menu DVAL-USE' data-address=''>printOut</span>(<span class='context-menu DENV-USE' data-address='1088'><span class='context-menu DVAL-USE' data-address=''>cst</span></span>.<span class='context-menu DVAL-USE' data-address=''>PREFIX_MSG</span> + <span class='context-menu DVAL-DEF' data-address='9632'>'[%s](%d) \u2713'</span>, <span class='context-menu DENV-USE' data-address='9456'><span class='context-menu DVAL-USE' data-address=''>proc</span></span>.<span class='context-menu DVAL-USE' data-address=''>pm2_env</span> ? <span class='context-menu DENV-USE' data-address='9456'><span class='context-menu DVAL-USE' data-address=''>proc</span></span>.<span class='context-menu DVAL-USE' data-address=''>pm2_env</span>.<span class='context-menu DVAL-USE' data-address=''>name</span> : <span class='context-menu DENV-USE' data-address='5360'><span class='context-menu DVAL-USE' data-address=''>process_name</span></span>, <span class='context-menu DENV-USE' data-address='6528'><span class='context-menu DVAL-USE' data-address=''>id</span></span>);</td>
+<td class='line'>166</td><td>          <span class='context-menu DENV-USE' data-address='1280'><span class='context-menu DVAL-USE' data-address=''>Common</span></span>.<span class='context-menu DVAL-USE' data-address=''>printOut</span>(<span class='context-menu DENV-USE' data-address='1088'><span class='context-menu DVAL-USE' data-address=''>cst</span></span>.<span class='context-menu DVAL-USE' data-address=''>PREFIX_MSG</span> + <span class='context-menu DVAL-DEF' data-address='9632'>'[%s](%d) \u2713'</span>, <span class='context-menu DENV-USE' data-address='9456'><span class='context-menu DVAL-USE' data-address=''>proc</span></span>.<span class='context-menu DVAL-USE' data-address=''>pm2_env</span> ? <span class='context-menu DENV-USE' data-address='9456'><span class='context-menu DVAL-USE' data-address=''>proc</span></span>.<span class='context-menu DVAL-USE' data-address=''>pm2_env</span>.<span class='context-menu DVAL-USE' data-address=''>name</span> : <span class='context-menu DENV-USE' data-address='5360'><span class='context-menu DVAL-USE' data-address='3408'>process_name</span></span>, <span class='context-menu DENV-USE' data-address='6528'><span class='context-menu DVAL-USE' data-address=''>id</span></span>);</td>
 </tr><tr class='code'>
 <td class='line'>154</td><td></td>
 <td class='line'>167</td><td></td>

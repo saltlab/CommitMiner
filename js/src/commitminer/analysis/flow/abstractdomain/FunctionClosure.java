@@ -126,11 +126,7 @@ public class FunctionClosure extends Closure {
 			Scratchpad scratchpad, Trace trace, Control control,
 			Stack<Address> callStack) {
 
-		/* Lift local variables and function declarations into the environment. */
 		Environment env = this.environment.clone();
-		store = Helpers.lift(facts, env, store,
-							 (ScriptNode)cfg.getEntryNode().getStatement(),
-							 cfgs, trace);
 
 		/* Match parameters with arguments. */
 		if(this.cfg.getEntryNode().getStatement() instanceof FunctionNode) {
@@ -183,6 +179,14 @@ public class FunctionClosure extends Closure {
 				i++;
 			}
 		}
+
+		/* Lift local variables and function declarations into the environment. 
+		 * This has to happen after the parameters are added to the environment
+		 * so that the parameters are available in the closure of functions 
+		 * declared within this function. */
+		store = Helpers.lift(facts, env, store,
+							 (ScriptNode)cfg.getEntryNode().getStatement(),
+							 cfgs, trace);
 		
 		/* Add 'this' to environment (points to caller's object or new object). */
 		env = env.strongUpdate("this", new Variable(cfg.getEntryNode().getId(), "this", Change.u(), new Addresses(selfAddr, Change.u())));

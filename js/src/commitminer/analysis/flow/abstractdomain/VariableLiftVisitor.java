@@ -38,19 +38,21 @@ public class VariableLiftVisitor implements NodeVisitor {
 		this.script = script;
 		this.variableDeclarations = new LinkedList<Name>();
 
-		/* Get the parameters if this is a function. */
-		if(script instanceof FunctionNode) {
-			FunctionNode function = (FunctionNode) script;
-			for(AstNode param : function.getParams()) {
-				if(param instanceof Name)
-					this.variableDeclarations.add((Name)param);
-				else if(param instanceof InfixExpression) {
-					InfixExpression ie = (InfixExpression) param;
-					if(ie.getLeft() instanceof Name)
-						this.variableDeclarations.add((Name)ie.getLeft());
-				}
-			}
-		}
+//		/* Parameters are added elsewhere. They point to properties of the
+//		 * argument object. */
+//		/* Get the parameters if this is a function. */
+//		if(script instanceof FunctionNode) {
+//			FunctionNode function = (FunctionNode) script;
+//			for(AstNode param : function.getParams()) {
+//				if(param instanceof Name)
+//					this.variableDeclarations.add((Name)param);
+//				else if(param instanceof InfixExpression) {
+//					InfixExpression ie = (InfixExpression) param;
+//					if(ie.getLeft() instanceof Name)
+//						this.variableDeclarations.add((Name)ie.getLeft());
+//				}
+//			}
+//		}
 
 	}
 
