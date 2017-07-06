@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 
 import commitminer.analysis.flow.abstractdomain.Address;
@@ -26,7 +24,6 @@ import commitminer.analysis.flow.abstractdomain.Store;
 import commitminer.analysis.flow.trace.Trace;
 import commitminer.cfg.CFG;
 
-
 public class ArgumentsFactory {
 	
 	private static final Integer ARG_DEFINER_ID = -2;
@@ -46,12 +43,11 @@ public class ArgumentsFactory {
 
 		NativeClosure closure = new NativeClosure() {
 				@Override
-				public State run(Map<IPredicate, IRelation> facts, 
-								 Address selfAddr, 
+				public State run(Address selfAddr, 
 								 Store store, Scratchpad scratchpad,
 								 Trace trace, Control control,
 								 Stack<Address> callStack) {
-					return new State(facts, store, null, scratchpad, trace, control,
+					return new State(store, null, scratchpad, trace, control,
 									 selfAddr, cfgs, callStack);
 				}
 			};

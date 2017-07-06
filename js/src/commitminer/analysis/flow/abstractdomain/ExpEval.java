@@ -85,7 +85,7 @@ public class ExpEval {
 		Closure closure = new FunctionClosure(state.cfgs.get(f), state.env, state.cfgs);
 		Address addr = state.trace.makeAddr(f.getID(), "");
 		addr = state.trace.modAddr(addr, JSClass.CFunction);
-		state.store = Helpers.createFunctionObj(state.facts, closure, state.store, state.trace, addr, f);
+		state.store = Helpers.createFunctionObj(closure, state.store, state.trace, addr, f);
 		return Address.inject(addr, Change.convU(f), Change.convU(f), DefinerIDs.inject(f.getID()));
 	}
 
@@ -478,7 +478,7 @@ public class ExpEval {
 			control = control.update(fc);
 
 			/* Call the function and get a join of the new states. */
-			newState = Helpers.applyClosure(state.facts, funVal, objAddr, state.store,
+			newState = Helpers.applyClosure(funVal, objAddr, state.store,
 												  scratch, state.trace, control,
 												  state.callStack);
 		}
@@ -497,8 +497,7 @@ public class ExpEval {
 					? BValue.top(Change.top(), Change.u())
 					: BValue.top(Change.u(), Change.u());
 			state.scratch = state.scratch.strongUpdate(value, null);
-			newState = new State(state.facts,
-								 state.store, state.env, state.scratch,
+			newState = new State(state.store, state.env, state.scratch,
 								 state.trace, state.control, state.selfAddr,
 								 state.cfgs, state.callStack);
 
@@ -528,7 +527,6 @@ public class ExpEval {
 			Obj funct = newState.store.getObj(addr);
 
 			InternalFunctionProperties ifp = (InternalFunctionProperties)funct.internalProperties;
-			FunctionClosure closure = (FunctionClosure)ifp.closure;
 
 			/* Was the callback analyzed within the callee?
 			 * qhanam: This check is not effective. It misses the case where a
@@ -549,7 +547,7 @@ public class ExpEval {
 				state.callStack.push(addr);
 
 				/* Analyze the function. */
-				ifp.closure.run(state.facts, state.selfAddr, state.store,
+				ifp.closure.run(state.selfAddr, state.store,
 								state.scratch, state.trace, control,
 								state.callStack);
 

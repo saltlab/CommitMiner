@@ -7,8 +7,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
@@ -38,9 +36,6 @@ public class State implements IState {
 	* is undefined or be a global which is defined elsewhere). */
 	private static final Integer UNDEFINED_ENV_ID = -1;
 	
-	/* Some facts are easier to generate during analysis. */
-	Map<IPredicate, IRelation> facts;
-
 	/* The abstract domains that make up the program state. The abstract
 	 * domains have access to each other. */
 
@@ -65,11 +60,9 @@ public class State implements IState {
 	 * @param store The abstract store of the new state.
 	 * @param environment The abstract environment of the new state.
 	 */
-	public State(Map<IPredicate, IRelation> facts, 
-				 Store store, Environment environment, Scratchpad scratchpad,
+	public State(Store store, Environment environment, Scratchpad scratchpad,
 				 Trace trace, Control control, Address selfAddr,
 				 Map<AstNode, CFG> cfgs, Stack<Address> callStack) {
-		this.facts = facts;
 		this.store = store;
 		this.env = environment;
 		this.scratch = scratchpad;
@@ -82,7 +75,7 @@ public class State implements IState {
 
 	@Override
 	public State clone() {
-		State clone =  new State(facts, store.clone(), env.clone(), scratch.clone(), trace,
+		State clone =  new State(store.clone(), env.clone(), scratch.clone(), trace,
 						 control.clone(), selfAddr, cfgs, callStack);
 		return clone;
 	}
@@ -634,7 +627,6 @@ public class State implements IState {
 		if(state == null) return this;
 
 		State joined = new State(
-				this.facts,
 				this.store.join(state.store),
 				this.env.join(state.env),
 				this.scratch.join(state.scratch),

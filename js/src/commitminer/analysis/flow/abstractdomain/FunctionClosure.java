@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
@@ -48,7 +46,7 @@ public class FunctionClosure extends Closure {
 	}
 
 	@Override
-	public State run(Map<IPredicate, IRelation> facts, 
+	public State run(
 			Address selfAddr, Store store,
 			Scratchpad scratchpad, Trace trace, Control control,
 			Stack<Address> callStack) {
@@ -60,7 +58,7 @@ public class FunctionClosure extends Closure {
 		/* Create the initial state if needed. */
 		State newState = null;
 		State oldState = (State) cfg.getEntryNode().getBeforeState();
-		State primeState = initState(facts, selfAddr, store, scratchpad, trace, control, callStack);
+		State primeState = initState(selfAddr, store, scratchpad, trace, control, callStack);
 		State exitState = null;
 		
 		if(oldState == null) {
@@ -110,7 +108,7 @@ public class FunctionClosure extends Closure {
 
 		/* Analyze the publicly accessible methods that weren't analyzed in
 		 * the main analysis. */
-		Helpers.analyzeEnvReachable(facts, exitState, exitState.env.environment, exitState.selfAddr, cfgs, new HashSet<Address>(), localVars);
+		Helpers.analyzeEnvReachable(exitState, exitState.env.environment, exitState.selfAddr, cfgs, new HashSet<Address>(), localVars);
 
 		return exitState;
 
@@ -121,7 +119,7 @@ public class FunctionClosure extends Closure {
 	 * create the initial state for the function call.
 	 * @return The environment for the closure, including parameters and {@code this}.
 	 */
-	private State initState(Map<IPredicate, IRelation> facts, 
+	private State initState(
 			Address selfAddr, Store store,
 			Scratchpad scratchpad, Trace trace, Control control,
 			Stack<Address> callStack) {
@@ -184,7 +182,7 @@ public class FunctionClosure extends Closure {
 		 * This has to happen after the parameters are added to the environment
 		 * so that the parameters are available in the closure of functions 
 		 * declared within this function. */
-		store = Helpers.lift(facts, env, store,
+		store = Helpers.lift(env, store,
 							 (ScriptNode)cfg.getEntryNode().getStatement(),
 							 cfgs, trace);
 		
@@ -192,7 +190,7 @@ public class FunctionClosure extends Closure {
 		env = env.strongUpdate("this", new Variable(cfg.getEntryNode().getId(), "this", Change.u(), new Addresses(selfAddr, Change.u())));
 		
 		/* Create the initial state for the function call. */
-		return new State(facts, store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
+		return new State(store, env, scratchpad, trace, control, selfAddr, cfgs, callStack);
 		
 	}
 	

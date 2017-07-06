@@ -8,12 +8,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.api.basics.ITuple;
-import org.deri.iris.factory.Factory;
-import org.deri.iris.storage.IRelation;
-import org.deri.iris.storage.IRelationFactory;
-import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
@@ -24,7 +18,6 @@ import commitminer.analysis.flow.trace.Trace;
 import commitminer.cfg.CFG;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.Version;
 
 public class Helpers {
 
@@ -58,7 +51,7 @@ public class Helpers {
 	 * @param closures The closure for the function.
 	 * @return The function object.
 	 */
-	public static Store createFunctionObj(Map<IPredicate, IRelation> facts, Closure closure, Store store, Trace trace, Address address, FunctionNode function) {
+	public static Store createFunctionObj(Closure closure, Store store, Trace trace, Address address, FunctionNode function) {
 
 		Map<String, Property> external = new HashMap<String, Property>();
 		store = addProp(function.getID(), "length", Num.inject(Num.top(Change.u()), Change.u(), DefinerIDs.bottom()), external, store, trace);
@@ -68,40 +61,9 @@ public class Helpers {
 				closure,
 				JSClass.CFunction);
 		
-		registerDefFact(facts, function.getVersion(), address, function.getAbsolutePosition(), "function".length());
-
 		store = store.alloc(address, new Obj(external, internal));
 
 		return store;
-
-	}
-
-	/**
-	 * @param statement The statement for which we are registering a fact.
-	 * @param identifier The identifier for which we are registering a fact.
-	 * @param annotation details about the 
-	 */
-	private static void registerDefFact(Map<IPredicate, IRelation> facts, 
-										Version version, 
-										Address address,
-										Integer position,
-										Integer length) {
-
-		IPredicate predicate = Factory.BASIC.createPredicate("Def", 4);
-		IRelation relation = facts.get(predicate);
-		if(relation == null) {
-			IRelationFactory relationFactory = new SimpleRelationFactory();
-			relation = relationFactory.createRelation();
-			facts.put(predicate, relation);
-		}
-
-		/* Add the new tuple to the relation. */
-		ITuple tuple = Factory.BASIC.createTuple(
-				Factory.TERM.createString(version.toString()),
-				Factory.TERM.createString(address.toString()),
-				Factory.TERM.createString(position.toString()),
-				Factory.TERM.createString(length.toString()));
-		relation.add(tuple);
 
 	}
 
@@ -208,8 +170,7 @@ public class Helpers {
 	 * @param trace The trace at the caller.
 	 * @return The final state of the closure.
 	 */
-	public static State applyClosure(Map<IPredicate, IRelation> facts, 
-							  BValue funVal, Address selfAddr, 
+	public static State applyClosure(BValue funVal, Address selfAddr, 
 							  Store store, Scratchpad sp, Trace trace, Control control,
 							  Stack<Address> callStack) {
 
@@ -236,7 +197,7 @@ public class Helpers {
 			callStack.push(address);
 
 			/* Run the function. */
-			State endState = ifp.closure.run(facts, selfAddr, store, sp, trace, control, callStack);
+			State endState = ifp.closure.run(selfAddr, store, sp, trace, control, callStack);
 
 			/* Pop this function off the call stack. */
 			callStack.pop();
@@ -265,7 +226,7 @@ public class Helpers {
 	 * @param trace The program trace including the call site of this function.
 	 * @return The new store. The environment is updated directly (no new object is created)
 	 */
-	public static Store lift(Map<IPredicate, IRelation> facts, Environment env,
+	public static Store lift(Environment env,
 										  Store store,
 										  ScriptNode function,
 										  Map<AstNode, CFG> cfgs,
@@ -293,7 +254,7 @@ public class Helpers {
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);
-			store = createFunctionObj(facts, closure, store, trace, address, child);
+			store = createFunctionObj(closure, store, trace, address, child);
 
 		}
 
@@ -308,7 +269,6 @@ public class Helpers {
 	 * @param visited Prevent circular lookups.
 	 */
 	public static void analyzeEnvReachable(
-			Map<IPredicate, IRelation> facts,
 			State state,
 			Map<String, Variable> vars,
 			Address selfAddr,
@@ -318,7 +278,7 @@ public class Helpers {
 		
 		for(Map.Entry<String, Variable> entry : vars.entrySet()) {
 			for(Address addr : entry.getValue().addresses.addresses) {
-				analyzePublic(facts, state, entry.getKey(), addr, selfAddr, cfgMap, visited, localvars);
+				analyzePublic(state, entry.getKey(), addr, selfAddr, cfgMap, visited, localvars);
 			}
 		}
 
@@ -331,7 +291,6 @@ public class Helpers {
 	 * @param visited Prevent circular lookups.
 	 */
 	private static void analyzeObjReachable(
-			Map<IPredicate, IRelation> facts,
 			State state,
 			Map<String, Property> props,
 			Address selfAddr,
@@ -340,7 +299,7 @@ public class Helpers {
 			Set<String> localvars) {
 
 		for(Map.Entry<String, Property> entry : props.entrySet()) {
-			analyzePublic(facts, state, entry.getKey(), entry.getValue().address, selfAddr, cfgMap, visited, localvars);
+			analyzePublic(state, entry.getKey(), entry.getValue().address, selfAddr, cfgMap, visited, localvars);
 		}
 		
 	}
@@ -354,7 +313,6 @@ public class Helpers {
 	 * @param visited Prevent circular lookups.
 	 */
 	private static void analyzePublic(
-			Map<IPredicate, IRelation> facts,
 			State state,
 			String name,
 			Address addr,
@@ -394,7 +352,7 @@ public class Helpers {
 					Scratchpad scratch = new Scratchpad(state.scratch.applyReturn(), new BValue[0]);
 
 					/* Analyze the function. Use a fresh call stack because we don't have any knowledge of it. */
-					ifp.closure.run(facts, selfAddr, state.store,
+					ifp.closure.run(selfAddr, state.store,
 									scratch, state.trace, control,
 									new Stack<Address>());
 
@@ -405,7 +363,7 @@ public class Helpers {
 			}
 
 			/* Recursively look for object properties that are functions. */
-			analyzeObjReachable(facts, state, obj.externalProperties, addr, cfgMap, visited, null);
+			analyzeObjReachable(state, obj.externalProperties, addr, cfgMap, visited, null);
 
 		}
 		

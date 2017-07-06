@@ -33,10 +33,10 @@ public class StateFactory {
 		Trace trace = new FSCI(script.getID());
 		Store store = StoreFactory.createInitialStore(cfgs);
 		Pair<Environment, Store> lifted =
-				EnvironmentFactory.createInitialEnvironment(facts, script, store, cfgs, trace);
+				EnvironmentFactory.createInitialEnvironment(script, store, cfgs, trace);
 		Scratchpad scratchpad = new Scratchpad();
 		Control control = new Control();
-		return new State(facts, lifted.getRight(), lifted.getLeft(), scratchpad,
+		return new State(lifted.getRight(), lifted.getLeft(), scratchpad,
 						 trace, control, StoreFactory.global_binding_Addr,
 						 cfgs, new Stack<Address>());
 	}

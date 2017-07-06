@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.FunctionNode;
-import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.ScriptNode;

@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 
 import commitminer.analysis.flow.abstractdomain.Address;
@@ -61,8 +59,7 @@ public class ObjFactory {
 
 		NativeClosure closure = new NativeClosure() {
 				@Override
-				public State run(Map<IPredicate, IRelation> facts, 
-								 Address selfAddr, 
+				public State run(Address selfAddr, 
 								 Store store, Scratchpad scratchpad,
 								 Trace trace, Control control,
 								 Stack<Address> callStack) {

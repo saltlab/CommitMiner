@@ -1,10 +1,6 @@
 package commitminer.analysis.flow.abstractdomain;
 
-import java.util.Map;
 import java.util.Stack;
-
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.storage.IRelation;
 
 import commitminer.analysis.flow.trace.Trace;
 
@@ -25,8 +21,7 @@ public abstract class Closure {
 	 * @param callStack Tracks the current call stack.
 	 * @return The new state after executing the function.
 	 */
-	public abstract State run(Map<IPredicate, IRelation> facts,
-							  Address selfAddr, 
+	public abstract State run(Address selfAddr, 
 							  Store store, Scratchpad scratchpad,
 							  Trace trace, Control control,
 							  Stack<Address> callStack);
