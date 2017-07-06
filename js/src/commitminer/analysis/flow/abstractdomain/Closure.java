@@ -11,7 +11,6 @@ import commitminer.analysis.flow.trace.Trace;
 public abstract class Closure {
 
 	/**
-	 * @param facts The fact database for facts generated during analysis.
 	 * @param selfAddr The value of the 'this' variable (a set of objects).
 	 * @param arbObj The argument array object.
 	 * @param store Main memory.

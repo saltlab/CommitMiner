@@ -4,8 +4,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.deri.iris.api.basics.IPredicate;
-import org.deri.iris.storage.IRelation;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
@@ -28,8 +26,7 @@ public class StateFactory {
 	 * @param script The file under analysis.
 	 * @return The initial state ς ∈ State := ρ x σ
 	 */
-	public static State createInitialState(Map<IPredicate, IRelation> facts,
-		ScriptNode script, Map<AstNode, CFG> cfgs) {
+	public static State createInitialState(ScriptNode script, Map<AstNode, CFG> cfgs) {
 		Trace trace = new FSCI(script.getID());
 		Store store = StoreFactory.createInitialStore(cfgs);
 		Pair<Environment, Store> lifted =

@@ -54,7 +54,7 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		}
 
 		/* Create the initial state. */
-		State state = StateFactory.createInitialState(facts, (ScriptNode) root, cfgMap);
+		State state = StateFactory.createInitialState((ScriptNode) root, cfgMap);
 
 		/* Perform the initial analysis and get the publicly accessible methods. */
 		state = Helpers.run(cfgMap.get(root), state);
