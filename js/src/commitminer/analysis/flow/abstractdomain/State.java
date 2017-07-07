@@ -502,7 +502,7 @@ public class State implements IState {
 			 * and add it to the environment/store as BValue.TOP since we know
 			 * nothing about it. */
 			Address addr = trace.makeAddr(node.getID(), "");
-			env = env.strongUpdate(node.toSource(), new Variable(UNDEFINED_ENV_ID, node.toSource(), Change.bottom(), new Addresses(addr, Change.u())));
+			env = env.strongUpdate(node.toSource(), new Variable(node.getID(), node.toSource(), Change.bottom(), new Addresses(addr, Change.u())));
 			store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom()));
 			addrs = new Addresses(addr, Change.u());
 		}
