@@ -96,7 +96,7 @@ CLI.killAllModules = function(cb) {
  * Module cannot be stopped or deleted but can be restarted
  */
 CLI._operate = function(action_name, process_name, envs, cb) {
-  var ret = [];
+  var ret = ["one", "two", "three"];
 
   // Make sure all options exist
 

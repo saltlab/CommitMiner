@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.mozilla.javascript.Token;
+import org.mozilla.javascript.ast.ArrayLiteral;
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionCall;
@@ -59,6 +60,9 @@ public class ExpEval {
 		}
 		else if(node instanceof ObjectLiteral) {
 			return evalObjectLiteral((ObjectLiteral)node);
+		}
+		else if(node instanceof ArrayLiteral) {
+			return evalArrayLiteral((ArrayLiteral)node);
 		}
 		else if(node instanceof FunctionNode) {
 			return evalFunctionNode((FunctionNode)node);
@@ -115,6 +119,33 @@ public class ExpEval {
 		state.store = state.store.alloc(objAddr, obj);
 
 		return Address.inject(objAddr, Change.convU(ol), Change.convU(ol), DefinerIDs.inject(ol.getID()));
+	}
+	
+	/**
+	 * Creates a new array from an array literal.
+	 * @param al The array literal.
+	 * @return A BValue that points to the new array literal.
+	 */
+	public BValue evalArrayLiteral(ArrayLiteral al) {
+
+		Map<String, Property> ext = new HashMap<String, Property>();
+		InternalObjectProperties in = new InternalObjectProperties();
+
+		Integer i = 0;
+		for(AstNode element : al.getElements()) {
+			BValue propVal = this.eval(element);
+			Address propAddr = state.trace.makeAddr(element.getID(), "");
+			state.store = state.store.alloc(propAddr, propVal);
+			ext.put(i.toString(), new Property(element.getID(), i.toString(), Change.u(), propAddr));
+			i++;
+		}
+
+		Obj obj = new Obj(ext, in);
+		Address objAddr = state.trace.makeAddr(al.getID(), "");
+		state.store = state.store.alloc(objAddr, obj);
+
+		return Address.inject(objAddr, Change.convU(al), Change.convU(al), DefinerIDs.inject(al.getID()));
+		
 	}
 
 	/**

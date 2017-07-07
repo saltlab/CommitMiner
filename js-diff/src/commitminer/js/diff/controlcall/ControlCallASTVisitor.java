@@ -74,7 +74,7 @@ public class ControlCallASTVisitor implements NodeVisitor {
 			if(Change.convU(fc).le == Change.LatticeElement.CHANGED) {
 				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 				ids.add(new GenericDependencyIdentifier(fc.getID()));
-				annotations.add(new Annotation("CALL-DEF", ids, fc.getLineno(), fc.getFixedPosition(), fc.getLength()));
+				annotations.add(new Annotation("CALL-DEF", ids, fc.getTarget().getLineno(), fc.getTarget().getFixedPosition(), fc.getTarget().getLength()));
 			}
 		}
 		/* Ignore the body of loops, ifs and functions. */
