@@ -89,6 +89,16 @@ public class DefValueASTVisitor implements NodeVisitor {
 	@Override
 	public boolean visit(AstNode node) {
 		
+		/* If this node is a dummy definer, register an annotation. */
+		if(node.isDummy()) {
+
+			List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+			ids.add(new GenericDependencyIdentifier(node.getID()));
+
+			this.annotations.add(new Annotation("DVAL-DEF", ids, node.getLineno(), node.getFixedPosition(), node.getLength()));
+
+		}
+		
 		/* Inspect variables and properties that use changed values. */
 		if(node instanceof Name) {
 
