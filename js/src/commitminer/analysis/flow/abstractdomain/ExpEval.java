@@ -531,10 +531,16 @@ public class ExpEval {
 			newState = new State(state.store, state.env, state.scratch,
 								 state.trace, state.control, state.selfAddr,
 								 state.cfgs, state.callStack);
-
+			
 			/* Create the return value. */
 			BValue retVal =  BValue.top(Change.convU(fc), Change.u());
-			newState.scratch.strongUpdate(retVal, null);
+			
+			/* Conservatively add a dummy DefinerID to the BValue, since we could have
+			 * received a new value here. */
+			retVal.definerIDs = retVal.definerIDs.strongUpdate(fc.getID());
+			fc.setDummy();
+			
+			newState.scratch = newState.scratch.strongUpdate(retVal, null);
 		}
 		else {
 

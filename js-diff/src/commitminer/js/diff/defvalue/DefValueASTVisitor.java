@@ -88,7 +88,7 @@ public class DefValueASTVisitor implements NodeVisitor {
 
 	@Override
 	public boolean visit(AstNode node) {
-
+		
 		/* Inspect variables and properties that use changed values. */
 		if(node instanceof Name) {
 

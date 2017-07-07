@@ -17,5 +17,5 @@ function bar(x) {
 test(foo);
 test(bar);
 
-var config = { setting: true };
+var config = require('config');
 console.log(config.setting);

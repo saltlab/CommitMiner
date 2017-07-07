@@ -76,11 +76,23 @@ public class GlobalVisitor implements NodeVisitor {
 		}
 		
 		else if(node instanceof FunctionNode) {
+
 			FunctionNode fn = (FunctionNode) node;
+			
+			/* The function name is a local var. */
+			Name name = fn.getFunctionName();
+			if(name != null) {
+				global.remove(name.toSource());
+				local.add(name.toSource());
+			}
+			
+			/* Get the list of globals from the function. */
 			GlobalVisitor visitor = new GlobalVisitor(fn.getParams());
 			fn.getBody().visit(visitor);
+			visitor.global.removeAll(local);
 			global.addAll(visitor.global);
 			return false;
+
 		}
 
 		return true;
