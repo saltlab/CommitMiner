@@ -173,13 +173,20 @@ function gotoDef(e, def, use) {
 
 /* Set up def/use highlighting when the user left-clicks on a variable or 
  * value. */
-function defUse(element, def, use) {
+function defUse(element, def, use, slice) {
+
+	if(element.length == 0) return;
 
 	erase();
 
+	if(slice) {
+		unslice();
+		hideRows();
+	}
+
 	/* Check if this span has a DVAL-DEF or DVAL-USE class. */
-	if($(element).attr('data-address') === '') return;
-	var ids = $(element).attr('data-address').split(',');
+	if(element.attr('data-address') === '') return;
+	var ids = element.attr('data-address').split(',');
 
 	/* Find and highlight the value definitions. */
 	$("span." + def).each(function(index) {
@@ -187,6 +194,7 @@ function defUse(element, def, use) {
 
 			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
 				$(this).addClass('goto');
+				if(slice) $(this).closest('tr').each(showContext);
 			}
 
 		}
@@ -198,10 +206,13 @@ function defUse(element, def, use) {
 
 			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
 				$(this).addClass('use');
+				if(slice) $(this).closest('tr').each(showContext);
 			}
 
 		}
 	});
+
+	if(slice) addPlaceholders();
 
 }
 
@@ -209,25 +220,8 @@ function defUse(element, def, use) {
 function sliLine() {
 
 	$("tr").hide();
-
-	$("td.insert").each(function() {
-		var tr = $(this).closest("tr");
-		tr.prev().prev().show();
-		tr.prev().show();
-		tr.show();
-		tr.next().show();
-		tr.next().next().show();
-	});
-
-	$("td.delete").each(function() {
-		var tr = $(this).closest("tr");
-		tr.prev().prev().show();
-		tr.prev().show();
-		tr.show().show();
-		tr.next().show();
-		tr.next().next().show();
-	});
-
+	$("td.insert").each(showContext);
+	$("td.delete").each(showContext);
 	addPlaceholders();
 
 }
@@ -253,6 +247,11 @@ function addPlaceholders() {
 
 }
 
+/* Finds uses of the variable or value. */
+function findUses(e, def, use) {
+	defUse($(e.target).closest("span." + def + ", span." + use), def, use, true);
+}
+
 function allVar() {	all('ENV-DEF', 'ENV-USE'); }
 function allVal() { all('VAL-DEF', 'VAL-USE'); }
 function allCall() { all('CALL-DEF', 'CALL-USE'); }
@@ -260,15 +259,18 @@ function allCon() { all('CON-DEF', 'CON-USE'); }
 function gotoVar(e) { gotoDef(e, "DENV-DEF", "DENV-USE"); }
 function gotoVal(e) { gotoDef(e, "DVAL-DEF", "DVAL-USE"); }
 
+function findVar(e) { findUses(e, "DENV-DEF", "DENV-USE"); }
+function findVal(e) { findUses(e, "DVAL-DEF", "DVAL-USE"); }
+
 $("span.DENV-USE, span.DENV-DEF").click(function(e) { 
 	if(!e.altKey) { 
-		defUse(this, "DENV-DEF", "DENV-USE"); 
+		defUse($(this), "DENV-DEF", "DENV-USE"); 
 	} 
 });
 
 $("span.DVAL-USE, span.DVAL-DEF").click(function(e) { 
 	if(e.altKey) { 
-		defUse(this, "DVAL-DEF", "DVAL-USE"); 
+		defUse($(this), "DVAL-DEF", "DVAL-USE"); 
 	} 
 });
 
@@ -307,6 +309,12 @@ $(function() {
 							case "goto-val":
 							gotoVal(e);
 							break;
+							case "find-var":
+							findVar(e);
+							break;
+							case "find-val":
+							findVal(e);
+							break;
 							case "sli-line":
 							sliLine();
 							break;
@@ -335,6 +343,12 @@ $(function() {
 							items: {
 								"goto-var": {name: "Variable Def", icon: "fa-bicycle"},
 								"goto-val": {name: "Value Def", icon: "fa-fighter-jet"}}},
+						"find": {
+							name: "Find All Uses",
+							icon: "fa-search",
+							items: {
+								"find-var": {name: "Variable Uses", icon: "fa-bicycle"},
+								"find-val": {name: "Value Uses", icon: "fa-fighter-jet"}}},
 						"sep1": "---------",
 						"erase": {name: "Remove Highlighting", icon: "fa-eraser"},
 						"unslice": {name: "Undo Slice", icon: "fa-undo"}
