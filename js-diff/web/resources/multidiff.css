@@ -23,6 +23,16 @@ td {
 		vertical-align: top;
 }
 
+.expandable-line {
+	background-color: rgba(3, 102, 214, 0.3);
+	border-left: 1px solid #eee;
+	text-align: right;
+}
+
+.expandable-blob {
+	background-color: #f1f8ff;
+}
+
 .alignment {
 	background-color: #fafafa;
 }

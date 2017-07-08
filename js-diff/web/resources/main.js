@@ -20,6 +20,7 @@ function erase() {
  * Shows all lines.
  */
 function unslice() {
+	$('tr.expandable').remove();
 	$('tr').show();
 }
 
@@ -235,6 +236,54 @@ function defUse(element, def, use) {
 
 }
 
+/* Slice to show only the line changes. */
+function sliLine() {
+
+	$("tr").hide();
+
+	$("td.insert").each(function() {
+		var tr = $(this).closest("tr");
+		tr.prev().prev().show();
+		tr.prev().show();
+		tr.show();
+		tr.next().show();
+		tr.next().next().show();
+	});
+
+	$("td.delete").each(function() {
+		var tr = $(this).closest("tr");
+		tr.prev().prev().show();
+		tr.prev().show();
+		tr.show().show();
+		tr.next().show();
+		tr.next().next().show();
+	});
+
+	placeholders();
+
+}
+
+/* Add placeholder rows to show where rows have been hidden. */
+function placeholders() {
+
+	var current = $("tr:hidden").first();
+
+	while(current.length > 0) {
+
+		current.before("<tr class='code expandable'><td class='expandable-line'><i class='fa fa-compress' style='font-size:18px;'></i></td><td class='expandable-blob' colspan='3'></td></tr>");
+
+		while(current.is(":hidden")) {
+			current = current.next();
+		}
+
+		while(current.is(":visible")) {
+			current = current.next();
+		}
+		
+	}
+
+}
+
 function allVar() {	all('ENV-DEF', 'ENV-USE'); }
 function selVar(e) { sel(e, "ENV-DEF", "ENV-USE"); }
 function sliVar(e) { slice(e, "ENV-DEF", "ENV-USE"); }
@@ -260,6 +309,11 @@ $("span.DVAL-USE, span.DVAL-DEF").click(function(e) {
 	if(e.altKey) { 
 		defUse(this, "DVAL-DEF", "DVAL-USE"); 
 	} 
+});
+
+/* Startup. */
+$(function() {
+	sliLine();
 });
 
 /* Set up the context menu. */
@@ -316,6 +370,9 @@ $(function() {
 							case "goto-val":
 							gotoVal(e);
 							break;
+							case "sli-line":
+							sliLine();
+							break;
 							case "erase":
 							erase();
 							break;
@@ -343,13 +400,14 @@ $(function() {
 								"sel-call": {name: "Callsites", icon: "fa-ship"},
 								"sel-con": {name: "Conditions", icon: "fa-train"}}},
 						"slice": {
-							name: "Sliced Effects",
+							name: "Slice",
 							icon: "fa-scissors",
 							items: {
 								"sli-var": {name: "Variables", icon: "fa-bicycle"},
 								"sli-val": {name: "Values", icon: "fa-fighter-jet"},
 								"sli-call": {name: "Callsites", icon: "fa-ship"},
-								"sli-con": {name: "Conditions", icon: "fa-train"}}},
+								"sli-con": {name: "Conditions", icon: "fa-train"},
+								"sli-line": {name: "Line", icon: "fa-taxi"}}},
 						"goto": {
 							name: "Goto Def",
 							icon: "fa-sign-in",
