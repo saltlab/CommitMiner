@@ -25,14 +25,40 @@ function unslice() {
 }
 
 /**
+ * Hide all rows.
+ */
+function hideRows() {
+	$("tr").hide();
+}
+
+/**
+ * Display the rows around the given element.
+ */
+function showContext() {
+	var tr = $(this).closest("tr");
+	tr.prev().prev().show();
+	tr.prev().show();
+	tr.show();
+	tr.next().show();
+	tr.next().next().show();
+}
+
+/**
  * Highlights all def/use spans.
  */
 function all(def, use) {
+
 	erase();
 	unslice();
-	$('.' + def).addClass('def');
-	$('.' + use).addClass('use');
+	hideRows();
+
+	$('.' + def).addClass('def').each(showContext);
+	$('.' + use).addClass('use').each(showContext);
+
+	addPlaceholders();
+
 }
+
 
 /**
  * Get the IDs for the selected def/use spans.
@@ -119,28 +145,33 @@ function sel(e, def, use) {
 function slice(e, def, use) {
 
 	erase();
-	var ids = getIDs(e, def, use);
-	if(ids === null) return;
+	unslice();
+//var ids = getIDs(e, def, use);
+//if(ids === null) return;
 
 	$("tr").hide();
 
-	$("span." + use).each(function(index) {
-		for(var i = 0; i < ids.length; i++) {
-			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
-				$(this).addClass('use');
-				$(this).closest('tr').show();
-			}
-		}
-	});
+	all(def, use);
 
-	$("span." + def).each(function(index) {
-		for(var i = 0; i < ids.length; i++) {
-			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
-				$(this).addClass('def');
-				$(this).closest('tr').show();
-			}
-		}
-	});
+	addPlaceholders();
+
+//	$("span." + use).each(function(index) {
+//		for(var i = 0; i < ids.length; i++) {
+//			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
+//				$(this).addClass('use');
+//				$(this).closest('tr').show();
+//			}
+//		}
+//	});
+//
+//	$("span." + def).each(function(index) {
+//		for(var i = 0; i < ids.length; i++) {
+//			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
+//				$(this).addClass('def');
+//				$(this).closest('tr').show();
+//			}
+//		}
+//	});
 
 }
 
@@ -259,12 +290,12 @@ function sliLine() {
 		tr.next().next().show();
 	});
 
-	placeholders();
+	addPlaceholders();
 
 }
 
 /* Add placeholder rows to show where rows have been hidden. */
-function placeholders() {
+function addPlaceholders() {
 
 	var current = $("tr:hidden").first();
 
