@@ -59,7 +59,6 @@ function all(def, use) {
 
 }
 
-
 /**
  * Get the IDs for the selected def/use spans.
  */
@@ -112,70 +111,6 @@ function getSpanElement(e, def, use) {
 }
 
 /**
- * Highlights the selected def/use spans.
- */
-function sel(e, def, use) {
-
-	erase();
-	unslice();
-	var ids = getIDs(e, def, use);
-	if(ids === null) return;
-
-	$("span." + use).each(function(index) {
-		for(var i = 0; i < ids.length; i++) {
-			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
-				$(this).addClass('use');
-			}
-		}
-	});
-
-	$("span." + def).each(function(index) {
-		for(var i = 0; i < ids.length; i++) {
-			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
-				$(this).addClass('def');
-			}
-		}
-	});
-
-}
-
-/**
- * Highlights and slices the selected def/use spans.
- */
-function slice(e, def, use) {
-
-	erase();
-	unslice();
-//var ids = getIDs(e, def, use);
-//if(ids === null) return;
-
-	$("tr").hide();
-
-	all(def, use);
-
-	addPlaceholders();
-
-//	$("span." + use).each(function(index) {
-//		for(var i = 0; i < ids.length; i++) {
-//			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
-//				$(this).addClass('use');
-//				$(this).closest('tr').show();
-//			}
-//		}
-//	});
-//
-//	$("span." + def).each(function(index) {
-//		for(var i = 0; i < ids.length; i++) {
-//			if($(this).attr('data-address').split(',').indexOf(ids[i]) >= 0) {
-//				$(this).addClass('def');
-//				$(this).closest('tr').show();
-//			}
-//		}
-//	});
-
-}
-
-/**
  * @return true if all the IDs are the same
  */
 function checkIDs(elements) {
@@ -197,6 +132,8 @@ function checkIDs(elements) {
 function gotoDef(e, def, use) {
 
 	erase();
+	unslice();
+
 	var ids = getIDs(e, def, use);
 	if(ids == null) return;
 
@@ -224,11 +161,12 @@ function gotoDef(e, def, use) {
 	}
 	else if(elements.length > 1 ) {
 		/* Slice the definitions. */
-		$("tr").hide();
-		element.closest('tr').show();
+		hideRows();
+		element.closest('tr').show().each(showContext);
 		for(var i = 0; i < elements.length; i++) {
-			elements[i].closest('tr').show();
+			elements[i].closest('tr').each(showContext);
 		}
+		addPlaceholders();
 	}
 
 }
@@ -316,17 +254,9 @@ function addPlaceholders() {
 }
 
 function allVar() {	all('ENV-DEF', 'ENV-USE'); }
-function selVar(e) { sel(e, "ENV-DEF", "ENV-USE"); }
-function sliVar(e) { slice(e, "ENV-DEF", "ENV-USE"); }
 function allVal() { all('VAL-DEF', 'VAL-USE'); }
-function selVal(e) { sel(e, "VAL-DEF", "VAL-USE"); }
-function sliVal(e) { slice(e, "VAL-DEF", "VAL-USE"); }
 function allCall() { all('CALL-DEF', 'CALL-USE'); }
-function selCall(e) { sel(e, "CALL-DEF", "CALL-USE"); }
-function sliCall(e) { slice(e, "CALL-DEF", "CALL-USE"); }
 function allCon() { all('CON-DEF', 'CON-USE'); }
-function selCon(e) { sel(e, "CON-DEF", "CON-USE"); }
-function sliCon(e) { slice(e, "CON-DEF", "CON-USE"); }
 function gotoVar(e) { gotoDef(e, "DENV-DEF", "DENV-USE"); }
 function gotoVal(e) { gotoDef(e, "DVAL-DEF", "DVAL-USE"); }
 
@@ -362,38 +292,14 @@ $(function() {
 							case "all-var":
 							allVar();
 							break;
-							case "sel-var":
-							selVar(e);
-							break;
-							case "sli-var":
-							sliVar(e);
-							break;
 							case "all-val":
 							allVal();
-							break;
-							case "sel-val":
-							selVal(e);
-							break;
-							case "sli-val":
-							sliVal(e);
 							break;
 							case "all-call":
 							allCall();
 							break;
-							case "sel-call":
-							selCall(e);
-							break;
-							case "sli-call":
-							sliCall(e);
-							break;
 							case "all-con":
 							allCon();
-							break;
-							case "sel-con":
-							selCon(e);
-							break;
-							case "sli-con":
-							sliCon(e);
 							break;
 							case "goto-var":
 							gotoVar(e);
@@ -415,29 +321,13 @@ $(function() {
 					},
 					items: {
 						"all": {
-							name: "All Effects",
+							name: "Change Impact",
 							icon: "fa-bars",
 							items: {
 								"all-var": {name: "Variables", icon: "fa-bicycle"},
 								"all-val": {name: "Values", icon: "fa-fighter-jet"},
 								"all-call": {name: "Callsites", icon: "fa-ship"},
-								"all-con": {name: "Conditions", icon: "fa-train"}}},
-						"selected": {
-							name: "Selected Effects",
-							icon: "fa-i-cursor",
-							items: {
-								"sel-var": {name: "Variables", icon: "fa-bicycle"},
-								"sel-val": {name: "Values", icon: "fa-fighter-jet"},
-								"sel-call": {name: "Callsites", icon: "fa-ship"},
-								"sel-con": {name: "Conditions", icon: "fa-train"}}},
-						"slice": {
-							name: "Slice",
-							icon: "fa-scissors",
-							items: {
-								"sli-var": {name: "Variables", icon: "fa-bicycle"},
-								"sli-val": {name: "Values", icon: "fa-fighter-jet"},
-								"sli-call": {name: "Callsites", icon: "fa-ship"},
-								"sli-con": {name: "Conditions", icon: "fa-train"},
+								"all-con": {name: "Conditions", icon: "fa-train"},
 								"sli-line": {name: "Line", icon: "fa-taxi"}}},
 						"goto": {
 							name: "Goto Def",
