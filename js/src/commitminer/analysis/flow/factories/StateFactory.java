@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.ScriptNode;
 
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.Addresses;
+import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.Control;
 import commitminer.analysis.flow.abstractdomain.DefinerIDs;
@@ -56,7 +57,7 @@ public class StateFactory {
 		for(String global : globals) {
 			Address address = trace.makeAddr(i, "");
 			env.strongUpdateNoCopy(global, new Variable(i, global, Change.bottom(), new Addresses(address, Change.u())));
-			store = store.alloc(address, Undefined.inject(Undefined.top(Change.u()), Change.u(), DefinerIDs.bottom()));
+			store = store.alloc(address, BValue.top(Change.u(), Change.u()));
 			i--;
 		}
 		

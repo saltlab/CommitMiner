@@ -37,8 +37,10 @@ public class Annotation {
 		String s = "";
 		if(dependencyIDs.isEmpty()) return "";
 		for(DependencyIdentifier id : dependencyIDs) {
-			s += id.getAddress() + ",";
+			String a = id.getAddress();
+			if(!a.isEmpty()) s += id.getAddress() + ",";
 		}
+		if(s.isEmpty()) return s;
 		return s.substring(0, s.length() - 1);
 	}
 	

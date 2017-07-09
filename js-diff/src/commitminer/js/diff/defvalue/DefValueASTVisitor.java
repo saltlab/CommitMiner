@@ -119,17 +119,17 @@ public class DefValueASTVisitor implements NodeVisitor {
 			PropertyGet pg = (PropertyGet) node;
 			
 			/* Try to resolve the full property get. */
+			List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 			for(Address addr : state.resolveOrCreate(node)) {
-				
 				BValue val = state.store.apply(addr);
-				
-				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 				ids.add(val);
+			}
+
+			if(ids.size() > 0) {
 				this.annotations.add(new Annotation("DVAL-USE", ids, 
 						pg.getRight().getLineno(), 
 						pg.getRight().getFixedPosition(), 
 						pg.getRight().getLength()));
-
 			}
 			
 			/* Visit the left hand side in case any objects have changed. */
