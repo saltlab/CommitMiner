@@ -264,13 +264,13 @@ function findVal(e) { findUses(e, "DVAL-DEF", "DVAL-USE"); }
 
 $("span.DENV-USE, span.DENV-DEF").click(function(e) { 
 	if(!e.altKey) { 
-		defUse($(this), "DENV-DEF", "DENV-USE"); 
+		defUse($(e.target).closest("span.DENV-DEF, span.DENV-USE"), "DENV-DEF", "DENV-USE");
 	} 
 });
 
 $("span.DVAL-USE, span.DVAL-DEF").click(function(e) { 
 	if(e.altKey) { 
-		defUse($(this), "DVAL-DEF", "DVAL-USE"); 
+		defUse($(e.target).closest("span.DVAL-DEF, span.DVAL-USE"), "DVAL-DEF", "DVAL-USE");
 	} 
 });
 
