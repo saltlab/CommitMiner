@@ -536,9 +536,13 @@ public class ExpEval {
 			BValue retVal =  BValue.top(Change.convU(fc), Change.u());
 			
 			/* Conservatively add a dummy DefinerID to the BValue, since we could have
-			 * received a new value here. */
-			retVal.definerIDs = retVal.definerIDs.strongUpdate(fc.getID());
-			fc.setDummy();
+			 * received a new value here. Only if this is an assignment or a return. */
+			if(fc.getParent().getType() == Token.ASSIGN 
+					|| fc.getParent().getType() == Token.VAR
+					|| fc.getParent().getType() == Token.RETURN) {
+				retVal.definerIDs = retVal.definerIDs.strongUpdate(fc.getID());
+				fc.setDummy();
+			}
 			
 			newState.scratch = newState.scratch.strongUpdate(retVal, null);
 		}
