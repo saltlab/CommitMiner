@@ -114,17 +114,13 @@ public class ControlFlowDifferencing {
         else src = ControlFlowDifferencing.createGumTree(cfgFactory, srcSourceCode, options.getSrc(), options.getPreProcess());
         if(dstSourceCode == null) dst = ControlFlowDifferencing.createGumTree(cfgFactory, options.getDst(), options.getPreProcess());
         else dst = ControlFlowDifferencing.createGumTree(cfgFactory, dstSourceCode, options.getDst(), options.getPreProcess());
-        
-		// TODO: Instead of using GumTree to do the matching, use our own meyers-diff
-		// to label the nodes in the tree (no matching).
-        LineMatcher matcher = new LineMatcher(srcSourceCode, dstSourceCode, src, dst);
-        matcher.match();
 
 		/* Match the source tree nodes to the destination tree nodes. */
-//        Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src.getRoot(), dst.getRoot());
+        Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src.getRoot(), dst.getRoot());
 
         /* Apply change classifications to nodes in the GumTrees. */
 //        ControlFlowDifferencing.classifyTreeNodes(src, dst, matcher);
+		ControlFlowDifferencing.classifyTreeNodesMeyers(srcSourceCode, dstSourceCode, src, dst, matcher);
 
 		/* Create the CFGs. */
 		List<CFG> srcCFGs = cfgFactory.createCFGs(src.getRoot().getClassifiedASTNode());
@@ -257,6 +253,7 @@ public class ControlFlowDifferencing {
 
 		/* Classify the GumTree (Tree) nodes. */
 		TreeClassifier classifier = new RootAndLeavesClassifier(src, dst, matcher);
+		classifier.classify();
 
 		/* We use mapping ids to keep track of mapping changes from the source
 		 * to the destination. */
@@ -266,6 +263,36 @@ public class ControlFlowDifferencing {
 		ASTClassifier astClassifier = new ASTClassifier(src, dst, classifier, mappings);
 		astClassifier.classifyASTNodes();
 
+	}
+	
+	/**
+	 * Classify nodes in the source and destination trees as deleted or added based
+	 * on the result of the Meyers diff. There are no mappings since there are no
+	 * moved or updated nodes.
+	 * @param srcCode The source code (text).
+	 * @param dstCode The destination code (text).
+	 * @param srcTree The source GumTree (AST).
+	 * @param dstTree The destination GumTree (AST).
+	 * @param matcher The data structure containing GumTree node mappings.
+	 * @throws InvalidClassException If GumTree Tree nodes are generated from a parser other than Mozilla Rhino.
+	 */
+	public static void classifyTreeNodesMeyers(String srcCode, String dstCode,
+											   TreeContext srcTree, TreeContext dstTree,
+											   Matcher matcher) throws InvalidClassException {
+
+		/* Classify the GumTree (Tree) nodes. */
+		TreeClassifier classifier = new LineMatcher(srcCode, dstCode, 
+													srcTree, dstTree, matcher);
+		classifier.classify();
+
+		/* We use mapping ids to keep track of mapping changes from the source
+		 * to the destination. */
+		MappingStore mappings = matcher.getMappings();
+
+		/* Assign the classifications directly to the AstNodes. */
+		ASTClassifier astClassifier = new ASTClassifier(srcTree, dstTree, classifier, mappings);
+		astClassifier.classifyASTNodes();
+		
 	}
 
 	/**
