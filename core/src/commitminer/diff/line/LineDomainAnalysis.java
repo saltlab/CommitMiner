@@ -1,4 +1,4 @@
-package commitminer.js.diff.line;
+package commitminer.diff.line;
 
 import java.util.LinkedList;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package commitminer.js.diff.line;
+package commitminer.diff.line;
 
 /*
  * Diff Match and Patch

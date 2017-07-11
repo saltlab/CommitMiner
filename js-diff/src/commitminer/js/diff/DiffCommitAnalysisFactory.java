@@ -9,13 +9,13 @@ import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.analysis.factories.IDomainAnalysisFactory;
 import commitminer.analysis.flow.FlowDomainAnalysisFactory;
 import commitminer.cfg.ICFGVisitorFactory;
+import commitminer.diff.line.LineDomainAnalysisFactory;
 import commitminer.js.diff.ast.AstDomainAnalysisFactory;
 import commitminer.js.diff.controlcall.ControlCallCFGVisitorFactory;
 import commitminer.js.diff.controlcondition.ControlConditionCFGVisitorFactory;
 import commitminer.js.diff.defenvironment.DefEnvCFGVisitorFactory;
 import commitminer.js.diff.defvalue.DefValueCFGVisitorFactory;
 import commitminer.js.diff.environment.EnvCFGVisitorFactory;
-import commitminer.js.diff.line.LineDomainAnalysisFactory;
 import commitminer.js.diff.value.ValueCFGVisitorFactory;
 
 /**

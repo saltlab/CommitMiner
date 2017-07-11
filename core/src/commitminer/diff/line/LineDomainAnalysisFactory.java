@@ -1,4 +1,4 @@
-package commitminer.js.diff.line;
+package commitminer.diff.line;
 
 import commitminer.analysis.DomainAnalysis;
 import commitminer.analysis.factories.IDomainAnalysisFactory;

@@ -3,7 +3,7 @@ package commitminer.js.diff.view;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import commitminer.js.diff.line.DiffMatchPatch;
+import commitminer.diff.line.DiffMatchPatch;
 
 /**
  * Prints source code as annotated HTML.

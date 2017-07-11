@@ -21,6 +21,7 @@ import com.github.gumtreediff.tree.TreeContext;
 import commitminer.cfg.CFG;
 import commitminer.cfg.CFGFactory;
 import commitminer.cfg.diff.CFGDifferencing;
+import commitminer.diff.line.LineMatcher;
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 
@@ -113,12 +114,17 @@ public class ControlFlowDifferencing {
         else src = ControlFlowDifferencing.createGumTree(cfgFactory, srcSourceCode, options.getSrc(), options.getPreProcess());
         if(dstSourceCode == null) dst = ControlFlowDifferencing.createGumTree(cfgFactory, options.getDst(), options.getPreProcess());
         else dst = ControlFlowDifferencing.createGumTree(cfgFactory, dstSourceCode, options.getDst(), options.getPreProcess());
+        
+		// TODO: Instead of using GumTree to do the matching, use our own meyers-diff
+		// to label the nodes in the tree (no matching).
+        LineMatcher matcher = new LineMatcher(srcSourceCode, dstSourceCode, src, dst);
+        matcher.match();
 
 		/* Match the source tree nodes to the destination tree nodes. */
-        Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src.getRoot(), dst.getRoot());
+//        Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src.getRoot(), dst.getRoot());
 
         /* Apply change classifications to nodes in the GumTrees. */
-        ControlFlowDifferencing.classifyTreeNodes(src, dst, matcher);
+//        ControlFlowDifferencing.classifyTreeNodes(src, dst, matcher);
 
 		/* Create the CFGs. */
 		List<CFG> srcCFGs = cfgFactory.createCFGs(src.getRoot().getClassifiedASTNode());
