@@ -279,6 +279,88 @@ $(function() {
 	sliLine();
 });
 
+/* Switch context menu selections. */
+function switchMenuSelection(key, options, e) {
+
+	switch(key) {
+		case "all-var":
+		allVar();
+		break;
+		case "all-val":
+		allVal();
+		break;
+		case "all-call":
+		allCall();
+		break;
+		case "all-con":
+		allCon();
+		break;
+		case "goto-var":
+		gotoVar(e);
+		break;
+		case "goto-val":
+		gotoVal(e);
+		break;
+		case "find-var":
+		findVar(e);
+		break;
+		case "find-val":
+		findVal(e);
+		break;
+		case "sli-line":
+		sliLine();
+		break;
+		case "erase":
+		erase();
+		break;
+		case "unslice":
+		unslice();
+		break;
+	}
+
+}
+
+function getChangeImpactMenu() {
+	return {	name: "Change Impact",
+						icon: "fa-bars",
+						items: {
+							"all-var": {name: "Variables", icon: "fa-bicycle"},
+							"all-val": {name: "Values", icon: "fa-fighter-jet"},
+							"all-call": {name: "Callsites", icon: "fa-ship"},
+							"all-con": {name: "Conditions", icon: "fa-train"},
+							"sli-line": {name: "Line", icon: "fa-taxi"}}};
+}
+
+function getVariableGotoMenu() {
+	return {	name: "Goto Definition",
+						icon: "fa-sign-in",
+						items: {
+							"goto-var": {name: "Variable Definition", icon: "fa-bicycle"},
+							"goto-val": {name: "Value Definition", icon: "fa-fighter-jet"}}};
+}
+
+function getVariableFindMenu() { 
+	return {	name: "Find All Uses",
+						icon: "fa-search",
+						items: {
+							"find-var": {name: "Variable Uses", icon: "fa-bicycle"},
+							"find-val": {name: "Value Uses", icon: "fa-fighter-jet"}}};
+}
+
+function getValueGotoMenu() {
+	return {	name: "Goto Definition",
+						icon: "fa-sign-in",
+						items: {
+							"goto-val": {name: "Value Definition", icon: "fa-fighter-jet"}}};
+}
+
+function getValueFindMenu() { 
+	return {	name: "Find All Uses",
+						icon: "fa-search",
+						items: {
+							"find-val": {name: "Value Uses", icon: "fa-fighter-jet"}}};
+}
+
 /* Set up the context menu. */
 $(function() {
 	$.contextMenu({
@@ -287,73 +369,45 @@ $(function() {
 			// this callback is executed every time the menu is to be shown
 			// its results are destroyed every time the menu is hidden
 			// e is the original contextmenu event, containing e.pageX and e.pageY (amongst other data)
-			return {
-					callback: function(key, options) {
 
-						switch(key) {
-							case "all-var":
-							allVar();
-							break;
-							case "all-val":
-							allVal();
-							break;
-							case "all-call":
-							allCall();
-							break;
-							case "all-con":
-							allCon();
-							break;
-							case "goto-var":
-							gotoVar(e);
-							break;
-							case "goto-val":
-							gotoVal(e);
-							break;
-							case "find-var":
-							findVar(e);
-							break;
-							case "find-val":
-							findVal(e);
-							break;
-							case "sli-line":
-							sliLine();
-							break;
-							case "erase":
-							erase();
-							break;
-							case "unslice":
-							unslice();
-							break;
+			/* Build the menu based on the context. */
+			if($(e.target).closest("span.DENV-DEF, span.DENV-USE").length > 0) {
+				return {
+						callback: function (key, options) { switchMenuSelection(key, options, e) },
+						items: {
+							"all": getChangeImpactMenu(),
+							"goto": getVariableGotoMenu(),
+							"find": getVariableFindMenu(),
+							"sep1": "---------",
+							"erase": {name: "Remove Highlighting", icon: "fa-eraser"},
+							"unslice": {name: "Undo Slice", icon: "fa-undo"}
 						}
-
-					},
-					items: {
-						"all": {
-							name: "Change Impact",
-							icon: "fa-bars",
-							items: {
-								"all-var": {name: "Variables", icon: "fa-bicycle"},
-								"all-val": {name: "Values", icon: "fa-fighter-jet"},
-								"all-call": {name: "Callsites", icon: "fa-ship"},
-								"all-con": {name: "Conditions", icon: "fa-train"},
-								"sli-line": {name: "Line", icon: "fa-taxi"}}},
-						"goto": {
-							name: "Goto Def",
-							icon: "fa-sign-in",
-							items: {
-								"goto-var": {name: "Variable Def", icon: "fa-bicycle"},
-								"goto-val": {name: "Value Def", icon: "fa-fighter-jet"}}},
-						"find": {
-							name: "Find All Uses",
-							icon: "fa-search",
-							items: {
-								"find-var": {name: "Variable Uses", icon: "fa-bicycle"},
-								"find-val": {name: "Value Uses", icon: "fa-fighter-jet"}}},
-						"sep1": "---------",
-						"erase": {name: "Remove Highlighting", icon: "fa-eraser"},
-						"unslice": {name: "Undo Slice", icon: "fa-undo"}
-					}
-			};
+				};
+			}
+			else if($(e.target).closest("span.DVAL-DEF, span.DVAL-USE").length > 0) {
+				return {
+						callback: function (key, options) { switchMenuSelection(key, options, e) },
+						items: {
+							"all": getChangeImpactMenu(),
+							"goto": getValueGotoMenu(),
+							"find": getValueFindMenu(),
+							"sep1": "---------",
+							"erase": {name: "Remove Highlighting", icon: "fa-eraser"},
+							"unslice": {name: "Undo Slice", icon: "fa-undo"}
+						}
+				};
+			}
+			else {
+				return {
+						callback: function (key, options) { switchMenuSelection(key, options, e) },
+						items: {
+							"all": getChangeImpactMenu(),
+							"sep1": "---------",
+							"erase": {name: "Remove Highlighting", icon: "fa-eraser"},
+							"unslice": {name: "Undo Slice", icon: "fa-undo"}
+						}
+				};
+			}
 		}
 	});
 });

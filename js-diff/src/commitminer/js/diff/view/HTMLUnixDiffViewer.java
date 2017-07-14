@@ -113,7 +113,7 @@ public class HTMLUnixDiffViewer {
 		if(srcRows.length != dstRows.length) throw new Error("SRC rows and DST rows should be equal");
 
 		for(int k = 0; k < srcRows.length; k++) {
-			out += "<tr class='code'>\n";
+			out += "<tr class='code context-menu'>\n";
 			out += srcRows[k] + "\n";
 			out += dstRows[k] + "\n";
 			out += "</tr>";
