@@ -51,7 +51,7 @@ public class ControlDependencyCFGVisitor implements ICFGVisitor {
 					&& node.getLineno() > 0) {
 				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 				ids.add(state.control.getDependency());
-				factBase.registerAnnotationFact(new Annotation("CONDEF-USE", ids, node.getLineno(), node.getFixedPosition(), node.getLength()));
+				factBase.registerAnnotationFact(new Annotation("CONDEP-USE", ids, node.getLineno(), node.getFixedPosition(), node.getLength()));
 			}
 		}
 		if(state != null) {

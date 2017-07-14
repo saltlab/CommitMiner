@@ -256,6 +256,8 @@ function allVar() {	all('ENV-DEF', 'ENV-USE'); }
 function allVal() { all('VAL-DEF', 'VAL-USE'); }
 function allCall() { all('CALL-DEF', 'CALL-USE'); }
 function allCon() { all('CON-DEF', 'CON-USE'); }
+function allConDep() { all('CONDEP-DEF', 'CONDEP-USE'); }
+function allDatDep() { all('DATDEP-DEF', 'DATDEP-USE'); }
 function gotoVar(e) { gotoDef(e, "DENV-DEF", "DENV-USE"); }
 function gotoVal(e) { gotoDef(e, "DVAL-DEF", "DVAL-USE"); }
 
@@ -294,6 +296,12 @@ function switchMenuSelection(key, options, e) {
 		break;
 		case "all-con":
 		allCon();
+		break;
+		case "all-condep":
+		allConDep();
+		break;
+		case "all-datadep":
+		allDatDep();
 		break;
 		case "goto-var":
 		gotoVar(e);
