@@ -297,6 +297,10 @@ public class ExpEval {
 			plus = BValue.bottom(Change.u(), Change.u());
 		}
 
+		/* Assign a definer ID to track this new value. */
+		ie.setDummy();
+		plus.definerIDs = plus.definerIDs.join(DefinerIDs.inject(ie.getID()));
+
 		/* For now, just do a basic conservative estimate of binary operator
 		 * evaluations. */
 

@@ -14,6 +14,7 @@ import org.mozilla.javascript.ast.ForInLoop;
 import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
+import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
@@ -32,6 +33,7 @@ import commitminer.analysis.annotation.GenericDependencyIdentifier;
 import commitminer.analysis.flow.abstractdomain.Address;
 import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Change;
+import commitminer.analysis.flow.abstractdomain.ExpEval;
 import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.State;
 import commitminer.analysis.flow.abstractdomain.Variable;
@@ -206,6 +208,30 @@ public class ValueASTVisitor implements NodeVisitor {
 				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getFixedPosition(), 1));
 				this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getFixedPosition() + node.getLength() - 1, 1));
 			}
+		}
+		else if(node instanceof InfixExpression) {
+			InfixExpression ie = (InfixExpression)node;
+			
+			if(ie.getType() == Token.ADD) {
+			
+				ExpEval expEval = new ExpEval(state);
+				BValue left = expEval.eval(ie.getLeft());
+				BValue right = expEval.eval(ie.getRight());
+
+				if(left.change.le == Change.LatticeElement.CHANGED
+						|| left.change.le == Change.LatticeElement.TOP
+						|| right.change.le == Change.LatticeElement.CHANGED
+						|| right.change.le == Change.LatticeElement.TOP
+						|| ie.getChangeType() == ChangeType.INSERTED
+						|| ie.getChangeType() == ChangeType.REMOVED
+						|| ie.getChangeType() == ChangeType.UPDATED) {
+					List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+					ids.add(new GenericDependencyIdentifier(node.getID()));
+					this.annotations.add(new Annotation("VAL-DEF", ids, node.getLineno(), node.getFixedPosition(), node.getLength()));
+				}
+			
+			}
+			
 		}
 		/* Ignore the body of loops, ifs and functions. */
 		else if(node instanceof IfStatement) {
