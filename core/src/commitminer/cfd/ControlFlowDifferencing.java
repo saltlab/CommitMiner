@@ -119,8 +119,8 @@ public class ControlFlowDifferencing {
         Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src.getRoot(), dst.getRoot());
 
         /* Apply change classifications to nodes in the GumTrees. */
-//        ControlFlowDifferencing.classifyTreeNodes(src, dst, matcher);
-		ControlFlowDifferencing.classifyTreeNodesMeyers(srcSourceCode, dstSourceCode, src, dst, matcher);
+        ControlFlowDifferencing.classifyTreeNodes(src, dst, matcher);
+//		ControlFlowDifferencing.classifyTreeNodesMeyers(srcSourceCode, dstSourceCode, src, dst, matcher);
 
 		/* Create the CFGs. */
 		List<CFG> srcCFGs = cfgFactory.createCFGs(src.getRoot().getClassifiedASTNode());

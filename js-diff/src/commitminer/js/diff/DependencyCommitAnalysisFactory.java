@@ -10,6 +10,7 @@ import commitminer.analysis.factories.IDomainAnalysisFactory;
 import commitminer.analysis.flow.FlowDomainAnalysisFactory;
 import commitminer.cfg.ICFGVisitorFactory;
 import commitminer.js.diff.controldependency.ControlDependencyCFGVisitorFactory;
+import commitminer.js.diff.datadependency.DataDependencyCFGVisitorFactory;
 import commitminer.js.diff.defenvironment.DefEnvCFGVisitorFactory;
 import commitminer.js.diff.defvalue.DefValueCFGVisitorFactory;
 
@@ -28,6 +29,7 @@ public class DependencyCommitAnalysisFactory implements ICommitAnalysisFactory {
 	public CommitAnalysis newInstance() {
 		List<ICFGVisitorFactory> cfgVisitorFactories = new LinkedList<ICFGVisitorFactory>();
 		cfgVisitorFactories.add(new ControlDependencyCFGVisitorFactory());
+		cfgVisitorFactories.add(new DataDependencyCFGVisitorFactory());
 		cfgVisitorFactories.add(new DefValueCFGVisitorFactory());
 		cfgVisitorFactories.add(new DefEnvCFGVisitorFactory());
 
