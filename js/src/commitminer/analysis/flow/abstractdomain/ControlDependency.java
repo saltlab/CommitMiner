@@ -153,13 +153,17 @@ public class ControlDependency implements DependencyIdentifier {
 		String id = "";
 		
 		/* Callsite addresses. */
-		if(callsites.isEmpty()) return "";
-		for(Integer callsite : callsites) {
-			id += callsite + ",";
+		if(!callsites.isEmpty()) {
+			for(Integer callsite : callsites) {
+				id += callsite + ",";
+			}
 		}
 		
 		/* Condition addresses. */
-		if(conditions.isEmpty()) return id;
+		if(conditions.isEmpty()) {
+			if(id.isEmpty()) return id;
+			return id.substring(0, id.length() - 1);
+		}
 		for(AstNode condition : conditions) {
 			/* Get the ID of the non-negated condition. */
 			if(condition.getID() == null && condition instanceof UnaryExpression) { 

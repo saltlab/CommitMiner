@@ -71,7 +71,9 @@ public class Annotation {
 	public String toString() {
 		String str = "Annotation: <" + label + "|" + line + "," + absolutePosition + "," + length + ",{";
 		for(DependencyIdentifier id : dependencyIDs) {
-			str += id.getAddress() + ",";
+			String addr = id.getAddress();
+			if(!addr.isEmpty())
+				str += id.getAddress() + ",";
 		}
 		return str.substring(0, str.length() - 1) + "}>";
 	}

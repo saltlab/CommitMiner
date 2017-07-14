@@ -75,6 +75,10 @@ public class Control {
 	public ControlCondition getCondition() {
 		return condition;
 	}
+	
+	public ControlDependency getDependency() {
+		return dependency;
+	}
 
 	@Override
 	public boolean equals(Object o) {
