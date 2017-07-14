@@ -612,13 +612,23 @@ public class ExpEval {
 	 * @return The addresses as a BValue.
 	 */
 	public BValue resolveValue(AstNode node) {
+
 		BValue value = null;
+		
+		/* Resolve the identifier. */
 		Set<Address> addrs = state.resolveOrCreate(node);
 		if(addrs == null) return null;
 		for(Address addr : addrs) {
 			if(value == null) value = state.store.apply(addr);
 			else value = value.join(state.store.apply(addr));
 		}
+		
+		/* Track data dependencies for modified values. */
+		if(Change.convU(node).le == Change.LatticeElement.CHANGED) {
+			value.dependent = Change.convU(node);
+			value.definerIDs = value.definerIDs.join(DefinerIDs.inject(node.getID()));
+		}
+		
 		return value;
 	}
 

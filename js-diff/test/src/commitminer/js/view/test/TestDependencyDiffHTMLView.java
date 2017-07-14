@@ -164,7 +164,7 @@ public class TestDependencyDiffHTMLView {
 	
 		String src = "./test/input/diff/tst_old.js";
 		String dst = "./test/input/diff/tst_new.js";
-		String out = "./web/pm2.html";
+		String out = "./web/pm2_dep.html";
 
 		runTest(src, dst, out);
 		
