@@ -14,6 +14,10 @@ function erase() {
 	$('.CALL-USE').removeClass('use');
 	$('.CON-DEF').removeClass('def');
 	$('.CON-USE').removeClass('use');
+	$('.CONDEP-DEF').removeClass('def');
+	$('.CONDEP-USE').removeClass('use');
+	$('.DATDEP-XDEF').removeClass('def');
+	$('.DATDEP-USE').removeClass('use');
 }
 
 /**
