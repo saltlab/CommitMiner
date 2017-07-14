@@ -38,12 +38,6 @@ public class ControlCondition implements DependencyIdentifier {
 		this.negConditions = negConditions;
 	}
 
-	@Override
-	public ControlCondition clone() {
-		return new ControlCondition(new HashSet<AstNode>(conditions),
-						   new HashSet<AstNode>(negConditions));
-	}
-
 	/**
 	 * Updates the state for the branch conditions exiting the CFGNode.
 	 * @return The new state (ControlFlowChange) after update.

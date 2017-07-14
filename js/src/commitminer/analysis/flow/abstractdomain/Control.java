@@ -12,20 +12,23 @@ public class Control {
 	
 	private ControlCall call;
 	private ControlCondition condition;
+	private ControlDependency dependency;
 
 	public Control() {
 		call = new ControlCall();
 		condition = new ControlCondition();
+		dependency = new ControlDependency();
 	}
 
-	public Control(ControlCall call, ControlCondition condition) {
+	public Control(ControlCall call, ControlCondition condition, ControlDependency dependency) {
 		this.call = call;
 		this.condition = condition;
+		this.dependency = dependency;
 	}
 
 	@Override
 	public Control clone() {
-		return new Control(call, condition);
+		return new Control(call, condition, dependency);
 	}
 
 	/**
@@ -33,7 +36,7 @@ public class Control {
 	 * @return The new control state after update.
 	 */
 	public Control update(CFGEdge edge, CFGNode node) {
-		return new Control(call, condition.update(edge, node));
+		return new Control(call, condition.update(edge, node), dependency.update(edge, node));
 	}
 	
 	/**
@@ -45,11 +48,11 @@ public class Control {
 		/* If this is a new function call, we interpret the control of
 		 * the callee as changed. */
 		if(Change.convU(fc).le == Change.LatticeElement.CHANGED)
-			return new Control(call.update(fc.getID()), new ControlCondition());
+			return new Control(call.update(fc.getID()), new ControlCondition(), dependency.update(fc.getID()));
 
-		/* If this is not a new function call, make a fresh (unchanged)
-		 * the control-call lattice is set to bottom. */
-		return new Control(new ControlCall(), new ControlCondition());
+		/* If this is not a new function call,  the control-call lattice is set to
+		* bottom. */
+		return new Control(new ControlCall(), new ControlCondition(), dependency);
 
 	}
 	
@@ -60,7 +63,8 @@ public class Control {
 	public Control join(Control right) {
 
 		return new Control(call.join(right.call),
-						   condition.join(right.condition));
+						   condition.join(right.condition),
+						   dependency.join(right.dependency));
 
 	}
 	
@@ -76,7 +80,7 @@ public class Control {
 	public boolean equals(Object o) {
 		if(!(o instanceof Control)) return false;
 		Control cc = (Control)o;
-		return call.equals(cc.call);
+		return call.equals(cc.call) && dependency.equals(cc.dependency);
 	}
 
 }
