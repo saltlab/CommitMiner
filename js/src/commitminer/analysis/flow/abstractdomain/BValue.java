@@ -33,10 +33,14 @@ public class BValue implements DependencyIdentifier {
 	/** The lattice element for tracking changes to this value. **/
 	public Change change;
 
+	/** The lattice element for data dependencies. **/
+	public Change dependent;
+
 	public BValue(Str stringAD, Num numberAD,
 					  Bool booleanAD, Null nullAD,
 					  Undefined undefinedAD, Addresses addressAD,
 					  Change change,
+					  Change dependent,
 					  DefinerIDs definerIDs) {
 		this.stringAD = stringAD;
 		this.numberAD = numberAD;
@@ -45,6 +49,7 @@ public class BValue implements DependencyIdentifier {
 		this.undefinedAD = undefinedAD;
 		this.addressAD = addressAD;
 		this.change = change;
+		this.dependent = dependent;
 		this.definerIDs = definerIDs;
 	}
 
@@ -52,6 +57,7 @@ public class BValue implements DependencyIdentifier {
 					  Bool booleanAD, Null nullAD,
 					  Undefined undefinedAD, Addresses addressAD,
 					  Change change,
+					  Change dependent,
 					  Integer definerID) {
 		this.stringAD = stringAD;
 		this.numberAD = numberAD;
@@ -60,6 +66,7 @@ public class BValue implements DependencyIdentifier {
 		this.undefinedAD = undefinedAD;
 		this.addressAD = addressAD;
 		this.change = change;
+		this.dependent = dependent;
 		this.definerIDs = DefinerIDs.inject(definerID);
 	}
 
@@ -73,6 +80,7 @@ public class BValue implements DependencyIdentifier {
 				this.undefinedAD.join(state.undefinedAD),
 				this.addressAD.join(state.addressAD),
 				this.change.join(state.change),
+				this.dependent.join(state.dependent),
 				this.definerIDs.join(state.definerIDs));
 
 	}
@@ -193,7 +201,7 @@ public class BValue implements DependencyIdentifier {
 	 * @param typeChange The change LE for the type constraint.
 	 * @return the top lattice element
 	 */
-	public static BValue top(Change valChange, Change typeChange) {
+	public static BValue top(Change valChange, Change dependent, Change typeChange) {
 		/* Set addresses to BOT to enable dynamic object creation. */
 		return new BValue(
 				Str.top(typeChange),
@@ -203,6 +211,7 @@ public class BValue implements DependencyIdentifier {
 				Undefined.top(typeChange),
 				Addresses.bottom(typeChange),
 				valChange,
+				dependent,
 				DefinerIDs.bottom());
 	}
 
@@ -211,7 +220,7 @@ public class BValue implements DependencyIdentifier {
 	 * @param typeChange The change LE for the type constraint.
 	 * @return the bottom lattice element
 	 */
-	public static BValue bottom(Change valChange, Change typeChange) {
+	public static BValue bottom(Change valChange, Change dependent, Change typeChange) {
 		return new BValue(
 				Str.bottom(typeChange),
 				Num.bottom(typeChange),
@@ -220,6 +229,7 @@ public class BValue implements DependencyIdentifier {
 				Undefined.bottom(typeChange),
 				Addresses.bottom(typeChange),
 				valChange,
+				dependent,
 				DefinerIDs.bottom());
 	}
 
@@ -228,7 +238,7 @@ public class BValue implements DependencyIdentifier {
 	 * @param typeChange The change LE for the type constraint.
 	 * @return a primitive value (not an address).
 	 */
-	public static BValue primitive(Change valChange, Change typeChange) {
+	public static BValue primitive(Change valChange, Change dependent, Change typeChange) {
 		return new BValue(
 				Str.top(typeChange),
 				Num.top(typeChange),
@@ -237,12 +247,13 @@ public class BValue implements DependencyIdentifier {
 				Undefined.top(typeChange),
 				Addresses.bottom(typeChange),
 				valChange,
+				dependent,
 				DefinerIDs.bottom());
 	}
 
 	@Override
 	public String toString() {
-		return this.nullAD.toString() + "|" + this.undefinedAD.toString() + "|" + this.booleanAD.toString() + "|" + this.numberAD.toString() + "|" + this.stringAD.toString() + "|" + this.addressAD.toString() + "|" + this.change.toString();
+		return this.nullAD.toString() + "|" + this.undefinedAD.toString() + "|" + this.booleanAD.toString() + "|" + this.numberAD.toString() + "|" + this.stringAD.toString() + "|" + this.addressAD.toString() + "|" + this.change.toString() + "|" + this.dependent.toString();
 	}
 	
 	@Override
@@ -256,6 +267,7 @@ public class BValue implements DependencyIdentifier {
 		if(!this.undefinedAD.equals(v.undefinedAD)) return false;
 		if(!this.addressAD.equals(v.addressAD)) return false;
 		if(!this.change.equals(v.change)) return false;
+		if(!this.dependent.equals(v.dependent)) return false;
 		if(!this.definerIDs.equals(v.definerIDs)) return false;
 		return true;
 	}

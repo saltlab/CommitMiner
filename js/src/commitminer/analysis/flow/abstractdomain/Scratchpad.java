@@ -12,12 +12,12 @@ public class Scratchpad {
 	private BValue[] args;
 
 	public Scratchpad() {
-		this.returnValue = BValue.bottom(Change.bottom(), Change.bottom());
+		this.returnValue = BValue.bottom(Change.bottom(), Change.bottom(), Change.bottom());
 		this.args = new BValue[0];
 	}
 
 	public Scratchpad(BValue returnValue, BValue[] args) {
-		this.returnValue = returnValue == null ? BValue.bottom(Change.bottom(), Change.bottom()) : returnValue;
+		this.returnValue = returnValue == null ? BValue.bottom(Change.bottom(), Change.bottom(), Change.bottom()) : returnValue;
 		this.args = args == null ? new BValue[0] : args;
 	}
 

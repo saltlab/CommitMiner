@@ -158,11 +158,11 @@ public class State implements IState {
 			/* Keep the BValue change LE (the value does not change). */
 			BValue oldVal = store.apply(addr);
 
-			BValue val = Undefined.inject(Undefined.top(change), oldVal.change, oldVal.definerIDs)
-					.join(Null.inject(Null.top(change), oldVal.change, oldVal.definerIDs))
-					.join(Str.inject(new Str(Str.LatticeElement.SBLANK, change), oldVal.change, DefinerIDs.bottom()))
-					.join(Num.inject(new Num(Num.LatticeElement.NAN_ZERO, change), oldVal.change, DefinerIDs.bottom()))
-					.join(Bool.inject(new Bool(Bool.LatticeElement.FALSE, change), oldVal.change, DefinerIDs.bottom()));
+			BValue val = Undefined.inject(Undefined.top(change), oldVal.change, oldVal.dependent, oldVal.definerIDs)
+					.join(Null.inject(Null.top(change), oldVal.change, oldVal.dependent, oldVal.definerIDs))
+					.join(Str.inject(new Str(Str.LatticeElement.SBLANK, change), oldVal.change, oldVal.dependent, DefinerIDs.bottom()))
+					.join(Num.inject(new Num(Num.LatticeElement.NAN_ZERO, change), oldVal.change, oldVal.dependent, DefinerIDs.bottom()))
+					.join(Bool.inject(new Bool(Bool.LatticeElement.FALSE, change), oldVal.change, oldVal.dependent, DefinerIDs.bottom()));
 			store.strongUpdate(addr, val);
 
 		}
@@ -187,7 +187,7 @@ public class State implements IState {
 		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
 
 		/* Get the value of the RHS. */
-		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom());
+		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom(), Change.bottom());
 		for(Address rhsAddr : rhsAddrs) {
 			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
 		}
@@ -231,7 +231,7 @@ public class State implements IState {
 
 		/* Get the value of the RHS. */
 		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
-		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom());
+		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom(), Change.bottom());
 		for(Address rhsAddr : rhsAddrs) {
 			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
 		}
@@ -242,21 +242,21 @@ public class State implements IState {
 		if(BValue.isUndefined(rhsVal) || BValue.isNull(rhsVal))
 			for(Address lhsAddr : lhsAddrs) {
 				BValue oldVal = store.apply(lhsAddr);
-				rhsVal = Undefined.inject(Undefined.top(change), oldVal.change, oldVal.definerIDs)
-						.join(Null.inject(Null.top(change), oldVal.change, oldVal.definerIDs));
+				rhsVal = Undefined.inject(Undefined.top(change), oldVal.change, oldVal.dependent, oldVal.definerIDs)
+						.join(Null.inject(Null.top(change), oldVal.change, oldVal.dependent, oldVal.definerIDs));
 				store.strongUpdate(lhsAddr, rhsVal);
 			}
 		if(BValue.isBlank(rhsVal) || BValue.isZero(rhsVal))
 			for(Address lhsAddr : lhsAddrs) {
 				BValue oldVal = store.apply(lhsAddr);
-				rhsVal = Str.inject(new Str(Str.LatticeElement.SBLANK, change), oldVal.change, oldVal.definerIDs)
-						.join(Num.inject(new Num(Num.LatticeElement.ZERO, change), oldVal.change, oldVal.definerIDs));
+				rhsVal = Str.inject(new Str(Str.LatticeElement.SBLANK, change), oldVal.change, oldVal.dependent, oldVal.definerIDs)
+						.join(Num.inject(new Num(Num.LatticeElement.ZERO, change), oldVal.change, oldVal.dependent, oldVal.definerIDs));
 				store.strongUpdate(lhsAddr, rhsVal);
 			}
 		if(BValue.isNaN(rhsVal))
 			for(Address lhsAddr : lhsAddrs) {
 				BValue oldVal = store.apply(lhsAddr);
-				store.strongUpdate(lhsAddr, Num.inject(new Num(Num.LatticeElement.NAN, change), oldVal.change, oldVal.definerIDs));
+				store.strongUpdate(lhsAddr, Num.inject(new Num(Num.LatticeElement.NAN, change), oldVal.change, oldVal.dependent, oldVal.definerIDs));
 			}
 		if(BValue.isFalse(rhsVal))
 			interpretAddrsFalsey(lhsAddrs, change);
@@ -273,7 +273,7 @@ public class State implements IState {
 
 		/* Get the value of the RHS. */
 		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
-		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom());
+		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom(), Change.bottom());
 		for(Address rhsAddr : rhsAddrs) {
 			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
 		}
@@ -293,7 +293,7 @@ public class State implements IState {
 		Set<Address> rhsAddrs = resolveOrCreate(ie.getRight());
 
 		/* Get the value of the RHS. */
-		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom());
+		BValue rhsVal = BValue.bottom(Change.bottom(), Change.bottom(), Change.bottom());
 		for(Address rhsAddr : rhsAddrs) {
 			rhsVal = rhsVal.join(this.store.apply(rhsAddr));
 		}
@@ -402,7 +402,7 @@ public class State implements IState {
 
 		/* Evaluate the return value from the return expression. */
 		if(rs.getReturnValue() == null) {
-			retVal = BValue.bottom(Change.convU(rs), Change.convU(rs));
+			retVal = BValue.bottom(Change.convU(rs), Change.convU(rs), Change.convU(rs));
 		}
 		else {
 			ExpEval expEval = new ExpEval(this);
@@ -503,7 +503,7 @@ public class State implements IState {
 			 * nothing about it. */
 			Address addr = trace.makeAddr(node.getID(), "");
 			env = env.strongUpdate(node.toSource(), new Variable(node.getID(), node.toSource(), Change.bottom(), new Addresses(addr, Change.u())));
-			store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom()));
+			store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom()));
 			addrs = new Addresses(addr, Change.u());
 		}
 
@@ -548,7 +548,7 @@ public class State implements IState {
 				Obj dummy = new Obj(ext, new InternalObjectProperties());
 				Address addr = trace.makeAddr(ie.getID(), "");
 				store = store.alloc(addr, dummy);
-				val = val.join(Address.inject(addr, Change.bottom(), Change.bottom(), DefinerIDs.bottom()));
+				val = val.join(Address.inject(addr, Change.bottom(), Change.bottom(), Change.bottom(), DefinerIDs.bottom()));
 				store = store.strongUpdate(valAddr, val);
 			}
 
@@ -575,7 +575,7 @@ public class State implements IState {
 					/* Create a new address (BValue) for the property and
 					 * put it in the store. */
 					propAddr = trace.makeAddr(ie.getID(), ie.getRight().toSource());
-					BValue propVal = Addresses.dummy(Change.bottom(), Change.bottom());
+					BValue propVal = Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom());
 					store = store.alloc(propAddr, propVal);
 
 					/* Add the property to the external properties of the object. */

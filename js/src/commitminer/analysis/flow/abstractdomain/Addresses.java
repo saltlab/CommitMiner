@@ -91,7 +91,7 @@ public class Addresses {
 	 * @param addresses The address lattice element to inject.
 	 * @return The base value tuple with injected addresses.
 	 */
-	public static BValue inject(Addresses addresses, Change valChange, DefinerIDs definerIDs) {
+	public static BValue inject(Addresses addresses, Change valChange, Change dependency, DefinerIDs definerIDs) {
 		return new BValue(
 				Str.bottom(addresses.change),
 				Num.bottom(addresses.change),
@@ -100,10 +100,11 @@ public class Addresses {
 				Undefined.bottom(addresses.change),
 				addresses,
 				valChange,
+				dependency,
 				definerIDs);
 	}
 
-	public static BValue dummy(Change valChange, Change typeChange) {
+	public static BValue dummy(Change valChange, Change dependency, Change typeChange) {
 		return new BValue(
 				Str.top(typeChange),
 				Num.top(typeChange),
@@ -112,6 +113,7 @@ public class Addresses {
 				Undefined.top(typeChange),
 				Addresses.bottom(typeChange),
 				valChange,
+				dependency,
 				DefinerIDs.bottom());
 	}
 

@@ -76,7 +76,7 @@ public class ExpEval {
 		}
 
 		/* We could not evaluate the expression. Return top. */
-		return BValue.top(Change.convU(node), Change.convU(node));
+		return BValue.top(Change.convU(node), Change.convU(node), Change.convU(node));
 
 	}
 
@@ -90,7 +90,7 @@ public class ExpEval {
 		Address addr = state.trace.makeAddr(f.getID(), "");
 		addr = state.trace.modAddr(addr, JSClass.CFunction);
 		state.store = Helpers.createFunctionObj(closure, state.store, state.trace, addr, f);
-		return Address.inject(addr, Change.convU(f), Change.convU(f), DefinerIDs.inject(f.getID()));
+		return Address.inject(addr, Change.convU(f), Change.convU(f), Change.convU(f), DefinerIDs.inject(f.getID()));
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class ExpEval {
 		Address objAddr = state.trace.makeAddr(ol.getID(), "");
 		state.store = state.store.alloc(objAddr, obj);
 
-		return Address.inject(objAddr, Change.convU(ol), Change.convU(ol), DefinerIDs.inject(ol.getID()));
+		return Address.inject(objAddr, Change.convU(ol), Change.convU(ol), Change.convU(ol), DefinerIDs.inject(ol.getID()));
 	}
 	
 	/**
@@ -144,7 +144,7 @@ public class ExpEval {
 		Address objAddr = state.trace.makeAddr(al.getID(), "");
 		state.store = state.store.alloc(objAddr, obj);
 
-		return Address.inject(objAddr, Change.convU(al), Change.convU(al), DefinerIDs.inject(al.getID()));
+		return Address.inject(objAddr, Change.convU(al), Change.convU(al), Change.convU(al), DefinerIDs.inject(al.getID()));
 		
 	}
 
@@ -161,15 +161,15 @@ public class ExpEval {
 		BValue val;
 		if(operand.change.le == Change.LatticeElement.CHANGED
 				|| operand.change.le == Change.LatticeElement.TOP) {
-			val = BValue.bottom(Change.c(), Change.u());
+			val = BValue.bottom(Change.c(), Change.c(), Change.u());
 		}
 		else if(ue.getChangeType() == ChangeType.INSERTED
 				|| ue.getChangeType() == ChangeType.REMOVED
 				|| ue.getChangeType() == ChangeType.UPDATED) {
-			val = BValue.bottom(Change.c(), Change.u());
+			val = BValue.bottom(Change.c(), Change.c(), Change.u());
 		}
 		else {
-			val = BValue.bottom(Change.u(), Change.u());
+			val = BValue.bottom(Change.u(), Change.u(), Change.u());
 		}
 
 		/* For now, just do a basic conservative estimate of unary operator
@@ -210,7 +210,7 @@ public class ExpEval {
 		case Token.GETPROP: {
 			/* This is an identifier.. so we attempt to dereference it. */
 			BValue val = resolveValue(ie);
-			if(val == null) return BValue.top(Change.u(), Change.u());
+			if(val == null) return BValue.top(Change.u(), Change.u(), Change.u());
 			return val; }
 		case Token.ADD:
 			return evalPlus(ie);
@@ -251,15 +251,15 @@ public class ExpEval {
 				|| left.change.le == Change.LatticeElement.TOP
 				|| right.change.le == Change.LatticeElement.CHANGED
 				|| right.change.le == Change.LatticeElement.TOP) {
-			val = BValue.top(Change.c(), Change.u());
+			val = BValue.top(Change.c(), Change.c(), Change.u());
 		}
 		else if(ie.getChangeType() == ChangeType.INSERTED
 				|| ie.getChangeType() == ChangeType.REMOVED
 				|| ie.getChangeType() == ChangeType.UPDATED) {
-			val = BValue.top(Change.c(), Change.u());
+			val = BValue.top(Change.c(), Change.c(), Change.u());
 		}
 		else {
-			val = BValue.top(Change.u(), Change.u());
+			val = BValue.top(Change.u(), Change.c(), Change.u());
 		}
 
 		return val;
@@ -286,15 +286,15 @@ public class ExpEval {
 				|| left.change.le == Change.LatticeElement.TOP
 				|| right.change.le == Change.LatticeElement.CHANGED
 				|| right.change.le == Change.LatticeElement.TOP) {
-			plus = BValue.bottom(Change.c(), Change.u());
+			plus = BValue.bottom(Change.c(), Change.c(), Change.u());
 		}
 		else if(ie.getChangeType() == ChangeType.INSERTED
 				|| ie.getChangeType() == ChangeType.REMOVED
 				|| ie.getChangeType() == ChangeType.UPDATED) {
-			plus = BValue.top(Change.c(), Change.u());
+			plus = BValue.top(Change.c(), Change.c(), Change.u());
 		}
 		else {
-			plus = BValue.bottom(Change.u(), Change.u());
+			plus = BValue.bottom(Change.u(), Change.c(), Change.u());
 		}
 
 		/* Assign a definer ID to track this new value. */
@@ -346,15 +346,15 @@ public class ExpEval {
 				|| left.change.le == Change.LatticeElement.TOP
 				|| right.change.le == Change.LatticeElement.CHANGED
 				|| right.change.le == Change.LatticeElement.TOP) {
-			val = BValue.bottom(Change.c(), Change.u());
+			val = BValue.bottom(Change.c(), Change.c(), Change.u());
 		}
 		else if(ie.getChangeType() == ChangeType.INSERTED
 				|| ie.getChangeType() == ChangeType.REMOVED
 				|| ie.getChangeType() == ChangeType.UPDATED) {
-			val = BValue.top(Change.c(), Change.u());
+			val = BValue.top(Change.c(), Change.c(), Change.u());
 		}
 		else {
-			val = BValue.bottom(Change.u(), Change.u());
+			val = BValue.bottom(Change.u(), Change.u(), Change.u());
 		}
 
 		/* For now, just do a basic conservative estimate of binary operator
@@ -372,7 +372,7 @@ public class ExpEval {
 	 */
 	public BValue evalName(Name name) {
 		BValue val = resolveValue(name);
-		if(val == null) return BValue.top(Change.u(), Change.u());
+		if(val == null) return BValue.top(Change.u(), Change.u(), Change.u());
 		return val;
 	}
 
@@ -381,7 +381,7 @@ public class ExpEval {
 	 * @return the abstract interpretation of the number literal
 	 */
 	public BValue evalNumberLiteral(NumberLiteral numl) {
-		return Num.inject(new Num(Num.LatticeElement.VAL, numl.getValue(), Change.convU(numl)), Change.convU(numl), DefinerIDs.inject(numl.getID()));
+		return Num.inject(new Num(Num.LatticeElement.VAL, numl.getValue(), Change.convU(numl)), Change.convU(numl), Change.convU(numl), DefinerIDs.inject(numl.getID()));
 	}
 
 	/**
@@ -401,7 +401,7 @@ public class ExpEval {
 			str = new Str(Str.LatticeElement.SNOTNUMNORSPLVAL, val, change);
 		}
 
-		return Str.inject(str, change, DefinerIDs.inject(strl.getID()));
+		return Str.inject(str, change, change, DefinerIDs.inject(strl.getID()));
 
 	}
 
@@ -415,14 +415,14 @@ public class ExpEval {
 		case Token.THIS:
 			return state.store.apply(state.selfAddr);
 		case Token.NULL:
-			return Null.inject(Null.top(change), change, DefinerIDs.inject(kwl.getID()));
+			return Null.inject(Null.top(change), change, change, DefinerIDs.inject(kwl.getID()));
 		case Token.TRUE:
-			return Bool.inject(new Bool(Bool.LatticeElement.TRUE, change), change, DefinerIDs.inject(kwl.getID()));
+			return Bool.inject(new Bool(Bool.LatticeElement.TRUE, change), change, change, DefinerIDs.inject(kwl.getID()));
 		case Token.FALSE:
-			return Bool.inject(new Bool(Bool.LatticeElement.FALSE, change), change, DefinerIDs.inject(kwl.getID()));
+			return Bool.inject(new Bool(Bool.LatticeElement.FALSE, change), change, change, DefinerIDs.inject(kwl.getID()));
 		case Token.DEBUGGER:
 		default:
-			return BValue.bottom(change, change);
+			return BValue.bottom(change, change, change);
 		}
 	}
 
@@ -529,15 +529,15 @@ public class ExpEval {
 			 * to any function object. In this case, we assume the (local) state
 			 * is unchanged, but add BValue.TOP as the return value. */
 			BValue value = callChange
-					? BValue.top(Change.top(), Change.u())
-					: BValue.top(Change.u(), Change.u());
+					? BValue.top(Change.top(), Change.top(), Change.u())
+					: BValue.top(Change.u(), Change.u(), Change.u());
 			state.scratch = state.scratch.strongUpdate(value, null);
 			newState = new State(state.store, state.env, state.scratch,
 								 state.trace, state.control, state.selfAddr,
 								 state.cfgs, state.callStack);
 			
 			/* Create the return value. */
-			BValue retVal =  BValue.top(Change.convU(fc), Change.u());
+			BValue retVal =  BValue.top(Change.convU(fc), Change.convU(fc), Change.u());
 			
 			/* Conservatively add a dummy DefinerID to the BValue, since we could have
 			 * received a new value here. Only if this is an assignment or a return. */
@@ -555,7 +555,7 @@ public class ExpEval {
 			BValue retVal =  newState.scratch.applyReturn();
 			if(retVal == null) {
 				/* Functions with no return statement return undefined. */
-				retVal = Undefined.inject(Undefined.top(Change.convU(fc)), Change.u(), DefinerIDs.bottom());
+				retVal = Undefined.inject(Undefined.top(Change.convU(fc)), Change.u(), Change.u(), DefinerIDs.bottom());
 				newState.scratch = newState.scratch.strongUpdate(retVal, null);
 			}
 
@@ -651,9 +651,9 @@ public class ExpEval {
 					}
 				}
 			}
-			if(selfAddrs.addresses.isEmpty()) return BValue.bottom(Change.u(), Change.u());
+			if(selfAddrs.addresses.isEmpty()) return BValue.bottom(Change.u(), Change.u(), Change.u());
 
-			return Addresses.inject(selfAddrs, Change.u(), definerIDs);
+			return Addresses.inject(selfAddrs, Change.u(), Change.u(), definerIDs);
 		}
 		else {
 			/* Ignore everything else (e.g., method calls) for now. */

@@ -54,10 +54,10 @@ public class Helpers {
 	public static Store createFunctionObj(Closure closure, Store store, Trace trace, Address address, FunctionNode function) {
 
 		Map<String, Property> external = new HashMap<String, Property>();
-		store = addProp(function.getID(), "length", Num.inject(Num.top(Change.u()), Change.u(), DefinerIDs.bottom()), external, store, trace);
+		store = addProp(function.getID(), "length", Num.inject(Num.top(Change.u()), Change.u(), Change.u(), DefinerIDs.bottom()), external, store, trace);
 
 		InternalFunctionProperties internal = new InternalFunctionProperties(
-				Address.inject(StoreFactory.Function_proto_Addr, Change.u(), Change.u(), DefinerIDs.bottom()),
+				Address.inject(StoreFactory.Function_proto_Addr, Change.u(), Change.u(), Change.u(), DefinerIDs.bottom()),
 				closure,
 				JSClass.CFunction);
 		
@@ -238,7 +238,7 @@ public class Helpers {
 			Change change = Change.convU(localVar);
 			Address address = trace.makeAddr(localVar.getID(), "");
 			env.strongUpdateNoCopy(localVar.toSource(), new Variable(localVar.getID(), localVar.toSource(), Change.convU(localVar), new Addresses(address, Change.u())));
-			store = store.alloc(address, Undefined.inject(Undefined.top(change), Change.u(), DefinerIDs.bottom()));
+			store = store.alloc(address, Undefined.inject(Undefined.top(change), Change.u(), Change.u(), DefinerIDs.bottom()));
 		}
 
 		/* Get a list of function declarations to lift into the function's environment. */
@@ -250,7 +250,7 @@ public class Helpers {
 
 			/* The function name variable points to our new function. */
 			env.strongUpdateNoCopy(child.getName(), new Variable(child.getID(), child.getName(), Change.convU(child.getFunctionName()), new Addresses(address, Change.u()))); // Env update with env change type
-			store = store.alloc(address, Address.inject(address, Change.convU(child), Change.convU(child), DefinerIDs.inject(child.getID())));
+			store = store.alloc(address, Address.inject(address, Change.convU(child), Change.convU(child), Change.convU(child), DefinerIDs.inject(child.getID())));
 
 			/* Create a function object. */
 			Closure closure = new FunctionClosure(cfgs.get(child), env, cfgs);

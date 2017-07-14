@@ -28,8 +28,8 @@ public class GlobalFactory {
 
 	public Obj Global_Obj() {
 		Map<String, Property> ext = new HashMap<String, Property>();
-		store = Helpers.addProp("Object", OBJECT_DEFINER_ID, Address.inject(StoreFactory.Object_Addr, Change.u(), Change.u(), DefinerIDs.bottom()), ext, store);
-		store = Helpers.addProp("undefined", UNDEFINED_DEFINER_ID, Undefined.inject(Undefined.top(Change.u()), Change.u(), DefinerIDs.bottom()), ext, store);
+		store = Helpers.addProp("Object", OBJECT_DEFINER_ID, Address.inject(StoreFactory.Object_Addr, Change.u(), Change.u(), Change.u(), DefinerIDs.bottom()), ext, store);
+		store = Helpers.addProp("undefined", UNDEFINED_DEFINER_ID, Undefined.inject(Undefined.top(Change.u()), Change.u(), Change.u(), DefinerIDs.bottom()), ext, store);
 
 		InternalObjectProperties internal = new InternalObjectProperties();
 		return new Obj(ext, internal);

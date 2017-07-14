@@ -57,7 +57,7 @@ public class StateFactory {
 		for(String global : globals) {
 			Address address = trace.makeAddr(i, "");
 			env.strongUpdateNoCopy(global, new Variable(i, global, Change.bottom(), new Addresses(address, Change.u())));
-			store = store.alloc(address, BValue.top(Change.u(), Change.u()));
+			store = store.alloc(address, BValue.top(Change.u(), Change.u(), Change.u()));
 			i--;
 		}
 		

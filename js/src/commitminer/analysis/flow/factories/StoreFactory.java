@@ -78,7 +78,7 @@ public class StoreFactory {
 
 		Store store = new Store(bValueStore, objectStore);
 
-		bValueStore.put(global_binding_Addr, Address.inject(global_Addr, Change.u(), Change.u(), DefinerIDs.bottom()));
+		bValueStore.put(global_binding_Addr, Address.inject(global_Addr, Change.u(), Change.u(), Change.u(), DefinerIDs.bottom()));
 
 		GlobalFactory gf = new GlobalFactory(store);
 		objectStore.put(global_Addr, gf.Global_Obj());

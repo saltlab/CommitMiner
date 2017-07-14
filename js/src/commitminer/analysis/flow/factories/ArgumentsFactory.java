@@ -38,8 +38,8 @@ public class ArgumentsFactory {
 
 	public Obj Arguments_Obj() {
 		Map<String, Property> ext = new HashMap<String, Property>();
-		store = Helpers.addProp("prototype", ARG_DEFINER_ID, Address.inject(StoreFactory.Object_proto_Addr, Change.u(), Change.u(), DefinerIDs.bottom()), ext, store);
-		store = Helpers.addProp("length", ARG_DEFINER_ID, Num.inject(Num.top(Change.u()), Change.u(), DefinerIDs.bottom()), ext, store);
+		store = Helpers.addProp("prototype", ARG_DEFINER_ID, Address.inject(StoreFactory.Object_proto_Addr, Change.u(), Change.u(), Change.u(), DefinerIDs.bottom()), ext, store);
+		store = Helpers.addProp("length", ARG_DEFINER_ID, Num.inject(Num.top(Change.u()), Change.u(), Change.u(), DefinerIDs.bottom()), ext, store);
 
 		NativeClosure closure = new NativeClosure() {
 				@Override

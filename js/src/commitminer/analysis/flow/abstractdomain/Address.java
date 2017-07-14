@@ -45,7 +45,7 @@ public class Address {
 	 * @param address The address lattice element to inject.
 	 * @return The base value tuple with injected address.
 	 */
-	public static BValue inject(Address address, Change valChange, Change typeChange, DefinerIDs definerIDs) {
+	public static BValue inject(Address address, Change valChange, Change dependency, Change typeChange, DefinerIDs definerIDs) {
 		Set<Address> addresses = new HashSet<Address>();
 		addresses.add(address);
 		return new BValue(
@@ -56,6 +56,7 @@ public class Address {
 				Undefined.bottom(typeChange),
 				new Addresses(addresses, typeChange),
 				valChange,
+				dependency,
 				definerIDs);
 	}
 
