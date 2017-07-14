@@ -320,7 +320,8 @@ function switchMenuSelection(key, options, e) {
 
 }
 
-function getChangeImpactMenu() {
+/* The menu for MultiDiff change impact analysis. */
+function getMultiDiffMenu() {
 	return {	name: "Change Impact",
 						icon: "fa-bars",
 						items: {
@@ -329,6 +330,15 @@ function getChangeImpactMenu() {
 							"all-call": {name: "Callsites", icon: "fa-ship"},
 							"all-con": {name: "Conditions", icon: "fa-train"},
 							"sli-line": {name: "Line", icon: "fa-taxi"}}};
+}
+
+/* The menu for data/control dependency change impact analysis. */
+function getDependencyMenu() {
+	return {	name: "Change Impact",
+						icon: "fa-bars",
+						items: {
+							"all-condep": {name: "Control Dependencies", icon: "fa-bicycle"},
+							"all-datdep": {name: "Data Dependencies", icon: "fa-fighter-jet"}}};
 }
 
 function getVariableGotoMenu() {
@@ -370,12 +380,19 @@ $(function() {
 			// its results are destroyed every time the menu is hidden
 			// e is the original contextmenu event, containing e.pageX and e.pageY (amongst other data)
 
+			/* Select the correct change impact menu options. */
+			var changeImpactMenu = null;
+			if($("span.CONDEP-DEF, span.CONDEF-USE, span.DATDEF-DEF, span.DATDEF-USE").first().length > 0)
+				changeImpactMenu = getDependencyMenu();
+			else 
+				changeImpactMenu = getMultiDiffMenu();
+
 			/* Build the menu based on the context. */
 			if($(e.target).closest("span.DENV-DEF, span.DENV-USE").length > 0) {
 				return {
 						callback: function (key, options) { switchMenuSelection(key, options, e) },
 						items: {
-							"all": getChangeImpactMenu(),
+							"all": changeImpactMenu,
 							"goto": getVariableGotoMenu(),
 							"find": getVariableFindMenu(),
 							"sep1": "---------",
@@ -388,7 +405,7 @@ $(function() {
 				return {
 						callback: function (key, options) { switchMenuSelection(key, options, e) },
 						items: {
-							"all": getChangeImpactMenu(),
+							"all": changeImpactMenu,
 							"goto": getValueGotoMenu(),
 							"find": getValueFindMenu(),
 							"sep1": "---------",
@@ -401,7 +418,7 @@ $(function() {
 				return {
 						callback: function (key, options) { switchMenuSelection(key, options, e) },
 						items: {
-							"all": getChangeImpactMenu(),
+							"all": changeImpactMenu,
 							"sep1": "---------",
 							"erase": {name: "Remove Highlighting", icon: "fa-eraser"},
 							"unslice": {name: "Undo Slice", icon: "fa-undo"}
