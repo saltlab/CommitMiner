@@ -75,6 +75,7 @@ public class Annotation {
 			if(!addr.isEmpty())
 				str += id.getAddress() + ",";
 		}
+		if(str.charAt(str.length() - 1) == '{') return str + "}>";
 		return str.substring(0, str.length() - 1) + "}>";
 	}
 
