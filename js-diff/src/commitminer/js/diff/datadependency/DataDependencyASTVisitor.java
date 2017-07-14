@@ -115,7 +115,7 @@ public class DataDependencyASTVisitor implements NodeVisitor {
 				}
 
 				/* Register DATDEP-XDEF facts only for the property being used. */
-				if(!(node.getParent() instanceof ObjectProperty)
+				if(node.getParent().getType() != Token.GETPROP
 						&& Change.convU(node).le == Change.LatticeElement.CHANGED) {
 
 					List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
@@ -147,6 +147,16 @@ public class DataDependencyASTVisitor implements NodeVisitor {
 						pg.getRight().getLineno(), 
 						pg.getRight().getFixedPosition(), 
 						pg.getRight().getLength()));
+			}
+
+			/* Register DATDEP-XDEF facts only for the property being used. */
+			if(node.getParent().getType() != Token.GETPROP
+					&& Change.convU(node).le == Change.LatticeElement.CHANGED) {
+
+				List<DependencyIdentifier> defIDs = new LinkedList<DependencyIdentifier>();
+				defIDs.add(new GenericDependencyIdentifier(node.getID()));
+
+				this.annotations.add(new Annotation("DATDEP-XDEF", defIDs, pg.getRight().getLineno(), pg.getRight().getFixedPosition(), pg.getRight().getLength()));
 			}
 			
 			/* Visit the left hand side in case any objects have changed. */
