@@ -36,6 +36,15 @@ function hideRows() {
 }
 
 /**
+ * Undoes the slice and scrolls to the target.
+ */
+function unsliceAndStay(e) {
+	var screenOffset = $(e.target).offset().top - $(window).scrollTop();
+	unslice();
+	$(window).scrollTop($(e.target).offset().top - screenOffset);
+}
+
+/**
  * Display the rows around the given element.
  */
 function showContext() {
@@ -158,9 +167,10 @@ function gotoDef(e, def, use) {
 	});
 
 	if(checkIDs(elements)) {
+		var screenOffset = $(e.target).offset().top - $(window).scrollTop();
 		/* Scroll to the element. */
 		$('html, body').animate({
-						scrollTop: elements[0].offset().top
+						scrollTop: elements[0].offset().top - screenOffset
 				}, 200);
 	}
 	else if(elements.length > 1 ) {
@@ -326,7 +336,7 @@ function switchMenuSelection(key, options, e) {
 		erase();
 		break;
 		case "unslice":
-		unslice();
+		unsliceAndStay(e);
 		break;
 	}
 
