@@ -595,6 +595,24 @@ public class State implements IState {
 		return result;
 
 	}
+	
+	/**
+	 * Resolve an identifier which we don't currently handle, such as an array
+	 * access.
+	 * @return the address of a new (stopgap) value.
+	 */
+	public Set<Address> resolveOrCreateUnknown(AstNode node) {
+
+		/* Create a stopgap value. This creates unsound results, but is probably
+		* better than nothing. */
+		Set<Address> addrs = new HashSet<Address>();
+		Address addr = trace.makeAddr(node.getID(), "");
+		store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom()));
+		node.setDummy();
+		addrs.add(addr);
+		return addrs;
+		
+	}
 
 	/**
 	 * Resolve an identifier to an address in the store.
@@ -613,7 +631,10 @@ public class State implements IState {
 			return resolveOrCreateInfixCase((InfixExpression)node);
 		}
 
-		return new HashSet<Address>();
+		/* TODO This is something we don't yet handle, like array access. */
+		else {
+			return resolveOrCreateUnknown(node);
+		}
 
 	}
 

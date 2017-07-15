@@ -168,6 +168,8 @@ public class TestMultiDiffHTMLView {
 	
 		String src = "./test/input/diff/tst_old.js";
 		String dst = "./test/input/diff/tst_new.js";
+//		String src = "./test/input/diff/pm2_old.js";
+//		String dst = "./test/input/diff/pm2_new.js";
 		String out = "./web/pm2.html";
 
 		runTest(src, dst, out);

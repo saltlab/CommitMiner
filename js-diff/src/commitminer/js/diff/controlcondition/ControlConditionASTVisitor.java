@@ -78,7 +78,7 @@ public class ControlConditionASTVisitor implements NodeVisitor {
 	public boolean visit(AstNode node) {
 
 		/* Register CON-DEF annotations for branch conditions. */
-		if(Change.convU(node).le == Change.LatticeElement.CHANGED) {
+		if(Change.convU(node).le == Change.LatticeElement.CHANGED && node.getID() != null) {
 			List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
 			ids.add(new GenericDependencyIdentifier(node.getID()));
 			if(node.getLength() > 0) // Don't register def for the negated condition
