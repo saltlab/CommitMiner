@@ -18,6 +18,7 @@ import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.ITree;
 import com.github.gumtreediff.tree.TreeContext;
 
+import commitminer.analysis.options.Options;
 import commitminer.cfg.CFG;
 import commitminer.cfg.CFGFactory;
 import commitminer.cfg.diff.CFGDifferencing;
@@ -119,8 +120,10 @@ public class ControlFlowDifferencing {
         Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src.getRoot(), dst.getRoot());
 
         /* Apply change classifications to nodes in the GumTrees. */
-        ControlFlowDifferencing.classifyTreeNodes(src, dst, matcher);
-//		ControlFlowDifferencing.classifyTreeNodesMeyers(srcSourceCode, dstSourceCode, src, dst, matcher);
+        if(Options.getInstance().getDiffMethod() == Options.DiffMethod.MEYERS)
+			ControlFlowDifferencing.classifyTreeNodesMeyers(srcSourceCode, dstSourceCode, src, dst, matcher);
+        else
+			ControlFlowDifferencing.classifyTreeNodes(src, dst, matcher);
 
 		/* Create the CFGs. */
 		List<CFG> srcCFGs = cfgFactory.createCFGs(src.getRoot().getClassifiedASTNode());

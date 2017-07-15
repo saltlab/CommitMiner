@@ -1,6 +1,7 @@
 package commitminer.analysis.flow.abstractdomain;
 
 import commitminer.analysis.annotation.DependencyIdentifier;
+import commitminer.analysis.options.Options;
 
 /**
  * The abstract domain for base values. Because the value can be multiple
@@ -267,8 +268,9 @@ public class BValue implements DependencyIdentifier {
 		if(!this.undefinedAD.equals(v.undefinedAD)) return false;
 		if(!this.addressAD.equals(v.addressAD)) return false;
 		if(!this.change.equals(v.change)) return false;
-		if(!this.dependent.equals(v.dependent)) return false;
 		if(!this.definerIDs.equals(v.definerIDs)) return false;
+        if(Options.getInstance().getChangeImpact() == Options.ChangeImpact.DEPENDENCIES)
+			if(!this.dependent.equals(v.dependent)) return false;
 		return true;
 	}
 

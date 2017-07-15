@@ -2,6 +2,7 @@ package commitminer.analysis.flow.abstractdomain;
 
 import org.mozilla.javascript.ast.AstNode;
 
+import commitminer.analysis.options.Options;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 
@@ -84,7 +85,11 @@ public class Control {
 	public boolean equals(Object o) {
 		if(!(o instanceof Control)) return false;
 		Control cc = (Control)o;
-		return call.equals(cc.call) && dependency.equals(cc.dependency);
+
+        if(Options.getInstance().getChangeImpact() == Options.ChangeImpact.DEPENDENCIES)
+			return call.equals(cc.call) && dependency.equals(cc.dependency);
+        else
+			return call.equals(cc.call);
 	}
 
 }

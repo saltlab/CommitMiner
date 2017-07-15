@@ -21,6 +21,7 @@ import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
+import commitminer.analysis.options.Options;
 import commitminer.classify.ClassifierFeatureVector;
 import commitminer.classify.Transformer;
 import commitminer.js.annotation.AnnotationDataSet;
@@ -38,6 +39,9 @@ public class TestDependencyDiffHTMLView {
 	 */
 	protected void runTest(
 			String src, String dst, String out) throws Exception {
+		
+		/* Set the options for this run. */
+		Options.createInstance(Options.DiffMethod.MEYERS, Options.ChangeImpact.DEPENDENCIES);
 
 		/* Read the source files. */
 		String srcCode = new String(Files.readAllBytes(Paths.get(src)));
