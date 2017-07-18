@@ -12,6 +12,7 @@ import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.ArrayLiteral;
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.ElementGet;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.InfixExpression;
@@ -46,6 +47,9 @@ public class ExpEval {
 		else if(node instanceof InfixExpression) {
 			return evalInfixExpression((InfixExpression)node);
 		}
+		else if(node instanceof ElementGet) {
+			return evalElementGet((ElementGet)node);
+		}
 		else if(node instanceof UnaryExpression) {
 			return evalUnaryExpression((UnaryExpression)node);
 		}
@@ -78,6 +82,17 @@ public class ExpEval {
 		/* We could not evaluate the expression. Return top. */
 		return BValue.top(Change.convU(node), Change.convU(node), Change.convU(node));
 
+	}
+
+	/**
+	 * @param eg The element get expression.
+	 * @return the value of the element.
+	 */
+	private BValue evalElementGet(ElementGet eg) {
+		/* This is an identifier.. so we attempt to dereference it. */
+		BValue val = resolveValue(eg);
+		if(val == null) return BValue.top(Change.u(), Change.u(), Change.u());
+		return val; 
 	}
 
 	/**

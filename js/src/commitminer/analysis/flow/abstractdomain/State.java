@@ -399,14 +399,14 @@ public class State implements IState {
 
 		/* Evaluate the return value from the return expression. */
 		if(rs.getReturnValue() == null) {
-			retVal = BValue.bottom(Change.convU(rs), Change.convU(rs), Change.convU(rs));
+			retVal = Undefined.inject(Undefined.top(Change.u()), Change.convU(rs), Change.convU(rs), DefinerIDs.inject(rs.getID()));
 		}
 		else {
 			ExpEval expEval = new ExpEval(this);
 			retVal = expEval.eval(rs.getReturnValue());
 		}
 
-		/* Join the values if a return value allready exists on the path. */
+		/* Join the values if a return value already exists on the path. */
 		BValue oldVal = this.scratch.applyReturn();
 		if(oldVal != null)
 			retVal = retVal.join(oldVal);
