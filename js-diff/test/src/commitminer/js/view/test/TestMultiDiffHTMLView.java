@@ -97,71 +97,6 @@ public class TestMultiDiffHTMLView {
 		runTest(src, dst, out);
 
 	}
-
-	@Test
-	public void testCreate() throws Exception {
-
-		String src = "./test/input/diff/create_old.js";
-		String dst = "./test/input/diff/create_new.js";
-		String out = "./output/create.html";
-
-		runTest(src, dst, out);
-
-	}
-
-	@Test
-	public void testTutorial() throws Exception {
-
-		String src = "./test/input/diff/tutorial_old.js";
-		String dst = "./test/input/diff/tutorial_new.js";
-		String out = "./output/tutorial.html";
-
-		runTest(src, dst, out);
-
-	}
-
-	@Test
-	public void testHelpSearch() throws Exception {
-
-		String src = "./test/input/diff/help-search_old.js";
-		String dst = "./test/input/diff/help-search_new.js";
-		String out = "./output/help-search.html";
-
-		runTest(src, dst, out);
-	}
-
-	@Test
-	public void testSails() throws Exception {
-
-		String src = "./test/input/eval/sails-074841dfa62f23a66113aa56f710e874149e35bf_old.js";
-		String dst = "./test/input/eval/sails-074841dfa62f23a66113aa56f710e874149e35bf_new.js";
-		String out = "./output/sails.html";
-
-		runTest(src, dst, out);
-
-	}
-
-	@Test
-	public void testBower() throws Exception {
-
-		String src = "./test/input/eval/bower-fd472403c1f9992b57e15b4ff745732677b64ee1_old.js";
-		String dst = "./test/input/eval/bower-fd472403c1f9992b57e15b4ff745732677b64ee1_new.js";
-		String out = "./output/bower.html";
-
-		runTest(src, dst, out);
-
-	}
-
-	@Test
-	public void testConnect() throws Exception {
-
-		String src = "./test/input/eval/connect-08337a38445b16f84192b40b74458bcea36f9a32_old.js";
-		String dst = "./test/input/eval/connect-08337a38445b16f84192b40b74458bcea36f9a32_new.js";
-		String out = "./output/connect.html";
-
-		runTest(src, dst, out);
-
-	}
 	
 	@Test
 	public void testPM2() throws Exception {
@@ -174,6 +109,24 @@ public class TestMultiDiffHTMLView {
 
 		runTest(src, dst, out);
 		
+	}
+
+	@Test
+	public void testCheerio() throws Exception {
+		String src = "./test/input/user_study/cheerio-e65ad72cad8fb696e0f3475b127c93492feca04d_old.js";
+		String dst = "./test/input/user_study/cheerio-e65ad72cad8fb696e0f3475b127c93492feca04d_new.js";
+		String out = "./web/cheerio.html";
+		runTest(src, dst, out);
+	}
+
+	@Test
+	public void testGenerator() throws Exception {
+//		String src = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_old.js";
+//		String dst = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_new.js";
+		String src = "./test/input/user_study/tmp_old.js";
+		String dst = "./test/input/user_study/tmp_new.js";
+		String out = "./web/generator.html";
+		runTest(src, dst, out);
 	}
 
 	/**

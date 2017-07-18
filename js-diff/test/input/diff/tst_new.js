@@ -464,6 +464,120 @@ CLI.getVersion = function(cb) {
 };
 
 /**
+ * Apply a RPC method on the json file
+ * @method actionFromJson
+ * @param {string} action RPC Method
+ * @param {object} options
+ * @param {string|object} file file
+ * @param {string} jsonVia action type (=only 'pipe' ?)
+ * @param {Function}
+ */
+CLI.actionFromJson = function(action, file, opts, jsonVia, cb) {
+  var appConf = {};
+  var ret_processes = [];
+
+  //accept programmatic calls
+  if (typeof file == 'object') {
+    cb = typeof jsonVia == 'function' ? jsonVia : cb;
+    appConf = file;
+  }
+  else if (jsonVia == 'file') {
+    var data = null;
+
+    try {
+      data = fs.readFileSync(file);
+    } catch(e) {
+      Common.printError(cst.PREFIX_MSG_ERR + 'File ' + file +' not found');
+      return cb ? cb(e) : Common.exitCli(cst.ERROR_EXIT);
+    }
+
+    try {
+      appConf = Utility.parseConfig(data, file);
+    } catch(e) {
+      Common.printError(cst.PREFIX_MSG_ERR + 'File ' + file + ' malformated');
+      console.error(e);
+      return cb ? cb(e) : Common.exitCli(cst.ERROR_EXIT);
+    }
+  } else if (jsonVia == 'pipe') {
+    appConf = Utility.parseConfig(file, 'pipe');
+  } else {
+    Common.printError('Bad call to actionFromJson, jsonVia should be one of file, pipe');
+    return Common.exitCli(cst.ERROR_EXIT);
+  }
+
+  // Backward compatibility
+  if (appConf.apps)
+    appConf = appConf.apps;
+
+  if (!Array.isArray(appConf))
+    appConf = [appConf];
+
+  if ((appConf = verifyConfs(appConf)) === null)
+    return cb ? cb({success:false}) : Common.exitCli(cst.ERROR_EXIT);
+
+  async.eachLimit(appConf, cst.CONCURRENT_ACTIONS, function(proc, next1) {
+    var name = '';
+    var new_env;
+
+    if (!proc.name)
+      name = p.basename(proc.script);
+    else
+      name = proc.name;
+
+    if (opts.only && opts.only != name)
+      return process.nextTick(next1);
+
+    if (opts && opts.env)
+      new_env = mergeEnvironmentVariables(proc, opts.env);
+    else
+      new_env = mergeEnvironmentVariables(proc);
+
+    Common.getProcessIdByName(name, function(err, ids) {
+      if (err) {
+        Common.printError(err);
+        return next1();
+      }
+      if (!ids) return next1();
+
+      async.eachLimit(ids, cst.CONCURRENT_ACTIONS, function(id, next2) {
+        var opts = {};
+
+        //stopProcessId could accept options to?
+        if (action == 'restartProcessId') {
+          opts = {id : id, env : new_env};
+        } else {
+          opts = id;
+        }
+
+        Satan.executeRemote(action, opts, function(err, res) {
+          ret_processes.push(res);
+          if (err) {
+            Common.printError(err);
+            return next2();
+          }
+
+          if (action == 'restartProcessId') {
+            Satan.notifyGod('restart', id);
+          } else if (action == 'deleteProcessId') {
+            Satan.notifyGod('delete', id);
+          } else if (action == 'stopProcessId') {
+            Satan.notifyGod('stop', id);
+          }
+
+          Common.printOut(cst.PREFIX_MSG + '[%s](%d) \u2713', name, id);
+          return next2();
+        });
+      }, function(err) {
+        return next1(null, ret_processes);
+      });
+    });
+  }, function(err) {
+    if (cb) return cb(null, ret_processes);
+    else return setTimeout(speedList, 100);
+  });
+};
+
+/**
  * Description
  * @method killDaemon
  * @param {} cb

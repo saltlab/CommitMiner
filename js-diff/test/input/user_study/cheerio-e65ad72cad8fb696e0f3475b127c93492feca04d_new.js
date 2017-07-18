@@ -50,14 +50,14 @@ exports.serializeArray = function() {
       if (val == null) {
         return null;
       } else {
-        // If we have an array of values (e.g. `<select multiple>`), return an array of key/value pairs
+        // If we have an array of values (e.g. `&#60;select multiple&#62;`), return an array of key/value pairs
         if (Array.isArray(val)) {
           return _.map(val, function(val) {
             // We trim replace any line endings (e.g. `\r` or `\r\n` with `\r\n`) to guarantee consistency across platforms
-            //   These can occur inside of `<textarea>'s`
+            //   These can occur inside of `&#60;textarea&#62;'s`
             return {name: name, value: val.replace( rCRLF, '\r\n' )};
           });
-        // Otherwise (e.g. `<input type="text">`, return only one key/value pair
+        // Otherwise (e.g. `&#60;input type="text"&#62;`, return only one key/value pair
         } else {
           return {name: name, value: val.replace( rCRLF, '\r\n' )};
         }

@@ -247,7 +247,7 @@ function addPlaceholders() {
 
 	while(current.length > 0) {
 
-		current.before("<tr class='code expandable'><td class='expandable-line'><i class='fa fa-compress' style='font-size:18px;'></i></td><td class='expandable-blob' colspan='3'></td></tr>");
+		current.before("<tr class='code expandable context-menu'><td class='expandable-line'><i class='fa fa-compress' style='font-size:18px;'></i></td><td class='expandable-blob' colspan='3'></td></tr>");
 
 		while(current.is(":hidden")) {
 			current = current.next();
