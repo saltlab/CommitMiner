@@ -16,6 +16,10 @@ public class DefinerIDs {
 		this.definerIDs = definerIDs;
 	}
 	
+	public boolean isEmpty() {
+		return definerIDs.isEmpty();
+	}
+	
 	public DefinerIDs weakUpdate(Integer definerID) {
 		Set<Integer> updated = new HashSet<Integer>(definerIDs);
 		updated.add(definerID);

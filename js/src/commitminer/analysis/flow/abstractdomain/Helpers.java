@@ -349,7 +349,9 @@ public class Helpers {
 					/* Create the control domain. */
 					Control control = new Control();
 					
-					Scratchpad scratch = new Scratchpad(state.scratch.applyReturn(), new BValue[0]);
+					/* Create the argument object. */
+					Scratchpad scratch = new Scratchpad(null, new BValue[0]);
+//					Scratchpad scratch = new Scratchpad(state.scratch.applyReturn(), new BValue[0]);
 
 					/* Analyze the function. Use a fresh call stack because we don't have any knowledge of it. */
 					ifp.closure.run(selfAddr, state.store,

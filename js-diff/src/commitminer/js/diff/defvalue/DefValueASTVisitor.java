@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.ArrayLiteral;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.DoLoop;
+import org.mozilla.javascript.ast.ElementGet;
 import org.mozilla.javascript.ast.ForInLoop;
 import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionNode;
@@ -134,6 +135,31 @@ public class DefValueASTVisitor implements NodeVisitor {
 			
 			/* Visit the left hand side in case any objects have changed. */
 			pg.getLeft().visit(this);
+
+			return false;
+
+		}
+		else if(node instanceof ElementGet) {
+			
+			ElementGet pg = (ElementGet) node;
+			
+			/* Try to resolve the full property get. */
+			List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+			for(Address addr : state.resolveOrCreate(node)) {
+				BValue val = state.store.apply(addr);
+				ids.add(val);
+			}
+
+			if(ids.size() > 0) {
+				this.annotations.add(new Annotation("DVAL-USE", ids, 
+						pg.getLineno(), 
+						pg.getFixedPosition(), 
+						pg.getLength()));
+			}
+			
+			/* Visit the left hand side in case any objects have changed. */
+			pg.getTarget().visit(this);
+			pg.getElement().visit(this);
 
 			return false;
 

@@ -10,6 +10,7 @@ import java.util.Stack;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.ElementGet;
 import org.mozilla.javascript.ast.EmptyStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionCall;
@@ -31,10 +32,6 @@ import commitminer.cfg.CFGNode;
  * Stores the state of the function analysis at a point in the CFG.
  */
 public class State implements IState {
-	
-	/* For cases where a variable has not been defined (it could be a global which
-	* is undefined or be a global which is defined elsewhere). */
-	private static final Integer UNDEFINED_ENV_ID = -1;
 	
 	/* The abstract domains that make up the program state. The abstract
 	 * domains have access to each other. */
@@ -413,6 +410,19 @@ public class State implements IState {
 		BValue oldVal = this.scratch.applyReturn();
 		if(oldVal != null)
 			retVal = retVal.join(oldVal);
+		
+		/* Conservatively add a dummy DefinerID to the BValue if there are currently
+		 * no DefinerIDs */
+		if(retVal.definerIDs.isEmpty()) {
+			if(rs.getReturnValue() == null) {
+				retVal.definerIDs = retVal.definerIDs.strongUpdate(rs.getID());
+				rs.setDummy();
+			}
+			else {
+				retVal.definerIDs = retVal.definerIDs.strongUpdate(rs.getReturnValue().getID());
+				rs.getReturnValue().setDummy();
+			}
+		}
 
 		/* Make a fake var in the environment and point it to the value so that
 		 * if it contains a function, it will be analyzed during the
@@ -459,6 +469,13 @@ public class State implements IState {
 		ExpEval expEval = new ExpEval(this);
 		BValue val = expEval.eval(rhs);
 
+		/* Conservatively add a dummy DefinerID to the BValue if there are currently
+		 * no DefinerIDs */
+		if(val.definerIDs.isEmpty()) {
+			val.definerIDs = val.definerIDs.strongUpdate(rhs.getID());
+			rhs.setDummy();
+		}
+
 		/* Update the values in the store. */
 		// TODO: Is this correct? We should probably only do a strong update if
 		//		 there is only one address. Otherwise we don't know which one
@@ -503,7 +520,7 @@ public class State implements IState {
 			 * nothing about it. */
 			Address addr = trace.makeAddr(node.getID(), "");
 			env = env.strongUpdate(node.toSource(), new Variable(node.getID(), node.toSource(), Change.bottom(), new Addresses(addr, Change.u())));
-			store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom()));
+			store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom(), DefinerIDs.inject(node.getID())));
 			addrs = new Addresses(addr, Change.u());
 		}
 
@@ -546,7 +563,7 @@ public class State implements IState {
 			if(val.addressAD.addresses.size() == 0) {
 				Map<String, Property> ext = new HashMap<String, Property>();
 				Obj dummy = new Obj(ext, new InternalObjectProperties());
-				Address addr = trace.makeAddr(ie.getID(), "");
+				Address addr = trace.makeAddr(ie.getLeft().getID(), "");
 				store = store.alloc(addr, dummy);
 				val = val.join(Address.inject(addr, Change.bottom(), Change.bottom(), Change.bottom(), DefinerIDs.bottom()));
 				store = store.strongUpdate(valAddr, val);
@@ -574,8 +591,8 @@ public class State implements IState {
 
 					/* Create a new address (BValue) for the property and
 					 * put it in the store. */
-					propAddr = trace.makeAddr(ie.getID(), ie.getRight().toSource());
-					BValue propVal = Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom());
+					propAddr = trace.makeAddr(ie.getRight().getID(), ie.getRight().toSource());
+					BValue propVal = Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom(), DefinerIDs.inject(ie.getRight().getID()));
 					store = store.alloc(propAddr, propVal);
 
 					/* Add the property to the external properties of the object. */
@@ -597,6 +614,101 @@ public class State implements IState {
 	}
 	
 	/**
+	 * Recursive case: An element access.
+	 * @param eg An element access node.
+	 * @return The set of addresses this element can resolve to.
+	 */
+	private Set<Address> resolveOrCreateElementCase(ElementGet eg) {
+
+		Set<Address> result = new HashSet<Address>();
+		
+		/* We have a qualified name. Recursively find all the addresses
+		 * that lhs can resolve to. */
+		Set<Address> lhs = resolveOrCreate(eg.getTarget());
+
+		/* Just in case we couldn't resolve or create the sub-expression. */
+		if(lhs == null) return result;
+
+		/* Lookup the current property at each of these addresses. Ignore
+		 * type errors and auto-boxing for now. */
+		for(Address valAddr : lhs) {
+			
+			/* Get the value at the address. */
+			BValue val = store.apply(valAddr);
+
+			/* We may need to create a dummy object if 'val' doesn't point
+			 * to any objects. */
+			if(val.addressAD.addresses.size() == 0) {
+				Map<String, Property> ext = new HashMap<String, Property>();
+				Obj dummy = new Obj(ext, new InternalObjectProperties());
+				Address addr = trace.makeAddr(eg.getID(), "");
+				store = store.alloc(addr, dummy);
+				val = val.join(Address.inject(addr, Change.bottom(), Change.bottom(), Change.bottom(), DefinerIDs.bottom()));
+				store = store.strongUpdate(valAddr, val);
+			}
+			
+			for(Address objAddr : val.addressAD.addresses) {
+
+				/* Get the Obj from the store. */
+				Obj obj = store.getObj(objAddr);
+
+				/* Look up the property. */
+				ExpEval expEval = new ExpEval(this);
+				BValue elementValue = expEval.eval(eg.getElement());
+				
+				String elementString = null;
+				if(elementValue.numberAD.le == Num.LatticeElement.VAL) {
+					elementString = elementValue.numberAD.val;
+				}
+				else if(elementValue.stringAD.le == Str.LatticeElement.SNOTNUMNORSPLVAL
+						|| elementValue.stringAD.le == Str.LatticeElement.SNUMVAL
+						|| elementValue.stringAD.le == Str.LatticeElement.SSPLVAL) {
+					elementString = elementValue.stringAD.val;
+				}
+				else {
+					elementString = "~unknown~";
+				}
+				
+				Address propAddr = obj.apply(elementString);
+
+				if(propAddr != null) {
+					result.add(propAddr);
+					// Sanity check that the property address is in the store.
+					BValue propVal = store.apply(propAddr);
+					if(propVal == null)
+						throw new Error("Property value does not exist in store.");
+				}
+				else {
+					/* This property was not found, which means it is either
+					 * undefined or was initialized somewhere outside the
+					 * analysis. Create it and give it the value BValue.TOP. */
+
+					/* Create a new address (BValue) for the property and
+					 * put it in the store. */
+					propAddr = trace.makeAddr(eg.getID(), elementString);
+					BValue propVal = Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom(), DefinerIDs.inject(eg.getID()));
+					store = store.alloc(propAddr, propVal);
+
+					/* Add the property to the external properties of the object. */
+					Map<String, Property> ext = new HashMap<String, Property>(obj.externalProperties);
+					ext.put(elementString, new Property(eg.getTarget().getID(), elementString, Change.u(), propAddr));
+
+					/* We need to create a new object so that the previous
+					 * states are not affected by this update. */
+					Obj newObj = new Obj(ext, obj.internalProperties);
+					store = store.strongUpdate(objAddr, newObj);
+
+					result.add(propAddr);
+				}
+			}
+		
+		}
+		
+		return result;
+		
+	}
+	
+	/**
 	 * Resolve an identifier which we don't currently handle, such as an array
 	 * access.
 	 * @return the address of a new (stopgap) value.
@@ -607,8 +719,8 @@ public class State implements IState {
 		* better than nothing. */
 		Set<Address> addrs = new HashSet<Address>();
 		Address addr = trace.makeAddr(node.getID(), "");
-		store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom()));
-		node.setDummy();
+		store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom(), DefinerIDs.bottom()));
+//		node.setDummy();
 		addrs.add(addr);
 		return addrs;
 		
@@ -629,6 +741,11 @@ public class State implements IState {
 		/* Recursive Case: A property access. */
 		else if(node instanceof InfixExpression) {
 			return resolveOrCreateInfixCase((InfixExpression)node);
+		}
+		
+		/* Recursive Case: An element access. */
+		else if(node instanceof ElementGet) {
+			return resolveOrCreateElementCase((ElementGet)node);
 		}
 
 		/* TODO This is something we don't yet handle, like array access. */

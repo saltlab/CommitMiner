@@ -104,7 +104,7 @@ public class Addresses {
 				definerIDs);
 	}
 
-	public static BValue dummy(Change valChange, Change dependency, Change typeChange) {
+	public static BValue dummy(Change valChange, Change dependency, Change typeChange, DefinerIDs definerIDs) {
 		return new BValue(
 				Str.top(typeChange),
 				Num.top(typeChange),
@@ -114,7 +114,7 @@ public class Addresses {
 				Addresses.bottom(typeChange),
 				valChange,
 				dependency,
-				DefinerIDs.bottom());
+				definerIDs);
 	}
 
 	/**

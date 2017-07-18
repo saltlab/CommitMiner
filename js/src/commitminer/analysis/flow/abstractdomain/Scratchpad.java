@@ -52,6 +52,14 @@ public class Scratchpad {
 	public Scratchpad strongUpdate(BValue returnValue, BValue[] args) {
 		return new Scratchpad(returnValue, args);
 	}
+	
+	/**
+	 * Performs a weak upadate to the return value.
+	 * @return The updated scratchpad.
+	 */
+	public Scratchpad weakUpdate(BValue returnValue) {
+		return this.join(new Scratchpad(returnValue, this.args));
+	}
 
 	/**
 	 * Compute the union of this and another Scratchpad.
