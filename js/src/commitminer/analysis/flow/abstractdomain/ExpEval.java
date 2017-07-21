@@ -481,8 +481,8 @@ public class ExpEval {
 	 */
 	public State evalFunctionCall(FunctionCall fc) {
 		
-		if(fc.getTarget().toSource().equals("findFile")) {
-			System.out.println("findFile: " + ctr);
+		if(fc.getTarget().toSource().equals("foo")) {
+			System.out.println("foo: " + ctr);
 			ctr++;
 		}
 		
@@ -560,15 +560,6 @@ public class ExpEval {
 			
 			/* Create the return value. */
 			BValue retVal =  BValue.top(Change.convU(fc), Change.convU(fc), Change.u());
-			
-//			/* Conservatively add a dummy DefinerID to the BValue, since we could have
-//			 * received a new value here. Only if this is an assignment or a return. */
-//			if(fc.getParent().getType() == Token.ASSIGN 
-//					|| fc.getParent().getType() == Token.VAR
-//					|| fc.getParent().getType() == Token.RETURN) {
-//				retVal.definerIDs = retVal.definerIDs.strongUpdate(fc.getID());
-//				fc.setDummy();
-//			}
 			
 			newState.scratch = newState.scratch.strongUpdate(retVal, null);
 		}

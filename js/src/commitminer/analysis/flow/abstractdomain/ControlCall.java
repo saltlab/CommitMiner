@@ -51,7 +51,7 @@ public class ControlCall implements DependencyIdentifier {
 		for(Integer callsite : callsites) {
 			if(!cc.callsites.contains(callsite)) return false;
 		}
-		return false;
+		return true;
 	}
 
 	@Override
