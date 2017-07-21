@@ -60,11 +60,11 @@ public class HTMLUnixDiffViewer {
 				  // Print lines from both files side by side
 				  i++;
 				  j++;
-				  if(srcLines.length > i)
+				  if(srcLines.length >= i)
 					  outSrc += "<td class='line'>" + i + "</td><td>" + srcLines[i-1].replace("\t", "  ") + "</td>\n";
 				  else
 					  outSrc += "<td class='line'>" + i + "</td><td></td>\n";
-				  if(dstLines.length > j)
+				  if(dstLines.length >= j)
 					  outDst += "<td class='line'>" + j + "</td><td>" + dstLines[j-1].replace("\t", "  ") + "</td>\n";
 				  else
 					  outDst += "<td class='line'>" + j + "</td><td></td>\n";
@@ -72,7 +72,7 @@ public class HTMLUnixDiffViewer {
 			  case DELETE:
 				  // Print source line and, if needed, blank lines in destination
 				  i++;
-				  if(srcLines.length > i)
+				  if(srcLines.length >= i)
 					  outSrc += "<td class='line deleteLine'>" + i + "</td><td class='delete'>" + srcLines[i-1].replace("\t", "  ") + "</td>\n";
 				  else 
 					  outSrc += "<td class='line deleteLine'>" + i + "</td><td class='delete'></td>\n";
@@ -80,7 +80,7 @@ public class HTMLUnixDiffViewer {
 			  case INSERT:
 				  // Print destination line and, if needed, blank lines in source
 				  j++;
-				  if(dstLines.length > j)
+				  if(dstLines.length >= j)
 					  outDst += "<td class='line insertLine'>" + j + "</td><td class='insert'>" + dstLines[j-1].replace("\t", "  ") + "</td>\n";
 				  else
 					  outDst += "<td class='line insertLine'>" + j + "</td><td class='insert'></td>\n";

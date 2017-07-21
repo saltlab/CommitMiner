@@ -65,7 +65,7 @@ public class TestMultiDiffHTMLView {
 		commitAnalysis.analyze(commit);
 
         /* Print the data set. */
-		dataSet.printDataSet();
+//		dataSet.printDataSet();
 
 		/* Only annotate the destination file. The source file isn't especially useful. */
 		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, dataSet.getAnnotationFactBase());
@@ -112,6 +112,17 @@ public class TestMultiDiffHTMLView {
 	}
 
 	@Test
+	public void testRuntime() throws Exception {
+	
+		String src = "./test/input/diff/karma_new.js";
+		String dst = "./test/input/diff/karma_new.js";
+		String out = "./web/runs.html";
+
+		runTest(src, dst, out);
+		
+	}
+
+	@Test
 	public void testCheerio() throws Exception {
 		String src = "./test/input/user_study/cheerio-e65ad72cad8fb696e0f3475b127c93492feca04d_old.js";
 		String dst = "./test/input/user_study/cheerio-e65ad72cad8fb696e0f3475b127c93492feca04d_new.js";
@@ -131,7 +142,7 @@ public class TestMultiDiffHTMLView {
 	public void testGenerator() throws Exception {
 //		String src = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_old.js";
 //		String dst = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_new.js";
-		String src = "./test/input/user_study/tmp_old.js";
+		String src = "./test/input/user_study/tmp_new.js";
 		String dst = "./test/input/user_study/tmp_new.js";
 		String out = "./web/generator.html";
 		runTest(src, dst, out);

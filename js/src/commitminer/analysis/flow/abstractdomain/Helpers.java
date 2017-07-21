@@ -131,22 +131,27 @@ public class Helpers {
 			semVal = semVal - 1;
 			iesMap.put(pathState.edge.getTo(), semVal);
 
-			/* Transfer the abstract state over the node. */
-			state = state.clone().transfer(pathState.edge.getTo());
-			pathState.edge.getTo().setAfterState(state);
+			/* Transfer the abstract state over the node, only if we need to make
+			* progress in the analysis by visiting a downstream edge. */
+			if(doTransfer(pathState, semVal)) {
 
-			/* Add all unvisited edges to the stack.
-			 * We currently only execute loops once. */
-			for(CFGEdge edge : pathState.edge.getTo().getEdges()) {
+				state = state.clone().transfer(pathState.edge.getTo());
+				pathState.edge.getTo().setAfterState(state);
 
-				/* Only visit an edge if the semaphore for the node is zero or if one of the
-				* edges is a loop edge. */
-				if(!pathState.visited.contains(edge)
-						&& (semVal == 0 || edge.isLoopEdge)) {
-					Set<CFGEdge> newVisited = new HashSet<CFGEdge>(pathState.visited);
-					newVisited.add(edge);
-					PathState newState = new PathState(edge, newVisited, state);
-					stack.push(newState);
+				/* Add all unvisited edges to the stack.
+				 * We currently only execute loops once. */
+				for(CFGEdge edge : pathState.edge.getTo().getEdges()) {
+
+					/* Only visit an edge if the semaphore for the current node is zero or if one of the
+					* edges is a loop edge. */
+					if(!pathState.visited.contains(edge)
+							&& (semVal == 0 || edge.isLoopEdge)) {
+						Set<CFGEdge> newVisited = new HashSet<CFGEdge>(pathState.visited);
+						newVisited.add(edge);
+						PathState newState = new PathState(edge, newVisited, state);
+						stack.push(newState);
+					}
+
 				}
 
 			}
@@ -160,6 +165,21 @@ public class Helpers {
 
 		return state;
 
+	}
+	
+	/**
+	 * Decide whether or not to transfer over a node. We transfer if (a) all
+	 * incoming edges have been visited (semVal == 0) or if (b) there is an
+	 * unvisited loop edge.
+	 * @param pathState The current state of the path.
+	 * @param semVal The number of incoming edges that have not yet been visited.
+	 * @return {@code true} if we need to transfer over the node.
+	 */
+	private static boolean doTransfer(PathState pathState, int semVal) {
+		if(semVal == 0) return true;
+		for(CFGEdge edge : pathState.edge.getTo().getEdges())
+			if(edge.isLoopEdge) return true;
+		return false;
 	}
 
 	/**

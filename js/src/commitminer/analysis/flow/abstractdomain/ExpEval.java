@@ -27,6 +27,8 @@ import org.mozilla.javascript.ast.UnaryExpression;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 
 public class ExpEval {
+	
+	private static int ctr = 1;
 
 	public State state;
 
@@ -478,6 +480,11 @@ public class ExpEval {
 	 * @return The return value of the function call.
 	 */
 	public State evalFunctionCall(FunctionCall fc) {
+		
+		if(fc.getTarget().toSource().equals("findFile")) {
+			System.out.println("findFile: " + ctr);
+			ctr++;
+		}
 		
 		/* The state after the function call. */
 		State newState = null;
