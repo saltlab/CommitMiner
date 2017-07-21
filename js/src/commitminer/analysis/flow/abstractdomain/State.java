@@ -17,6 +17,7 @@ import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
+import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
@@ -534,15 +535,12 @@ public class State implements IState {
 	 * @param ie A qualified name node.
 	 * @return The set of addresses this identifier can resolve to.
 	 */
-	private Set<Address> resolveOrCreateInfixCase(InfixExpression ie) {
+	private Set<Address> resolveOrCreateProperty(PropertyGet ie) {
 
 		Set<Address> result = new HashSet<Address>();
 
-		/* We do not handle the cases where:
-		 * 	1. The rhs is an expression
-		 *  2. The operator is not a property access */
-		if(!(ie.getRight() instanceof Name)
-				|| ie.getOperator() != Token.GETPROP) return result;
+		/* We do not handle the cases where the rhs is an expression. */
+		if(!(ie.getRight() instanceof Name)) return result;
 
 		/* We have a qualified name. Recursively find all the addresses
 		 * that lhs can resolve to. */
@@ -713,15 +711,18 @@ public class State implements IState {
 	 * access.
 	 * @return the address of a new (stopgap) value.
 	 */
-	public Set<Address> resolveOrCreateUnknown(AstNode node) {
-
-		/* Create a stopgap value. This creates unsound results, but is probably
-		* better than nothing. */
+	public Set<Address> resolveOrCreateExpression(AstNode node) {
+		
+		/* Resolve the expression to a value. */
+		ExpEval expEval = new ExpEval(this);
+		BValue val = expEval.eval(node);
+		
+		/* Place the value on the store */
 		Set<Address> addrs = new HashSet<Address>();
 		Address addr = trace.makeAddr(node.getID(), "");
-		store = store.alloc(addr, Addresses.dummy(Change.bottom(), Change.bottom(), Change.bottom(), DefinerIDs.bottom()));
-//		node.setDummy();
+		store = store.alloc(addr, val);
 		addrs.add(addr);
+
 		return addrs;
 		
 	}
@@ -739,8 +740,8 @@ public class State implements IState {
 		}
 
 		/* Recursive Case: A property access. */
-		else if(node instanceof InfixExpression) {
-			return resolveOrCreateInfixCase((InfixExpression)node);
+		else if(node instanceof PropertyGet) {
+			return resolveOrCreateProperty((PropertyGet)node);
 		}
 		
 		/* Recursive Case: An element access. */
@@ -748,9 +749,9 @@ public class State implements IState {
 			return resolveOrCreateElementCase((ElementGet)node);
 		}
 
-		/* TODO This is something we don't yet handle, like array access. */
+		/* This must be an expression, which we need to resolve. */
 		else {
-			return resolveOrCreateUnknown(node);
+			return resolveOrCreateExpression(node);
 		}
 
 	}

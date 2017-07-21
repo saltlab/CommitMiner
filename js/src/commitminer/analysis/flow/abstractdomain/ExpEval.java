@@ -121,12 +121,12 @@ public class ExpEval {
 
 		for(ObjectProperty property : ol.getElements()) {
 			AstNode prop = property.getLeft();
-			String propName = null;
+			String propName = "~unknown~";
 			if(prop instanceof Name) propName = prop.toSource();
 			else if(prop instanceof StringLiteral) propName = ((StringLiteral)prop).getValue();
 			else if(prop instanceof NumberLiteral) propName = ((NumberLiteral)prop).getValue();
 			BValue propVal = this.eval(property.getRight());
-			Address propAddr = state.trace.makeAddr(property.getID(), "");
+			Address propAddr = state.trace.makeAddr(property.getID(), propName);
 			state.store = state.store.alloc(propAddr, propVal);
 			if(propName != null) ext.put(propName, new Property(property.getID(), propName, Change.u(), propAddr));
 		}
