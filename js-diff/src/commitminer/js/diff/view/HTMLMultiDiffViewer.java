@@ -26,7 +26,11 @@ public class HTMLMultiDiffViewer {
 
 		String out = "";
 
-		Annotation current = factBase.isEmpty() ? null : factBase.pop();
+		Annotation current = null;
+		while(!factBase.isEmpty()) {
+			current = factBase.pop();
+			if(current.absolutePosition > 0) break;
+		}
 
 		char[] chars = source.toCharArray();
 
