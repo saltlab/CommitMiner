@@ -78,7 +78,16 @@ public class HTMLMultiDiffViewer {
 			}
 
 			/* Write the next character in the file. */
-			out = out.concat(String.valueOf(chars[i]));
+			switch (chars[i]) {
+			case '<':
+				out = out.concat("&#60");
+				break;
+			case '>':
+				out = out.concat("&#62");
+				break;
+			default:
+				out = out.concat(String.valueOf(chars[i]));
+			}
 
 		}
 

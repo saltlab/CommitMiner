@@ -20,8 +20,12 @@ public class HTMLUnixDiffViewer {
 	public static String annotate(String srcCode,
 						  		  String dstCode,
 						  		  String dstAnnotated) throws IOException {
+		
+		String saniSrcCode = srcCode;
+		saniSrcCode = saniSrcCode.replace("<", "&#60");
+		saniSrcCode = saniSrcCode.replace(">", "&#62");
 
-		String[] srcLines = srcCode.split("\n");
+		String[] srcLines = saniSrcCode.split("\n");
 		String[] dstLines = dstAnnotated.split("\n");
 
 		String outSrc = "";

@@ -140,10 +140,10 @@ public class TestMultiDiffHTMLView {
 
 	@Test
 	public void testGenerator() throws Exception {
-//		String src = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_old.js";
-//		String dst = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_new.js";
-		String src = "./test/input/user_study/tmp_new.js";
-		String dst = "./test/input/user_study/tmp_new.js";
+		String src = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_old.js";
+		String dst = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_new.js";
+//		String src = "./test/input/user_study/tmp_new.js";
+//		String dst = "./test/input/user_study/tmp_new.js";
 		String out = "./web/generator.html";
 		runTest(src, dst, out);
 	}
