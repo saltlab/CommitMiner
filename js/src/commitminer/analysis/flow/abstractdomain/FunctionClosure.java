@@ -98,10 +98,17 @@ public class FunctionClosure extends Closure {
 			
 		}
 		
-		/* We'll use this later when executing unanalyzed functions. */
-		List<Name> localVarNames = VariableLiftVisitor.getVariableDeclarations((ScriptNode)cfg.getEntryNode().getStatement());
+		/* Get the set of local vars to search for unanalyzed functions. */
 		Set<String> localVars = new HashSet<String>();
+		List<Name> localVarNames = VariableLiftVisitor.getVariableDeclarations((ScriptNode)cfg.getEntryNode().getStatement());
 		for(Name localVarName : localVarNames) localVars.add(localVarName.toSource());
+
+		/* Get the set of local functions to search for unanalyzed functions. */
+		List<FunctionNode> localFunctions = FunctionLiftVisitor.getFunctionDeclarations((ScriptNode)cfg.getEntryNode().getStatement());
+		for(FunctionNode localFunction : localFunctions) {
+			Name name = localFunction.getFunctionName();
+			if(name != null) localVars.add(name.toSource());
+		}
 
 		/* Perform the initial analysis and get the publicly accessible methods. */
 		exitState = Helpers.run(cfg, newState);

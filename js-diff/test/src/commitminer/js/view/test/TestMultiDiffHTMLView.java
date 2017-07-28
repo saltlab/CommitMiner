@@ -148,6 +148,60 @@ public class TestMultiDiffHTMLView {
 		runTest(src, dst, out);
 	}
 
+	/* USER STUDY CANDIDATE. */
+	@Test
+	public void testNPM() throws Exception {
+		String src = "./test/input/user_study/npm-af94ccd140a72c4b7625e6dde6d76ab586a8134f_old.js";
+		String dst = "./test/input/user_study/npm-af94ccd140a72c4b7625e6dde6d76ab586a8134f_new.js";
+		String out = "./web/npm.html";
+		runTest(src, dst, out);
+	}
+
+	/* USER STUDY CANDIDATE. */
+	@Test
+	public void testMongoDB() throws Exception {
+		String src = "./test/input/user_study/mongodb-a243fbeb788d0d6191800decb0629be4b9f4dd63_old.js";
+		String dst = "./test/input/user_study/mongodb-a243fbeb788d0d6191800decb0629be4b9f4dd63_new.js";
+		String out = "./web/mongo.html";
+		runTest(src, dst, out);
+	}
+
+	/* USER STUDY CANDIDATE. */
+	@Test
+	public void testPM2B() throws Exception {
+		String src = "./test/input/user_study/pm2-402190264f92afb845f41ac671331a91b708c18f_old.js";
+		String dst = "./test/input/user_study/pm2-402190264f92afb845f41ac671331a91b708c18f_new.js";
+		String out = "./web/pm2b.html";
+		runTest(src, dst, out);
+	}
+
+	/* USER STUDY CANDIDATE. */
+	@Test
+	public void testSubstack() throws Exception {
+		String src = "./test/input/user_study/substack-83f9c24dc292aee00db4613208660502130be739_old.js";
+		String dst = "./test/input/user_study/substack-83f9c24dc292aee00db4613208660502130be739_new.js";
+		String out = "./web/substack.html";
+		runTest(src, dst, out);
+	}
+
+	/* USER STUDY CANDIDATE. */
+	@Test
+	public void testMediacenterJS() throws Exception {
+		String src = "./test/input/user_study/mediacenterjs-f8f1713fc8a15d652c571ee0e5176889dcea095d_old.js";
+		String dst = "./test/input/user_study/mediacenterjs-f8f1713fc8a15d652c571ee0e5176889dcea095d_new.js";
+		String out = "./web/mediacenterjs.html";
+		runTest(src, dst, out);
+	}
+
+	/* USER STUDY CANDIDATE. */
+	@Test
+	public void testSailsB() throws Exception {
+		String src = "./test/input/user_study/sails-10cd52fe0e8cef3c25fde9130fac1e39a76a2e6f_old.js";
+		String dst = "./test/input/user_study/sails-10cd52fe0e8cef3c25fde9130fac1e39a76a2e6f_new.js";
+		String out = "./web/sailsb.html";
+		runTest(src, dst, out);
+	}
+
 	@Test
 	public void testDebug() throws Exception {
 		String src = "./test/input/user_study/debug.js";
