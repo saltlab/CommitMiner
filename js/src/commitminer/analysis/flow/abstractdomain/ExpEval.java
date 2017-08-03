@@ -581,7 +581,8 @@ public class ExpEval {
 		}
 
 		/* Analyze any callbacks
-		 * qhanam: Removed condition: "that were not analyzed within the callee". */
+		 * TODO: Either figure out why callbacks ignore state change rules, or don't analyze callbacks until we are done analyzing the method.
+		 */
 		for(Address addr : callbacks) {
 			Obj funct = newState.store.getObj(addr);
 

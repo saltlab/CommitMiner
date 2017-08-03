@@ -65,7 +65,7 @@ public class TestDependencyDiffHTMLView {
 		commitAnalysis.analyze(commit);
 
         /* Print the data set. */
-		dataSet.printDataSet();
+//		dataSet.printDataSet();
 
 		/* Only annotate the destination file. The source file isn't especially useful. */
 		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, dataSet.getAnnotationFactBase());
