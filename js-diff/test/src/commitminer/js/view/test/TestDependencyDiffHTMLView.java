@@ -166,9 +166,9 @@ public class TestDependencyDiffHTMLView {
 	@Test
 	public void testPM2() throws Exception {
 	
-		String src = "./test/input/diff/tst_old.js";
-		String dst = "./test/input/diff/tst_new.js";
-		String out = "./web/pm2_dep.html";
+		String src = "./test/input/diff/pm2_old.js";
+		String dst = "./test/input/diff/pm2_new.js";
+		String out = "./web/pm2-dep.html";
 
 		runTest(src, dst, out);
 		
