@@ -174,6 +174,24 @@ public class TestDependencyDiffHTMLView {
 		
 	}
 
+	@Test
+	public void testKarma() throws Exception {
+		String src = "./test/input/user_study/karma-82f1c1207b34955602b7590a34f8bf50b1a5ba6a_old.js";
+		String dst = "./test/input/user_study/karma-82f1c1207b34955602b7590a34f8bf50b1a5ba6a_new.js";
+		String out = "./web/karma-dep.html";
+		runTest(src, dst, out);
+	}
+
+	@Test
+	public void testGenerator() throws Exception {
+//		String src = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_old.js";
+//		String dst = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_new.js";
+		String src = "./test/input/user_study/debug.js";
+		String dst = "./test/input/user_study/debug.js";
+		String out = "./web/generator-dep.html";
+		runTest(src, dst, out);
+	}
+
 	/* USER STUDY CANDIDATE. */
 	@Test
 	public void testNPM() throws Exception {

@@ -91,8 +91,6 @@ public class LineMatcher extends TreeClassifier{
 
 		for (DiffMatchPatch.Diff diff : diffs) {
 
-			System.out.println(diff.operation.toString());
-			
 			/* Print the lines. */
 			for (int y = 0; y < diff.text.length(); y++) {
 				switch(diff.operation) {
@@ -100,8 +98,10 @@ public class LineMatcher extends TreeClassifier{
 					// Increment the absolute position of the source and destination files.
 					i++;
 					j++;
-					srcAbs += srcLines[i-1].length() + 1;
-					dstAbs += dstLines[j-1].length() + 1;
+					if(srcLines.length >= i)
+						srcAbs += srcLines[i-1].length() + 1;
+					if(dstLines.length >= j)
+						dstAbs += dstLines[j-1].length() + 1;
 				  break;
 			  	case DELETE:
 			  		// Increment the absolute position of the source file.

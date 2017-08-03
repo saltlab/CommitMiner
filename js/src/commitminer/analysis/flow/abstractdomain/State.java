@@ -36,6 +36,8 @@ public class State implements IState {
 	
 	/* The abstract domains that make up the program state. The abstract
 	 * domains have access to each other. */
+	
+	private static int i = 1;
 
 	public Environment env;
 	public Store store;
@@ -376,6 +378,10 @@ public class State implements IState {
 			interpretVariableDeclaration((VariableDeclaration)node);
 		}
 		else if(node instanceof FunctionCall) {
+			if(((FunctionCall)node).getTarget().toSource().equals("this.runHooks")) {
+				System.out.println(i + " - " + "this.runHooks");
+				this.i++;
+			}
 			ExpEval expEval = new ExpEval(this);
 			State endState = expEval.evalFunctionCall((FunctionCall) node);
 			this.store = endState.store;

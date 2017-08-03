@@ -21,6 +21,7 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.ObjectLiteral;
 import org.mozilla.javascript.ast.ObjectProperty;
+import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.UnaryExpression;
 
@@ -481,11 +482,6 @@ public class ExpEval {
 	 */
 	public State evalFunctionCall(FunctionCall fc) {
 		
-		if(fc.getTarget().toSource().equals("foo")) {
-			System.out.println("foo: " + ctr);
-			ctr++;
-		}
-		
 		/* The state after the function call. */
 		State newState = null;
 
@@ -510,7 +506,12 @@ public class ExpEval {
 			}
 			
 			args[i] = argVal;
-			callbacks.addAll(extractFunctions(argVal, new LinkedList<Address>(), new HashSet<Address>()));
+			
+			/* Arguments of bind, call or apply are not callbacks. */
+			AstNode target = fc.getTarget();
+			if(!(target instanceof PropertyGet && ((PropertyGet)target).getRight().toSource().equals("bind")))
+				callbacks.addAll(extractFunctions(argVal, new LinkedList<Address>(), new HashSet<Address>()));
+
 			i++;
 
 		}
@@ -586,33 +587,25 @@ public class ExpEval {
 
 			InternalFunctionProperties ifp = (InternalFunctionProperties)funct.internalProperties;
 
-			/* Was the callback analyzed within the callee?
-			 * qhanam: This check is not effective. It misses the case where a
-			 * 		   function needs to be re-checked through a function call.
-			 * 		   It is probably safe to omit the check in most cases. */
-//			if(closure.cfg.getEntryNode().getBeforeState() == null) {
+			/* Create the argument object. */
+			scratch = new Scratchpad(null, new BValue[0]);
 
-				/* Create the argument object. */
-				scratch = new Scratchpad(null, new BValue[0]);
+			/* Create the control domain. */
+			Control control = new Control();
 
-				/* Create the control domain. */
-				Control control = new Control();
+			/* Is this function being called recursively? If so abort. */
+			if(state.callStack.contains(addr)) continue;
 
-				/* Is this function being called recursively? If so abort. */
-				if(state.callStack.contains(addr)) continue;
+			/* Push this function onto the call stack. */
+			state.callStack.push(addr);
 
-				/* Push this function onto the call stack. */
-				state.callStack.push(addr);
+			/* Analyze the function. */
+			ifp.closure.run(state.selfAddr, state.store,
+							scratch, state.trace, control,
+							state.callStack);
 
-				/* Analyze the function. */
-				ifp.closure.run(state.selfAddr, state.store,
-								scratch, state.trace, control,
-								state.callStack);
-
-				/* Pop this function off the call stack. */
-				state.callStack.pop();
-
-//			}
+			/* Pop this function off the call stack. */
+			state.callStack.pop();
 
 		}
 

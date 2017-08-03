@@ -72,9 +72,11 @@ public class ControlCallASTVisitor implements NodeVisitor {
 			FunctionCall fc = (FunctionCall) node;
 			
 			if(Change.convU(fc).le == Change.LatticeElement.CHANGED) {
-				List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
-				ids.add(new GenericDependencyIdentifier(fc.getID()));
-				annotations.add(new Annotation("CONDEP-DEF", ids, fc.getTarget().getLineno(), fc.getTarget().getFixedPosition(), fc.getTarget().getLength()));
+				if(fc.getID() != null) { // Don't register annotations for abstract nodes
+					List<DependencyIdentifier> ids = new LinkedList<DependencyIdentifier>();
+					ids.add(new GenericDependencyIdentifier(fc.getID()));
+					annotations.add(new Annotation("CONDEP-DEF", ids, fc.getTarget().getLineno(), fc.getTarget().getFixedPosition(), fc.getTarget().getLength()));
+				}
 			}
 		}
 		/* Ignore the body of loops, ifs and functions. */

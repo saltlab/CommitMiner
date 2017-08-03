@@ -132,6 +132,7 @@ public class DomainAnalysis {
 			}
 			catch(ArrayIndexOutOfBoundsException e) {
 				System.err.println("ArrayIndexOutOfBoundsException: possibly caused by empty file.");
+				e.printStackTrace();
 				return;
 			}
 			catch(EvaluatorException e) {
