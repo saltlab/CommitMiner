@@ -25,6 +25,7 @@ import commitminer.cfg.diff.CFGDifferencing;
 import commitminer.diff.line.LineMatcher;
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
+import ca.ubc.ece.salt.gumtree.ast.MeyersASTClassifier;
 
 /**
  * A control class for performing control flow differencing and running a flow
@@ -293,7 +294,7 @@ public class ControlFlowDifferencing {
 		MappingStore mappings = matcher.getMappings();
 
 		/* Assign the classifications directly to the AstNodes. */
-		ASTClassifier astClassifier = new ASTClassifier(srcTree, dstTree, classifier, mappings);
+		MeyersASTClassifier astClassifier = new MeyersASTClassifier(srcTree, dstTree, classifier, mappings);
 		astClassifier.classifyASTNodes();
 		
 	}

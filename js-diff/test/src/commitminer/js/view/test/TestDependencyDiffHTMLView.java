@@ -184,11 +184,17 @@ public class TestDependencyDiffHTMLView {
 
 	@Test
 	public void testGenerator() throws Exception {
-//		String src = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_old.js";
-//		String dst = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_new.js";
-		String src = "./test/input/user_study/debug.js";
-		String dst = "./test/input/user_study/debug.js";
+		String src = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_old.js";
+		String dst = "./test/input/user_study/generator-f3a63f7a71cda9f977f66a11736858d43418b074_new.js";
 		String out = "./web/generator-dep.html";
+		runTest(src, dst, out);
+	}
+
+	@Test
+	public void testCheerio() throws Exception {
+		String src = "./test/input/user_study/cheerio-e65ad72cad8fb696e0f3475b127c93492feca04d_old.js";
+		String dst = "./test/input/user_study/cheerio-e65ad72cad8fb696e0f3475b127c93492feca04d_new.js";
+		String out = "./web/cheerio-dep.html";
 		runTest(src, dst, out);
 	}
 
