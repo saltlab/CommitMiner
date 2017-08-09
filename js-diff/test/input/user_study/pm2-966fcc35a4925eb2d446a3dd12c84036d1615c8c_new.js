@@ -1,6 +1,3 @@
-// Commit Message:
-// Refactor reload/gracefulRelaod a bit 
-
 'use strict';
 
 /**

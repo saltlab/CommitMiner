@@ -1,7 +1,3 @@
-// Commit Message:
-// Added `.serialize()` support. Fixes #69 (#827)
-// .serialize()? #69
-
 // https://github.com/jquery/jquery/blob/2.1.3/src/manipulation/var/rcheckableType.js
 // https://github.com/jquery/jquery/blob/2.1.3/src/serialize.js
 var _ = require('lodash'),

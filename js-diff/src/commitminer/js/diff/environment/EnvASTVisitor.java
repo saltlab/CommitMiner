@@ -14,6 +14,7 @@ import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
+import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.VariableDeclaration;
@@ -97,6 +98,12 @@ public class EnvASTVisitor implements NodeVisitor {
 				}
 			}
 
+		}
+		/* Inspect the expression part of an object property. */
+		else if(node instanceof ObjectProperty) {
+			ObjectProperty op = (ObjectProperty) node;
+			op.getRight().visit(this);
+			return false;
 		}
 		/* Inspect the variable part of a property access. */
 		if(node instanceof PropertyGet) {

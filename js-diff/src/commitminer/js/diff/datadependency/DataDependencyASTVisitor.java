@@ -128,6 +128,11 @@ public class DataDependencyASTVisitor implements NodeVisitor {
 			}
 			
 		}
+		else if(node instanceof ObjectProperty) {
+			ObjectProperty op = (ObjectProperty) node;
+			op.getRight().visit(this);
+			return false;
+		}
 		else if(node instanceof PropertyGet) {
 			
 			PropertyGet pg = (PropertyGet) node;

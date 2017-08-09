@@ -1,8 +1,3 @@
-// Commit Message:
-// fix(reporter): Better handling of non string error Ref #1969, #1988
-// Missing error handler on `socket`. TypeError: (msg || "").replace is not a function Error #1969
-// Move Folder -> Missing Error Handler on Socket? #1988
-
 var util = require('util')
 var log = require('./logger').create('reporter')
 var MultiReporter = require('./reporters/multi')

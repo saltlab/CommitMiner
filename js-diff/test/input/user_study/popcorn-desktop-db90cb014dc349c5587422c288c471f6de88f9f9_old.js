@@ -1,6 +1,3 @@
-// Commit Message:
-// Fix resize Regex and load stored Trakt Credentials
-
 function app (App) {
     'use strict';
 

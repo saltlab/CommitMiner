@@ -6,7 +6,7 @@ function test(cb) {
 
 function foo(x) { 
 	if(!x) return;
-	console.log("Foo says: " + x.greeting); // TODO: Why does x.greeting resolve to two values when we detect globals?
+	console.log("Foo says: " + x.greeting);
 }
 
 function bar(x) { 

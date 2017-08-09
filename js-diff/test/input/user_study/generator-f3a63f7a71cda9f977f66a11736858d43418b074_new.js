@@ -1,7 +1,3 @@
-// Commit Message:
-// Base#registerTransformStream supports array of stream as parameter Fix #856
-// `Base#registerTransformStream` should support multiple streams #856
-
 'use strict';
 var util = require('util');
 var path = require('path');

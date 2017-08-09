@@ -198,6 +198,14 @@ public class TestDependencyDiffHTMLView {
 		runTest(src, dst, out);
 	}
 
+	@Test
+	public void testPopcornTime() throws Exception {
+		String src = "./test/input/user_study/popcorn-desktop-db90cb014dc349c5587422c288c471f6de88f9f9_old.js";
+		String dst = "./test/input/user_study/popcorn-desktop-db90cb014dc349c5587422c288c471f6de88f9f9_new.js";
+		String out = "./web/popcorn-dep.html";
+		runTest(src, dst, out);
+	}
+
 	/* USER STUDY CANDIDATE. */
 	@Test
 	public void testNPM() throws Exception {
