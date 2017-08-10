@@ -189,6 +189,10 @@ public class DefValueASTVisitor implements NodeVisitor {
 					prop.getFixedPosition(), 
 					prop.getLength()));
 			
+			op.getRight().visit(this);
+			
+			return false;
+			
 		}
 		/* Register DVAL-DEF annotations for  literals. */
 		else if(node instanceof KeywordLiteral) {
