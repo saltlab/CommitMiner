@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -17,9 +16,6 @@ import commitminer.analysis.annotation.AnnotationDataSet;
 import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.analysis.options.Options;
-import commitminer.js.diff.DiffCommitAnalysisFactory;
-import commitminer.js.diff.view.HTMLMultiDiffViewer;
-import commitminer.js.diff.view.HTMLUnixDiffViewer;
 
 public class TestMultiDiffMetrics {
 
@@ -29,10 +25,10 @@ public class TestMultiDiffMetrics {
 	 * @throws Exception
 	 */
 	protected void runTest(
-			String src, String dst) throws Exception {
+			String src, String dst, String out) throws Exception {
 
 		/* Set the options for this run. */
-		Options.createInstance(Options.DiffMethod.GUMTREE, Options.ChangeImpact.MULTIDIFF);
+		Options.createInstance(Options.DiffMethod.GUMTREE, Options.ChangeImpact.DEPENDENCIES);
 
 		/* Read the source files. */
 		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
@@ -45,7 +41,7 @@ public class TestMultiDiffMetrics {
 		AnnotationDataSet dataSet = new AnnotationDataSet(AnnotationFactBase.getInstance(sourceCodeFileChange));
 
 		/* Set up the analysis. */
-		ICommitAnalysisFactory commitFactory = new CommitAnalysisFactoryUnixDiffMetrics(dataSet);
+		ICommitAnalysisFactory commitFactory = new CommitAnalysisFactoryAnnotationMetrics(dataSet);
 		CommitAnalysis commitAnalysis = commitFactory.newInstance();
 
 		/* Run the analysis. */
@@ -54,6 +50,9 @@ public class TestMultiDiffMetrics {
         /* Print the data set. */
 		dataSet.printDataSet();
 
+		/* Write metrics to a file. */
+		// TODO
+
 	}
 	
 	@Test
@@ -61,8 +60,9 @@ public class TestMultiDiffMetrics {
 	
 		String src = "./test/input/diff/pm2_old.js";
 		String dst = "./test/input/diff/pm2_new.js";
+		String out = "./output/metrics/pm2.metrics";
 
-		runTest(src, dst);
+		runTest(src, dst, out);
 
 	}
 
