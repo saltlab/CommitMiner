@@ -10,11 +10,11 @@ import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.NodeVisitor;
 
+import commitminer.analysis.annotation.Annotation;
 import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.analysis.annotation.GenericDependencyIdentifier;
 import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.State;
-import commitminer.js.annotation.Annotation;
 
 public class ControlConditionASTVisitor implements NodeVisitor {
 

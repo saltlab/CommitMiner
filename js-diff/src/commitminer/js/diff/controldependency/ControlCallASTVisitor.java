@@ -18,11 +18,11 @@ import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
+import commitminer.analysis.annotation.Annotation;
 import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.analysis.annotation.GenericDependencyIdentifier;
 import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.State;
-import commitminer.js.annotation.Annotation;
 
 public class ControlCallASTVisitor implements NodeVisitor {
 

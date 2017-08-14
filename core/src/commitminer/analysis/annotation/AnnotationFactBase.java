@@ -1,4 +1,4 @@
-package commitminer.js.annotation;
+package commitminer.analysis.annotation;
 
 import java.util.Comparator;
 import java.util.HashMap;

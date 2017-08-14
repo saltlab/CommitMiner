@@ -27,6 +27,7 @@ import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
+import commitminer.analysis.annotation.Annotation;
 import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.analysis.annotation.GenericDependencyIdentifier;
 import commitminer.analysis.flow.abstractdomain.Address;
@@ -34,7 +35,6 @@ import commitminer.analysis.flow.abstractdomain.BValue;
 import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.State;
 import commitminer.analysis.flow.abstractdomain.Variable;
-import commitminer.js.annotation.Annotation;
 
 public class DefValueASTVisitor implements NodeVisitor {
 

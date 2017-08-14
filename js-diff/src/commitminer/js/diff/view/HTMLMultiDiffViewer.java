@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
-import commitminer.js.annotation.Annotation;
-import commitminer.js.annotation.AnnotationFactBase;
+import commitminer.analysis.annotation.Annotation;
+import commitminer.analysis.annotation.AnnotationFactBase;
 
 /**
  * Prints source code as annotated HTML.

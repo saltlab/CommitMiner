@@ -29,6 +29,7 @@ import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import commitminer.analysis.annotation.Annotation;
 import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.analysis.annotation.GenericDependencyIdentifier;
 import commitminer.analysis.flow.abstractdomain.Address;
@@ -38,7 +39,6 @@ import commitminer.analysis.flow.abstractdomain.ExpEval;
 import commitminer.analysis.flow.abstractdomain.Obj;
 import commitminer.analysis.flow.abstractdomain.State;
 import commitminer.analysis.flow.abstractdomain.Variable;
-import commitminer.js.annotation.Annotation;
 
 public class ValueASTVisitor implements NodeVisitor {
 

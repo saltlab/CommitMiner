@@ -1,8 +1,6 @@
-package commitminer.js.annotation;
+package commitminer.analysis.annotation;
 
 import java.util.List;
-
-import commitminer.analysis.annotation.DependencyIdentifier;
 
 /**
  * Stores the label, references, and location of a source file annotation.

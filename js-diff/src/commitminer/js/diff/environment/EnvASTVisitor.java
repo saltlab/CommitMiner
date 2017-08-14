@@ -22,11 +22,11 @@ import org.mozilla.javascript.ast.VariableInitializer;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
+import commitminer.analysis.annotation.Annotation;
 import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.analysis.flow.abstractdomain.Change;
 import commitminer.analysis.flow.abstractdomain.Environment;
 import commitminer.analysis.flow.abstractdomain.Variable;
-import commitminer.js.annotation.Annotation;
 
 public class EnvASTVisitor implements NodeVisitor {
 

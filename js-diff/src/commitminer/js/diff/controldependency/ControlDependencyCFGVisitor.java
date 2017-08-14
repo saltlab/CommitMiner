@@ -7,13 +7,13 @@ import java.util.Set;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 
+import commitminer.analysis.annotation.Annotation;
+import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.annotation.DependencyIdentifier;
 import commitminer.analysis.flow.abstractdomain.State;
 import commitminer.cfg.CFGEdge;
 import commitminer.cfg.CFGNode;
 import commitminer.cfg.ICFGVisitor;
-import commitminer.js.annotation.Annotation;
-import commitminer.js.annotation.AnnotationFactBase;
 
 /**
  * Extracts facts from a flow analysis.

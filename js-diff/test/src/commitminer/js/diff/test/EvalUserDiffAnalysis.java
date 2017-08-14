@@ -14,10 +14,10 @@ import commitminer.analysis.Commit;
 import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
+import commitminer.analysis.annotation.Annotation;
+import commitminer.analysis.annotation.AnnotationDataSet;
+import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
-import commitminer.js.annotation.Annotation;
-import commitminer.js.annotation.AnnotationDataSet;
-import commitminer.js.annotation.AnnotationFactBase;
 import commitminer.js.diff.DiffCommitAnalysisFactory;
 
 public class EvalUserDiffAnalysis {
