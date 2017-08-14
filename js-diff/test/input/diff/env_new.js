@@ -26,8 +26,6 @@ function aru(err, x) {
 	console.log("Aru says: " + x.greeting);
 }
 
-test(foo);
-
 function bli(x) {
 	console.log("Bli says: " + x.greeting);
 }
@@ -71,6 +69,8 @@ cam(message2);
 drp(err, message2);
 
 console.log("Beginning test sequence 2.");
+
+test(foo);
 
 test(bar);
 

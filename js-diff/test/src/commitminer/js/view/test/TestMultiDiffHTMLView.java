@@ -208,8 +208,8 @@ public class TestMultiDiffHTMLView {
 
 	@Test
 	public void testDebug() throws Exception {
-		String src = "./test/input/user_study/debug.js";
-		String dst = "./test/input/user_study/debug.js";
+		String src = "./test/input/user_study/debug_old.js";
+		String dst = "./test/input/user_study/debug_new.js";
 		String out = "./web/debug.html";
 		runTest(src, dst, out);
 	}

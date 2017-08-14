@@ -1,6 +1,8 @@
 function app (App) {
     'use strict';
 
+		var preHashed = false;
+
     var request = require('request'), 
         URI = require('URIjs'), 
         Q = require('q'), 
@@ -13,26 +15,8 @@ function app (App) {
         API_PLUGIN_VERSION = AdvSettings.get('traktTvVersion'),
         PT_VERSION = AdvSettings.get('version');
 
-    function TraktTv() {
-        App.Providers.CacheProvider.call(this, 'metadata');
+		function TraktTv() { }
 
-        this.authenticated = false;
-        this._credentials = {username: '', password: ''};
-
-        // Login with stored credentials
-        if(AdvSettings.get('traktUsername') !== '' && AdvSettings.get('traktPassword') !== '') {
-            this.authenticate(AdvSettings.get('traktUsername'), AdvSettings.get('traktPassword'), true);
-        }
-
-        var self = this;
-        // Bind all "sub" method calls to TraktTv
-        _.each(this.movie, function(method, key) {
-            self.movie[key] = method.bind(self);
-        });
-        _.each(this.show, function(method, key) {
-            self.show[key] = method.bind(self);
-        });
-    }
     // Inherit the Cache Provider
     inherits(TraktTv, App.Providers.CacheProvider);
 
@@ -109,17 +93,24 @@ function app (App) {
     };
 
     TraktTv.prototype.authenticate = function(username, password, preHashed) {
+        var self = this;
+
         preHashed = preHashed || false;
 
-        var self = this;
+				// hash only if not pre-hashed
+				if(preHashed) {
+					password = crypto.createHash('sha1', password);
+				}
+
         return this.post('account/test/{KEY}', {
             username: username, 
-            password: preHashed ? password : crypto.createHash('sha1').update(password, 'utf8').digest('hex')
+            password: password
         }).then(function(data) {
             if(data.status === 'success') {
                 self._credentials = {
                     username: username, 
-                    password: preHashed ? password : crypto.createHash('sha1').update(password, 'utf8').digest('hex')
+                    password: password,
+										preHashed: preHashed
                 };
                 self.authenticated = true;
                 // Store the credentials (hashed ofc)
@@ -373,8 +364,30 @@ function app (App) {
         }
     };
 
+    TraktTv.prototype.init = function() {
+        App.Providers.CacheProvider.call(this, 'metadata');
+
+        this.authenticated = false;
+        this._credentials = {username: '', password: ''};
+
+        // Login with stored credentials
+        if(AdvSettings.get('traktUsername') !== '' && AdvSettings.get('traktPassword') !== '') {
+            this.authenticate(AdvSettings.get('traktPassword'), AdvSettings.get('traktUsername'), true);
+        }
+
+        var self = this;
+        // Bind all "sub" method calls to TraktTv
+        _.each(this.movie, function(method, key) {
+            self.movie[key] = method.bind(self);
+        });
+        _.each(this.show, function(method, key) {
+            self.show[key] = method.bind(self);
+        });
+    }
+
     App.Providers.Trakttv = TraktTv;
 
 }
 
 app(window.App);
+

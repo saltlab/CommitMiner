@@ -1,6 +1,8 @@
 function app (App) {
     'use strict';
 
+		var preHashed = false;
+
     var request = require('request'), 
         URI = require('URIjs'), 
         Q = require('q'), 
@@ -13,20 +15,8 @@ function app (App) {
         API_PLUGIN_VERSION = AdvSettings.get('traktTvVersion'),
         PT_VERSION = AdvSettings.get('version');
 
-    function TraktTv() {
-        App.Providers.CacheProvider.call(this, 'metadata');
-        this.authenticated = false;
-        this._credentials = {username: '', password: ''};
+		function TraktTv() { }
 
-        var self = this;
-        // Bind all "sub" method calls to TraktTv
-        _.each(this.movie, function(method, key) {
-            self.movie[key] = method.bind(self);
-        });
-        _.each(this.show, function(method, key) {
-            self.show[key] = method.bind(self);
-        });
-    }
     // Inherit the Cache Provider
     inherits(TraktTv, App.Providers.CacheProvider);
 
@@ -102,16 +92,20 @@ function app (App) {
         return defer.promise;
     };
 
-    TraktTv.prototype.authenticate = function(username, password) {
+    var authenticate = TraktTv.prototype.authenticate = function(username, password) {
         var self = this;
+
+				password = crypto.createHash('sha1', password);
+
         return this.post('account/test/{KEY}', {
             username: username, 
-            password: crypto.createHash('sha1').update(password, 'utf8').digest('hex')
+            password: password
         }).then(function(data) {
             if(data.status === 'success') {
                 self._credentials = {
                     username: username, 
-                    password: crypto.createHash('sha1').update(password, 'utf8').digest('hex')
+                    password: password,
+										preHashed: preHashed
                 };
                 self.authenticated = true;
                 return true;
@@ -362,8 +356,24 @@ function app (App) {
         }
     };
 
+    TraktTv.prototype.init = function() {
+        App.Providers.CacheProvider.call(this, 'metadata');
+        this.authenticated = false;
+        this._credentials = {username: '', password: ''};
+
+        var self = this;
+        // Bind all "sub" method calls to TraktTv
+        _.each(this.movie, function(method, key) {
+            self.movie[key] = method.bind(self);
+        });
+        _.each(this.show, function(method, key) {
+            self.show[key] = method.bind(self);
+        });
+    }
+
     App.Providers.Trakttv = TraktTv;
 
 }
 
 app(window.App);
+

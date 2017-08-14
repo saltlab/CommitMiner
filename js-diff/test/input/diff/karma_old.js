@@ -1,12 +1,11 @@
-var util = require('util');
-var log = require('./logger').create('reporter');
-var MultiReporter = require('./reporters/multi');
-var baseReporterDecoratorFactory = require('./reporters/base').decoratorFactory;
-var SourceMapConsumer = require('source-map').SourceMapConsumer;
-var WeakMap = require('core-js/es6/weak-map');
-var _ = require('./helper')._;
+var util = require('util')
+var log = require('./logger').create('reporter')
+var MultiReporter = require('./reporters/multi')
+var baseReporterDecoratorFactory = require('./reporters/base').decoratorFactory
+var SourceMapConsumer = require('source-map').SourceMapConsumer
+var WeakMap = require('core-js/es6/weak-map')
 
-var createErrorFormatter = function (basePath, emitter, SourceMapConsumer, regexp) {
+var createErrorFormatter = function (basePath, emitter, SourceMapConsumer) {
   var lastServedFiles = []
 
   emitter.on('file_list_modified', function (files) {
@@ -22,6 +21,14 @@ var createErrorFormatter = function (basePath, emitter, SourceMapConsumer, regex
     return null
   }
 
+  var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/]*)?\\/?' +
+    '(base|absolute)' + // prefix
+    '((?:[A-z]\\:)?[^\\?\\s\\:]*)' + // path
+    '(\\?\\w*)?' + // sha
+    '(\\:(\\d+))?' + // line
+    '(\\:(\\d+))?' + // column
+    '', 'g')
+
   var getSourceMapConsumer = (function () {
     var cache = new WeakMap()
     return function (sourceMap) {
@@ -32,36 +39,17 @@ var createErrorFormatter = function (basePath, emitter, SourceMapConsumer, regex
     }
   }())
 
-  return function (input, indentation) {
-
-		var regexp = new RegExp('(?:https?:\\/\\/[^\\/]*)?\\/?' +
-			'(base|absolute|relative)' + // prefix
-			'((?:[A-z]\\:)?[^\\?\\s\\:]*)' + // path
-			'(\\?\\w*)?' + // sha
-			'(\\:(\\d+))?' + // line
-			'(\\:(\\d+))?' + // column
-			'', 'g')
-
-    indentation = _.isString(indentation) ? indentation : ''
-    if (_.isError(input)) {
-			// when error, initialize to error message
-      input = input.message
-    } else if (_.isEmpty(input)) {
-			// when empty array, initialize to empty string
-      input = ''
-    } else if (!_.isString(input)) {
-			// when not a string, stringify the object
-      input = JSON.stringify(input, null, indentation)
-    }
-
+  return function (msg, indentation) {
     // remove domain and timestamp from source files
     // and resolve base path / absolute path urls into absolute path
-    var msg = input.replace(regexp, function (_, prefix, path, __, ___, line, ____, column) {
+    msg = (msg || '').replace(URL_REGEXP, function (_, prefix, path, __, ___, line, ____, column) {
       if (prefix === 'base') {
         path = basePath + path
       }
 
-      if (!findFile(path) && findFile(path).sourceMap && line) {
+      var file = findFile(path)
+
+      if (file && file.sourceMap && line) {
         line = parseInt(line || '0', 10)
 
         column = parseInt(column, 10)
@@ -71,7 +59,7 @@ var createErrorFormatter = function (basePath, emitter, SourceMapConsumer, regex
         var bias = column ? SourceMapConsumer.GREATEST_LOWER_BOUND : SourceMapConsumer.LEAST_UPPER_BOUND
 
         try {
-          var original = getSourceMapConsumer(findFile().sourceMap)
+          var original = getSourceMapConsumer(file.sourceMap)
             .originalPositionFor({line: line, column: (column || 0), bias: bias})
 
           var formattedColumn = column ? util.format(':%s', column) : ''
@@ -97,16 +85,7 @@ var createErrorFormatter = function (basePath, emitter, SourceMapConsumer, regex
 }
 
 var createReporters = function (names, config, emitter, injector) {
-
-  var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/]*)?\\/?' +
-    '(base|absolute)' + // prefix
-    '((?:[A-z]\\:)?[^\\?\\s\\:]*)' + // path
-    '(\\?\\w*)?' + // sha
-    '(\\:(\\d+))?' + // line
-    '(\\:(\\d+))?' + // column
-    '', 'g')
-
-  var errorFormatter = createErrorFormatter(config.basePath, emitter, SourceMapConsumer, URL_REGEXP)
+  var errorFormatter = createErrorFormatter(config.basePath, emitter, SourceMapConsumer)
   var reporters = []
 
   // TODO(vojta): instantiate all reporters through DI

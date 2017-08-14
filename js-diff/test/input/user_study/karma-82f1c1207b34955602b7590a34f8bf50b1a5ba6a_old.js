@@ -1,11 +1,11 @@
-var util = require('util')
-var log = require('./logger').create('reporter')
-var MultiReporter = require('./reporters/multi')
-var baseReporterDecoratorFactory = require('./reporters/base').decoratorFactory
-var SourceMapConsumer = require('source-map').SourceMapConsumer
-var WeakMap = require('core-js/es6/weak-map')
+var util = require('util');
+var log = require('./logger').create('reporter');
+var MultiReporter = require('./reporters/multi');
+var baseReporterDecoratorFactory = require('./reporters/base').decoratorFactory;
+var SourceMapConsumer = require('source-map').SourceMapConsumer;
+var WeakMap = require('core-js/es6/weak-map');
 
-var createErrorFormatter = function (basePath, emitter, SourceMapConsumer) {
+var createErrorFormatter = function (basePath, emitter, SourceMapConsumer, regexp) {
   var lastServedFiles = []
 
   emitter.on('file_list_modified', function (files) {
@@ -21,14 +21,6 @@ var createErrorFormatter = function (basePath, emitter, SourceMapConsumer) {
     return null
   }
 
-  var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/]*)?\\/?' +
-    '(base|absolute)' + // prefix
-    '((?:[A-z]\\:)?[^\\?\\s\\:]*)' + // path
-    '(\\?\\w*)?' + // sha
-    '(\\:(\\d+))?' + // line
-    '(\\:(\\d+))?' + // column
-    '', 'g')
-
   var getSourceMapConsumer = (function () {
     var cache = new WeakMap()
     return function (sourceMap) {
@@ -42,7 +34,7 @@ var createErrorFormatter = function (basePath, emitter, SourceMapConsumer) {
   return function (msg, indentation) {
     // remove domain and timestamp from source files
     // and resolve base path / absolute path urls into absolute path
-    msg = (msg || '').replace(URL_REGEXP, function (_, prefix, path, __, ___, line, ____, column) {
+    msg = (msg || '').replace(regexp, function (_, prefix, path, __, ___, line, ____, column) {
       if (prefix === 'base') {
         path = basePath + path
       }
@@ -85,7 +77,16 @@ var createErrorFormatter = function (basePath, emitter, SourceMapConsumer) {
 }
 
 var createReporters = function (names, config, emitter, injector) {
-  var errorFormatter = createErrorFormatter(config.basePath, emitter, SourceMapConsumer)
+
+  var URL_REGEXP = new RegExp('(?:https?:\\/\\/[^\\/]*)?\\/?' +
+    '(base|absolute)' + // prefix
+    '((?:[A-z]\\:)?[^\\?\\s\\:]*)' + // path
+    '(\\?\\w*)?' + // sha
+    '(\\:(\\d+))?' + // line
+    '(\\:(\\d+))?' + // column
+    '', 'g')
+
+  var errorFormatter = createErrorFormatter(config.basePath, emitter, SourceMapConsumer, URL_REGEXP)
   var reporters = []
 
   // TODO(vojta): instantiate all reporters through DI
