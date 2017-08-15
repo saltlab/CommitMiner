@@ -51,8 +51,10 @@ public class TestMultiDiffMetrics {
 		dataSet.printDataSet();
 
 		/* Write metrics to a file. */
-		// TODO
-
+		AnnotationMetricsPostprocessor postProc = new AnnotationMetricsPostprocessor(out);
+		postProc.writeHeader();
+		postProc.process(commit, sourceCodeFileChange, dataSet);
+		
 	}
 	
 	@Test
