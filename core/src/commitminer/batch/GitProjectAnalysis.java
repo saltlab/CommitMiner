@@ -25,6 +25,7 @@ import commitminer.analysis.Commit;
 import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
+import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.git.GitProject;
 
@@ -153,6 +154,13 @@ public class GitProjectAnalysis extends GitProject {
 		try {
 			CommitAnalysis commitAnalysis = commitAnalysisFactory.newInstance();
 			commitAnalysis.analyze(commit);
+			
+			for(SourceCodeFileChange fileChange : commit.sourceCodeFileChanges) {
+				/* Initialize a data set for the file analysis results. */
+				AnnotationFactBase factBase = AnnotationFactBase.getInstance(fileChange);
+				
+			}
+			
 		}
 		catch(Exception ignore) {
 			System.err.println("Ignoring exception in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nBug Fixing Revision: " + bugFixingRevision);

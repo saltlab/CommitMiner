@@ -20,7 +20,6 @@ import commitminer.analysis.Commit;
 import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
-import commitminer.analysis.annotation.AnnotationDataSet;
 import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.analysis.options.Options;
@@ -55,20 +54,20 @@ public class TestMultiDiffHTMLView {
 		commit.addSourceCodeFileChange(getSourceCodeFileChange(src, dst));
 
 		/* Builds the data set with our custom queries. */
-		AnnotationDataSet dataSet = new AnnotationDataSet( AnnotationFactBase.getInstance(sourceCodeFileChange));
+		AnnotationFactBase factBase = AnnotationFactBase.getInstance(sourceCodeFileChange);
 
 		/* Set up the analysis. */
-		ICommitAnalysisFactory commitFactory = new DiffCommitAnalysisFactory(dataSet);
+		ICommitAnalysisFactory commitFactory = new DiffCommitAnalysisFactory();
 		CommitAnalysis commitAnalysis = commitFactory.newInstance();
 
 		/* Run the analysis. */
 		commitAnalysis.analyze(commit);
 
         /* Print the data set. */
-		dataSet.printDataSet();
+		factBase.printDataSet();
 
 		/* Only annotate the destination file. The source file isn't especially useful. */
-		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, dataSet.getAnnotationFactBase());
+		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, factBase);
 
 		/* Combine the annotated file with the UnixDiff. */
 		String annotatedCombined = HTMLUnixDiffViewer.annotate(srcCode, dstCode, annotatedDst);

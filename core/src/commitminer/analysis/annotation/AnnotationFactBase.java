@@ -94,5 +94,11 @@ public class AnnotationFactBase extends FactBase {
 		annotations.remove(annotation);
 		return annotation;
 	}
+
+	public void printDataSet() {
+		for(Annotation annotation : annotations) {
+			System.out.println(annotation.toString());
+		}
+	}
 	
 }

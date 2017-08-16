@@ -15,7 +15,6 @@ import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
 import commitminer.analysis.annotation.Annotation;
-import commitminer.analysis.annotation.AnnotationDataSet;
 import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.js.diff.DiffCommitAnalysisFactory;
@@ -35,20 +34,20 @@ public class EvalUserDiffAnalysis {
 		commit.addSourceCodeFileChange(sourceFileChange);
 
 		/* Builds the data set with our custom queries. */
-		AnnotationDataSet dataSet = new AnnotationDataSet( AnnotationFactBase.getInstance(sourceFileChange));
+		AnnotationFactBase factBase = AnnotationFactBase.getInstance(sourceFileChange);
 
 		/* Set up the analysis. */
-		ICommitAnalysisFactory commitFactory = new DiffCommitAnalysisFactory(dataSet);
+		ICommitAnalysisFactory commitFactory = new DiffCommitAnalysisFactory();
 		CommitAnalysis commitAnalysis = commitFactory.newInstance();
 
 		/* Run the analysis. */
 		commitAnalysis.analyze(commit);
 
         /* Print the data set. */
-		dataSet.printDataSet();
+		factBase.printDataSet();
 
         /* Verify the expected annotations match the actual annotations. */
-		SortedSet<Annotation> actualAnnotations = dataSet.getAnnotationFactBase().getAnnotations();
+		SortedSet<Annotation> actualAnnotations = factBase.getAnnotations();
 		for(Annotation expectedAnnotation : expectedAnnotations) {
 			Assert.assertTrue(actualAnnotations.contains(expectedAnnotation));
 		}

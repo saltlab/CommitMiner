@@ -23,7 +23,7 @@ import commitminer.js.diff.value.ValueCFGVisitorFactory;
  */
 public class DiffCommitAnalysisFactory implements ICommitAnalysisFactory {
 
-	public DiffCommitAnalysisFactory(DataSet dataSet) { }
+	public DiffCommitAnalysisFactory() { }
 
 	@Override
 	public CommitAnalysis newInstance() {

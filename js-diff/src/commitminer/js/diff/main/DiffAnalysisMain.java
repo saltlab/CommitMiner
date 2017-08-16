@@ -67,7 +67,7 @@ public class DiffAnalysisMain {
 				new LinkedList<IRule>(), getUseQueries());
 
 		/* Set up the analysis factory. */
-		ICommitAnalysisFactory commitFactory = new DiffCommitAnalysisFactory(dataSet);
+		ICommitAnalysisFactory commitFactory = new DiffCommitAnalysisFactory();
 
 		/* Set up the project analysis. */
         GitProjectAnalysis gitProjectAnalysis;

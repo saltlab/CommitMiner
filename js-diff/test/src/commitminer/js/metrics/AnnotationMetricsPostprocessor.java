@@ -9,7 +9,7 @@ import java.util.SortedSet;
 import commitminer.analysis.Commit;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.annotation.Annotation;
-import commitminer.analysis.annotation.AnnotationDataSet;
+import commitminer.analysis.annotation.AnnotationFactBase;
 
 public class AnnotationMetricsPostprocessor {
 	
@@ -22,11 +22,11 @@ public class AnnotationMetricsPostprocessor {
 		this.path = path;
 	}
 	
-	public void process(Commit commit, SourceCodeFileChange file, AnnotationDataSet dataSet) throws IOException {
+	public void process(Commit commit, SourceCodeFileChange file, AnnotationFactBase factBase) throws IOException {
 
 		/* Convenience */
 		String code = file.repairedCode;
-		SortedSet<Annotation> annotations = dataSet.getAnnotationFactBase().getAnnotations();
+		SortedSet<Annotation> annotations = factBase.getAnnotations();
 
 		CommitMetrics metrics = new CommitMetrics(commit, file);
 		

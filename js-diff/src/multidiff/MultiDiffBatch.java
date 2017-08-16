@@ -2,9 +2,6 @@ package multidiff;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
 import org.apache.commons.io.FileUtils;
 import org.kohsuke.args4j.CmdLineException;
@@ -17,55 +14,59 @@ import commitminer.analysis.Commit.Type;
 import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.analysis.options.Options;
+import commitminer.batch.GitProjectAnalysis;
 import commitminer.js.diff.DiffCommitAnalysisFactory;
-import commitminer.js.diff.view.HTMLMultiDiffViewer;
-import commitminer.js.diff.view.HTMLUnixDiffViewer;
+import commitminer.js.diff.factories.CommitAnalysisFactoryAnnotationMetrics;
+import commitminer.js.metrics.AnnotationMetricsPostprocessor;
 
-public class MultiDiff {
+public class MultiDiffBatch {
 
+	/** The directory where repositories are checked out. **/
+	public static final String CHECKOUT_DIR =  new String("repositories");
+	
 	public static void main(String[] args) {
 
-		/* The test files. */
+		/* Get the options from the command line args. */
 		MultiDiffOptions options = new MultiDiffOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 
 		try {
 			parser.parseArgument(args);
 		} catch (CmdLineException e) {
-			MultiDiff.printUsage(e.getMessage(), parser);
+			MultiDiffBatch.printUsage(e.getMessage(), parser);
 			return;
 		}
 
 		/* Print the help page. */
 		if(options.getHelp()) {
-			MultiDiff.printHelp(parser);
+			MultiDiffBatch.printHelp(parser);
 			return;
 		}
 
-		/* Read the source files. */
-		SourceCodeFileChange sourceCodeFileChange = null;
+		/* The analysis we will be using. */
+		ICommitAnalysisFactory analysisFactory = new CommitAnalysisFactoryAnnotationMetrics();
 		
-		try { 
-			sourceCodeFileChange = getSourceCodeFileChange(options.getOriginal(), options.getModified());
-		} catch(IOException e) {
-			System.err.println("An IOException occurred while reading the source code files. Check that the paths are correct.");
-			return;
-		}
-
-		/* Build the expected feature vectors. */
+		GitProjectAnalysis gitProjectAnalysis;
 		try {
-			MultiDiff multiDiff = new MultiDiff(options);
-			multiDiff.diff(sourceCodeFileChange);
+
+			/* Checkout or pull the project. */
+            gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(),
+            		CHECKOUT_DIR, ".*", analysisFactory);
+            
+            /* Run the analysis on the project history. */
+			gitProjectAnalysis.analyze();
+
 		} catch (Exception e) {
-			System.err.println("An Exception occurred while generating the diff... aborting.");
-		}
+			e.printStackTrace(System.err);
+			return;
+		}	
 
 	}
 	
 	/** The analysis options. **/
 	private MultiDiffOptions options;
 	
-	public MultiDiff(MultiDiffOptions options) {
+	public MultiDiffBatch(MultiDiffOptions options) {
 		this.options = options;
 	}
 
@@ -77,11 +78,7 @@ public class MultiDiff {
 		/* Set the options for this run. */
 		Options.createInstance(Options.DiffMethod.GUMTREE, Options.ChangeImpact.DEPENDENCIES);
 
-		/* Read the source files. */
-		String srcCode = new String(Files.readAllBytes(Paths.get(options.getOriginal())));
-		String dstCode = new String(Files.readAllBytes(Paths.get(options.getModified())));
-
-		/* Set up a 'fake' commit since this is not a mining task. */
+		/* Build the dummy commit. */
 		Commit commit = getCommit();
 		commit.addSourceCodeFileChange(sourceFileChange);
 
@@ -98,12 +95,10 @@ public class MultiDiff {
         /* Print the data set. */
 		factBase.printDataSet();
 
-		/* Only annotate the destination file. The source file isn't especially useful. */
-		String annotatedDst = HTMLMultiDiffViewer.annotate(dstCode, factBase);
-
-		/* Combine the annotated file with the UnixDiff. */
-		String annotatedCombined = HTMLUnixDiffViewer.annotate(srcCode, dstCode, annotatedDst);
-		Files.write(Paths.get(options.getOutputFile()), annotatedCombined.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+		/* Write metrics to a file. */
+		AnnotationMetricsPostprocessor postProc = new AnnotationMetricsPostprocessor(options.getOutputFile());
+		postProc.writeHeader();
+		postProc.process(commit, sourceFileChange, factBase);
 
 	}
 
@@ -112,7 +107,7 @@ public class MultiDiff {
 	 * @param parser The args4j parser.
 	 */
 	private static void printHelp(CmdLineParser parser) {
-        System.out.print("Usage: MultiDiff ");
+        System.out.print("Usage: MultiDiffBatch ");
         parser.printSingleLineUsage(System.out);
         System.out.println("\n");
         parser.printUsage(System.out);

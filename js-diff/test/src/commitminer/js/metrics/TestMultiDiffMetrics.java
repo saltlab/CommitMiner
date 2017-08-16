@@ -10,7 +10,6 @@ import commitminer.analysis.Commit;
 import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
-import commitminer.analysis.annotation.AnnotationDataSet;
 import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.analysis.options.Options;
@@ -37,7 +36,7 @@ public class TestMultiDiffMetrics {
 		commit.addSourceCodeFileChange(sourceCodeFileChange);
 
 		/* builds the data set with our custom queries. */
-		AnnotationDataSet dataSet = new AnnotationDataSet(AnnotationFactBase.getInstance(sourceCodeFileChange));
+		AnnotationFactBase factBase = AnnotationFactBase.getInstance(sourceCodeFileChange);
 
 		/* Set up the analysis. */
 		ICommitAnalysisFactory commitFactory = new CommitAnalysisFactoryAnnotationMetrics();
@@ -47,12 +46,12 @@ public class TestMultiDiffMetrics {
 		commitAnalysis.analyze(commit);
 
         /* Print the data set. */
-		dataSet.printDataSet();
+		factBase.printDataSet();
 
 		/* Write metrics to a file. */
 		AnnotationMetricsPostprocessor postProc = new AnnotationMetricsPostprocessor(out);
 		postProc.writeHeader();
-		postProc.process(commit, sourceCodeFileChange, dataSet);
+		postProc.process(commit, sourceCodeFileChange, factBase);
 		
 	}
 	
