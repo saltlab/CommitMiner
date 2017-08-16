@@ -17,6 +17,7 @@ import commitminer.analysis.Commit.Type;
 import commitminer.analysis.annotation.AnnotationDataSet;
 import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
+import commitminer.analysis.options.Options;
 import commitminer.js.diff.DiffCommitAnalysisFactory;
 import commitminer.js.diff.view.HTMLMultiDiffViewer;
 import commitminer.js.diff.view.HTMLUnixDiffViewer;
@@ -73,6 +74,9 @@ public class MultiDiff {
 	 * Generate the diff in a partial html file.
 	 */
 	protected void diff(SourceCodeFileChange sourceFileChange) throws Exception {
+
+		/* Set the options for this run. */
+		Options.createInstance(Options.DiffMethod.GUMTREE, Options.ChangeImpact.DEPENDENCIES);
 
 		/* Read the source files. */
 		String srcCode = new String(Files.readAllBytes(Paths.get(options.getOriginal())));

@@ -11,7 +11,7 @@ public class AstDomainAnalysisFactory implements IDomainAnalysisFactory {
 	public DomainAnalysis newInstance() {
 		ISourceCodeFileAnalysisFactory srcFactory = new AstScriptAnalysisFactory();
 		ISourceCodeFileAnalysisFactory dstFactory = new AstScriptAnalysisFactory();
-		return new DomainAnalysis(srcFactory, dstFactory, new JavaScriptCFGFactory(), false);
+		return new DomainAnalysis(srcFactory, dstFactory, new JavaScriptCFGFactory(), false, false);
 	}
 
 }

@@ -13,11 +13,7 @@ import commitminer.js.classify.protect.ProtectedCFGVisitorFactory;
 
 public class FlowCommitAnalysisFactory implements ICommitAnalysisFactory {
 
-	private DataSet dataSet;
-
-	public FlowCommitAnalysisFactory(DataSet dataSet) {
-		this.dataSet = dataSet;
-	}
+	public FlowCommitAnalysisFactory(DataSet dataSet) { }
 
 	@Override
 	public CommitAnalysis newInstance() {
@@ -25,7 +21,7 @@ public class FlowCommitAnalysisFactory implements ICommitAnalysisFactory {
 		cfgVisitorFactories.add(new ProtectedCFGVisitorFactory());
 		List<IDomainAnalysisFactory> domainFactories = new LinkedList<IDomainAnalysisFactory>();
 		domainFactories.add(new FlowDomainAnalysisFactory(cfgVisitorFactories));
-		return new CommitAnalysis(dataSet, domainFactories);
+		return new CommitAnalysis(domainFactories);
 	}
 
 }

@@ -23,11 +23,7 @@ import commitminer.js.diff.value.ValueCFGVisitorFactory;
  */
 public class DiffCommitAnalysisFactory implements ICommitAnalysisFactory {
 
-	private DataSet dataSet;
-
-	public DiffCommitAnalysisFactory(DataSet dataSet) {
-		this.dataSet = dataSet;
-	}
+	public DiffCommitAnalysisFactory(DataSet dataSet) { }
 
 	@Override
 	public CommitAnalysis newInstance() {
@@ -43,7 +39,7 @@ public class DiffCommitAnalysisFactory implements ICommitAnalysisFactory {
 		domainFactories.add(new FlowDomainAnalysisFactory(cfgVisitorFactories));
 //		domainFactories.add(new LineDomainAnalysisFactory());
 //		domainFactories.add(new AstDomainAnalysisFactory());
-		return new CommitAnalysis(dataSet, domainFactories);
+		return new CommitAnalysis(domainFactories);
 	}
 
 }

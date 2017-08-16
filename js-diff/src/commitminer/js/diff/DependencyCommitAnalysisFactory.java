@@ -19,11 +19,7 @@ import commitminer.js.diff.defvalue.DefValueCFGVisitorFactory;
  */
 public class DependencyCommitAnalysisFactory implements ICommitAnalysisFactory {
 
-	private DataSet dataSet;
-
-	public DependencyCommitAnalysisFactory(DataSet dataSet) {
-		this.dataSet = dataSet;
-	}
+	public DependencyCommitAnalysisFactory(DataSet dataSet) { }
 
 	@Override
 	public CommitAnalysis newInstance() {
@@ -35,7 +31,7 @@ public class DependencyCommitAnalysisFactory implements ICommitAnalysisFactory {
 
 		List<IDomainAnalysisFactory> domainFactories = new LinkedList<IDomainAnalysisFactory>();
 		domainFactories.add(new FlowDomainAnalysisFactory(cfgVisitorFactories));
-		return new CommitAnalysis(dataSet, domainFactories);
+		return new CommitAnalysis(domainFactories);
 	}
 
 }

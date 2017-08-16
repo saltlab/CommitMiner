@@ -139,6 +139,7 @@ public class AnnotationMetricsPostprocessor {
 			s += "Project:       " + commit.projectID + "\n";
 			s += "Commit:        " + commit.repairedCommitID + "\n";
 			s += "File:          " + file.repairedFile + "\n";
+			s += "Runtime (ms):  " + file.analysisRuntime + "\n";
 			s += "---------------\n";
 			s += "Total Lines:   " + totLin + "\n";
 			s += "---------------\n";
@@ -162,6 +163,7 @@ public class AnnotationMetricsPostprocessor {
 			String s = "'" + commit.projectID + "'";
 			s += ", '" + commit.repairedCommitID + "'";
 			s += ", '" + file.repairedFile + "'";
+			s += ", " + file.analysisRuntime;
 			s += ", " + totLin;
 			s += ", " + datDef;
 			s += ", " + datUse;

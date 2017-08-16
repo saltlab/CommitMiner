@@ -2,8 +2,6 @@ package commitminer.js.metrics;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -16,6 +14,7 @@ import commitminer.analysis.annotation.AnnotationDataSet;
 import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.analysis.options.Options;
+import commitminer.js.diff.factories.CommitAnalysisFactoryAnnotationMetrics;
 
 public class TestMultiDiffMetrics {
 
@@ -35,13 +34,13 @@ public class TestMultiDiffMetrics {
 
 		/* Build the dummy commit. */
 		Commit commit = getCommit();
-		commit.addSourceCodeFileChange(getSourceCodeFileChange(src, dst));
+		commit.addSourceCodeFileChange(sourceCodeFileChange);
 
-		/* Builds the data set with our custom queries. */
+		/* builds the data set with our custom queries. */
 		AnnotationDataSet dataSet = new AnnotationDataSet(AnnotationFactBase.getInstance(sourceCodeFileChange));
 
 		/* Set up the analysis. */
-		ICommitAnalysisFactory commitFactory = new CommitAnalysisFactoryAnnotationMetrics(dataSet);
+		ICommitAnalysisFactory commitFactory = new CommitAnalysisFactoryAnnotationMetrics();
 		CommitAnalysis commitAnalysis = commitFactory.newInstance();
 
 		/* Run the analysis. */

@@ -21,7 +21,7 @@ import commitminer.analysis.annotation.DependencyIdentifier;
 public class LineDomainAnalysis extends DomainAnalysis {
 
 	public LineDomainAnalysis() {
-		super(null, null, null, false);
+		super(null, null, null, false, false);
 	}
 
 	@Override

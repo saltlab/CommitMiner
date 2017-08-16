@@ -11,7 +11,7 @@ public class SimpleDomainAnalysisFactory implements IDomainAnalysisFactory {
 		ISourceCodeFileAnalysisFactory srcFactory = new SimpleScriptAnalysisFactory();
 		ISourceCodeFileAnalysisFactory dstFactory = new SimpleScriptAnalysisFactory();
 		SimpleCFGFactory cfgFactory = new SimpleCFGFactory();
-		return new DomainAnalysis(srcFactory, dstFactory, cfgFactory, false);
+		return new DomainAnalysis(srcFactory, dstFactory, cfgFactory, false, false);
 	}
 
 }

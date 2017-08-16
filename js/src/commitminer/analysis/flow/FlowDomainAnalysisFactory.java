@@ -20,7 +20,7 @@ public class FlowDomainAnalysisFactory implements IDomainAnalysisFactory {
 	public DomainAnalysis newInstance() {
 		ISourceCodeFileAnalysisFactory srcFactory = new ScriptFlowAnalysisFactory(cfgVisitorFactories);
 		ISourceCodeFileAnalysisFactory dstFactory = new ScriptFlowAnalysisFactory(cfgVisitorFactories);
-		return new DomainAnalysis(srcFactory, dstFactory, new JavaScriptCFGFactory(), /*Do AST pre-processing:*/true);
+		return new DomainAnalysis(srcFactory, dstFactory, new JavaScriptCFGFactory(), /*Do AST pre-processing:*/true, true);
 	}
 
 }

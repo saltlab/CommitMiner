@@ -2,8 +2,6 @@ package commitminer.analysis;
 
 import java.util.regex.Matcher;
 
-
-
 /**
  * Stores the information that represents a change to a source code file.
  *
@@ -23,6 +21,9 @@ public class SourceCodeFileChange {
 
 	/** The code after the commit. **/
 	public String repairedCode;
+	
+	/** The the time spent analyzing the file. **/
+	public long analysisRuntime;
 
 	/**
 	 * @param buggyFile The path to the source file before the commit.
@@ -36,6 +37,7 @@ public class SourceCodeFileChange {
 		this.repairedFile = repairedFile;
 		this.buggyCode = buggyCode;
 		this.repairedCode = repairedCode;
+		this.analysisRuntime = -1;
 	}
 
 	/**

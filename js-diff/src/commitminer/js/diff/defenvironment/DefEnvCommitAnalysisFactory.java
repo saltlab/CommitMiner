@@ -12,11 +12,7 @@ import commitminer.cfg.ICFGVisitorFactory;
 
 public class DefEnvCommitAnalysisFactory implements ICommitAnalysisFactory {
 
-	private DataSet dataSet;
-
-	public DefEnvCommitAnalysisFactory(DataSet dataSet) {
-		this.dataSet = dataSet;
-	}
+	public DefEnvCommitAnalysisFactory(DataSet dataSet) { }
 
 	@Override
 	public CommitAnalysis newInstance() {
@@ -24,7 +20,7 @@ public class DefEnvCommitAnalysisFactory implements ICommitAnalysisFactory {
 		cfgVisitorFactories.add(new DefEnvCFGVisitorFactory());
 		List<IDomainAnalysisFactory> domainFactories = new LinkedList<IDomainAnalysisFactory>();
 		domainFactories.add(new FlowDomainAnalysisFactory(cfgVisitorFactories));
-		return new CommitAnalysis(dataSet, domainFactories);
+		return new CommitAnalysis(domainFactories);
 	}
 
 }

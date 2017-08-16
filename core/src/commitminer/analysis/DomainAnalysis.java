@@ -31,6 +31,9 @@ public class DomainAnalysis {
 
 	/** Set to true to enable AST pre-processing. **/
 	private boolean preProcess;
+	
+	/** Set to true to measure the runtime of this domain. **/
+	private boolean measureRuntime;
 
 	/**
 	 * @param srcAnalysis The analysis to run on the source (or buggy) file.
@@ -38,11 +41,13 @@ public class DomainAnalysis {
 	 */
 	public DomainAnalysis(ISourceCodeFileAnalysisFactory srcAnalysisClass,
 						  ISourceCodeFileAnalysisFactory dstAnalysisClass,
-						  CFGFactory cfgFactory, boolean preProcess) {
+						  CFGFactory cfgFactory, boolean preProcess,
+						  boolean measureRuntime) {
 		this.srcAnalysisFactory = srcAnalysisClass;
 		this.dstAnalysisFactory = dstAnalysisClass;
 		this.cfgFactory = cfgFactory;
 		this.preProcess = preProcess;
+		this.measureRuntime = measureRuntime;
 	}
 
 	/**
@@ -72,6 +77,9 @@ public class DomainAnalysis {
 			this.analyzeFile(sourceCodeFileChange, facts);
 
 			fileTimer.stop();
+			
+			if(measureRuntime) sourceCodeFileChange.analysisRuntime = Math.round(fileTimer.getNanoTime()/Math.pow(10, 6));
+
 			System.out.println("Time to analyze file (milliseconds):" + Math.round(fileTimer.getNanoTime()/Math.pow(10, 6)));
 		}
 
