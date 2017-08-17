@@ -79,18 +79,14 @@ public class GitProject {
 	/** Dates of last (most recent) and first commit **/
 	protected Date lastCommitDate, firstCommitDate;
 
-	/** The regex which identifies bug fixing commits. **/
-	protected String commitMessageRegex;
-
 	/**
 	 * Constructor that is used by our static factory methods.
 	 * @param commitMessageRegex
 	 */
-	protected GitProject(Git git, Repository repository, String URI, String commitMessageRegex) {
+	protected GitProject(Git git, Repository repository, String URI) {
 		this.git = git;
 		this.repository = repository;
 		this.URI = URI;
-		this.commitMessageRegex = commitMessageRegex;
 
 		try {
 			this.projectID = getGitProjectName(URI);
@@ -104,8 +100,8 @@ public class GitProject {
 	 * Constructor that clones another Git Project. Particularly useful for
 	 * subclasses
 	 */
-	protected GitProject(GitProject project, String commitMessageRegex) {
-		this(project.git, project.repository, project.URI, commitMessageRegex);
+	protected GitProject(GitProject project) {
+		this(project.git, project.repository, project.URI);
 	}
 
 	/*
@@ -289,7 +285,7 @@ public class GitProject {
 			Matcher mEx = pEx.matcher(message);
 
 			/* Bug fixing commit pattern */
-			Pattern pBFC = Pattern.compile(this.commitMessageRegex, Pattern.CASE_INSENSITIVE);
+			Pattern pBFC = Pattern.compile("(fix|bug|repair)", Pattern.CASE_INSENSITIVE);
 			Matcher mBFC = pBFC.matcher(message);
 
 			if(mEx.find()) commitMessageType = Type.MERGE;
@@ -382,7 +378,7 @@ public class GitProject {
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitProjectAnalysisException
 	 */
-	public static GitProject fromDirectory(String directory, String commitMessageRegex) throws GitProjectAnalysisException {
+	public static GitProject fromDirectory(String directory) throws GitProjectAnalysisException {
 		Git git;
 		Repository repository;
 
@@ -393,7 +389,7 @@ public class GitProject {
 			throw new GitProjectAnalysisException("The git project was not found in the directory " + directory + ".");
 		}
 
-		return new GitProject(git, repository, repository.getConfig().getString("remote", "origin", "url"), commitMessageRegex);
+		return new GitProject(git, repository, repository.getConfig().getString("remote", "origin", "url"));
 	}
 
 	/**
@@ -408,7 +404,7 @@ public class GitProject {
 	 * @throws TransportException
 	 * @throws InvalidRemoteException
 	 */
-	public static GitProject fromURI(String uri, String directory, String commitMessageRegex)
+	public static GitProject fromURI(String uri, String directory)
 			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
 		Git git;
 		Repository repository;
@@ -449,7 +445,7 @@ public class GitProject {
 			repository = git.getRepository();
 		}
 
-		GitProject gitProject = new GitProject(git, repository, uri, commitMessageRegex);
+		GitProject gitProject = new GitProject(git, repository, uri);
 
 		return gitProject;
 	}

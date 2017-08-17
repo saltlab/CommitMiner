@@ -56,7 +56,7 @@ public class TestBatchAnalysis {
 		/* Set up the project analysis (analyzes one project). */
 		GitProjectAnalysis projectAnalysis = GitProjectAnalysis.fromURI(
 				"https://github.com/naman14/Timber.git", "./repositories/",
-				"^.*$", analysisFactory);
+				null, analysisFactory);
 
 		/* Run the analysis. */
 		projectAnalysis.analyze();

@@ -11,6 +11,7 @@ import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
 import commitminer.analysis.annotation.AnnotationFactBase;
+import commitminer.analysis.annotation.AnnotationMetricsPostprocessor;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.analysis.options.Options;
 import commitminer.js.diff.factories.CommitAnalysisFactoryAnnotationMetrics;

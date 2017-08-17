@@ -26,6 +26,7 @@ import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
 import commitminer.analysis.annotation.AnnotationFactBase;
+import commitminer.analysis.annotation.AnnotationMetricsPostprocessor;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.git.GitProject;
 
@@ -38,15 +39,19 @@ public class GitProjectAnalysis extends GitProject {
 
 	/** Runs an analysis on a source file. **/
 	private ICommitAnalysisFactory commitAnalysisFactory;
+	
+	/** The annotation post-processor. **/
+	AnnotationMetricsPostprocessor postProc;
 
 	/**
 	 * Constructor that is used by our static factory methods.
 	 */
 	protected GitProjectAnalysis(GitProject gitProject,
 								 ICommitAnalysisFactory commitAnalysisFactory,
-								 String commitMessageRegex) {
-		super(gitProject, commitMessageRegex);
+								 AnnotationMetricsPostprocessor postProc) {
+		super(gitProject);
 		this.commitAnalysisFactory = commitAnalysisFactory;
+		this.postProc = postProc;
 	}
 
 	/**
@@ -159,6 +164,9 @@ public class GitProjectAnalysis extends GitProject {
 				/* Initialize a data set for the file analysis results. */
 				AnnotationFactBase factBase = AnnotationFactBase.getInstance(fileChange);
 				
+				/* Post-process to aggregate metrics. */
+				this.postProc.process(commit, fileChange, factBase);
+				this.postProc.toString();
 			}
 			
 		}
@@ -229,11 +237,11 @@ public class GitProjectAnalysis extends GitProject {
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitProjectAnalysisException
 	 */
-	public static GitProjectAnalysis fromDirectory(String directory, String commitMessageRegex, ICommitAnalysisFactory commitAnalysisFactory)
+	public static GitProjectAnalysis fromDirectory(String directory, AnnotationMetricsPostprocessor postProc, ICommitAnalysisFactory commitAnalysisFactory)
 			throws GitProjectAnalysisException {
-		GitProject gitProject = GitProject.fromDirectory(directory, commitMessageRegex);
+		GitProject gitProject = GitProject.fromDirectory(directory);
 
-		return new GitProjectAnalysis(gitProject, commitAnalysisFactory, commitMessageRegex);
+		return new GitProjectAnalysis(gitProject, commitAnalysisFactory, postProc);
 	}
 
 	/**
@@ -249,11 +257,11 @@ public class GitProjectAnalysis extends GitProject {
 	 * @throws TransportException
 	 * @throws InvalidRemoteException
 	 */
-	public static GitProjectAnalysis fromURI(String uri, String directory, String commitMessageRegex, ICommitAnalysisFactory commitAnalysisFactory)
+	public static GitProjectAnalysis fromURI(String uri, String directory, AnnotationMetricsPostprocessor postProc, ICommitAnalysisFactory commitAnalysisFactory)
 			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
-		GitProject gitProject = GitProject.fromURI(uri, directory, commitMessageRegex);
+		GitProject gitProject = GitProject.fromURI(uri, directory);
 
-		return new GitProjectAnalysis(gitProject, commitAnalysisFactory, commitMessageRegex);
+		return new GitProjectAnalysis(gitProject, commitAnalysisFactory, postProc);
 	}
 
 }

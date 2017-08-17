@@ -77,7 +77,7 @@ public class DiffAnalysisMain {
 
 			try {
                 gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(),
-                		CHECKOUT_DIR, options.getRegex(), commitFactory);
+                		CHECKOUT_DIR, null, commitFactory);
 				gitProjectAnalysis.analyze();
 
 			} catch (Exception e) {
@@ -123,7 +123,7 @@ public class DiffAnalysisMain {
 				try {
 					/* Build git repository object */
 					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri,
-							DiffAnalysisMain.CHECKOUT_DIR, options.getRegex(), commitFactory);
+							DiffAnalysisMain.CHECKOUT_DIR, null, commitFactory);
 
 					/* Perform the analysis (this may take some time) */
 					executor.submit(new GitProjectAnalysisTask(gitProjectAnalysis, latch));

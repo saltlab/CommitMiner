@@ -63,10 +63,10 @@ public class GitMetricsExtractorMain {
 				String uri = line.split(",")[0];
 				Integer downloadsLastMonth = Integer.parseInt(line.split(",")[1]);
 
-				project = GitProject.fromURI(uri, CHECKOUT_DIR, options.getCommitMessageRegex());
+				project = GitProject.fromURI(uri, CHECKOUT_DIR);
 				project.setDownloadsLastMonth(downloadsLastMonth);
 			} else {
-				project = GitProject.fromURI(line, CHECKOUT_DIR, options.getCommitMessageRegex());
+				project = GitProject.fromURI(line, CHECKOUT_DIR);
 			}
 
 			System.out.println("* Accessing repository: " + project.getURI());

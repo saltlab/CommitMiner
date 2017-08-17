@@ -12,12 +12,12 @@ import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
 import commitminer.analysis.annotation.AnnotationFactBase;
+import commitminer.analysis.annotation.AnnotationMetricsPostprocessor;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.analysis.options.Options;
 import commitminer.batch.GitProjectAnalysis;
 import commitminer.js.diff.DiffCommitAnalysisFactory;
 import commitminer.js.diff.factories.CommitAnalysisFactoryAnnotationMetrics;
-import commitminer.js.metrics.AnnotationMetricsPostprocessor;
 
 public class MultiDiffBatch {
 
@@ -46,12 +46,15 @@ public class MultiDiffBatch {
 		/* The analysis we will be using. */
 		ICommitAnalysisFactory analysisFactory = new CommitAnalysisFactoryAnnotationMetrics();
 		
+		/* The metrics post-processor. */
+		AnnotationMetricsPostprocessor postProc = new AnnotationMetricsPostprocessor(options.getOutputFile());
+		
 		GitProjectAnalysis gitProjectAnalysis;
 		try {
 
 			/* Checkout or pull the project. */
             gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(),
-            		CHECKOUT_DIR, ".*", analysisFactory);
+            		CHECKOUT_DIR, postProc, analysisFactory);
             
             /* Run the analysis on the project history. */
 			gitProjectAnalysis.analyze();

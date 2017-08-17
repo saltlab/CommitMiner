@@ -1,4 +1,4 @@
-package commitminer.js.metrics;
+package commitminer.analysis.annotation;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,8 +8,6 @@ import java.util.SortedSet;
 
 import commitminer.analysis.Commit;
 import commitminer.analysis.SourceCodeFileChange;
-import commitminer.analysis.annotation.Annotation;
-import commitminer.analysis.annotation.AnnotationFactBase;
 
 public class AnnotationMetricsPostprocessor {
 	
