@@ -27,8 +27,8 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
  */
 public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 	
-	/** Not thread safe. Use only for runtime experiments right now. */
-	public static StopWatch stopWatch = new StopWatch();
+	/** The timeout value. **/
+	private static final long TIMEOUT = 60;
 
 	private List<ICFGVisitorFactory> cfgVisitorFactories;
 
@@ -44,12 +44,14 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 			Map<IPredicate, IRelation> facts, ClassifiedASTNode root,
 			List<CFG> cfgs) throws Exception {
 		
-		/* Start the stopwatch. We don't want to run forever. */
-		ScriptFlowAnalysis.stopWatch.start();
-
+		/* Start a timer for this analysis. We don't want to run forever. */
+		StopWatch timer = new StopWatch();
+		timer.start();
+		
 		/* Build a map of AstNodes to CFGs. Used for inter-proc CFA. */
 		Map<AstNode, CFG> cfgMap = new HashMap<AstNode, CFG>();
 		for(CFG cfg : cfgs) {
+			cfg.attachTimer(timer, TIMEOUT);
 			cfgMap.put((AstNode)cfg.getEntryNode().getStatement(), cfg);
 		}
 
@@ -64,9 +66,8 @@ public class ScriptFlowAnalysis extends SourceCodeFileAnalysis {
 		 * NOTE: Only one level deep. Does not recursively check constructors. */
 		Helpers.analyzeEnvReachable(state, state.env.environment, state.selfAddr, cfgMap, new HashSet<Address>(), null);
 		
-		/* Reset the stopwatch for the next run. */
-		ScriptFlowAnalysis.stopWatch.stop();
-		ScriptFlowAnalysis.stopWatch.reset();
+		/* Done with the timer. */
+		timer.stop();
 
 		/* Generate facts from the results of the analysis. */
 		for(CFG cfg : cfgs) {

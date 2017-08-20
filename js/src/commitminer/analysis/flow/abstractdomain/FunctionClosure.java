@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.TimeoutException;
 
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
@@ -60,6 +61,17 @@ public class FunctionClosure extends Closure {
 		State oldState = (State) cfg.getEntryNode().getBeforeState();
 		State primeState = initState(selfAddr, store, scratchpad, trace, control, callStack);
 		State exitState = null;
+
+		/* Have we hit a timeout? Return the current exit state. This creates
+		* unsoundness, but is better than running forever. */
+		if(cfg.hasTimedOut()) {
+			System.err.println("FunctionClosure::run -- WARNING -- aborting function analysis because of timeout.");
+			for(CFGNode exitNode : cfg.getExitNodes()) {
+				if(exitState == null) exitState = (State)exitNode.getBeforeState();
+				else exitState = exitState.join((State)exitNode.getBeforeState());
+			}
+			return exitState;
+		}
 		
 		if(oldState == null) {
 			/* Create the initial state for the function call by lifting local 

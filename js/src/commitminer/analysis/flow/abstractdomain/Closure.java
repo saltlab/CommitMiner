@@ -1,6 +1,7 @@
 package commitminer.analysis.flow.abstractdomain;
 
 import java.util.Stack;
+import java.util.concurrent.TimeoutException;
 
 import commitminer.analysis.flow.trace.Trace;
 

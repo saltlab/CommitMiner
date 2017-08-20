@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.commons.lang3.time.StopWatch;
+
 /**
  * A low(er) level control flow graph or subgraph.
  *
@@ -17,6 +19,9 @@ import java.util.Stack;
  * break, continue, throw and return.
  */
 public class CFG {
+	
+	private StopWatch timer;
+	private long timeout;
 
 	private CFGNode entryNode;
 	private List<CFGNode> exitNodes;
@@ -32,6 +37,22 @@ public class CFG {
 		this.continueNodes = new LinkedList<CFGNode>();
 		this.throwNodes = new LinkedList<CFGNode>();
 		this.returnNodes = new LinkedList<CFGNode>();
+		this.timer = null;
+	}
+	
+	/**
+	 * Attach a timer to control the runtime of the analysis.
+	 */
+	public void attachTimer(StopWatch timer, long timeout) {
+		this.timer = timer;
+		this.timeout = timeout;
+	}
+	
+	/**
+	 * @return the runtime timer for the current analysis.
+	 */
+	public boolean hasTimedOut() {
+		return (this.timer.getTime() / 1000) > this.timeout;
 	}
 
 	/**
@@ -126,6 +147,8 @@ public class CFG {
 			CFGNode copy = newNodes.get(node);
 			if(copy != null) cfg.addExitNode(copy);
 		}
+		
+		cfg.attachTimer(timer, timeout);
 
 		return cfg;
 	}

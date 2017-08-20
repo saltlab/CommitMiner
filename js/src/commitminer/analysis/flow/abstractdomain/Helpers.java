@@ -74,7 +74,7 @@ public class Helpers {
 	 * @return The state after the script has finished.
 	 */
 	public static State run(CFG cfg, State state) {
-
+		
 		/* Merge state with prior state if needed. */
 		State initState = (State)cfg.getEntryNode().getBeforeState();
 		if(initState != null) state = state.join(initState);
@@ -193,7 +193,7 @@ public class Helpers {
 							  Stack<Address> callStack) {
 
 		State state = null;
-
+		
 		/* Get the results for each possible function. */
 		for(Address address : funVal.addressAD.addresses) {
 
