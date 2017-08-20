@@ -172,11 +172,11 @@ public class GitProjectAnalysis extends GitProject {
 		}
 		catch(Exception ignore) {
 			System.err.println("Ignoring exception in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nBug Fixing Revision: " + bugFixingRevision);
-			throw ignore;
+//			throw ignore;
 		}
 		catch(Error e) {
 			System.err.println("Ignoring error in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nBug Fixing Revision: " + bugFixingRevision);
-			throw e;
+//			throw e;
 		}
 
 	}

@@ -67,7 +67,6 @@ public class MultiDiffBatch {
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
-			return;
 		}	
 
 	}
