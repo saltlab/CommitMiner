@@ -7,10 +7,10 @@ public class MultiDiffOptions {
 	@Option(name="-f", aliases={"--file"}, usage="The output file to write diff results to.")
 	private String outFile = "out.csv";
 	
-	@Option(name="-o", aliases={"--original"}, usage="The original file.", required=true)
+	@Option(name="-o", aliases={"--original"}, usage="The original file.")
 	private String original = null;
 	
-	@Option(name="-m", aliases={"--modified"}, usage="The modified file.", required=true)
+	@Option(name="-m", aliases={"--modified"}, usage="The modified file.")
 	private String modified = null;
 	
 	@Option(name="-u", aliases={"--uri"}, 

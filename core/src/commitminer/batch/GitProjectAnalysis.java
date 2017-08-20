@@ -166,7 +166,7 @@ public class GitProjectAnalysis extends GitProject {
 				
 				/* Post-process to aggregate metrics. */
 				this.postProc.process(commit, fileChange, factBase);
-				this.postProc.toString();
+				System.out.println(this.postProc.toString());
 			}
 			
 		}

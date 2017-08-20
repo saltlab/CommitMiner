@@ -48,6 +48,12 @@ public class MultiDiffBatch {
 		
 		/* The metrics post-processor. */
 		AnnotationMetricsPostprocessor postProc = new AnnotationMetricsPostprocessor(options.getOutputFile());
+		try {
+			postProc.writeHeader();
+		} catch (IOException e1) {
+			System.err.println("MultiDiffBatch::main -- Could not write to output file.");
+			return;
+		}
 		
 		GitProjectAnalysis gitProjectAnalysis;
 		try {

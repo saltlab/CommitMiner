@@ -89,6 +89,7 @@ public class AnnotationMetricsPostprocessor {
 		String s = "ProjectID";
 		s += ", CommitID";
 		s += ", File";
+		s += ", Runtime";
 		s += ", TotalLines";
 		s += ", DataDepDef";
 		s += ", DataDepUse";
@@ -175,7 +176,7 @@ public class AnnotationMetricsPostprocessor {
 			s += ", " + cndUse;
 			s += ", " + valDef;
 			s += ", " + valUse;
-			return s;
+			return s + "\n";
 		}
 	}
 	
