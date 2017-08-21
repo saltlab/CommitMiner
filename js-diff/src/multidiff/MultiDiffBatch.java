@@ -84,7 +84,7 @@ public class MultiDiffBatch {
 	protected void diff(SourceCodeFileChange sourceFileChange) throws Exception {
 
 		/* Set the options for this run. */
-		Options.createInstance(Options.DiffMethod.GUMTREE, Options.ChangeImpact.DEPENDENCIES);
+		Options.createInstance(options.getDiffMethod(), options.getChangeImpact());
 
 		/* Build the dummy commit. */
 		Commit commit = getCommit();
