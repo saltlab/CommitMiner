@@ -34,6 +34,13 @@ public class AnnotationFactBase extends FactBase {
 		return instance;
 	}
 	
+	/**
+	 * Removes the {@code AnnotationFactBase} for the given {@code SourceCodeFileChange}.
+	 */
+	public static void removeInstance(SourceCodeFileChange sourceCodeFileChange) {
+		instances.remove(sourceCodeFileChange);
+	}
+	
 	private AnnotationFactBase(SourceCodeFileChange sourceCodeFileChange) {
 
 		super(sourceCodeFileChange);

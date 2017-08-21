@@ -1,7 +1,9 @@
 package commitminer.batch;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +30,8 @@ import commitminer.analysis.Commit.Type;
 import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.annotation.AnnotationMetricsPostprocessor;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
+import commitminer.analysis.options.Options;
+import commitminer.analysis.options.Options.DiffMethod;
 import commitminer.git.GitProject;
 
 /**
@@ -157,16 +161,40 @@ public class GitProjectAnalysis extends GitProject {
 		/* Run the {@code CommitAnalysis} through the AnalysisRunner. */
 
 		try {
-			CommitAnalysis commitAnalysis = commitAnalysisFactory.newInstance();
-			commitAnalysis.analyze(commit);
+			/* We'll be performing two analyses: once for Gumtree and once for Meyers. */
+			Map<SourceCodeFileChange, AnnotationFactBase> gumtreeAnnotations = new HashMap<SourceCodeFileChange, AnnotationFactBase>();
+			Map<SourceCodeFileChange, AnnotationFactBase> meyersAnnotations = new HashMap<SourceCodeFileChange, AnnotationFactBase>();
 			
+			Options options = Options.getInstance();
+			CommitAnalysis commitAnalysis = commitAnalysisFactory.newInstance();
+
+			/* Run the first analysis with Meyers diff. */
+			options.setDiffMethod(DiffMethod.MEYERS);
+			commitAnalysis.analyze(commit);
+			for(SourceCodeFileChange fileChange : commit.sourceCodeFileChanges)
+				meyersAnnotations.put(fileChange, AnnotationFactBase.getInstance(fileChange));
+
+			/* Reset the annotations for the next run. */
+			for(SourceCodeFileChange fileChange : commit.sourceCodeFileChanges)
+				AnnotationFactBase.removeInstance(fileChange);
+
+			/* Run the first analysis with GumTree diff. */
+			options.setDiffMethod(DiffMethod.GUMTREE);
+			commitAnalysis.analyze(commit);
+			for(SourceCodeFileChange fileChange : commit.sourceCodeFileChanges)
+				gumtreeAnnotations.put(fileChange, AnnotationFactBase.getInstance(fileChange));
+
+			/* Post-process to aggregate metrics. */
 			for(SourceCodeFileChange fileChange : commit.sourceCodeFileChanges) {
-				/* Initialize a data set for the file analysis results. */
-				AnnotationFactBase factBase = AnnotationFactBase.getInstance(fileChange);
-				
-				/* Post-process to aggregate metrics. */
-				this.postProc.process(commit, fileChange, factBase);
-				System.out.println(this.postProc.toString());
+				AnnotationFactBase gumTreeFactBase = gumtreeAnnotations.get(fileChange);
+				AnnotationFactBase meyersFactBase = meyersAnnotations.get(fileChange);
+				if(gumTreeFactBase != null && meyersFactBase != null) {
+					this.postProc.process(commit, fileChange, gumTreeFactBase, meyersFactBase);
+					System.out.println(this.postProc.toString());
+				}
+				else {
+					System.out.println("GitProjectAnalysis::analyzeDiff -- WARNING -- FactBase missing");
+				}
 			}
 			
 		}

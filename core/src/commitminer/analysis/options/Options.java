@@ -23,6 +23,10 @@ public class Options {
 	public DiffMethod getDiffMethod() {
 		return this.diffMethod;
 	}
+
+	public void setDiffMethod(Options.DiffMethod diffMethod) {
+		this.diffMethod = diffMethod;
+	}
 	
 	public ChangeImpact getChangeImpact() {
 		return this.changeImpact;

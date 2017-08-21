@@ -25,9 +25,13 @@ public class TestMultiDiffMetrics {
 	 */
 	protected void runTest(
 			String src, String dst, String out) throws Exception {
+		
+		/* For comparison. */
+		AnnotationFactBase gumtreeFactBase;
+		AnnotationFactBase meyersFactBase;
 
 		/* Set the options for this run. */
-		Options.createInstance(Options.DiffMethod.GUMTREE, Options.ChangeImpact.DEPENDENCIES);
+		Options options = Options.createInstance(Options.DiffMethod.GUMTREE, Options.ChangeImpact.DEPENDENCIES);
 
 		/* Read the source files. */
 		SourceCodeFileChange sourceCodeFileChange = getSourceCodeFileChange(src, dst);
@@ -36,23 +40,25 @@ public class TestMultiDiffMetrics {
 		Commit commit = getCommit();
 		commit.addSourceCodeFileChange(sourceCodeFileChange);
 
-		/* builds the data set with our custom queries. */
-		AnnotationFactBase factBase = AnnotationFactBase.getInstance(sourceCodeFileChange);
-
 		/* Set up the analysis. */
 		ICommitAnalysisFactory commitFactory = new CommitAnalysisFactoryAnnotationMetrics(Options.ChangeImpact.DEPENDENCIES);
 		CommitAnalysis commitAnalysis = commitFactory.newInstance();
 
-		/* Run the analysis. */
+		/* Run the meyers analysis. */
+		options.setDiffMethod(Options.DiffMethod.MEYERS);
 		commitAnalysis.analyze(commit);
+		meyersFactBase = AnnotationFactBase.getInstance(sourceCodeFileChange);
 
-        /* Print the data set. */
-		factBase.printDataSet();
+		/* Run the gumtree analysis. */
+		AnnotationFactBase.removeInstance(sourceCodeFileChange);
+		options.setDiffMethod(Options.DiffMethod.GUMTREE);
+		commitAnalysis.analyze(commit);
+		gumtreeFactBase = AnnotationFactBase.getInstance(sourceCodeFileChange);
 
 		/* Write metrics to a file. */
 		AnnotationMetricsPostprocessor postProc = new AnnotationMetricsPostprocessor(out);
 		postProc.writeHeader();
-		postProc.process(commit, sourceCodeFileChange, factBase);
+		postProc.process(commit, sourceCodeFileChange, gumtreeFactBase, meyersFactBase);
 		
 	}
 	
