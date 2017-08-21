@@ -8,15 +8,12 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import commitminer.analysis.Commit;
-import commitminer.analysis.CommitAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.analysis.Commit.Type;
-import commitminer.analysis.annotation.AnnotationFactBase;
 import commitminer.analysis.annotation.AnnotationMetricsPostprocessor;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.analysis.options.Options;
 import commitminer.batch.GitProjectAnalysis;
-import commitminer.js.diff.DiffCommitAnalysisFactory;
 import commitminer.js.diff.factories.CommitAnalysisFactoryAnnotationMetrics;
 
 public class MultiDiffBatch {
@@ -44,7 +41,7 @@ public class MultiDiffBatch {
 		}
 
 		/* The analysis we will be using. */
-		ICommitAnalysisFactory analysisFactory = new CommitAnalysisFactoryAnnotationMetrics();
+		ICommitAnalysisFactory analysisFactory = new CommitAnalysisFactoryAnnotationMetrics(options.getChangeImpact());
 		
 		/* The metrics post-processor. */
 		AnnotationMetricsPostprocessor postProc = new AnnotationMetricsPostprocessor(options.getOutputFile());
@@ -54,6 +51,9 @@ public class MultiDiffBatch {
 			System.err.println("MultiDiffBatch::main -- Could not write to output file.");
 			return;
 		}
+
+		/* Set the options for this run. */
+		Options.createInstance(options.getDiffMethod(), options.getChangeImpact());
 		
 		GitProjectAnalysis gitProjectAnalysis;
 		try {
@@ -71,45 +71,6 @@ public class MultiDiffBatch {
 
 	}
 	
-	/** The analysis options. **/
-	private MultiDiffOptions options;
-	
-	public MultiDiffBatch(MultiDiffOptions options) {
-		this.options = options;
-	}
-
-	/**
-	 * Generate the diff in a partial html file.
-	 */
-	protected void diff(SourceCodeFileChange sourceFileChange) throws Exception {
-
-		/* Set the options for this run. */
-		Options.createInstance(options.getDiffMethod(), options.getChangeImpact());
-
-		/* Build the dummy commit. */
-		Commit commit = getCommit();
-		commit.addSourceCodeFileChange(sourceFileChange);
-
-		/* Builds the data set with our custom queries. */
-		AnnotationFactBase factBase = AnnotationFactBase.getInstance(sourceFileChange);
-
-		/* Set up the analysis. */
-		ICommitAnalysisFactory commitFactory = new DiffCommitAnalysisFactory();
-		CommitAnalysis commitAnalysis = commitFactory.newInstance();
-
-		/* Run the analysis. */
-		commitAnalysis.analyze(commit);
-
-        /* Print the data set. */
-		factBase.printDataSet();
-
-		/* Write metrics to a file. */
-		AnnotationMetricsPostprocessor postProc = new AnnotationMetricsPostprocessor(options.getOutputFile());
-		postProc.writeHeader();
-		postProc.process(commit, sourceFileChange, factBase);
-
-	}
-
 	/**
 	 * Prints the help file for main.
 	 * @param parser The args4j parser.

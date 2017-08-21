@@ -40,7 +40,7 @@ public class TestMultiDiffMetrics {
 		AnnotationFactBase factBase = AnnotationFactBase.getInstance(sourceCodeFileChange);
 
 		/* Set up the analysis. */
-		ICommitAnalysisFactory commitFactory = new CommitAnalysisFactoryAnnotationMetrics();
+		ICommitAnalysisFactory commitFactory = new CommitAnalysisFactoryAnnotationMetrics(Options.ChangeImpact.DEPENDENCIES);
 		CommitAnalysis commitAnalysis = commitFactory.newInstance();
 
 		/* Run the analysis. */

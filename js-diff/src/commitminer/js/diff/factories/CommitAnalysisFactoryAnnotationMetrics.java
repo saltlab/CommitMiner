@@ -8,6 +8,7 @@ import commitminer.analysis.DataSet;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.analysis.factories.IDomainAnalysisFactory;
 import commitminer.analysis.flow.FlowDomainAnalysisFactory;
+import commitminer.analysis.options.Options;
 import commitminer.cfg.ICFGVisitorFactory;
 import commitminer.diff.line.LineDomainAnalysisFactory;
 import commitminer.js.diff.ast.AstDomainAnalysisFactory;
@@ -24,8 +25,12 @@ import commitminer.js.diff.value.ValueCFGVisitorFactory;
  * Use for creating a diff commit analysis.
  */
 public class CommitAnalysisFactoryAnnotationMetrics implements ICommitAnalysisFactory {
+	
+	private Options.ChangeImpact changeImpact;
 
-	public CommitAnalysisFactoryAnnotationMetrics() { }
+	public CommitAnalysisFactoryAnnotationMetrics(Options.ChangeImpact changeImpact) { 
+		this.changeImpact = changeImpact;
+	}
 
 	@Override
 	public CommitAnalysis newInstance() {
@@ -38,9 +43,11 @@ public class CommitAnalysisFactoryAnnotationMetrics implements ICommitAnalysisFa
 		cfgVisitorFactories.add(new EnvCFGVisitorFactory());
 		cfgVisitorFactories.add(new ValueCFGVisitorFactory());
 		
-		// DepDiff
-		cfgVisitorFactories.add(new ControlDependencyCFGVisitorFactory());
-		cfgVisitorFactories.add(new DataDependencyCFGVisitorFactory());
+		if(this.changeImpact == Options.ChangeImpact.DEPENDENCIES) {
+			// DepDiff
+			cfgVisitorFactories.add(new ControlDependencyCFGVisitorFactory());
+			cfgVisitorFactories.add(new DataDependencyCFGVisitorFactory());
+		}
 
 		List<IDomainAnalysisFactory> domainFactories = new LinkedList<IDomainAnalysisFactory>();
 		
