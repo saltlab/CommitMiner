@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.learn;
+package commitminer.learn.js;
 
 
 import java.io.BufferedReader;
@@ -15,17 +15,19 @@ import org.apache.log4j.PropertyConfigurator;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
-import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
-import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysis;
-import ca.ubc.ece.salt.pangor.batch.GitProjectAnalysisTask;
-import ca.ubc.ece.salt.pangor.js.learn.analysis.ChangeComplexityDomainAnalysis;
-import ca.ubc.ece.salt.pangor.js.learn.statements.StatementDomainAnalysis;
-import ca.ubc.ece.salt.pangor.learn.analysis.LearningDataSet;
+import commitminer.analysis.CommitAnalysis;
+import commitminer.analysis.DomainAnalysis;
+import commitminer.analysis.factories.ICommitAnalysisFactory;
+import commitminer.batch.GitProjectAnalysis;
+import commitminer.batch.GitProjectAnalysisTask;
+import commitminer.learn.analysis.LearningDataSet;
+import commitminer.learn.js.analysis.ChangeComplexityDomainAnalysis;
+import commitminer.learn.js.analysis.LearningDomainAnalysis;
+import commitminer.learn.js.factories.LearningCommitAnalysisFactory;
 
-public class StatementAnalysisMain {
+public class LearningAnalysisMain {
 
-	protected static final Logger logger = LogManager.getLogger(StatementAnalysisMain.class);
+	protected static final Logger logger = LogManager.getLogger(LearningAnalysisMain.class);
 
 	/** The directory where repositories are checked out. **/
 	public static final String CHECKOUT_DIR =  new String("repositories");
@@ -44,24 +46,20 @@ public class StatementAnalysisMain {
 		try {
 			parser.parseArgument(args);
 		} catch (CmdLineException e) {
-			StatementAnalysisMain.printUsage(e.getMessage(), parser);
+			LearningAnalysisMain.printUsage(e.getMessage(), parser);
 			return;
 		}
 
 		/* Print the help page. */
 		if(options.getHelp()) {
-			StatementAnalysisMain.printHelp(parser);
+			LearningAnalysisMain.printHelp(parser);
 			return;
 		}
 
-		/* Create the commit analyiss that will analyze commits. */
+		/* Create the commit analysis that will analyze commits. */
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath());
-		DomainAnalysis learning = StatementDomainAnalysis.createLearningAnalysis();
-		DomainAnalysis complexity = ChangeComplexityDomainAnalysis.createComplexityAnalysis();
-		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
-		domains.add(learning);
-		domains.add(complexity);
-		CommitAnalysis commitAnalysis = new CommitAnalysis(dataSet, domains);
+//		ICommitAnalysisFactory factory = new LearningCommitAnalysisFactory().newInstance();
+		ICommitAnalysisFactory factory = new LearningCommitAnalysisFactory();
 
         GitProjectAnalysis gitProjectAnalysis;
 
@@ -70,7 +68,7 @@ public class StatementAnalysisMain {
 
 			try {
                 gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(),
-                		CHECKOUT_DIR, options.getRegex(), commitAnalysis);
+                		CHECKOUT_DIR, /* TODO AnnotationMetricsPostProcessor */null, factory);
 				gitProjectAnalysis.analyze();
 
 			} catch (Exception e) {
@@ -116,7 +114,7 @@ public class StatementAnalysisMain {
 				try {
 					/* Build git repository object */
 					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri,
-							StatementAnalysisMain.CHECKOUT_DIR, options.getRegex(), commitAnalysis);
+							LearningAnalysisMain.CHECKOUT_DIR, /* TODO AnnotationMetricsPostProcessor */null, factory);
 
 					/* Perform the analysis (this may take some time) */
 					executor.submit(new GitProjectAnalysisTask(gitProjectAnalysis, latch));
@@ -139,7 +137,7 @@ public class StatementAnalysisMain {
 		}
 		else {
 			System.out.println("No repository given.");
-			StatementAnalysisMain.printUsage("No repository given.", parser);
+			LearningAnalysisMain.printUsage("No repository given.", parser);
 			return;
 		}
 

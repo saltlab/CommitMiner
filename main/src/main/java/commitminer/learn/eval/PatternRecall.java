@@ -1,31 +1,31 @@
-package ca.uab.ece.salt.pangor.learn.eval;
+package commitminer.learn.eval;
 
-import ca.ubc.ece.salt.pangor.learn.EvaluationResult;
+import commitminer.learn.EvaluationResult;
 
-class Inspected implements Data {
+public class PatternRecall implements Data {
 
 	@Override
 	public String[] getData(EvaluationResult[] dataSetResult) {
 		String[] data = new String[dataSetResult.length];
 		for(int j = 0; j < dataSetResult.length; j++) {
-			data[j] = String.valueOf(dataSetResult[j].inspected);
+			data[j] = String.valueOf(dataSetResult[j].patternRecall);
 		}
 		return data;
 	}
 
 	@Override
 	public String[] getLim() {
-		return new String[]{ "0.0", "0.3" };
+		return new String[]{ "0.0", "1.0" };
 	}
 
 	@Override
 	public String[] getAxp() {
-		return new String[]{ "0.0", "0.3", "3.0" };
+		return new String[]{ "0.0", "1.0", "5.0" };
 	}
 
 	@Override
 	public String getLabel() {
-		return "Inspected";
+		return "Pattern Recall";
 	}
 
 }

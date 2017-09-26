@@ -1,31 +1,31 @@
-package ca.uab.ece.salt.pangor.learn.eval;
+package commitminer.learn.eval;
 
-import ca.ubc.ece.salt.pangor.learn.EvaluationResult;
+import commitminer.learn.EvaluationResult;
 
-class Epsilon implements Data {
+public class FMeasure implements Data {
 
 	@Override
 	public String[] getData(EvaluationResult[] dataSetResult) {
 		String[] data = new String[dataSetResult.length];
 		for(int j = 0; j < dataSetResult.length; j++) {
-			data[j] = String.valueOf(Math.round(dataSetResult[j].epsilon*100.0)/100.0);
+			data[j] = String.valueOf(dataSetResult[j].fMeasure);
 		}
 		return data;
 	}
 
 	@Override
 	public String[] getLim() {
-		return new String[]{ "0.1", "5.9" };
+		return new String[]{ "0.0", "0.3" };
 	}
 
 	@Override
 	public String[] getAxp() {
-		return new String[]{ "0.1", "5.9", "29.0" };
+		return new String[]{ "0.0", "0.3", "3.0" };
 	}
 
 	@Override
 	public String getLabel() {
-		return "Epsilon";
+		return "F-Measure";
 	}
 
 }

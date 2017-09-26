@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.js.learn;
+package commitminer.learn.js;
 
 import org.kohsuke.args4j.Option;
 

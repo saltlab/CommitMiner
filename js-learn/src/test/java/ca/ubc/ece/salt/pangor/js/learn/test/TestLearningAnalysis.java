@@ -127,8 +127,8 @@ public class TestLearningAnalysis {
 	public void testReservedWords() throws Exception {
 
 		/* The test files. */
-		String src = "./test/input/learning/keyword_old.js";
-		String dst = "./test/input/learning/keyword_new.js";
+		String src = "./src/test/resources/input/learning/keyword_old.js";
+		String dst = "./src/test/resources/input/learning/keyword_new.js";
 
 		/* Define the expected keywords. */
 		TopLevelAPI api = JSAPIFactory.buildTopLevelAPI();

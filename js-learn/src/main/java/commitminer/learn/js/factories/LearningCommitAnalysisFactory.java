@@ -15,6 +15,7 @@ public class LearningCommitAnalysisFactory implements ICommitAnalysisFactory {
 		/* Set up the analysis. */
 		List<IDomainAnalysisFactory> domainAnalysisFactories = new LinkedList<IDomainAnalysisFactory>();
 		domainAnalysisFactories.add(new LearningDomainAnalysisFactory());
+		domainAnalysisFactories.add(new ChangeComplexityDomainAnalysisFactory());
 
 		/* Set up the commit analysis. */
 		return new CommitAnalysis(domainAnalysisFactories);

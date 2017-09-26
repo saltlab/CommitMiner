@@ -1,11 +1,11 @@
-package ca.uab.ece.salt.pangor.learn.eval;
+package commitminer.learn.eval;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import ca.ubc.ece.salt.pangor.learn.EvaluationResult;
+import commitminer.learn.EvaluationResult;
 
 
 public class RLineChart {

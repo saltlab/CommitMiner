@@ -59,7 +59,7 @@
 		<!--<module>classify</module>-->
 		<!--<module>java</module>-->
 		<!--<module>java-classify</module>-->
-		<!--<module>main</module>-->
+		<module>main</module>
 	</modules>
 			
 	<repositories>

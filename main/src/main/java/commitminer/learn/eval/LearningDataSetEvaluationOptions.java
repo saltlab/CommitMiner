@@ -1,4 +1,4 @@
-package ca.uab.ece.salt.pangor.learn.eval;
+package commitminer.learn.eval;
 
 import org.kohsuke.args4j.Option;
 import org.kohsuke.args4j.spi.StringArrayOptionHandler;

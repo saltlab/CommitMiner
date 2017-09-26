@@ -1,13 +1,13 @@
-package ca.uab.ece.salt.pangor.learn.eval;
+package commitminer.learn.eval;
 
-import ca.ubc.ece.salt.pangor.learn.EvaluationResult;
+import commitminer.learn.EvaluationResult;
 
-class ClusterComposition implements Data {
+class ClassComposition implements Data {
 
 	/* The class to get data for. */
 	private String classID;
 
-	public ClusterComposition(String classID) {
+	public ClassComposition(String classID) {
 		this.classID = classID;
 	}
 
@@ -15,7 +15,7 @@ class ClusterComposition implements Data {
 	public String[] getData(EvaluationResult[] dataSetResult) {
 		String[] data = new String[dataSetResult.length];
 		for(int j = 0; j < dataSetResult.length; j++) {
-			Double val = dataSetResult[j].clusterComposition.get(this.classID);
+			Double val = dataSetResult[j].classComposition.get(this.classID);
 			data[j] = val == null ? "NA" : String.valueOf(val);
 		}
 		return data;
@@ -33,7 +33,7 @@ class ClusterComposition implements Data {
 
 	@Override
 	public String getLabel() {
-		return "Cluster Composition " + this.classID;
+		return "Class Composition " + this.classID;
 	}
 
 }

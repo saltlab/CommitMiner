@@ -1,6 +1,6 @@
-package ca.uab.ece.salt.pangor.learn.eval;
+package commitminer.learn.eval;
 
-import ca.ubc.ece.salt.pangor.learn.EvaluationResult;
+import commitminer.learn.EvaluationResult;
 
 interface Data {
 	String[] getData(EvaluationResult[] dataSetResult);

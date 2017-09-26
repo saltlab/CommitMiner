@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>ca.ubc.ece.salt</groupId>
-		<artifactId>pangor</artifactId>
+		<artifactId>commitminer</artifactId>
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>pangor-main</artifactId>
+	<artifactId>commitminer-main</artifactId>
 	<packaging>jar</packaging>
 
 	<name>Pangor Main Executables</name>
@@ -16,8 +16,7 @@
 	<inceptionYear>2016</inceptionYear>
 
 	<build>
-		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>test/src</testSourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -33,22 +32,17 @@
 	<dependencies>
 		<dependency>
 			<groupId>ca.ubc.ece.salt</groupId>
-			<artifactId>pangor-core</artifactId>
+			<artifactId>commitminer-core</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.ubc.ece.salt</groupId>
-			<artifactId>pangor-js</artifactId>
+			<artifactId>commitminer-js</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.ubc.ece.salt</groupId>
-			<artifactId>pangor-js-learn</artifactId>
-			<version>0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>ca.ubc.ece.salt</groupId>
-			<artifactId>pangor-js-learn</artifactId>
+			<artifactId>commitminer-js-learn</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

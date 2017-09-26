@@ -1,9 +1,6 @@
-package ca.ubc.ece.salt.pangor.learn;
+package commitminer.learn.eval;
 
-import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -14,24 +11,25 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import weka.core.WekaException;
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
-import ca.ubc.ece.salt.pangor.api.KeywordUse;
-import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.pangor.learn.analysis.LearningDataSet;
-import ca.ubc.ece.salt.pangor.learn.analysis.LearningMetrics;
-import ca.ubc.ece.salt.pangor.learn.analysis.LearningMetrics.KeywordFrequency;
+import commitminer.analysis.Commit.Type;
+import commitminer.api.KeywordUse;
+import commitminer.api.KeywordUse.KeywordContext;
+import commitminer.learn.ClusterMetrics;
+import commitminer.learn.EvaluationResult;
+import commitminer.learn.analysis.LearningDataSet;
 
 /**
- * Creates clusters similar repairs.
+ * Evaluates a list of datasets for various values of epsilon (and possibly
+ * complexity weight). Outputs an R script which charts the results.
  *
+ * For each data set:
  * 1. Reads the results of the data mining task ({@code LearningAnalysisMain})
  * 2. Builds a CSV file of WEKA-supported feature vectors
  * 3. Clusters the feature vectors
  */
-public class LearningDataSetMain {
+public class LearningDataSetEvaluation {
 
-	protected static final Logger logger = LogManager.getLogger(LearningDataSetMain.class);
+	protected static final Logger logger = LogManager.getLogger(LearningDataSetEvaluation.class);
 
 	/**
 	 * Creates the learning data sets for extracting repair patterns.
@@ -40,80 +38,86 @@ public class LearningDataSetMain {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		LearningDataSetOptions options = new LearningDataSetOptions();
+		LearningDataSetEvaluationOptions options = new LearningDataSetEvaluationOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 
 		try {
 			parser.parseArgument(args);
 		} catch (CmdLineException e) {
-			LearningDataSetMain.printUsage(e.getMessage(), parser);
+			LearningDataSetEvaluation.printUsage(e.getMessage(), parser);
 			return;
 		}
 
 		/* Print the help page. */
 		if(options.getHelp()) {
-			LearningDataSetMain.printHelp(parser);
+			LearningDataSetEvaluation.printHelp(parser);
 			return;
 		}
 
-		/* Get the clusters for the data set. */
+		double min = 0.1, max = 6, interval = 0.2;
+		EvaluationResult[][] results = new EvaluationResult[options.getDataSetPaths().length][(int)Math.ceil((max-min)/interval)];
 
-		/* The clusters stored according to their keyword. */
-		Set<ClusterMetrics> keywordClusters = new TreeSet<ClusterMetrics>(new Comparator<ClusterMetrics>() {
-			@Override
-			public int compare(ClusterMetrics c1, ClusterMetrics c2) {
-				if(c1.totalInstances == c2.totalInstances) return c1.toString().compareTo(c2.toString());
-				else if(c1.totalInstances < c2.totalInstances) return 1;
-				else return -1;
-			}
-		});
+		/* Evaluate each data set. */
+		for(int i = 0; i < options.getDataSetPaths().length; i++) {
 
-		/* Re-construct the data set. */
-		LearningDataSet clusteringDataSet =
-				LearningDataSet.createLearningDataSet(
-						options.getDataSetPath(),
-						options.getOraclePath(),
-						new LinkedList<KeywordUse>(), // column filters
-						options.getEpsilon(),
-						options.getComplexityWeight(),
+			String dataSetPath = options.getDataSetPaths()[i];
+
+			/* Evaluate each value of epsilon. */
+			for(double epsilon = min; epsilon <= max; epsilon += interval) {
+
+				int j = (int)(epsilon / interval);
+				double complexityWeight = 0.2;
+
+				/* Re-construct the data set. */
+				LearningDataSet dataSet =
+					LearningDataSet.createLearningDataSet(
+						dataSetPath, options.getOraclePath(),
+						new LinkedList<KeywordUse>(),
+						epsilon, complexityWeight,
 						options.getMinClusterSize());
 
-		/* Store the total instances in the dataset before filtering. */
-		ClusterMetrics clusterMetrics = new ClusterMetrics();
+				/* Store the total instances in the dataset before filtering. */
+				ClusterMetrics clusterMetrics = new ClusterMetrics();
 
-		/* Pre-process the file. */
-		clusteringDataSet.preProcess(getBasicRowFilterQuery(options.getMaxChangeComplexity()));
-		clusterMetrics.setTotalInstances(clusteringDataSet.getSize());
-		clusteringDataSet.preProcess(getStatementRowFilterQuery(options.getMaxChangeComplexity()));
+				/* Pre-process the file. */
+				dataSet.preProcess(getBasicRowFilterQuery(options.getMaxChangeComplexity()));
+				clusterMetrics.setTotalInstances(dataSet.getSize());
+				dataSet.preProcess(getStatementRowFilterQuery(options.getMaxChangeComplexity()));
 
-		/* Print the metrics from the processed data set. */
-		LearningMetrics metrics = clusteringDataSet.getMetrics();
-		for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
-			System.out.println(frequency.keyword + " : " + frequency.frequency);
+				/* Cluster the data set. */
+				try {
+					dataSet.getWekaClusters(clusterMetrics);
+				} catch (WekaException ex) {
+					logger.error("Weka error on building clusters.", ex);
+				}
+
+				/* Evaluate the clusters. */
+				EvaluationResult result = dataSet.evaluate(clusterMetrics);
+				results[i][j] = result;
+
+			}
+
 		}
 
-		/* Get the clusters. */
-		try {
-			clusteringDataSet.getWekaClusters(clusterMetrics);
-		} catch (WekaException ex) {
-			logger.error("Weka error on building clusters.", ex);
-			return;
+		LearningDataSetEvaluation.printCSV(results, new String[]{"3", "5", "6", "7"});
+		//System.out.println("-----------------");
+		//RLineChart.printPRChart(results);
+		//System.out.println("-----------------");
+		//RLineChart.printDensityChart(results, new String[]{"3", "5", "6", "7"});
+
+	}
+
+	/**
+	 * Print the evaluation results as a CSV file
+	 * @param results The results of the evaluation.
+	 */
+	private static void printCSV(EvaluationResult[][] results, String[] classes) {
+		System.out.println(results[0][0].getResultsArrayHeader());
+		for(int i = 0; i < results.length; i++) {
+			for(int j = 0; j < results[i].length; j++) {
+				System.out.println(i + " ," + results[i][j].getResultsArray(classes));
+			}
 		}
-
-		/* Save arff file */
-		if (options.getArffFolder() != null)
-			clusteringDataSet.writeArffFile(options.getArffFolder(), "ALL_KEYWORDS.arff");
-
-		/* We only have one ClusterMetrics now. */
-		keywordClusters.add(clusterMetrics);
-
-		/* Write the evaluation results from the clustering. */
-//		EvaluationResult result = clusteringDataSet.evaluate(clusterMetrics);
-//		System.out.println(result.getConfusionMatrix());
-
-		System.out.println(clusterMetrics.getRankedClusterTable());
-		//System.out.println(ClusterMetrics.getLatexTable(keywordClusters));
-
 	}
 
 	/**
@@ -171,10 +175,6 @@ public class LearningDataSetMain {
 						complexity,
 						Factory.CONCRETE.createInt(maxComplexity))),
 				Factory.BASIC.createLiteral(true,
-					Factory.BUILTIN.createGreater(
-						complexity,
-						Factory.CONCRETE.createInt(0))),
-				Factory.BASIC.createLiteral(true,
 					Factory.BUILTIN.createNotExactEqual(
 						Factory.TERM.createVariable("CommitMessage"),
 						Factory.TERM.createString(Type.MERGE.toString()))));
@@ -223,11 +223,7 @@ public class LearningDataSetMain {
 				Factory.BASIC.createLiteral(true,
 					Factory.BUILTIN.createNotExactEqual(
 						Factory.TERM.createVariable("KeywordContext"),
-						Factory.TERM.createString(KeywordContext.STATEMENT.toString()))),
-				Factory.BASIC.createLiteral(true,
-					Factory.BUILTIN.createNotExactEqual(
-						Factory.TERM.createVariable("ChangeType"),
-						Factory.TERM.createString(ChangeType.UPDATED.toString()))));
+						Factory.TERM.createString(KeywordContext.STATEMENT.toString()))));
 
 		return query;
 
