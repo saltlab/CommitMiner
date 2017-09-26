@@ -14,11 +14,11 @@ import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.pangor.js.analysis.utilities.AnalysisUtilities;
-import ca.ubc.ece.salt.pangor.pointsto.PointsToPrediction;
+import commitminer.analysis.SourceCodeFileChange;
+import commitminer.api.KeywordDefinition.KeywordType;
+import commitminer.api.KeywordUse.KeywordContext;
+import commitminer.js.analysis.utilities.AnalysisUtilities;
+import commitminer.pointsto.PointsToPrediction;
 
 /**
  * Inspects scripts and functions for API keywords.

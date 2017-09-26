@@ -12,10 +12,10 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import ca.ubc.ece.salt.pangor.api.AbstractAPI;
-import ca.ubc.ece.salt.pangor.api.KeywordDefinition;
-import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.pangor.js.api.JSAPIFactory;
+import commitminer.api.AbstractAPI;
+import commitminer.api.KeywordDefinition;
+import commitminer.api.KeywordDefinition.KeywordType;
+import commitminer.js.api.JSAPIFactory;
 
 public class TestAPI {
 

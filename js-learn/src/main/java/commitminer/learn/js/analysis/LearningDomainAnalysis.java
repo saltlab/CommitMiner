@@ -1,12 +1,7 @@
 package commitminer.learn.js.analysis;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import commitminer.analysis.DomainAnalysis;
-import commitminer.analysis.SourceCodeFileAnalysis;
-import commitminer.js.analysis.FunctionAnalysis;
-import commitminer.js.analysis.ScriptAnalysis;
+import commitminer.analysis.factories.ISourceCodeFileAnalysisFactory;
 import commitminer.js.cfg.JavaScriptCFGFactory;
 
 /**
@@ -22,30 +17,9 @@ public class LearningDomainAnalysis extends DomainAnalysis {
 	 * @param srcAnalysis the source analysis the anlaysis runs to extract domain facts
 	 * @param dstAnalysis the destination analysis the anlaysis runs to extract domain facts
 	 */
-	private LearningDomainAnalysis(SourceCodeFileAnalysis srcSCFA,
-								   SourceCodeFileAnalysis dstSCFA) {
-		super(srcSCFA, dstSCFA, new JavaScriptCFGFactory(), false);
-	}
-
-	/**
-	 * Builds a new {@code LearningAnalysis}
-	 * @param maxChangeComplexity The maximum number of statements that can change in a commit.
-	 * @return an analysis for extracting facts in the learning domain.
-	 */
-	public static LearningDomainAnalysis createLearningAnalysis() {
-
-		List<FunctionAnalysis> srcFunctionAnalyses = new LinkedList<FunctionAnalysis>();
-		List<FunctionAnalysis> dstFunctionAnalyses = new LinkedList<FunctionAnalysis>();
-
-		srcFunctionAnalyses.add(new LearningFunctionAnalysis(false));
-		dstFunctionAnalyses.add(new LearningFunctionAnalysis(true));
-
-		SourceCodeFileAnalysis srcSCFA = new ScriptAnalysis(srcFunctionAnalyses);
-		SourceCodeFileAnalysis dstSCFA = new ScriptAnalysis(dstFunctionAnalyses);
-
-		LearningDomainAnalysis analysis = new LearningDomainAnalysis(srcSCFA, dstSCFA);
-
-		return analysis;
+	public LearningDomainAnalysis(ISourceCodeFileAnalysisFactory srcSCFA,
+								   ISourceCodeFileAnalysisFactory dstSCFA) {
+		super(srcSCFA, dstSCFA, new JavaScriptCFGFactory(), false, false);
 	}
 
 }

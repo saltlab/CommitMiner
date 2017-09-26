@@ -13,21 +13,20 @@ import commitminer.analysis.Commit;
 import commitminer.analysis.DomainAnalysis;
 import commitminer.analysis.SourceCodeFileChange;
 import commitminer.js.cfg.JavaScriptCFGFactory;
+import commitminer.learn.js.factories.ChangeComplexityFileAnalysisFactory;
 
 public class ChangeComplexityDomainAnalysis extends DomainAnalysis {
 
-	private ChangeComplexitySCFA srcComplexity;
-	private ChangeComplexitySCFA dstComplexity;
-
-	public ChangeComplexityDomainAnalysis(ChangeComplexitySCFA srcAnalysis,
-									ChangeComplexitySCFA dstAnalysis) {
-		super(srcAnalysis, dstAnalysis, new JavaScriptCFGFactory(), false);
-		this.srcComplexity = srcAnalysis;
-		this.dstComplexity = dstAnalysis;
+	public ChangeComplexityDomainAnalysis(ChangeComplexityFileAnalysisFactory srcAnalysis,
+									ChangeComplexityFileAnalysisFactory dstAnalysis) {
+		super(srcAnalysis, dstAnalysis, new JavaScriptCFGFactory(), false, false);
 	}
 
 	@Override
 	public void analyze(Commit commit, Map<IPredicate, IRelation> facts) throws Exception {
+
+		ChangeComplexitySCFA srcComplexity = (ChangeComplexitySCFA)this.srcAnalysisFactory.newInstance();
+		ChangeComplexitySCFA dstComplexity = (ChangeComplexitySCFA)this.srcAnalysisFactory.newInstance();
 
 		/* Measure the number of modified statements in each source code file.
 		 * If there are more than `maxChangeComplexity` modified statements,
@@ -90,22 +89,6 @@ public class ChangeComplexityDomainAnalysis extends DomainAnalysis {
 		relation.add(tuple);
 
 		facts.put(predicate, relation);
-	}
-
-	/**
-	 * Builds a new {@code ComplexityDomainAnalysis}.
-	 * @return an analysis for extracting the statement change complexity for
-	 * 		   a commit.
-	 */
-	public static ChangeComplexityDomainAnalysis createComplexityAnalysis() {
-
-		ChangeComplexitySCFA srcSCFA = new ChangeComplexitySCFA(false);
-		ChangeComplexitySCFA dstSCFA = new ChangeComplexitySCFA(true);
-
-		ChangeComplexityDomainAnalysis analysis = new ChangeComplexityDomainAnalysis(srcSCFA, dstSCFA);
-
-		return analysis;
-
 	}
 
 }

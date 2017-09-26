@@ -1,7 +1,7 @@
 package commitminer.learn.js.nodes;
 
 import commitminer.analysis.DomainAnalysis;
-import commitminer.analysis.SourceCodeFileAnalysis;
+import commitminer.analysis.factories.ISourceCodeFileAnalysisFactory;
 import commitminer.js.cfg.JavaScriptCFGFactory;
 
 /**
@@ -17,24 +17,9 @@ public class NodeDomainAnalysis extends DomainAnalysis {
 	 * @param dataSet the manager that stores the feature vectors produced by this analysis.
 	 * @param domainAnalyses The domains to extract facts from.
 	 */
-	private NodeDomainAnalysis(SourceCodeFileAnalysis srcSCFA,
-							SourceCodeFileAnalysis dstSCFA) {
-		super(srcSCFA, dstSCFA, new JavaScriptCFGFactory(), false);
-	}
-
-	/**
-	 * Builds a new {@code LearningAnalysis}
-	 * @param maxChangeComplexity The maximum number of statements that can change in a commit.
-	 * @return an analysis for extracting facts in the learning domain.
-	 */
-	public static NodeDomainAnalysis createLearningAnalysis() {
-
-		SourceCodeFileAnalysis srcSCFA = new NodeScriptAnalysis();
-		SourceCodeFileAnalysis dstSCFA = new NodeScriptAnalysis();
-
-		NodeDomainAnalysis analysis = new NodeDomainAnalysis(srcSCFA, dstSCFA);
-
-		return analysis;
+	public NodeDomainAnalysis(ISourceCodeFileAnalysisFactory srcSCFA,
+							ISourceCodeFileAnalysisFactory dstSCFA) {
+		super(srcSCFA, dstSCFA, new JavaScriptCFGFactory(), false, false);
 	}
 
 }

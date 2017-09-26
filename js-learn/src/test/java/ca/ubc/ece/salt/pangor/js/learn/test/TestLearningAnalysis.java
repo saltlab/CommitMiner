@@ -1,6 +1,5 @@
 package ca.ubc.ece.salt.pangor.js.learn.test;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,19 +14,18 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.Commit;
-import ca.ubc.ece.salt.pangor.analysis.Commit.Type;
-import ca.ubc.ece.salt.pangor.analysis.CommitAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.DomainAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.api.AbstractAPI;
-import ca.ubc.ece.salt.pangor.api.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.pangor.api.KeywordUse;
-import ca.ubc.ece.salt.pangor.api.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.pangor.api.TopLevelAPI;
-import ca.ubc.ece.salt.pangor.js.api.JSAPIFactory;
+import commitminer.analysis.Commit;
+import commitminer.analysis.Commit.Type;
+import commitminer.analysis.CommitAnalysis;
+import commitminer.analysis.SourceCodeFileChange;
+import commitminer.api.AbstractAPI;
+import commitminer.api.KeywordDefinition.KeywordType;
+import commitminer.api.KeywordUse;
+import commitminer.api.KeywordUse.KeywordContext;
+import commitminer.api.TopLevelAPI;
+import commitminer.js.api.JSAPIFactory;
 import commitminer.learn.analysis.LearningDataSet;
-import commitminer.learn.js.analysis.LearningDomainAnalysis;
+import commitminer.learn.js.factories.LearningCommitAnalysisFactory;
 
 public class TestLearningAnalysis {
 
@@ -49,13 +47,11 @@ public class TestLearningAnalysis {
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet();
 
 		/* Set up the analysis. */
-		List<DomainAnalysis> domains = new LinkedList<DomainAnalysis>();
-		LearningDomainAnalysis analysis = LearningDomainAnalysis.createLearningAnalysis();
-		domains.add(analysis);
+		LearningCommitAnalysisFactory factory = new LearningCommitAnalysisFactory();
 
 		/* Set up the commit analysis. */
-		CommitAnalysis commitAnalysis = new CommitAnalysis(dataSet, domains);
-
+		CommitAnalysis commitAnalysis = factory.newInstance();
+		
 		/* Run the analysis. */
 		commitAnalysis.analyze(commit);
 

@@ -9,10 +9,10 @@ import org.deri.iris.api.basics.IPredicate;
 import org.deri.iris.storage.IRelation;
 import org.junit.Test;
 
-import ca.ubc.ece.salt.pangor.analysis.SourceCodeFileChange;
-import ca.ubc.ece.salt.pangor.cfd.CFDContext;
-import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
-import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
+import commitminer.analysis.SourceCodeFileChange;
+import commitminer.cfd.CFDContext;
+import commitminer.cfd.ControlFlowDifferencing;
+import commitminer.js.cfg.JavaScriptCFGFactory;
 import commitminer.learn.js.analysis.ChangeComplexitySCFA;
 import commitminer.learn.js.analysis.ChangeComplexityVisitor.ChangeComplexity;
 
