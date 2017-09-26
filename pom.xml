@@ -3,14 +3,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ca.ubc.ece.salt</groupId>
-	<artifactId>pangor</artifactId>
+	<artifactId>commitminer</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Pangor parent POM</name>
+	<name>CommitMiner parent POM</name>
 	<description>
 		CommitMiner is a software repository mining framework that provides tools for
-		deep static analysis of source code and source code changes. More 
+		static analysis of source code and source code changes. More 
 		specifically, CommitMiner (1) automates the collection of source code artifacts
 		from Git repositories, (2) provides a framework for building custom static 
 		analyses (including AST, flow and differential) and (3) provides a framework
@@ -31,15 +31,15 @@
 	</properties>
 
 	<scm>
-		<connection>scm:git:git@github.com:saltlab/pangor.git</connection>
-		<developerConnection>scm:git:git@github.com:saltlab/pangor.git</developerConnection>
-		<url>https://github.com/saltlab/Pangor</url>
+		<connection>scm:git:git@github.com:saltlab/commitminer.git</connection>
+		<developerConnection>scm:git:git@github.com:saltlab/commitminer.git</developerConnection>
+		<url>https://github.com/saltlab/CommitMiner</url>
 		<tag>HEAD</tag>
 	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/saltlab/Panor/issues</url>
+		<url>https://github.com/saltlab/CommitMiner/issues</url>
 	</issueManagement>
 
 	<licenses>
@@ -52,13 +52,14 @@
 
 	<modules>
 		<module>core</module>
-		<module>learn</module>
+		<module>js</module>
+		<module>js-diff</module>
+		<!--<module>learn</module>-->
 		<!--<module>classify</module>-->
 		<!--<module>java</module>-->
 		<!--<module>java-classify</module>-->
-		<module>js</module>
-		<module>js-learn</module>
-		<module>main</module>
+		<!--<module>js-learn</module>-->
+		<!--<module>main</module>-->
 	</modules>
 			
 	<repositories>
@@ -199,21 +200,6 @@
 			<groupId>ca.ubc.ece.salt</groupId>
 			<artifactId>iris</artifactId>
 			<version>1.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>fr.labri.gumtree</groupId>
-			<artifactId>core</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>fr.labri.gumtree</groupId>
-			<artifactId>gen.js</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>fr.labri.gumtree</groupId>
-			<artifactId>gen.jdt</artifactId>
-			<version>1.0-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>

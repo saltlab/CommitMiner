@@ -8,10 +8,10 @@
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>commitminer-core</artifactId>
+	<artifactId>commitminer-js-diff</artifactId>
 	<packaging>jar</packaging>
 
-	<name>CommitMiner core</name>
+	<name>CommitMiner JavaScript Diff Utility</name>
 
 	<inceptionYear>2015</inceptionYear>
 
@@ -29,5 +29,18 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>ca.ubc.ece.salt</groupId>
+			<artifactId>commitminer-core</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>ca.ubc.ece.salt</groupId>
+			<artifactId>commitminer-js</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 
 </project>
