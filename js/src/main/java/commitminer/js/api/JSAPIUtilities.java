@@ -24,8 +24,8 @@ import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
 import commitminer.js.analysis.utilities.SpecialTypeAnalysisUtilities;
-import commitminer.pangor.api.KeywordDefinition.KeywordType;
-import commitminer.pangor.api.KeywordUse.KeywordContext;
+import commitminer.api.KeywordDefinition.KeywordType;
+import commitminer.api.KeywordUse.KeywordContext;
 
 /**
  * Provides AST utilities to help collect feature information (i.e., keyword

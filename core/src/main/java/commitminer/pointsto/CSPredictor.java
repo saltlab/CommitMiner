@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import commitminer.pangor.api.AbstractAPI;
-import commitminer.pangor.api.KeywordDefinition;
-import commitminer.pangor.api.KeywordUse;
-import commitminer.pangor.api.TopLevelAPI;
+import commitminer.api.AbstractAPI;
+import commitminer.api.KeywordDefinition;
+import commitminer.api.KeywordUse;
+import commitminer.api.TopLevelAPI;
 
 /**
  * Predictor implementation using "confidence" and "support" measures.

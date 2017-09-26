@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import commitminer.pangor.api.AbstractAPI;
-import commitminer.pangor.api.KeywordDefinition;
-import commitminer.pangor.api.KeywordUse;
-import commitminer.pangor.api.TopLevelAPI;
-import commitminer.pangor.api.KeywordDefinition.KeywordType;
-
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import commitminer.api.AbstractAPI;
+import commitminer.api.KeywordDefinition;
+import commitminer.api.KeywordUse;
+import commitminer.api.TopLevelAPI;
+import commitminer.api.KeywordDefinition.KeywordType;
 
 /**
  * Abstract class to model a Predictor

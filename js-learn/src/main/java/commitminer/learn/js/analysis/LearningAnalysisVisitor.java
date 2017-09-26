@@ -1,11 +1,16 @@
-package commitminer.js.api;
+package commitminer.learn.js.analysis;
 
-import java.util.HashMap;
+
 import java.util.Map;
 
+import org.deri.iris.api.basics.IPredicate;
+import org.deri.iris.api.basics.ITuple;
+import org.deri.iris.factory.Factory;
+import org.deri.iris.storage.IRelation;
+import org.deri.iris.storage.IRelationFactory;
+import org.deri.iris.storage.simple.SimpleRelationFactory;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.BreakStatement;
 import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.FunctionNode;
@@ -22,22 +27,38 @@ import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 
-import commitminer.js.analysis.utilities.SpecialTypeAnalysisUtilities;
-import commitminer.api.KeywordUse;
-import commitminer.api.KeywordDefinition.KeywordType;
-import commitminer.api.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import commitminer.analysis.SourceCodeFileChange;
+import commitminer.api.KeywordDefinition.KeywordType;
+import commitminer.api.KeywordUse;
+import commitminer.api.KeywordUse.KeywordContext;
+import commitminer.js.analysis.utilities.AnalysisUtilities;
+import commitminer.js.analysis.utilities.SpecialTypeAnalysisUtilities;
+import commitminer.js.api.JSAPIUtilities;
+import commitminer.pointsto.PointsToPrediction;
 
 /**
- * Creates a map of keywords and how frequently they are used.
+ * Inspects scripts and functions for API keywords.
  */
-public class APIModelVisitor implements NodeVisitor {
+public class LearningAnalysisVisitor implements NodeVisitor {
 
-	/** The keyword counts for the file. **/
-	private Map<KeywordUse, Integer> keywordMap;
+	/** Store unique IDs for KeywordChange facts. **/
+	private static Integer uniqueID = 0;
+
+	/** True if this is a destination file analysis. **/
+	private boolean dst;
+
+	/** The fact database. **/
+	private Map<IPredicate, IRelation> facts;
 
 	/** The root of the function or script we are visiting. **/
 	private ScriptNode root;
+
+	/**
+	 * Utility for predicting points-to relationships between keywords and
+	 * methods/fields/events in packages.
+	 */
+	private PointsToPrediction packageModel;
 
 	/**
 	 * If true, will visit function signatures and bodies. This should be true
@@ -47,36 +68,34 @@ public class APIModelVisitor implements NodeVisitor {
 	private boolean visitFunctions;
 
 	/**
-	 * Visits the script and returns a feature vector containing only the
-	 * keywords in the script. The feature vector will not contain package
-	 * associations for the keywords. Unlike {@code getFunctionFeatureVector},
-	 * this method extracts keywords from the entire script (i.e., it visits
-	 * function declarations and bodies).
-	 * @param script The script to extract keywords from.
-	 * @return A feature vector containing the keywords extracted from the
-	 * 		   script.
+	 * Visits the script or function and returns a feature vector for it.
+	 * @param facts
+	 * @param scfc
+	 * @param function the script or function to visit.
+	 * @param packageModel
+	 * @return the feature vector for the function.
 	 */
-	public static Map<KeywordUse, Integer> getScriptFeatureVector(AstRoot script) {
+	public static void getLearningFacts(Map<IPredicate, IRelation> facts,
+			SourceCodeFileChange scfc, ScriptNode function,
+			PointsToPrediction packageModel, boolean dst) {
 
 		/* Create the feature vector by visiting the function. */
-		APIModelVisitor visitor = new APIModelVisitor(script, true);
-		script.visit(visitor);
-
-		return visitor.getKeywordMap();
-
+		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(facts, scfc,
+				AnalysisUtilities.getFunctionName(function), function, packageModel,
+				false, dst);
+		function.visit(visitor);
 	}
 
-	private APIModelVisitor(ScriptNode root, boolean visitFunctions) {
-		this.keywordMap = new HashMap<KeywordUse, Integer>();
+
+	private LearningAnalysisVisitor(Map<IPredicate, IRelation> facts,
+			SourceCodeFileChange scfc, String functionName, ScriptNode root,
+			PointsToPrediction packageModel, boolean visitFunctions,
+			boolean dst) {
+		this.facts = facts;
+		this.packageModel = packageModel;
 		this.root = root;
 		this.visitFunctions = visitFunctions;
-	}
-
-	/**
-	 * @return The keyword model for this file.
-	 */
-	public Map<KeywordUse, Integer> getKeywordMap() {
-		return this.keywordMap;
+		this.dst = dst;
 	}
 
 	@Override
@@ -118,18 +137,24 @@ public class APIModelVisitor implements NodeVisitor {
 		 * as MOVED, and all keywords within this function are also marked as
 		 * MOVED. For now, we relabel MOVED change types as UNCHANGED.
 		 */
-		if (changeType == ChangeType.MOVED)
-			changeType = ChangeType.UNCHANGED;
+		if (changeType == ChangeType.MOVED) changeType = ChangeType.UNCHANGED;
 
 		/* Add a typeof keyword if we're checking if this node is truthy or
 		 * falsey. */
 		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
 
 			KeywordUse keyword = null;
-			keyword = new KeywordUse(type, context, "falsey", changeType);
-			keyword.apiPackage = "global";
+			if(this.packageModel != null) {
+				keyword = this.packageModel.getKeyword(type, context, "falsey", changeType);
+			}
+			else {
+				keyword = new KeywordUse(type, context, "falsey", changeType);
+				keyword.apiPackage = "global";
+			}
 
-			if(keyword != null) this.increment(keyword);
+			if(keyword != null) {
+				this.addKeywordChangeFact(keyword);
+			}
 
 		}
 
@@ -220,21 +245,67 @@ public class APIModelVisitor implements NodeVisitor {
 
 		/* Insert the token into the feature vector if it is a keyword. */
 		KeywordUse keyword = null;
-		keyword = new KeywordUse(type, context, token, changeType);
+
+		if(this.packageModel != null) {
+			keyword = this.packageModel.getKeyword(type, context, token, changeType);
+		}
+		else {
+			keyword = new KeywordUse(type, context, token, changeType);
+		}
 
 		/* Add the keyword to the feature vector. */
-		if(keyword != null) this.increment(keyword);
+		if(keyword != null) {
+			this.addKeywordChangeFact(keyword);
+		}
 
 	}
 
 	/**
-	 * Increment the keyword count.
-	 * @param keyword The key to increment in the map.
+	 * Adds a KeywordUse fact to the fact database.
+	 * @param keyword The keyword change to record.
 	 */
-	private void increment(KeywordUse keyword) {
-		Integer count = this.keywordMap.get(keyword);
-		count = count == null ? 1 : count + 1;
-		this.keywordMap.put(keyword, count);
+	private void addKeywordChangeFact(KeywordUse keyword) {
+
+		/* Check the change type against the analysis we're doing. */
+		if(this.dst && !(keyword.changeType == ChangeType.INSERTED
+				|| keyword.changeType == ChangeType.UPDATED)) return;
+		if(!this.dst && !(keyword.changeType == ChangeType.REMOVED)) return;
+
+		/* Get the relation for this predicate from the fact base. */
+		IPredicate predicate = Factory.BASIC.createPredicate("KeywordChange", 8);
+		IRelation relation = facts.get(predicate);
+		if(relation == null) {
+
+			/* The predicate does not yet exist in the fact base. Create a
+			 * relation for the predicate and add it to the fact base. */
+			IRelationFactory relationFactory = new SimpleRelationFactory();
+			relation = relationFactory.createRelation();
+			facts.put(predicate, relation);
+
+		}
+
+		/* Add the new tuple to the relation. */
+		ITuple tuple = Factory.BASIC.createTuple(
+				Factory.TERM.createString("ClassNA"),
+				Factory.TERM.createString("MethodNA"),
+				Factory.TERM.createString(keyword.type.toString()),
+				Factory.TERM.createString(keyword.context.toString()),
+				Factory.TERM.createString(keyword.getPackageName()),
+				Factory.TERM.createString(keyword.changeType.toString()),
+				Factory.TERM.createString(keyword.keyword),
+				Factory.TERM.createString(getUniqueID().toString()));
+		relation.add(tuple);
+
+		this.facts.put(predicate, relation);
+	}
+
+	/**
+	 * @return A unique ID to assign to a KeywordChange fact.
+	 */
+	private static synchronized Integer getUniqueID() {
+		Integer id = uniqueID;
+		uniqueID = uniqueID + 1;
+		return id;
 	}
 
 }

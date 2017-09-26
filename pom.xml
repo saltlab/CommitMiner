@@ -52,13 +52,13 @@
 
 	<modules>
 		<module>core</module>
+		<module>learn</module>
 		<module>js</module>
 		<module>js-diff</module>
-		<!--<module>learn</module>-->
+		<module>js-learn</module>
 		<!--<module>classify</module>-->
 		<!--<module>java</module>-->
 		<!--<module>java-classify</module>-->
-		<!--<module>js-learn</module>-->
 		<!--<module>main</module>-->
 	</modules>
 			

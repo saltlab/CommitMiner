@@ -3,9 +3,9 @@ package commitminer.js.api;
 import java.util.Arrays;
 import java.util.List;
 
-import commitminer.pangor.api.ClassAPI;
-import commitminer.pangor.api.PackageAPI;
-import commitminer.pangor.api.TopLevelAPI;
+import commitminer.api.ClassAPI;
+import commitminer.api.PackageAPI;
+import commitminer.api.TopLevelAPI;
 
 /**
  * Builds the APIs. Right now APIs are hard coded into this class. In the

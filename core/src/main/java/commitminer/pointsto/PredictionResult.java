@@ -1,7 +1,7 @@
 package commitminer.pointsto;
 
 
-import commitminer.pangor.api.AbstractAPI;
+import commitminer.api.AbstractAPI;
 
 /**
  * Data structure to store an API and a likelihood calculated by a prediction
