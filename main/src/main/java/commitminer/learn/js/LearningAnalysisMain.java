@@ -15,14 +15,10 @@ import org.apache.log4j.PropertyConfigurator;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
-import commitminer.analysis.CommitAnalysis;
-import commitminer.analysis.DomainAnalysis;
 import commitminer.analysis.factories.ICommitAnalysisFactory;
 import commitminer.batch.GitProjectAnalysis;
 import commitminer.batch.GitProjectAnalysisTask;
 import commitminer.learn.analysis.LearningDataSet;
-import commitminer.learn.js.analysis.ChangeComplexityDomainAnalysis;
-import commitminer.learn.js.analysis.LearningDomainAnalysis;
 import commitminer.learn.js.factories.LearningCommitAnalysisFactory;
 
 public class LearningAnalysisMain {
@@ -58,7 +54,6 @@ public class LearningAnalysisMain {
 
 		/* Create the commit analysis that will analyze commits. */
 		LearningDataSet dataSet = LearningDataSet.createLearningDataSet(options.getDataSetPath());
-//		ICommitAnalysisFactory factory = new LearningCommitAnalysisFactory().newInstance();
 		ICommitAnalysisFactory factory = new LearningCommitAnalysisFactory();
 
         GitProjectAnalysis gitProjectAnalysis;
