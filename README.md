@@ -3,7 +3,7 @@
 
 Many of the next big advancements in static program analysis will undoubtedly come by learning from large datasets of existing source code. One of the fundamental challenges of learning from source code is extracting useful features at scale. CommitMiner is a prototype static analysis framework which helps extract features from source code changes by performing efficient AST and flow analysis on software version histories.
 
-CommitMiner contains two analysis types: keyword change analysis (a data mining framework) and static change analysis (a flow analysis framework).
+CommitMiner contains two analysis types: keyword change analysis (a data mining framework) and static change analysis (a flow analysis framework). Only the JavaScript analysis is currently functional. It uses an abstract machine similar to [JSAI](https://www.cs.ucsb.edu/~benh/research/papers/kashyap14jsai.pdf).
 
 ## Publications ##
 
